@@ -51,5 +51,12 @@ public interface FormulaParsingWorkbook {
 	 * max column and row numbers, max arguments to a function, etc.)
 	 */
 	SpreadsheetVersion getSpreadsheetVersion();
-
+	
+	/**
+	 * Return the associated book name of the specified ExternalLink index.
+	 * Excel stores ExternalLink index in place of the [].(e.g. [1]Sheet1:Sheet3!xxx)
+	 * @param externalLinkIndex external link index 
+	 * @return the associated book name of the specified ExternalLink index.
+	 */
+	String getBookNameFromExternalLinkIndex(String externalLinkIndex);
 }

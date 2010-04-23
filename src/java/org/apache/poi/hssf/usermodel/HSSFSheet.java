@@ -73,6 +73,7 @@ import org.apache.poi.util.POILogger;
  * @author  Yegor Kozlov (yegor at apache.org) (Autosizing columns)
  * @author  Josh Micich
  * @author  Petr Udalau(Petr.Udalau at exigenservices.com) - set/remove array formulas
+ * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     private static final POILogger log = POILogFactory.getLogger(HSSFSheet.class);
@@ -1325,7 +1326,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         // Update any formulas on this sheet that point to
         //  rows which have been moved
         int sheetIndex = _workbook.getSheetIndex(this);
-        short externSheetIndex = _book.checkExternSheet(sheetIndex);
+        short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
         FormulaShifter shifter = FormulaShifter.createForRowShift(externSheetIndex, startRow, endRow, n);
         _sheet.updateFormulasAfterCellShift(shifter, externSheetIndex);
 
@@ -1335,7 +1336,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             if (otherSheet == this._sheet) {
                 continue;
             }
-            short otherExtSheetIx = _book.checkExternSheet(i);
+            short otherExtSheetIx = _book.checkExternSheet(i, i);
             otherSheet.updateFormulasAfterCellShift(shifter, otherExtSheetIx);
         }
         _workbook.getWorkbook().updateNamesAfterCellShift(shifter);

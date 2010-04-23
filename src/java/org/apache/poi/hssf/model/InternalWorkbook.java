@@ -107,6 +107,7 @@ import org.apache.poi.util.POILogger;
  * @author  Brian Sanders (bsanders at risklabs dot com) - custom palette
  * @author  Dan Sherman (dsherman at isisph.com)
  * @author  Glen Stampoultzis (glens at apache.org)
+ * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  * @see org.apache.poi.hssf.usermodel.HSSFWorkbook
  */
 @Internal
@@ -400,7 +401,7 @@ public final class InternalWorkbook {
         }
         records.add( retval.createCountry() );
         for ( int k = 0; k < nBoundSheets; k++ ) {
-            retval.getOrCreateLinkTable().checkExternSheet(k);
+            retval.getOrCreateLinkTable().checkExternSheet(k, k);
         }
         retval.sst = new SSTRecord();
         records.add(retval.sst);
@@ -710,7 +711,7 @@ public final class InternalWorkbook {
             records.add(records.getBspos()+1, bsr);
             records.setBspos( records.getBspos() + 1 );
             boundsheets.add(bsr);
-            getOrCreateLinkTable().checkExternSheet(sheetnum);
+            getOrCreateLinkTable().checkExternSheet(sheetnum, sheetnum);
             fixTabIdRecord();
         }
     }
@@ -1753,14 +1754,16 @@ public final class InternalWorkbook {
             // Not sure if this can ever happen (See bug 45798)
             return ""; // Seems to be what excel would do in this case
         }
-        return getSheetName(indexToSheet);
+        int indexToSheet2 = linkTable.getLastIndexToInternalSheet(externSheetIndex);
+        return indexToSheet == indexToSheet2 || indexToSheet2 < 0 || indexToSheet2 >= boundsheets.size() ?
+        		getSheetName(indexToSheet) : getSheetName(indexToSheet)+':'+getSheetName(indexToSheet2);  
     }
     public ExternalSheet getExternalSheet(int externSheetIndex) {
         String[] extNames = linkTable.getExternalBookAndSheetName(externSheetIndex);
         if (extNames == null) {
             return null;
         }
-        return new ExternalSheet(extNames[0], extNames[1]);
+        return new ExternalSheet(extNames[0], extNames[1], extNames[2]);
     }
 
     /**
@@ -1772,14 +1775,19 @@ public final class InternalWorkbook {
     {
         return linkTable.getSheetIndexFromExternSheetIndex(externSheetNumber);
     }
+    
+    public int getLastSheetIndexFromExternSheetIndex(int externSheetNumber)
+    {
+        return linkTable.getLastSheetIndexFromExternSheetIndex(externSheetNumber);
+    }
 
     /** returns the extern sheet number for specific sheet number ,
      *  if this sheet doesn't exist in extern sheet , add it
      * @param sheetNumber sheet number
      * @return index to extern sheet
      */
-    public short checkExternSheet(int sheetNumber){
-        return (short)getOrCreateLinkTable().checkExternSheet(sheetNumber);
+    public short checkExternSheet(int sheetNumber, int sheetNumber2){
+        return (short)getOrCreateLinkTable().checkExternSheet(sheetNumber, sheetNumber2);
     }
 
     public int getExternalSheetIndex(String workbookName, String sheetName) {

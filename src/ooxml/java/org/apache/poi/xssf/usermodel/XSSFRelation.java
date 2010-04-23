@@ -35,6 +35,7 @@ import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 import org.apache.poi.xssf.model.CalculationChain;
 import org.apache.poi.xssf.model.CommentsTable;
+import org.apache.poi.xssf.model.ExternalLink;
 import org.apache.poi.xssf.model.MapInfo;
 import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.SingleXmlCells;
@@ -240,7 +241,12 @@ public final class XSSFRelation extends POIXMLRelation {
             "/xl/calcChain.xml",
             CalculationChain.class
     );
-
+    public static final XSSFRelation EXTERNAL_LINK = new XSSFRelation(
+    		"application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml",
+    		"http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink",
+    		"/x1/externalLinks/externalLink#.xml",
+    		ExternalLink.class
+    );
 
 	private XSSFRelation(String type, String rel, String defaultName, Class<? extends POIXMLDocumentPart> cls) {
         super(type, rel, defaultName, cls);

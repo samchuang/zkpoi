@@ -52,6 +52,7 @@ import org.apache.poi.ss.util.CellReference.NameType;
  *  @author Peter M. Murray (pete at quantrix dot com)
  *  @author Pavel Krupets (pkrupets at palmtreebusiness dot com)
  *  @author Josh Micich
+ *  @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public final class FormulaParser {
 	private static final class Identifier {
@@ -86,7 +87,20 @@ public final class FormulaParser {
 
 		private final String _bookName;
 		private final Identifier _sheetIdentifier;
-		public SheetIdentifier(String bookName, Identifier sheetIdentifier) {
+		public SheetIdentifier(String bookName, Identifier sheetIdentifier, FormulaParsingWorkbook book) {
+			if (bookName == null && sheetIdentifier.isQuoted()) { //might be '[Book.xls]Sheet 1'!
+				final String name = sheetIdentifier.getName();
+				if (name.charAt(0) == '[') {
+					int j = name.indexOf(']');
+					if (j > 1) {
+						bookName = name.substring(1, j);
+						sheetIdentifier = new Identifier(name.substring(j+1), true);
+					}
+				}
+			}
+			if (bookName != null) {
+				bookName = book.getBookNameFromExternalLinkIndex(bookName);
+			}
 			_bookName = bookName;
 			_sheetIdentifier = sheetIdentifier;
 		}
@@ -819,7 +833,7 @@ public final class FormulaParser {
 			SkipWhite();
 			if (look == '!') {
 				GetChar();
-				return new SheetIdentifier(bookName, iden);
+				return new SheetIdentifier(bookName, iden, _book);
 			}
 			return null;
 		}
@@ -835,7 +849,7 @@ public final class FormulaParser {
 			SkipWhite();
 			if (look == '!') {
 				GetChar();
-				return new SheetIdentifier(bookName, new Identifier(sb.toString(), false));
+				return new SheetIdentifier(bookName, new Identifier(sb.toString(), false), _book);
 			}
 			return null;
 		}
@@ -852,6 +866,7 @@ public final class FormulaParser {
 		switch(ch) {
 			case '.': // dot is OK
 			case '_': // underscore is OK
+			case ':': // colon is OK
 				return true;
 		}
 		return false;

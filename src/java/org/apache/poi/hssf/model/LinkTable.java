@@ -63,6 +63,7 @@ import org.apache.poi.hssf.record.formula.Ref3DPtg;
  *
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 final class LinkTable {
 
@@ -317,10 +318,13 @@ final class LinkTable {
 			return null;
 		}
 		int shIx = _externSheetRecord.getFirstSheetIndexFromRefIndex(extRefIndex);
+		int shIx2 = _externSheetRecord.getLastSheetIndexFromRefIndex(extRefIndex);
 		String usSheetName = ebr.getSheetNames()[shIx];
+		String usSheetName2 = ebr.getSheetNames()[shIx2];
 		return new String[] {
 				ebr.getURL(),
 				usSheetName,
+				usSheetName2,
 		};
 	}
 
@@ -341,12 +345,17 @@ final class LinkTable {
 		if (ebrTarget == null) {
 			throw new RuntimeException("No external workbook with name '" + workbookName + "'");
 		}
-		int sheetIndex = getSheetIndex(ebrTarget.getSheetNames(), sheetName);
+		final int j = sheetName.indexOf(':');
+		final String sheetName1 = j < 0 ? sheetName : sheetName.substring(0, j);
+		final String sheetName2 = j < 0 ? sheetName : sheetName.substring(j+1);
+		
+		final int sheetIndex1 = getSheetIndex(ebrTarget.getSheetNames(), sheetName1);
+		final int sheetIndex2 = getSheetIndex(ebrTarget.getSheetNames(), sheetName2);
 
-		int result = _externSheetRecord.getRefIxForSheet(externalBookIndex, sheetIndex);
+		int result = _externSheetRecord.getRefIxForSheet(externalBookIndex, sheetIndex1, sheetIndex2);
 		if (result < 0) {
 			throw new RuntimeException("ExternSheetRecord does not contain combination ("
-					+ externalBookIndex + ", " + sheetIndex + ")");
+					+ externalBookIndex + ", " + sheetIndex1 + ", " + sheetIndex2 +")");
 		}
 		return result;
 	}
@@ -368,6 +377,10 @@ final class LinkTable {
 	public int getIndexToInternalSheet(int extRefIndex) {
 		return _externSheetRecord.getFirstSheetIndexFromRefIndex(extRefIndex);
 	}
+	
+	public int getLastIndexToInternalSheet(int extRefIndex) {
+		return _externSheetRecord.getLastSheetIndexFromRefIndex(extRefIndex);
+	}
 
 	public int getSheetIndexFromExternSheetIndex(int extRefIndex) {
 		if (extRefIndex >= _externSheetRecord.getNumOfRefs()) {
@@ -375,8 +388,15 @@ final class LinkTable {
 		}
 		return _externSheetRecord.getFirstSheetIndexFromRefIndex(extRefIndex);
 	}
+	
+	public int getLastSheetIndexFromExternSheetIndex(int extRefIndex) {
+		if (extRefIndex >= _externSheetRecord.getNumOfRefs()) {
+			return -1;
+		}
+		return _externSheetRecord.getLastSheetIndexFromRefIndex(extRefIndex);
+	}
 
-	public int checkExternSheet(int sheetIndex) {
+	public int checkExternSheet(int sheetIndex, int sheetIndex2) {
 		int thisWbIndex = -1; // this is probably always zero
 		for (int i=0; i<_externalBookBlocks.length; i++) {
 			SupBookRecord ebr = _externalBookBlocks[i].getExternalBookRecord();
@@ -390,12 +410,12 @@ final class LinkTable {
 		}
 
 		//Trying to find reference to this sheet
-		int i = _externSheetRecord.getRefIxForSheet(thisWbIndex, sheetIndex);
+		int i = _externSheetRecord.getRefIxForSheet(thisWbIndex, sheetIndex, sheetIndex2);
 		if (i>=0) {
 			return i;
 		}
 		//We haven't found reference to this sheet
-		return _externSheetRecord.addRef(thisWbIndex, sheetIndex, sheetIndex);
+		return _externSheetRecord.addRef(thisWbIndex, sheetIndex, sheetIndex2);
 	}
 
 

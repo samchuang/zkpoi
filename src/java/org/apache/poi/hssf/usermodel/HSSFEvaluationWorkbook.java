@@ -38,6 +38,7 @@ import org.apache.poi.ss.formula.FormulaType;
  * Internal POI use only
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, EvaluationWorkbook, FormulaParsingWorkbook {
 
@@ -57,8 +58,12 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public int getExternalSheetIndex(String sheetName) {
-		int sheetIndex = _uBook.getSheetIndex(sheetName);
-		return _iBook.checkExternSheet(sheetIndex);
+		final int j = sheetName.indexOf(':');
+		final String sheetName1 = j < 0 ? sheetName : sheetName.substring(0, j);
+		final String sheetName2 = j < 0 ? sheetName : sheetName.substring(j+1);
+		int sheetIndex1 = _uBook.getSheetIndex(sheetName1);
+		int sheetIndex2 = _uBook.getSheetIndex(sheetName2);
+		return _iBook.checkExternSheet(sheetIndex1, sheetIndex2);
 	}
 	public int getExternalSheetIndex(String workbookName, String sheetName) {
 		return _iBook.getExternalSheetIndex(workbookName, sheetName);
@@ -102,6 +107,9 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 	public int convertFromExternSheetIndex(int externSheetIndex) {
 		return _iBook.getSheetIndexFromExternSheetIndex(externSheetIndex);
+	}
+	public int convertLastIndexFromExternSheetIndex(int externSheetIndex) {
+		return _iBook.getLastSheetIndexFromExternSheetIndex(externSheetIndex);
 	}
 
 	public ExternalSheet getExternalSheet(int externSheetIndex) {
@@ -172,5 +180,11 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 
 	public SpreadsheetVersion getSpreadsheetVersion(){
 		return SpreadsheetVersion.EXCEL97;
+	}
+
+	@Override
+	public String getBookNameFromExternalLinkIndex(String externalLinkIndex) {
+		//TODO Excel 97-2003, external link index?
+		return externalLinkIndex;
 	}
 }

@@ -31,14 +31,33 @@ import org.apache.poi.ss.formula.eval.NotImplementedException;
  */
 public final class NotImplementedFunction implements Function {
 	private final String _functionName;
+	private Function _func;
+	private static Class _funcClass;
+	static {
+		try {
+			_funcClass = Thread.currentThread().getClass().forName("org.zkoss.zss.formula.ELEvalFunction");
+		} catch (ClassNotFoundException e) {
+			//ignore
+		}		
+	}
 	protected NotImplementedFunction() {
 		_functionName = getClass().getName();
+		_func = null;
 	}
 	public NotImplementedFunction(String name) {
 		_functionName = name;
+		if (_funcClass != null) {
+			try {
+				_func = (Function) _funcClass.getConstructor(String.class).newInstance(name);
+			} catch(Exception ex) {
+				//ignore
+			}
+		}
 	}
 
 	public ValueEval evaluate(ValueEval[] operands, int srcRow, int srcCol) {
+		if (_func != null)
+			return _func.evaluate(operands, srcRow, srcCol);
 		throw new NotImplementedException(_functionName);
 	}
 	public String getFunctionName() {

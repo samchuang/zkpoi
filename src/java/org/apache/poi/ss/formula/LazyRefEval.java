@@ -39,7 +39,7 @@ final class LazyRefEval extends RefEvalBase {
 		}
 		_evaluator = sre;
 	}
-
+	
 	public ValueEval getInnerValueEval() {
 		return _evaluator.getEvalForCell(getRow(), getColumn());
 	}
@@ -51,12 +51,31 @@ final class LazyRefEval extends RefEvalBase {
 
 		return new LazyAreaEval(area, _evaluator);
 	}
+	
+	public String getSheetName() {
+		return _evaluator.getSheetName();
+	}
+	
+	public String getLastSheetName() {
+		return _evaluator.getLastSheetName();
+	}
+	
+	public String getBookName() {
+		return _evaluator.getBookName();
+	}
 
 	public String toString() {
 		CellReference cr = new CellReference(getRow(), getColumn());
 		StringBuffer sb = new StringBuffer();
 		sb.append(getClass().getName()).append("[");
+		final String bookName = _evaluator.getBookName();
+		if (bookName != null) {
+			sb.append('[').append(bookName).append(']');
+		}
 		sb.append(_evaluator.getSheetName());
+		if (!getSheetName().equals(getLastSheetName())) {
+			sb.append(':').append(_evaluator.getLastSheetName());
+		}
 		sb.append('!');
 		sb.append(cr.formatAsString());
 		sb.append("]");

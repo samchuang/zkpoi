@@ -51,8 +51,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.util.*;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.Internal;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
+import org.apache.poi.util.PackageHelper;
 import org.apache.poi.xssf.model.CalculationChain;
+import org.apache.poi.xssf.model.ExternalLink;
 import org.apache.poi.xssf.model.MapInfo;
 import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
@@ -78,6 +83,8 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
  * High level representation of a SpreadsheetML workbook.  This is the first object most users
  * will construct whether they are reading or writing a workbook.  It is also the
  * top level object for creating new sheets/etc.
+ * 
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<XSSFSheet> {
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
@@ -152,6 +159,51 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     private XSSFCreationHelper _creationHelper;
 
     /**
+     * List of Array of external sheet references.
+     * String[0]: book name.
+     * String[1]: first sheet name
+     * String[2]: last sheet name
+     */
+	private List<String[]> _externalSheetRefs = new ArrayList<String[]>(4);
+
+	/**
+	 * Map from external link index to target book name (for evaluation)
+	 */
+	private Map<String, String> linkIndexToBookName = new HashMap<String, String>(4);
+	
+	/**
+	 * Map from target book name to external link index (for formula parsing)
+	 */
+	private Map<String, String> bookNameToLinkIndex = new HashMap<String, String>(4);
+	
+	/**
+	 * @return  the external sheet index with the given book name and 
+	 * sheet names; create if not exists.
+	 */
+	/*package*/ int getOrCreateExternalSheetIndex(String bookName, String sheetName1, String sheetName2) {
+		synchronized(_externalSheetRefs) {
+			final int len = _externalSheetRefs.size();
+			for(int j = 0; j < len; ++j) {
+				final String jbookName = _externalSheetRefs.get(j)[0];
+				if ((bookName == jbookName || (bookName != null && bookName.equalsIgnoreCase(jbookName))) 
+					&& _externalSheetRefs.get(j)[1].equalsIgnoreCase(sheetName1) 
+					&& _externalSheetRefs.get(j)[2].equalsIgnoreCase(sheetName2)) {
+					return j;
+				}
+			}
+			_externalSheetRefs.add(new String[] {bookName, sheetName1, sheetName2});
+			return len;
+		}
+	}
+	
+	/*package*/ String[] convertFromExternSheetIndex(int externSheetIndex) {
+		if (_externalSheetRefs.size() <= externSheetIndex) {
+			return null;
+		}
+		return _externalSheetRefs.get(externSheetIndex);
+	}
+
+    /**
      * Create a new SpreadsheetML workbook.
      */
     public XSSFWorkbook() {
@@ -202,6 +254,10 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                 else if(p instanceof MapInfo) mapInfo = (MapInfo)p;
                 else if (p instanceof XSSFSheet) {
                     shIdMap.put(p.getPackageRelationship().getId(), (XSSFSheet)p);
+                } else if (p instanceof ExternalLink) {
+                	final ExternalLink el = (ExternalLink) p;
+                	linkIndexToBookName.put(el.getLinkIndex(), el.getBookName());
+                	bookNameToLinkIndex.put(el.getBookName(), el.getLinkIndex());
                 }
             }
 
@@ -1462,5 +1518,9 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 		if (workbook.getWorkbookProtection() == null){
 			workbook.setWorkbookProtection(CTWorkbookProtection.Factory.newInstance());
 		}
+	}
+
+	/*package*/ String getBookNameFromExternalLinkIndex(String externalLinkIndex) {
+		return linkIndexToBookName.get(externalLinkIndex);
 	}
 }

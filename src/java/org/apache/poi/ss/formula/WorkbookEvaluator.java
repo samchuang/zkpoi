@@ -49,6 +49,7 @@ import org.apache.poi.hssf.record.formula.StringPtg;
 import org.apache.poi.hssf.record.formula.UnionPtg;
 import org.apache.poi.hssf.record.formula.UnknownPtg;
 import org.apache.poi.hssf.record.formula.eval.AreaEval;
+import org.apache.poi.hssf.record.formula.eval.ValuesEval;
 import org.apache.poi.hssf.record.formula.eval.BlankEval;
 import org.apache.poi.hssf.record.formula.eval.BoolEval;
 import org.apache.poi.hssf.record.formula.eval.ErrorEval;
@@ -80,6 +81,7 @@ import org.apache.poi.ss.usermodel.Cell;
  * For POI internal use only
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference, dependency tracking
  */
 public final class WorkbookEvaluator {
 
@@ -94,6 +96,8 @@ public final class WorkbookEvaluator {
 	private CollaboratingWorkbooksEnvironment _collaboratingWorkbookEnvironment;
 	private final IStabilityClassifier _stabilityClassifier;
 	private final UDFFinder _udfFinder;
+	
+	private DependencyTracker _dependencyTracker;
 
 	/**
 	 * @param udfFinder pass <code>null</code> for default (AnalysisToolPak only)
@@ -113,7 +117,11 @@ public final class WorkbookEvaluator {
 		_stabilityClassifier = stabilityClassifier;
 		_udfFinder = udfFinder == null ? UDFFinder.DEFAULT : udfFinder;
 	}
-
+	
+	public void setDependencyTracker(DependencyTracker tracker) {
+		_dependencyTracker = tracker;
+	}
+	
 	/**
 	 * also for debug use. Used in toString methods
 	 */
@@ -436,8 +444,10 @@ public final class WorkbookEvaluator {
 				}
 //				logDebug("invoke " + operation + " (nAgs=" + numops + ")");
 				opResult = OperationEvaluatorFactory.evaluate(optg, ops, ec);
+				opResult = addDependency(ec, opResult, true);
 			} else {
 				opResult = getEvalForPtg(ptg, ec);
+				opResult = addDependency(ec, opResult, false);
 			}
 			if (opResult == null) {
 				throw new RuntimeException("Evaluation result must not be null");
@@ -452,7 +462,13 @@ public final class WorkbookEvaluator {
 		}
 		return dereferenceResult(value, ec.getRowIndex(), ec.getColumnIndex());
 	}
-
+	
+	private ValueEval addDependency(OperationEvaluationContext ec, ValueEval opResult, boolean eval) {
+		if (_dependencyTracker != null) {
+			opResult = _dependencyTracker.addDependency(ec, opResult, eval);
+		}
+		return opResult;
+	}
 	/**
 	 * Calculates the number of tokens that the evaluator should skip upon reaching a tAttrSkip.
 	 *
@@ -521,7 +537,9 @@ public final class WorkbookEvaluator {
 				return evaluateNameFormula(nameRecord.getNameDefinition(), ec);
 			}
 
-			throw new RuntimeException("Don't now how to evalate name '" + nameRecord.getNameText() + "'");
+			return new NameEval(nameRecord.getNameText());
+			//shall be #NAME? error
+			//throw new RuntimeException("Don't now how to evalate name '" + nameRecord.getNameText() + "'");
 		}
 		if (ptg instanceof NameXPtg) {
 			return new NameXEval(((NameXPtg) ptg));
@@ -593,12 +611,22 @@ public final class WorkbookEvaluator {
 	/**
 	 * Used by the lazy ref evals whenever they need to get the value of a contained cell.
 	 */
-	/* package */ ValueEval evaluateReference(EvaluationSheet sheet, int sheetIndex, int rowIndex,
+	/* package */ ValueEval evaluateReference(String sheetname1, String sheetname2, int rowIndex,
 			int columnIndex, EvaluationTracker tracker) {
-
-		EvaluationCell cell = sheet.getCell(rowIndex, columnIndex);
-		return evaluateAny(cell, sheetIndex, rowIndex, columnIndex, tracker);
+		final int i1 = getSheetIndex(sheetname1);
+		final int i2 = getSheetIndex(sheetname2);
+		final int sheetIndex1 = Math.min(i1, i2);
+		final int sheetIndex2 = Math.max(i1, i2);
+		final int size = sheetIndex2 - sheetIndex1 + 1;
+		ValueEval[] results = new ValueEval[size];
+		for(int j = sheetIndex1, k=0; j <= sheetIndex2; ++j, ++k) {
+			final EvaluationSheet sheet = getSheet(j);
+			EvaluationCell cell = sheet.getCell(rowIndex, columnIndex);
+			results[k] = evaluateAny(cell, j, rowIndex, columnIndex, tracker);
+		}
+		return size > 1 ? new ValuesEval(results) : results[0];
 	}
+	
 	public FreeRefFunction findUserDefinedFunction(String functionName) {
 		return _udfFinder.findFunction(functionName);
 	}

@@ -27,6 +27,7 @@ import org.apache.poi.hssf.util.CellReference;
 /**
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 final class LazyAreaEval extends AreaEvalBase {
 
@@ -74,12 +75,31 @@ final class LazyAreaEval extends AreaEvalBase {
 		return new LazyAreaEval(getFirstRow(), absColIx, getLastRow(), absColIx, _evaluator);
 	}
 
+	public String getSheetName() {
+		return _evaluator.getSheetName();
+	}
+	
+	public String getLastSheetName() {
+		return _evaluator.getLastSheetName();
+	}
+	
+	public String getBookName() {
+		return _evaluator.getBookName();
+	}
+	
 	public String toString() {
 		CellReference crA = new CellReference(getFirstRow(), getFirstColumn());
 		CellReference crB = new CellReference(getLastRow(), getLastColumn());
 		StringBuffer sb = new StringBuffer();
 		sb.append(getClass().getName()).append("[");
+		final String bookName = _evaluator.getBookName();
+		if (bookName != null) {
+			sb.append('[').append(bookName).append(']');
+		}
 		sb.append(_evaluator.getSheetName());
+		if (!_evaluator.getSheetName().equals(_evaluator.getLastSheetName())) {
+			sb.append(':').append(_evaluator.getLastSheetName());
+		}
 		sb.append('!');
 		sb.append(crA.formatAsString());
 		sb.append(':');

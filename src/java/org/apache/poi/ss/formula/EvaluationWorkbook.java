@@ -27,6 +27,7 @@ import org.apache.poi.hssf.record.formula.Ptg;
  * For POI internal use only
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public interface EvaluationWorkbook {
 	String getSheetName(int sheetIndex);
@@ -47,6 +48,7 @@ public interface EvaluationWorkbook {
 	 */
 	ExternalSheet getExternalSheet(int externSheetIndex);
 	int convertFromExternSheetIndex(int externSheetIndex);
+	int convertLastIndexFromExternSheetIndex(int externSheetIndex);
 	EvaluationName getName(NamePtg namePtg);
 	String resolveNameXText(NameXPtg ptg);
 	Ptg[] getFormulaTokens(EvaluationCell cell);
@@ -54,16 +56,21 @@ public interface EvaluationWorkbook {
 	class ExternalSheet {
 		private final String _workbookName;
 		private final String _sheetName;
+		private final String _lastSheetName;
 
-		public ExternalSheet(String workbookName, String sheetName) {
+		public ExternalSheet(String workbookName, String sheetName, String lastSheetName) {
 			_workbookName = workbookName;
 			_sheetName = sheetName;
+			_lastSheetName = lastSheetName;
 		}
 		public String getWorkbookName() {
 			return _workbookName;
 		}
 		public String getSheetName() {
 			return _sheetName;
+		}
+		public String getLastSheetName() {
+			return _lastSheetName;
 		}
 	}
 }

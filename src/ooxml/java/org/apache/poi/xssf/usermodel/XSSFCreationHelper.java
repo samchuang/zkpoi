@@ -16,6 +16,10 @@
 ==================================================================== */
 package org.apache.poi.xssf.usermodel;
 
+import org.apache.poi.hssf.record.formula.udf.UDFFinder;
+import org.apache.poi.hssf.usermodel.HSSFEvaluationWorkbook;
+import org.apache.poi.ss.formula.IStabilityClassifier;
+import org.apache.poi.ss.formula.WorkbookEvaluator;
 import org.apache.poi.ss.usermodel.CreationHelper;
 
 public class XSSFCreationHelper implements CreationHelper {

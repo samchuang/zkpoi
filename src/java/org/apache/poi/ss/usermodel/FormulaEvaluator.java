@@ -17,6 +17,8 @@
 
 package org.apache.poi.ss.usermodel;
 
+import org.apache.poi.ss.formula.WorkbookEvaluator;
+
 /**
  * Evaluates formula cells.<p/>
  * 
@@ -95,4 +97,6 @@ public interface FormulaEvaluator {
      * @param cell
      */
     Cell evaluateInCell(Cell cell);
+    
+    WorkbookEvaluator getWorkbookEvaluator();
 }

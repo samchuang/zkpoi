@@ -84,8 +84,9 @@ import org.apache.poi.util.POILogger;
  * @author  Andrew C. Oliver (acoliver at apache dot org)
  * @author  Glen Stampoultzis (glens at apache.org)
  * @author  Shawn Laubach (slaubach at apache dot org)
+ * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
-public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.usermodel.Workbook {
+public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.usermodel.Workbook {
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
     private static final int MAX_ROW = 0xFFFF;
     private static final short MAX_COLUMN = (short)0x00FF;
@@ -606,7 +607,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * be removed in future versions of POI.
      */
     public int getExternalSheetIndex(int internalSheetIndex) {
-        return workbook.checkExternSheet(internalSheetIndex);
+        return workbook.checkExternSheet(internalSheetIndex, internalSheetIndex);
     }
     /**
      * @deprecated for POI internal use only (formula rendering).  This method is likely to
@@ -675,7 +676,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         if (filterDbNameIndex >=0) {
             NameRecord origNameRecord = workbook.getNameRecord(filterDbNameIndex);
             // copy original formula but adjust 3D refs to the new external sheet index
-            int newExtSheetIx = workbook.checkExternSheet(newSheetIndex);
+            int newExtSheetIx = workbook.checkExternSheet(newSheetIndex, newSheetIndex);
             Ptg[] ptgs = origNameRecord.getNameDefinition();
             for (int i=0; i< ptgs.length; i++) {
                 Ptg ptg = ptgs[i];
@@ -935,7 +936,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         if (startRow > endRow) throw new IllegalArgumentException("Invalid row range specification");
 
         HSSFSheet sheet = getSheetAt(sheetIndex);
-        short externSheetIndex = getWorkbook().checkExternSheet(sheetIndex);
+        short externSheetIndex = getWorkbook().checkExternSheet(sheetIndex, sheetIndex);
 
         boolean settingRowAndColumn =
                 startColumn != -1 && endColumn != -1 && startRow != -1 && endRow != -1;

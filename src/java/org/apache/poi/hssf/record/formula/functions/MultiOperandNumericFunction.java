@@ -17,6 +17,7 @@
 
 package org.apache.poi.hssf.record.formula.functions;
 
+import org.apache.poi.hssf.record.formula.eval.ValuesEval;
 import org.apache.poi.hssf.record.formula.eval.BlankEval;
 import org.apache.poi.hssf.record.formula.eval.BoolEval;
 import org.apache.poi.hssf.record.formula.eval.ErrorEval;
@@ -29,10 +30,12 @@ import org.apache.poi.hssf.record.formula.eval.ValueEval;
 import org.apache.poi.ss.formula.TwoDEval;
 
 /**
- * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
  * This is the super class for all excel function evaluator
  * classes that take variable number of operands, and
  * where the order of operands does not matter
+ *
+ * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public abstract class MultiOperandNumericFunction implements Function {
 
@@ -188,6 +191,13 @@ public abstract class MultiOperandNumericFunction implements Function {
 		if (ve == BlankEval.instance) {
 			if (_isBlankCounted) {
 				temp.add(0.0);
+			}
+			return;
+		}
+		if (ve instanceof ValuesEval) {
+			ValueEval[] ves = ((ValuesEval) ve).getValueEvals();
+			for(ValueEval xve : ves) {
+				collectValue(xve, isViaReference, temp); //recursive
 			}
 			return;
 		}

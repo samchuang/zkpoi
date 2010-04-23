@@ -113,8 +113,13 @@ public final class SheetNameFormatter {
 		}
 		if(Character.isLetter(rawSheetName.charAt(0))
 				&& Character.isDigit(rawSheetName.charAt(len-1))) {
-			// note - values like "A$1:$C$20" don't get this far 
-			if(nameLooksLikePlainCellReference(rawSheetName)) {
+			final int j = rawSheetName.indexOf(':'); 
+			if(j >= 0) {
+				if (nameLooksLikePlainCellReference(rawSheetName.substring(0, j))
+					|| nameLooksLikePlainCellReference(rawSheetName.substring(j+1))) {
+					return true;
+				}
+			} else if(nameLooksLikePlainCellReference(rawSheetName)) {
 				return true;
 			}
 		}
@@ -148,6 +153,7 @@ public final class SheetNameFormatter {
 		switch(ch) {
 			case '.': // dot is OK
 			case '_': // underscore is OK
+			case ':': // colon is OK
 				return false;
 			case '\n':
 			case '\r':

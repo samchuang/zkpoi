@@ -39,6 +39,7 @@ import org.apache.poi.ss.formula.OperationEvaluationContext;
  * interpreted as A1-style or R1C1-style.
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public final class Indirect implements FreeRefFunction {
 
@@ -94,11 +95,12 @@ public final class Indirect implements FreeRefFunction {
 		int plingPos = text.lastIndexOf('!');
 
 		String workbookName;
-		String sheetName;
+		String sheetName, lastSheetName;
 		String refText; // whitespace around this gets trimmed OK
 		if (plingPos < 0) {
 			workbookName = null;
 			sheetName = null;
+			lastSheetName = null;
 			refText = text;
 		} else {
 			String[] parts = parseWorkbookAndSheetName(text.subSequence(0, plingPos));
@@ -107,6 +109,7 @@ public final class Indirect implements FreeRefFunction {
 			}
 			workbookName = parts[0];
 			sheetName = parts[1];
+			lastSheetName = parts[2];
 			refText = text.substring(plingPos + 1);
 		}
 
@@ -121,12 +124,12 @@ public final class Indirect implements FreeRefFunction {
 			refStrPart1 = refText.substring(0, colonPos).trim();
 			refStrPart2 = refText.substring(colonPos + 1).trim();
 		}
-		return ec.getDynamicReference(workbookName, sheetName, refStrPart1, refStrPart2, isA1style);
+		return ec.getDynamicReference(workbookName, sheetName, lastSheetName, refStrPart1, refStrPart2, isA1style);
 	}
 
 	/**
-	 * @return array of length 2: {workbookName, sheetName,}.  Second element will always be
-	 * present.  First element may be null if sheetName is unqualified.
+	 * @return array of length 3: {workbookName, sheetName, sheetName2}.  Second element and third 
+	 * element will always be present.  First element may be null if sheetName is unqualified.
 	 * Returns <code>null</code> if text cannot be parsed.
 	 */
 	private static String[] parseWorkbookAndSheetName(CharSequence text) {
@@ -174,7 +177,9 @@ public final class Indirect implements FreeRefFunction {
 									 // start/end with whitespace
 				return null;
 			}
-			return new String[] { wbName, sheetName, };
+			final int j = sheetName.indexOf(':');
+			return j < 0 ? new String[] { wbName, sheetName, sheetName} :
+				new String[] {wbName, sheetName.substring(0, j), sheetName.substring(j+1)};
 		}
 
 		if (firstChar == '[') {
@@ -190,10 +195,14 @@ public final class Indirect implements FreeRefFunction {
 			if (canTrim(sheetName)) {
 				return null;
 			}
-			return new String[] { wbName.toString(), sheetName.toString(), };
+			final String xsheetName = sheetName.toString(); 
+			final int j = xsheetName.indexOf(':');
+			return j < 0 ? new String[] { wbName.toString(), xsheetName, xsheetName} :
+				new String[] {wbName.toString(), xsheetName.substring(0, j), xsheetName.substring(j+1)};
 		}
 		// else - just sheet name
-		return new String[] { null, text.toString(), };
+		final String sheetName = text.toString();
+		return new String[] { null, sheetName, sheetName};
 	}
 
 	/**

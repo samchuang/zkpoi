@@ -35,6 +35,7 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDefinedName;
  * Internal POI use only
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, EvaluationWorkbook, FormulaParsingWorkbook {
 
@@ -51,28 +52,28 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 		_uBook = book;
 	}
 
-	private int convertFromExternalSheetIndex(int externSheetIndex) {
-		return externSheetIndex;
-	}
 	/**
 	 * @return the sheet index of the sheet with the given external index.
 	 */
 	public int convertFromExternSheetIndex(int externSheetIndex) {
-		return externSheetIndex;
+		final String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);
+		if (names == null) return -1;
+		return getSheetIndex(names[1]);
 	}
 	/**
-	 * @return  the external sheet index of the sheet with the given internal
-	 * index. Used by some of the more obscure formula and named range things.
-	 * Fairly easy on XSSF (we think...) since the internal and external
-	 * indicies are the same
+	 * @return the sheet index of the 2nd sheet with the given external index.
 	 */
-	private int convertToExternalSheetIndex(int sheetIndex) {
-		return sheetIndex;
+	public int convertLastIndexFromExternSheetIndex(int externSheetIndex) {
+		final String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);
+		if (names == null) return -1;
+		return getSheetIndex(names[2]);
 	}
-
+	
 	public int getExternalSheetIndex(String sheetName) {
-		int sheetIndex = _uBook.getSheetIndex(sheetName);
-		return convertToExternalSheetIndex(sheetIndex);
+		final int j = sheetName.indexOf(':');
+		final String sheetName1 = j < 0 ? sheetName : sheetName.substring(0, j);
+		final String sheetName2 = j < 0 ? sheetName : sheetName.substring(j+1);
+		return _uBook.getOrCreateExternalSheetIndex(null, sheetName1, sheetName2);
 	}
 
 	public EvaluationName getName(String name, int sheetIndex) {
@@ -104,12 +105,19 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 		return new XSSFEvaluationSheet(_uBook.getSheetAt(sheetIndex));
 	}
 
+	/** Return null if in the same workbook */
 	public ExternalSheet getExternalSheet(int externSheetIndex) {
-		// TODO Auto-generated method stub
+		String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);
+		if (names != null && names[0] != null) {
+			return new ExternalSheet(names[0], names[1], names[2]);
+		}
 		return null;
 	}
 	public int getExternalSheetIndex(String workbookName, String sheetName) {
-		throw new RuntimeException("not implemented yet");
+		final int j = sheetName.indexOf(':');
+		final String sheetName1 = j < 0 ? sheetName : sheetName.substring(0, j);
+		final String sheetName2 = j < 0 ? sheetName : sheetName.substring(j+1);
+		return _uBook.getOrCreateExternalSheetIndex(workbookName, sheetName1, sheetName2);
 	}
 	public int getSheetIndex(String sheetName) {
 		return _uBook.getSheetIndex(sheetName);
@@ -124,8 +132,8 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public String getSheetNameByExternSheet(int externSheetIndex) {
-		int sheetIndex = convertFromExternalSheetIndex(externSheetIndex);
-		return _uBook.getSheetName(sheetIndex);
+		String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);		
+		return names == null ? "" : names[1].equals(names[2]) ? names[1] : names[1]+':'+names[2];  
 	}
 
 	public String getNameText(NamePtg namePtg) {
@@ -183,5 +191,10 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 
 	public SpreadsheetVersion getSpreadsheetVersion(){
 		return SpreadsheetVersion.EXCEL2007;
+	}
+
+	@Override
+	public String getBookNameFromExternalLinkIndex(String externalLinkIndex) {
+		return _uBook.getBookNameFromExternalLinkIndex(externalLinkIndex);
 	}
 }

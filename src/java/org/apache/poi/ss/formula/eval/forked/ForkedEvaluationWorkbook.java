@@ -36,6 +36,7 @@ import org.apache.poi.ss.usermodel.Workbook;
  * updated after a call to {@link #getOrCreateUpdatableCell(String, int, int)}.
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 final class ForkedEvaluationWorkbook implements EvaluationWorkbook {
 
@@ -85,6 +86,10 @@ final class ForkedEvaluationWorkbook implements EvaluationWorkbook {
 
 	public int convertFromExternSheetIndex(int externSheetIndex) {
 		return _masterBook.convertFromExternSheetIndex(externSheetIndex);
+	}
+
+	public int convertLastIndexFromExternSheetIndex(int externSheetIndex) {
+		return _masterBook.convertLastIndexFromExternSheetIndex(externSheetIndex);
 	}
 
 	public ExternalSheet getExternalSheet(int externSheetIndex) {

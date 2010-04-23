@@ -27,6 +27,7 @@ import org.apache.poi.util.LittleEndianOutput;
  * A List of Indexes to  EXTERNALBOOK (supplemental book) Records <p/>
  * 
  * @author Libin Roman (Vista Portal LDT. Developer)
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public class ExternSheetRecord extends StandardRecord {
 	public final static short sid = 0x0017;
@@ -183,6 +184,10 @@ public class ExternSheetRecord extends StandardRecord {
 		return getRef(extRefIndex).getFirstSheetIndex();
 	}
 
+	public int getLastSheetIndexFromRefIndex(int extRefIndex) {
+		return getRef(extRefIndex).getLastSheetIndex();
+	}
+	
 	/**
 	 * @return index of newly added ref
 	 */
@@ -191,14 +196,14 @@ public class ExternSheetRecord extends StandardRecord {
 		return _list.size() - 1;
 	}
 
-	public int getRefIxForSheet(int externalBookIndex, int sheetIndex) {
+	public int getRefIxForSheet(int externalBookIndex, int sheetIndex, int sheetIndex2) {
 		int nItems = _list.size();
 		for (int i = 0; i < nItems; i++) {
 			RefSubRecord ref = getRef(i);
 			if (ref.getExtBookIndex() != externalBookIndex) {
 				continue;
 			}
-			if (ref.getFirstSheetIndex() == sheetIndex && ref.getLastSheetIndex() == sheetIndex) {
+			if (ref.getFirstSheetIndex() == sheetIndex && ref.getLastSheetIndex() == sheetIndex2) {
 				return i;
 			}
 		}

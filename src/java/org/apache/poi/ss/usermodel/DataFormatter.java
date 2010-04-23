@@ -523,7 +523,26 @@ public class DataFormatter {
         throw new RuntimeException("Unexpected celltype (" + cellType + ")");
     }
 
-
+    //Henri
+    public String formatCellValue(Cell cell, int cellType) {
+        switch (cellType) {
+        case Cell.CELL_TYPE_NUMERIC :
+            if (DateUtil.isCellDateFormatted(cell)) {
+                return getFormattedDateString(cell);
+            }
+            return getFormattedNumberString(cell);
+		case Cell.CELL_TYPE_ERROR:
+			return ErrorConstants.getText(cell.getErrorCellValue());
+        case Cell.CELL_TYPE_STRING :
+            return cell.getRichStringCellValue().getString();
+        case Cell.CELL_TYPE_BOOLEAN :
+            return String.valueOf(cell.getBooleanCellValue());
+        case Cell.CELL_TYPE_BLANK :
+            return "";
+	    }
+	    throw new RuntimeException("Unexpected celltype (" + cellType + ")");
+    }
+    
     /**
      * <p>
      * Sets a default number format to be used when the Excel format cannot be

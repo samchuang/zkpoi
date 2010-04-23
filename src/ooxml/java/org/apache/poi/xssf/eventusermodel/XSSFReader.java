@@ -37,6 +37,7 @@ import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.apache.xmlbeans.XmlException;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTExternalLink;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbook;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
@@ -130,7 +131,7 @@ public class XSSFReader {
         }
         return sheet.getInputStream();
     }
-
+    
     /**
      * Returns an Iterator which will let you get at all the
      *  different Sheets in turn.
@@ -232,5 +233,23 @@ public class XSSFReader {
         public void remove() {
             throw new IllegalStateException("Not supported");
         }
+    }
+
+    /**
+     * Returns an ExternalLinkPart with the specified relationId.
+     * @param relId the relationId of the external reference, from a r:id on the workbook
+     */
+    public PackagePart getExternalLink(String relId) throws IOException, InvalidFormatException {
+        PackageRelationship rel = workbookPart.getRelationship(relId);
+        if(rel == null) {
+            throw new IllegalArgumentException("No ExternalLink found with r:id " + relId);
+        }
+        PackagePartName relName = PackagingURIHelper.createPartName(rel.getTargetURI());
+        System.out.println("relName:"+relName);
+        PackagePart externalLink = pkg.getPart(relName);
+        if(externalLink == null) {
+            throw new IllegalArgumentException("No data found for ExternalLink with r:id " + relId);
+        }
+        return externalLink;
     }
 }

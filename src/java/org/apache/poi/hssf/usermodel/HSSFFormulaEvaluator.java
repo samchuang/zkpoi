@@ -332,4 +332,9 @@ public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 		}
 		throw new RuntimeException("Unexpected eval class (" + eval.getClass().getName() + ")");
 	}
+	
+	@Override
+	public WorkbookEvaluator getWorkbookEvaluator() {
+		return _bookEvaluator;
+	}
 }

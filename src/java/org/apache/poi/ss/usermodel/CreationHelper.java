@@ -16,6 +16,10 @@
 ==================================================================== */
 package org.apache.poi.ss.usermodel;
 
+import org.apache.poi.hssf.record.formula.udf.UDFFinder;
+import org.apache.poi.ss.formula.IStabilityClassifier;
+import org.apache.poi.ss.formula.WorkbookEvaluator;
+
 /**
  * An object that handles instantiating concrete
  *  classes of the various instances one needs for

@@ -22,35 +22,42 @@ import org.apache.poi.hssf.record.formula.eval.ValueEval;
  *
  *
  * @author Josh Micich
+ * @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 final class SheetRefEvaluator {
 
 	private final WorkbookEvaluator _bookEvaluator;
 	private final EvaluationTracker _tracker;
 	private final int _sheetIndex;
-	private EvaluationSheet _sheet;
+	private final int _lastSheetIndex;
 
-	public SheetRefEvaluator(WorkbookEvaluator bookEvaluator, EvaluationTracker tracker, int sheetIndex) {
+	public SheetRefEvaluator(WorkbookEvaluator bookEvaluator, EvaluationTracker tracker, int sheetIndex, int lastSheetIndex) {
 		if (sheetIndex < 0) {
 			throw new IllegalArgumentException("Invalid sheetIndex: " + sheetIndex + ".");
+		}
+		if (lastSheetIndex < 0) {
+			throw new IllegalArgumentException("Invalid sheetIndex2: " + lastSheetIndex + ".");
 		}
 		_bookEvaluator = bookEvaluator;
 		_tracker = tracker;
 		_sheetIndex = sheetIndex;
+		_lastSheetIndex = lastSheetIndex;
 	}
 
 	public String getSheetName() {
 		return _bookEvaluator.getSheetName(_sheetIndex);
 	}
-
-	public ValueEval getEvalForCell(int rowIndex, int columnIndex) {
-		return _bookEvaluator.evaluateReference(getSheet(), _sheetIndex, rowIndex, columnIndex, _tracker);
+	
+	public String getLastSheetName() {
+		return _bookEvaluator.getSheetName(_lastSheetIndex);
 	}
 
-	private EvaluationSheet getSheet() {
-		if (_sheet == null) {
-			_sheet = _bookEvaluator.getSheet(_sheetIndex);
-		}
-		return _sheet;
+	public ValueEval getEvalForCell(int rowIndex, int columnIndex) {
+		return _bookEvaluator.evaluateReference(getSheetName(), getLastSheetName(), rowIndex, columnIndex, _tracker);
+	}
+	
+	public String getBookName() {
+		final CollaboratingWorkbooksEnvironment env = _bookEvaluator.getEnvironment();
+		return env.getBookName(_bookEvaluator);
 	}
 }
