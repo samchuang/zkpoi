@@ -17,6 +17,7 @@
 
 package org.apache.poi.xssf.usermodel;
 
+import java.awt.peer.SystemTrayPeer;
 import java.util.List;
 
 import org.apache.poi.POIXMLDocumentPart;
@@ -24,8 +25,14 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.ss.usermodel.BaseTestBugzillaIssues;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Name;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.XSSFITestDataProvider;
 import org.apache.poi.xssf.XSSFTestDataSamples;
+import org.apache.poi.xssf.usermodel.extensions.XSSFCellFill;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 
 public final class TestXSSFBugs extends BaseTestBugzillaIssues {
 
@@ -137,5 +144,120 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
         rels = drawing.getRelations();
         assertEquals(1, rels.size());
         assertEquals("Sheet1!A1", rels.get(0).getPackageRelationship().getTargetURI().getFragment());
+    }
+    
+    /**
+     * Excel will sometimes write a button with a textbox
+     *  containing &gt;br&lt; (not closed!).
+     * Clearly Excel shouldn't do this, but test that we can
+     *  read the file despite the naughtyness
+     */
+    public void test49020() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("BrNotClosed.xlsx");
+    }
+
+    /**
+     * ensure that CTPhoneticPr is loaded by the ooxml test suite so that it is included in poi-ooxml-schemas
+     */
+    public void test49325() throws Exception {
+        XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("49325.xlsx");
+        CTWorksheet sh = wb.getSheetAt(0).getCTWorksheet();
+        assertNotNull(sh.getPhoneticPr());
+    }
+    
+    /**
+     * Names which are defined with a Sheet
+     *  should return that sheet index properly 
+     */
+    public void test48923() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("48923.xlsx");
+       assertEquals(4, wb.getNumberOfNames());
+       
+       Name b1 = wb.getName("NameB1");
+       Name b2 = wb.getName("NameB2");
+       Name sheet2 = wb.getName("NameSheet2");
+       Name test = wb.getName("Test");
+       
+       assertNotNull(b1);
+       assertEquals("NameB1", b1.getNameName());
+       assertEquals("Sheet1", b1.getSheetName());
+       assertEquals(-1, b1.getSheetIndex());
+       
+       assertNotNull(b2);
+       assertEquals("NameB2", b2.getNameName());
+       assertEquals("Sheet1", b2.getSheetName());
+       assertEquals(-1, b2.getSheetIndex());
+       
+       assertNotNull(sheet2);
+       assertEquals("NameSheet2", sheet2.getNameName());
+       assertEquals("Sheet2", sheet2.getSheetName());
+       assertEquals(-1, sheet2.getSheetIndex());
+       
+       assertNotNull(test);
+       assertEquals("Test", test.getNameName());
+       assertEquals("Sheet1", test.getSheetName());
+       assertEquals(-1, test.getSheetIndex());
+    }
+    
+    /**
+     * Problem with evaluation formulas due to
+     *  NameXPtgs.
+     * Blows up on:
+     *   IF(B6= (ROUNDUP(B6,0) + ROUNDDOWN(B6,0))/2, MROUND(B6,2),ROUND(B6,0))
+     */
+    public void DISABLEDtest48539() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("48539.xlsx");
+       assertEquals(3, wb.getNumberOfSheets());
+       
+       // Try each cell individually
+       XSSFFormulaEvaluator eval = new XSSFFormulaEvaluator(wb);
+       for(int i=0; i<wb.getNumberOfSheets(); i++) {
+          Sheet s = wb.getSheetAt(i);
+          for(Row r : s) {
+             for(Cell c : r) {
+                if(c.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                   eval.evaluate(c);
+                }
+             }
+          }
+       }
+       
+       // Now all of them
+       XSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
+    }
+    
+    /**
+     * Foreground colours should be found even if
+     *  a theme is used 
+     */
+    public void test48779() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("48779.xlsx");
+       XSSFCell cell = wb.getSheetAt(0).getRow(0).getCell(0);
+       XSSFCellStyle cs = cell.getCellStyle();
+       
+       assertNotNull(cs);
+       assertEquals(1, cs.getIndex());
+
+       // Look at the low level xml elements
+       assertEquals(2, cs.getCoreXf().getFillId());
+       assertEquals(0, cs.getCoreXf().getXfId());
+       assertEquals(true, cs.getCoreXf().getApplyFill());
+       
+       XSSFCellFill fg = wb.getStylesSource().getFillAt(2);
+       assertEquals(0, fg.getFillForegroundColor().getIndexed());
+       assertEquals(0.0, fg.getFillForegroundColor().getTint());
+       assertEquals("FFFF0000", fg.getFillForegroundColor().getARGBHex());
+       assertEquals(64, fg.getFillBackgroundColor().getIndexed());
+       
+       // Now look higher up
+       assertNotNull(cs.getFillForegroundXSSFColor());
+       assertEquals(0, cs.getFillForegroundColor());
+       assertEquals("FFFF0000", cs.getFillForegroundXSSFColor().getARGBHex());
+       assertEquals("FFFF0000", cs.getFillForegroundColorColor().getARGBHex());
+       
+       assertNotNull(cs.getFillBackgroundColor());
+       assertEquals(64, cs.getFillBackgroundColor());
+       assertEquals(null, cs.getFillBackgroundXSSFColor().getARGBHex());
+       assertEquals(null, cs.getFillBackgroundColorColor().getARGBHex());
     }
 }

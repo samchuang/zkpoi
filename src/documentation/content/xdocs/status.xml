@@ -34,6 +34,29 @@
 
     <changes>
         <release version="3.7-SNAPSHOT" date="2010-??-??">
+           <action dev="POI-DEVELOPERS" type="add">48779 - Allow you to get straight from a CellStyle to a Color, irrespective of if the Color is indexed or inline-defined</action>
+           <action dev="POI-DEVELOPERS" type="add">48924 - Allow access of the HWPF DateAndTime underlying date values</action>
+           <action dev="POI-DEVELOPERS" type="add">48926 - Initial support for the HWPF revision marks authors list</action>
+           <action dev="POI-DEVELOPERS" type="fix">49160 - Ensure that CTDigSigBlob is included in poi-ooxml jar</action>
+           <action dev="POI-DEVELOPERS" type="fix">49189 - Detect w:tab and w:cr entries in XWPF paragraphs, even when the XSD is silly and maps them to CTEmpty</action>
+           <action dev="POI-DEVELOPERS" type="fix">49273 - Correct handling for Font Character Sets with indicies greater than 127</action>
+           <action dev="POI-DEVELOPERS" type="add">49334 - Track the ValueRangeRecords of charts in HSSFChart, to allow the basic axis operations</action>
+           <action dev="POI-DEVELOPERS" type="add">49242 - Track the LinkDataRecords of charts in HSSFChart</action>
+           <action dev="POI-DEVELOPERS" type="add">Improved performance of XSSFWorkbook.write </action>
+           <action dev="POI-DEVELOPERS" type="fix">48846 - Avoid NPE when finding cell comments</action>
+           <action dev="POI-DEVELOPERS" type="fix">49325 - Ensure that CTPhoneticPr is included in poi-ooxml jar</action>
+           <action dev="POI-DEVELOPERS" type="fix">49191 - Fixed tests failing in non-english locales</action>
+           <action dev="POI-DEVELOPERS" type="add">48432 - Support for XSSF themes</action>
+           <action dev="POI-DEVELOPERS" type="add">49244 - Support for data validation for OOXML format</action>
+           <action dev="POI-DEVELOPERS" type="add">49066 - Worksheet/cell formatting, with view and HTML converter</action>
+           <action dev="POI-DEVELOPERS" type="fix">49020 - Workaround Excel outputting invalid XML in button definitions by not closing BR tags</action>
+           <action dev="POI-DEVELOPERS" type="fix">49050 - Improve performance of AbstractEscherHolderRecord when there are lots of Continue Records</action>
+           <action dev="POI-DEVELOPERS" type="fix">49194 - Correct text size limit for OOXML .xlsx files</action>
+           <action dev="POI-DEVELOPERS" type="fix">49254 - Fix CellUtils.setFont to use the correct type internally</action>
+           <action dev="POI-DEVELOPERS" type="fix">49139 - Properly support 4k big block size in POIFS</action>
+           <action dev="POI-DEVELOPERS" type="fix">48936 - Avoid writing malformed CDATA blocks in sharedStrings.xml</action>
+           <action dev="POI-DEVELOPERS" type="add">49026 - Added implementation for TEXT()  </action>
+           <action dev="POI-DEVELOPERS" type="add">49025 - Added implementation for TRUNC()  </action>
            <action dev="POI-DEVELOPERS" type="fix">49147 - Properly close internal InputStream in ExtractorFactory#createExtractor(File)</action>
            <action dev="POI-DEVELOPERS" type="fix">49138 - Fixed locale-sensitive formatters in PackagePropertiesPart</action>
            <action dev="POI-DEVELOPERS" type="fix">49153 - Ensure that CTVectorVariant is included in poi-ooxml-schemas.jar</action>

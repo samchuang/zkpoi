@@ -358,6 +358,7 @@ under the License.
         </condition>
     </target>
     <target name="fetch-ooxml-xsds" unless="ooxml-xsds.present"
+            depends="check-ooxml-xsds"
             description="Fetches needed OOXML xsd files from the Internet">
         <get src="${ooxml.xsds.url}" dest="${ooxml.xsds.ozip}"/>
         <unzip src="${ooxml.xsds.ozip}" dest="${ooxml.lib}">
@@ -366,7 +367,7 @@ under the License.
             </patternset>
         </unzip>
     </target>
-    <target name="check-compiled-ooxml-xsds">
+    <target name="check-compiled-ooxml-xsds" depends="fetch-ooxml-xsds">
         <condition property="ooxml-compiled-xsds.present">
             <or>
                 <and>
@@ -377,7 +378,7 @@ under the License.
         </condition>
     </target>
     <target name="compile-ooxml-xsds" unless="ooxml-compiled-xsds.present"
-            depends="check-jars,fetch-jars"
+            depends="check-jars,fetch-jars,check-compiled-ooxml-xsds"
             description="Unpacks the OOXML xsd files, and compiles them into XmlBeans">
         <property name="ooxml.xsds.tmp.dir" location="build/ooxml-xsds"/>
         <mkdir dir="${ooxml.xsds.tmp.dir}"/>
@@ -503,6 +504,11 @@ under the License.
                 <pathelement path="${ooxml.output.dir}"/>
             </classpath>
         </javac>
+        <copy todir="${examples.output.dir}">
+          <fileset dir="${examples.src}">
+            <include name="**/*.css"/>
+          </fileset>
+        </copy>
     </target>
 
     <target name="compile-ooxml" depends="compile-main,compile-scratchpad">
@@ -1069,5 +1075,22 @@ under the License.
       <m2-install artifactId="poi-ooxml-schemas"/>
     </target>
     
+    <!-- Runs Apache Rat against the source code, to spot any files -->
+    <!--  which are missing the correct license headers -->
+    <!-- You need to download rat from http://incubator.apache.org/rat/ -->
+    <!--  and place the Rat jar into your ant lib before running -->
+    <target name="rat-check">
+       <typedef resource="org/apache/rat/anttasks/antlib.xml"
+             uri="antlib:org.apache.rat.anttasks"/>
+       <rat:report xmlns:rat="antlib:org.apache.rat.anttasks">
+           <fileset dir="src/">
+              <exclude name="documentation/content/xdocs/dtd/" />
+              <exclude name="documentation/content/xdocs/entity/" />
+              <exclude name="scratchpad/testcases/dummy.txt" />
+              <exclude name="contrib/testcases/dummy.txt" />
+              <exclude name="examples/lib/dummy.txt" />
+           </fileset>
+       </rat:report>
+    </target>
 </project>
 
