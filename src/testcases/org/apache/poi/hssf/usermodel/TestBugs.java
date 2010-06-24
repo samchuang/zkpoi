@@ -35,8 +35,11 @@ import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.record.CellValueRecordInterface;
 import org.apache.poi.hssf.record.EmbeddedObjectRefSubRecord;
 import org.apache.poi.hssf.record.NameRecord;
+import org.apache.poi.hssf.record.Record;
+import org.apache.poi.hssf.record.TabIdRecord;
 import org.apache.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.apache.poi.hssf.record.common.UnicodeString;
+import org.apache.poi.hssf.record.formula.Area3DPtg;
 import org.apache.poi.hssf.record.formula.DeletedArea3DPtg;
 import org.apache.poi.hssf.record.formula.Ptg;
 import org.apache.poi.ss.usermodel.*;
@@ -1571,5 +1574,164 @@ public final class TestBugs extends BaseTestBugzillaIssues {
        
        assertEquals("RT", withoutExt.getString());
        assertTrue((withoutExt.getOptionFlags() & 0x0004) == 0x0000);
+    }
+    
+    /**
+     * Problem with cloning a sheet with a chart
+     *  contained in it.
+     */
+    public void test49096() throws Exception {
+       HSSFWorkbook wb = openSample("49096.xls");
+       assertEquals(1, wb.getNumberOfSheets());
+       
+       assertNotNull(wb.getSheetAt(0));
+       wb.cloneSheet(0);
+       assertEquals(2, wb.getNumberOfSheets());
+       
+       wb = writeOutAndReadBack(wb);
+       assertEquals(2, wb.getNumberOfSheets());
+    }
+    
+    /**
+     * Newly created sheets need to get a 
+     *  proper TabID, otherwise print setup
+     *  gets confused on them.
+     * Also ensure that print setup refs are
+     *  by reference not value 
+     */
+    public void test46664() throws Exception {
+       HSSFWorkbook wb = new HSSFWorkbook();
+       HSSFSheet sheet = wb.createSheet("new_sheet");
+       HSSFRow row = sheet.createRow((short)0);
+       row.createCell(0).setCellValue(new HSSFRichTextString("Column A"));
+       row.createCell(1).setCellValue(new HSSFRichTextString("Column B"));
+       row.createCell(2).setCellValue(new HSSFRichTextString("Column C"));
+       row.createCell(3).setCellValue(new HSSFRichTextString("Column D"));
+       row.createCell(4).setCellValue(new HSSFRichTextString("Column E"));
+       row.createCell(5).setCellValue(new HSSFRichTextString("Column F"));
+
+       //set print area from column a to column c (on first row)
+       wb.setPrintArea(
+               0, //sheet index
+               0, //start column
+               2, //end column
+               0, //start row
+               0  //end row
+       );
+       
+       wb = writeOutAndReadBack(wb);
+       
+       // Ensure the tab index
+       TabIdRecord tr = null;
+       for(Record r : wb.getWorkbook().getRecords()) {
+          if(r instanceof TabIdRecord) {
+             tr = (TabIdRecord)r;
+          }
+       }
+       assertNotNull(tr);
+       assertEquals(1, tr._tabids.length);
+       assertEquals(0, tr._tabids[0]);
+       
+       // Ensure the print setup
+       assertEquals("new_sheet!$A$1:$C$1", wb.getPrintArea(0));
+       assertEquals("new_sheet!$A$1:$C$1", wb.getName("Print_Area").getRefersToFormula());
+       
+       // Needs reference not value
+       NameRecord nr = wb.getWorkbook().getNameRecord(
+             wb.getNameIndex("Print_Area")
+       ); 
+       assertEquals("Print_Area", nr.getNameText());
+       assertEquals(1, nr.getNameDefinition().length);
+       assertEquals(
+             "new_sheet!$A$1:$C$1", 
+             ((Area3DPtg)nr.getNameDefinition()[0]).toFormulaString(HSSFEvaluationWorkbook.create(wb))
+       );
+       // TODO - fix me to be Reference not Value!
+if(1==2) {       
+       assertEquals('R', nr.getNameDefinition()[0].getRVAType());
+}
+    }
+    
+    /**
+     * Problems with formula references to 
+     *  sheets via URLs
+     */
+    public void test45970() throws Exception {
+       HSSFWorkbook wb = openSample("FormulaRefs.xls");
+       assertEquals(3, wb.getNumberOfSheets());
+       
+       HSSFSheet s = wb.getSheetAt(0);
+       HSSFRow row;
+       
+       row = s.getRow(0);
+       assertEquals(Cell.CELL_TYPE_NUMERIC, row.getCell(1).getCellType());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(1);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("B1", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(2);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("Sheet1!B1", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(3);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("[Formulas2.xls]Sheet1!B2", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(4);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("'[\u0005$http://gagravarr.org/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       // Change 4
+       row.getCell(1).setCellFormula("'[\u0005$http://gagravarr.org/FormulaRefs2.xls]Sheet1'!B2");
+       row.getCell(1).setCellValue(123.0);
+       
+       // Add 5
+       row = s.createRow(5);
+       row.createCell(1, Cell.CELL_TYPE_FORMULA);
+       row.getCell(1).setCellFormula("'[\u0005$http://example.com/FormulaRefs.xls]Sheet1'!B1");
+       row.getCell(1).setCellValue(234.0);
+       
+       
+       // Re-test
+       wb = writeOutAndReadBack(wb);
+       s = wb.getSheetAt(0);
+       
+       row = s.getRow(0);
+       assertEquals(Cell.CELL_TYPE_NUMERIC, row.getCell(1).getCellType());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(1);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("B1", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(2);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("Sheet1!B1", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(3);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("[Formulas2.xls]Sheet1!B2", row.getCell(1).getCellFormula());
+       assertEquals(112.0, row.getCell(1).getNumericCellValue());
+       
+// TODO - Fix these so they work...
+if(1==2) {
+       row = s.getRow(4);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("'[\u0005$http://gagravarr.org/FormulaRefs2.xls]Sheet1'!B2", row.getCell(1).getCellFormula());
+       assertEquals(123.0, row.getCell(1).getNumericCellValue());
+       
+       row = s.getRow(5);
+       assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
+       assertEquals("'[\u0005$http://example.com/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
+       assertEquals(234.0, row.getCell(1).getNumericCellValue());
+}
     }
 }

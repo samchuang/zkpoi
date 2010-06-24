@@ -17,18 +17,22 @@
 
 package org.apache.poi.xssf.usermodel;
 
-import java.awt.peer.SystemTrayPeer;
 import java.util.List;
 
 import org.apache.poi.POIXMLDocumentPart;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.ss.usermodel.BaseTestBugzillaIssues;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.XSSFITestDataProvider;
 import org.apache.poi.xssf.XSSFTestDataSamples;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellFill;
@@ -259,5 +263,138 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
        assertEquals(64, cs.getFillBackgroundColor());
        assertEquals(null, cs.getFillBackgroundXSSFColor().getARGBHex());
        assertEquals(null, cs.getFillBackgroundColorColor().getARGBHex());
+    }
+    
+    /**
+     * With HSSF, if you create a font, don't change it, and
+     *  create a 2nd, you really do get two fonts that you 
+     *  can alter as and when you want.
+     * With XSSF, that wasn't the case, but this verfies
+     *  that it now is again
+     */
+    public void test48718() throws Exception {
+       // Verify the HSSF behaviour
+       // Then ensure the same for XSSF
+       Workbook[] wbs = new Workbook[] {
+             new HSSFWorkbook(),
+             new XSSFWorkbook()
+       };
+       int[] initialFonts = new int[] { 4, 1 };
+       for(int i=0; i<wbs.length; i++) {
+          Workbook wb = wbs[i];
+          int startingFonts = initialFonts[i];
+          
+          assertEquals(startingFonts, wb.getNumberOfFonts());
+          
+          // Get a font, and slightly change it
+          Font a = wb.createFont();
+          assertEquals(startingFonts+1, wb.getNumberOfFonts());
+          a.setFontHeightInPoints((short)23);
+          assertEquals(startingFonts+1, wb.getNumberOfFonts());
+          
+          // Get two more, unchanged
+          Font b = wb.createFont();
+          assertEquals(startingFonts+2, wb.getNumberOfFonts());
+          Font c = wb.createFont();
+          assertEquals(startingFonts+3, wb.getNumberOfFonts());
+       }
+    }
+    
+    /**
+     * Ensure General and @ format are working properly
+     *  for integers 
+     */
+    public void test47490() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("GeneralFormatTests.xlsx");
+       Sheet s = wb.getSheetAt(1);
+       Row r;
+       DataFormatter df = new DataFormatter();
+       
+       r = s.getRow(1);
+       assertEquals(1.0, r.getCell(2).getNumericCellValue());
+       assertEquals("General", r.getCell(2).getCellStyle().getDataFormatString());
+       assertEquals("1", df.formatCellValue(r.getCell(2)));
+       assertEquals("1", df.formatRawCellContents(1.0, -1, "@"));
+       assertEquals("1", df.formatRawCellContents(1.0, -1, "General"));
+              
+       r = s.getRow(2);
+       assertEquals(12.0, r.getCell(2).getNumericCellValue());
+       assertEquals("General", r.getCell(2).getCellStyle().getDataFormatString());
+       assertEquals("12", df.formatCellValue(r.getCell(2)));
+       assertEquals("12", df.formatRawCellContents(12.0, -1, "@"));
+       assertEquals("12", df.formatRawCellContents(12.0, -1, "General"));
+       
+       r = s.getRow(3);
+       assertEquals(123.0, r.getCell(2).getNumericCellValue());
+       assertEquals("General", r.getCell(2).getCellStyle().getDataFormatString());
+       assertEquals("123", df.formatCellValue(r.getCell(2)));
+       assertEquals("123", df.formatRawCellContents(123.0, -1, "@"));
+       assertEquals("123", df.formatRawCellContents(123.0, -1, "General"));
+    }
+    
+    /**
+     * Ensures that XSSF and HSSF agree with each other,
+     *  and with the docs on when fetching the wrong
+     *  kind of value from a Formula cell
+     */
+    public void test47815() {
+       Workbook[] wbs = new Workbook[] {
+             new HSSFWorkbook(),
+             new XSSFWorkbook()
+       };
+       for(Workbook wb : wbs) {
+          Sheet s = wb.createSheet();
+          Row r = s.createRow(0);
+          
+          // Setup
+          Cell cn = r.createCell(0, Cell.CELL_TYPE_NUMERIC);
+          cn.setCellValue(1.2);
+          Cell cs = r.createCell(1, Cell.CELL_TYPE_STRING);
+          cs.setCellValue("Testing");
+          
+          Cell cfn = r.createCell(2, Cell.CELL_TYPE_FORMULA);
+          cfn.setCellFormula("A1");  
+          Cell cfs = r.createCell(3, Cell.CELL_TYPE_FORMULA);
+          cfs.setCellFormula("B1");
+          
+          FormulaEvaluator fe = wb.getCreationHelper().createFormulaEvaluator();
+          assertEquals(Cell.CELL_TYPE_NUMERIC, fe.evaluate(cfn).getCellType());
+          assertEquals(Cell.CELL_TYPE_STRING, fe.evaluate(cfs).getCellType());
+          fe.evaluateFormulaCell(cfn);
+          fe.evaluateFormulaCell(cfs);
+          
+          // Now test
+          assertEquals(Cell.CELL_TYPE_NUMERIC, cn.getCellType());
+          assertEquals(Cell.CELL_TYPE_STRING, cs.getCellType());
+          assertEquals(Cell.CELL_TYPE_FORMULA, cfn.getCellType());
+          assertEquals(Cell.CELL_TYPE_NUMERIC, cfn.getCachedFormulaResultType());
+          assertEquals(Cell.CELL_TYPE_FORMULA, cfs.getCellType());
+          assertEquals(Cell.CELL_TYPE_STRING, cfs.getCachedFormulaResultType());
+          
+          // Different ways of retrieving
+          assertEquals(1.2, cn.getNumericCellValue());
+          try {
+             cn.getRichStringCellValue();
+             fail();
+          } catch(IllegalStateException e) {}
+          
+          assertEquals("Testing", cs.getStringCellValue());
+          try {
+             cs.getNumericCellValue();
+             fail();
+          } catch(IllegalStateException e) {}
+          
+          assertEquals(1.2, cfn.getNumericCellValue());
+          try {
+             cfn.getRichStringCellValue();
+             fail();
+          } catch(IllegalStateException e) {}
+          
+          assertEquals("Testing", cfs.getStringCellValue());
+          try {
+             cfs.getNumericCellValue();
+             fail();
+          } catch(IllegalStateException e) {}
+       }
     }
 }

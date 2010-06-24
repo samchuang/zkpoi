@@ -95,6 +95,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     private final TreeMap<Integer, HSSFRow> _rows;
     protected final InternalWorkbook _book;
     protected final HSSFWorkbook _workbook;
+    private HSSFPatriarch _patriarch;
     private int _firstrow;
     private int _lastrow;
 
@@ -1364,8 +1365,8 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
      * @param colSplit      Horizonatal position of split.
      * @param rowSplit      Vertical position of split.
-     * @param topRow        Top row visible in bottom pane
      * @param leftmostColumn   Left column visible in right pane.
+     * @param topRow        Top row visible in bottom pane
      */
     public void createFreezePane(int colSplit, int rowSplit, int leftmostColumn, int topRow) {
         validateColumn(colSplit);
@@ -1577,11 +1578,11 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
         _sheet.aggregateDrawingRecords(_book.getDrawingManager(), true);
         EscherAggregate agg = (EscherAggregate) _sheet.findFirstRecordBySid(EscherAggregate.sid);
-        HSSFPatriarch patriarch = new HSSFPatriarch(this, agg);
+        _patriarch = new HSSFPatriarch(this, agg);
         agg.clear();     // Initially the behaviour will be to clear out any existing shapes in the sheet when
                          // creating a new patriarch.
-        agg.setPatriarch(patriarch);
-        return patriarch;
+        agg.setPatriarch(_patriarch);
+        return _patriarch;
     }
 
     /**
@@ -1627,11 +1628,13 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      *  start from scratch!
      */
     public HSSFPatriarch getDrawingPatriarch() {
+        if(_patriarch != null) return _patriarch;
+        
         EscherAggregate agg = getDrawingEscherAggregate();
         if(agg == null) return null;
 
-        HSSFPatriarch patriarch = new HSSFPatriarch(this, agg);
-        agg.setPatriarch(patriarch);
+        _patriarch = new HSSFPatriarch(this, agg);
+        agg.setPatriarch(_patriarch);
 
         // Have it process the records into high level objects
         //  as best it can do (this step may eat anything
@@ -1639,7 +1642,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         agg.convertRecordsToUserModel();
 
         // Return what we could cope with
-        return patriarch;
+        return _patriarch;
     }
 
     /**

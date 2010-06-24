@@ -33,6 +33,7 @@ public final class TestBasics extends TestCase {
    private MAPIMessage quick;
    private MAPIMessage outlook30;
    private MAPIMessage attachments;
+   private MAPIMessage noRecipientAddress;
 
 	/**
 	 * Initialize this test, load up the blank.msg mapi message.
@@ -44,6 +45,7 @@ public final class TestBasics extends TestCase {
       quick  = new MAPIMessage(samples.openResourceAsStream("quick.msg"));
       outlook30  = new MAPIMessage(samples.openResourceAsStream("outlook_30_msg.msg"));
       attachments = new MAPIMessage(samples.openResourceAsStream("attachment_test_msg.msg"));
+      noRecipientAddress = new MAPIMessage(samples.openResourceAsStream("no_recipient_address.msg"));
 	}
 	
 	/**
@@ -73,6 +75,35 @@ public final class TestBasics extends TestCase {
       assertEquals("Test the content transformer", quick.getSubject());
       assertEquals("IN-SPIRE servers going down for a bit, back up around 8am", outlook30.getSubject());
       assertEquals("test pi\u00e8ce jointe 1", attachments.getSubject());
+	}
+	
+	/**
+	 * Test message headers
+	 */
+	public void testHeaders() throws Exception {
+	   // Simple email first
+	   assertEquals(26, simple.getHeaders().length);
+	   assertTrue(simple.getHeaders()[0].startsWith("Return-path:"));
+      assertTrue(simple.getHeaders()[1].equals("Envelope-to: travis@overwrittenstack.com"));
+      assertTrue(simple.getHeaders()[25].startsWith("X-Antivirus-Scanner: Clean"));
+      
+      // Quick doesn't have them
+      try {
+         quick.getHeaders();
+         fail();
+      } catch(ChunkNotFoundException e) {}
+      
+      // Attachments doesn't have them
+      try {
+         attachments.getHeaders();
+         fail();
+      } catch(ChunkNotFoundException e) {}
+      
+      // Outlook30 has some
+      assertEquals(33, outlook30.getHeaders().length);
+      assertTrue(outlook30.getHeaders()[0].startsWith("Microsoft Mail Internet Headers"));
+      assertTrue(outlook30.getHeaders()[1].startsWith("x-mimeole:"));
+      assertTrue(outlook30.getHeaders()[32].startsWith("\t\"Williams")); // May need better parsing in future
 	}
 	
 	/**
@@ -110,5 +141,40 @@ public final class TestBasics extends TestCase {
       } catch(ChunkNotFoundException e) {
          // Good
       }
+	}
+	
+	/**
+	 * More missing chunk testing, this time for
+	 *  missing recipient email address
+	 */
+	public void testMissingAddressChunk() throws Exception {
+      assertEquals(false, noRecipientAddress.isReturnNullOnMissingChunk());
+
+      try {
+         noRecipientAddress.getRecipientEmailAddress();
+         fail();
+      } catch(ChunkNotFoundException e) {
+         // Good
+      }
+      try {
+         noRecipientAddress.getRecipientEmailAddressList();
+         fail();
+      } catch(ChunkNotFoundException e) {
+         // Good
+      }
+      
+      noRecipientAddress.setReturnNullOnMissingChunk(true);
+      
+      noRecipientAddress.getRecipientEmailAddress();
+      noRecipientAddress.getRecipientEmailAddressList();
+      assertEquals("", noRecipientAddress.getRecipientEmailAddress());
+      assertEquals(1, noRecipientAddress.getRecipientEmailAddressList().length);
+      assertEquals(null, noRecipientAddress.getRecipientEmailAddressList()[0]);
+      
+      // Check a few other bits too
+      assertEquals("Microsoft Outlook 2003 Team", noRecipientAddress.getDisplayFrom());
+      assertEquals("New Outlook User", noRecipientAddress.getDisplayTo());
+      
+      noRecipientAddress.setReturnNullOnMissingChunk(false);
 	}
 }
