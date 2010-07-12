@@ -20,8 +20,10 @@ package org.apache.poi.hssf.usermodel;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.poi.hssf.model.InternalSheet;
 import org.apache.poi.hssf.record.CellValueRecordInterface;
 import org.apache.poi.hssf.record.ExtendedFormatRecord;
+import org.apache.poi.hssf.record.NoteRecord;
 import org.apache.poi.hssf.record.RowRecord;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -683,4 +685,119 @@ public final class HSSFRow implements Row {
         }
         return false;
     }
+    
+    //20100524, henrichen@zkoss.org
+    /**
+     * Shifts cells between startColumn and endColumn n number of columns.
+     * If you use a negative number, it will shift columns left.
+     * Code ensures that columns don't wrap around
+     *
+     * @param startCol the column to start shifting
+     * @param endCol the column to end shifting
+     * @param n the number of columns to shift
+     * @param clearRest whether clear the rest cells after the shifted endCol
+     */
+    public void shiftCells(int startCol, int endCol, int n, boolean clearRest) {
+    	final InternalSheet _sheet = sheet.getSheet();
+    	if (endCol < 0) {
+    		endCol = getLastCellNum() - 1;
+    	}
+    	
+        int s, inc;
+        if (n < 0) {
+        	if (endCol < (startCol + n))
+        		return;
+            s = startCol;
+            inc = 1;
+        } else {
+        	if (endCol < startCol)
+        		return;
+            s = endCol; 
+            inc = -1;
+        }
+
+        final int rowNum = getRowNum();
+        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum < 256; colNum += inc ) {
+        	HSSFCell cell = getCell(colNum, RETURN_NULL_AND_BLANK);
+            // notify cell in this row that we are going to shift them,
+            // it can throw IllegalStateException if the operation is not allowed, for example,
+            // if the cell included in a multi-cell array formula
+            if(cell != null) notifyCellShifting(cell);
+
+            final int newColNum = colNum + n;
+            final boolean inbound = newColNum >= 0 && newColNum <= SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+            
+            if (!inbound) {
+            	if (cell != null) {
+            		removeCell(cell);
+            	}
+            	continue;
+            }
+
+            //exists target cell, shall remove it first! 
+        	HSSFCell replaceCell = getCell(newColNum, RETURN_NULL_AND_BLANK);
+        	if (replaceCell != null) {
+                removeCell(replaceCell);
+        	}
+        	
+        	if (cell == null) {
+        		continue;
+        	}
+        	
+            //move cell to target column
+            CellValueRecordInterface cellRecord = cell.getCellValueRecord();
+            
+            //remove cell from the row but keep the record in cell
+            if(cell.isPartOfArrayFormulaGroup()){
+                cell.notifyArrayFormulaChanging();
+            }
+            cells[colNum]=null;
+            
+            _sheet.removeValueRecord(rowNum, cellRecord); //remove the record from the sheet
+            cellRecord.setColumn((short)newColNum); //set new column
+            addCell(cell);
+            _sheet.addValueRecord(rowNum, cellRecord);
+
+            //adjust hyperlink columns
+            HSSFHyperlink link = cell.getHyperlink();
+            if(link != null){
+                link.setFirstColumn(link.getFirstColumn() + n);
+                link.setLastColumn(link.getLastColumn() + n);
+            }
+        }
+        //special case1: endRow < startRow
+        //special case2: (endRow - startRow + 1) < ABS(n)
+        if (n < 0) {
+        	if (endCol < startCol) { //special case1
+	    		final int replacedStartCol = startCol + n;
+	            for ( int colNum = replacedStartCol; colNum >= replacedStartCol && colNum <= endCol && colNum >= 0 && colNum < 65536; ++colNum) {
+	            	final HSSFCell cell = getCell(colNum, RETURN_NULL_AND_BLANK);
+	            	if (cell != null) {
+	            		removeCell(cell);
+	            	}
+	            }
+            } else if (clearRest) { //special case 2
+            	final int replacedStartCol = endCol + n + 1;
+            	if (replacedStartCol <= startCol) {
+    	            for ( int colNum = replacedStartCol; colNum >= replacedStartCol && colNum <= startCol && colNum >= 0 && colNum < 65536; ++colNum) {
+    	            	final HSSFCell cell = getCell(colNum, RETURN_NULL_AND_BLANK);
+    	            	if (cell != null) {
+    	            		removeCell(cell);
+    	            	}
+    	            }
+            	}
+        	}
+        }
+    }
+    
+    //20100524, henrichen@zkoss.org
+    private void notifyCellShifting(HSSFCell cell){
+        String msg = "Cell[rownum="+cell.getRowIndex()+", columnnum="+cell.getColumnIndex()+"] included in a multi-cell array formula. " +
+                "You cannot change part of an array.";
+        if(cell.isPartOfArrayFormulaGroup()){
+            cell.notifyArrayFormulaChanging(msg);
+        }
+    }
+
+
 }

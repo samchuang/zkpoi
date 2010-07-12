@@ -18,6 +18,7 @@
 package org.apache.poi.xwpf.usermodel;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -58,27 +59,62 @@ public final class TestXWPFHeader extends TestCase {
 		CTText t = ctR1.addNewT();
 		t.setStringValue("Paragraph in header");
 
+		// Commented MB 23 May 2010
+		//CTP ctP2 = CTP.Factory.newInstance();
+		//CTR ctR2 = ctP2.addNewR();
+		//CTText t2 = ctR2.addNewT();
+		//t2.setStringValue("Second paragraph.. for footer");
+		
+		// Create two paragraphs for insertion into the footer.
+		// Previously only one was inserted MB 23 May 2010
 		CTP ctP2 = CTP.Factory.newInstance();
 		CTR ctR2 = ctP2.addNewR();
 		CTText t2 = ctR2.addNewT();
-		t2.setStringValue("Second paragraph.. for footer");
+		t2.setStringValue("First paragraph for the footer");
+		
+		CTP ctP3 = CTP.Factory.newInstance();
+		CTR ctR3 = ctP3.addNewR();
+		CTText t3 = ctR3.addNewT();
+		t3.setStringValue("Second paragraph for the footer");
 
 		XWPFParagraph p1 = new XWPFParagraph(ctP1);
 		XWPFParagraph[] pars = new XWPFParagraph[1];
 		pars[0] = p1;
 
 		XWPFParagraph p2 = new XWPFParagraph(ctP2);
-		XWPFParagraph[] pars2 = new XWPFParagraph[1];
+		XWPFParagraph p3 = new XWPFParagraph(ctP3, null);
+		XWPFParagraph[] pars2 = new XWPFParagraph[2];
 		pars2[0] = p2;
+		pars2[1] = p3;
 
-		// set a default header and test it is not null
+		// Set headers
 		policy.createHeader(policy.DEFAULT, pars);
 		policy.createHeader(policy.FIRST);
-		policy.createFooter(policy.DEFAULT, pars2);
+		// Set a default footer and capture the returned XWPFFooter object.
+		XWPFFooter footer = policy.createFooter(policy.DEFAULT, pars2);
 
+		// Ensure the headers and footer were set correctly....
 		assertNotNull(policy.getDefaultHeader());
 		assertNotNull(policy.getFirstPageHeader());
 		assertNotNull(policy.getDefaultFooter());
+		// ....and that the footer object captured above contains two
+		// paragraphs of text.
+		assertEquals(footer.getParagraphs().size(), 2);
+		
+		// As an additional check, recover the defauls footer and
+		// make sure that it contains two paragraphs of text and that
+		// both do hold what is expected.
+		footer = policy.getDefaultFooter();
+
+		XWPFParagraph[] paras = new XWPFParagraph[footer.getParagraphs().size()];
+		int i=0;
+		for(XWPFParagraph p : footer.getParagraphs()) {
+		   paras[i++] = p;
+		}
+		
+		assertEquals(paras.length, 2);
+		assertEquals(paras[0].getText(), "First paragraph for the footer");
+		assertEquals(paras[1].getText(), "Second paragraph for the footer");
 	}
 
 	public void testSetWatermark() {

@@ -19,6 +19,9 @@ package org.apache.poi.ss.usermodel;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.RoundingMode;
 import java.text.*;
 
 /**
@@ -77,6 +80,16 @@ public class DataFormatter {
     /** A regex to find patterns like [$$-1009] and [$?-452]. */
     private static final Pattern specialPatternGroup = Pattern.compile("(\\[\\$[^-\\]]*-[0-9A-Z]+\\])");
 
+    /** 
+     * A regex to match the colour formattings rules.
+     * Allowed colours are: Black, Blue, Cyan, Green,
+     *  Magenta, Red, White, Yellow, "Color n" (1<=n<=56)
+     */
+    private static final Pattern colorPattern = 
+       Pattern.compile("(\\[BLACK\\])|(\\[BLUE\\])|(\\[CYAN\\])|(\\[GREEN\\])|" +
+       		"(\\[MAGENTA\\])|(\\[RED\\])|(\\[WHITE\\])|(\\[YELLOW\\])|" +
+       		"(\\[COLOR\\s*\\d\\])|(\\[COLOR\\s*[0-5]\\d\\])", Pattern.CASE_INSENSITIVE);
+    
     /**
      * The decimal symbols of the locale used for formatting values.
      */
@@ -165,6 +178,20 @@ public class DataFormatter {
     }
 
     private Format getFormat(double cellValue, int formatIndex, String formatStr) {
+       // Excel supports positive/negative/zero, but java
+       // doesn't, so we need to do it specially
+       if(formatStr.indexOf(';') != formatStr.lastIndexOf(';')) {
+          int lastAt = formatStr.lastIndexOf(';');
+          String zeroFormat = formatStr.substring(lastAt+1);
+          String normalFormat = formatStr.substring(0,lastAt);
+          if(cellValue == 0.0) {
+             formatStr = zeroFormat;
+          } else {
+             formatStr = normalFormat;
+          }
+       }
+      
+       // See if we already have it cached
         Format format = formats.get(formatStr);
         if (format != null) {
             return format;
@@ -195,8 +222,24 @@ public class DataFormatter {
     }
 
     private Format createFormat(double cellValue, int formatIndex, String sFormat) {
-        // remove color formatting if present
-        String formatStr = sFormat.replaceAll("\\[[a-zA-Z]*\\]", "");
+        String formatStr = sFormat;
+        
+        // Remove colour formatting if present
+        Matcher colourM = colorPattern.matcher(formatStr);
+        while(colourM.find()) {
+           String colour = colourM.group();
+           
+           // Paranoid replacement...
+           int at = formatStr.indexOf(colour);
+           if(at == -1) break;
+           String nFormatStr = formatStr.substring(0,at) +
+              formatStr.substring(at+colour.length());
+           if(nFormatStr.equals(formatStr)) break;
+
+           // Try again in case there's multiple
+           formatStr = nFormatStr;
+           colourM = colorPattern.matcher(formatStr);
+        }
 
         // try to extract special characters like currency
         Matcher m = specialPatternGroup.matcher(formatStr);
@@ -235,7 +278,10 @@ public class DataFormatter {
         formatStr = formatStr.replaceAll("\\\\-","-");
         formatStr = formatStr.replaceAll("\\\\,",",");
         formatStr = formatStr.replaceAll("\\\\ "," ");
+        formatStr = formatStr.replaceAll("\\\\/","/"); // weird: m\\/d\\/yyyy 
         formatStr = formatStr.replaceAll(";@", "");
+        formatStr = formatStr.replaceAll("\"/\"", "/"); // "/" is escaped for no reason in: mm"/"dd"/"yyyy
+
         boolean hasAmPm = false;
         Matcher amPmMatcher = amPmPattern.matcher(formatStr);
         while (amPmMatcher.find()) {
@@ -253,7 +299,7 @@ public class DataFormatter {
         }
 
         // Convert excel date format to SimpleDateFormat.
-        // Excel uses lower case 'm' for both minutes and months.
+        // Excel uses lower and upper case 'm' for both minutes and months.
         // From Excel help:
         /*
             The "m" or "mm" code must appear immediately after the "h" or"hh"
@@ -275,7 +321,7 @@ public class DataFormatter {
                     sb.append('H');
                 }
             }
-            else if (c == 'm') {
+            else if (c == 'm' || c == 'M') {
                 if(mIsMonth) {
                     sb.append('M');
                     ms.add(
@@ -317,7 +363,7 @@ public class DataFormatter {
         formatStr = sb.toString();
 
         try {
-            return new SimpleDateFormat(formatStr, dateSymbols);
+            return new ExcelStyleDateFormatter(formatStr, dateSymbols);
         } catch(IllegalArgumentException iae) {
 
             // the pattern could not be parsed correctly,
@@ -329,23 +375,36 @@ public class DataFormatter {
 
     private Format createNumberFormat(String formatStr, double cellValue) {
         StringBuffer sb = new StringBuffer(formatStr);
-        for (int i = 0; i < sb.length(); i++) {
+        
+        // If they requested spacers, with "_",
+        //  remove those as we don't do spacing
+        // If they requested full-column-width
+        //  padding, with "*", remove those too
+        for(int i = 0; i < sb.length(); i++) {
             char c = sb.charAt(i);
-            //handle (#,##0_);
-            if (c == '(') {
-                int idx = sb.indexOf(")", i);
-                if (idx > -1 && sb.charAt(idx -1) == '_') {
-                    sb.deleteCharAt(idx);
-                    sb.deleteCharAt(idx - 1);
-                    sb.deleteCharAt(i);
-                    i--;
-                }
-            } else if (c == ')' && i > 0 && sb.charAt(i - 1) == '_') {
-                sb.deleteCharAt(i);
-                sb.deleteCharAt(i - 1);
-                i--;
+            if(c == '_' || c == '*') {
+               if(i > 0 && sb.charAt((i-1)) == '\\') {
+                  // It's escaped, don't worry
+                  continue;
+               } else {
+                  if(i < sb.length()-1) {
+                     // Remove the character we're supposed
+                     //  to match the space of / pad to the
+                     //  column width with
+                     sb.deleteCharAt(i+1);
+                  }
+                  // Remove the _ too
+                  sb.deleteCharAt(i);
+               }
+            }
+        }
+        
+        // Now, handle the other aspects like 
+        //  quoting and scientific notation
+        for(int i = 0; i < sb.length(); i++) {
+           char c = sb.charAt(i);
             // remove quotes and back slashes
-            } else if (c == '\\' || c == '"') {
+            if (c == '\\' || c == '"') {
                 sb.deleteCharAt(i);
                 i--;
 
@@ -357,7 +416,9 @@ public class DataFormatter {
         }
 
         try {
-            return new DecimalFormat(sb.toString(), decimalSymbols);
+            DecimalFormat df = new DecimalFormat(sb.toString(), decimalSymbols);
+            setExcelStyleRoundingMode(df);
+            return df;
         } catch(IllegalArgumentException iae) {
 
             // the pattern could not be parsed correctly,
@@ -395,6 +456,17 @@ public class DataFormatter {
         }
         return generalDecimalNumFormat;
     }
+    
+    /**
+     * Performs Excel-style date formatting, using the
+     *  supplied Date and format
+     */
+    private String performDateFormatting(Date d, Format dateFormat) {
+       if(dateFormat != null) {
+          return dateFormat.format(d);
+      }
+      return d.toString();
+    }
 
     /**
      * Returns the formatted value of an Excel date as a <tt>String</tt> based
@@ -406,11 +478,14 @@ public class DataFormatter {
      */
     private String getFormattedDateString(Cell cell) {
         Format dateFormat = getFormat(cell);
-        Date d = cell.getDateCellValue();
-        if (dateFormat != null) {
-            return dateFormat.format(d);
+        if(dateFormat instanceof ExcelStyleDateFormatter) {
+           // Hint about the raw excel value
+           ((ExcelStyleDateFormatter)dateFormat).setDateToBeFormatted(
+                 cell.getNumericCellValue()
+           );
         }
-        return d.toString();
+        Date d = cell.getDateCellValue();
+        return performDateFormatting(d, dateFormat);
     }
 
     /**
@@ -438,16 +513,24 @@ public class DataFormatter {
      * @see #formatCellValue(Cell)
      */
     public String formatRawCellContents(double value, int formatIndex, String formatString) {
+       return formatRawCellContents(value, formatIndex, formatString, false);
+    }
+    /**
+     * Formats the given raw cell value, based on the supplied
+     *  format index and string, according to excel style rules.
+     * @see #formatCellValue(Cell)
+     */
+    public String formatRawCellContents(double value, int formatIndex, String formatString, boolean use1904Windowing) {
         // Is it a date?
         if(DateUtil.isADateFormat(formatIndex,formatString) &&
                 DateUtil.isValidExcelDate(value)) {
-
             Format dateFormat = getFormat(value, formatIndex, formatString);
-            Date d = DateUtil.getJavaDate(value);
-            if (dateFormat == null) {
-                return d.toString();
+            if(dateFormat instanceof ExcelStyleDateFormatter) {
+               // Hint about the raw excel value
+               ((ExcelStyleDateFormatter)dateFormat).setDateToBeFormatted(value);
             }
-            return dateFormat.format(d);
+            Date d = DateUtil.getJavaDate(value, use1904Windowing);
+            return performDateFormatting(d, dateFormat);
         }
         // else Number
         Format numberFormat = getFormat(value, formatIndex, formatString);
@@ -597,6 +680,30 @@ public class DataFormatter {
         result.setParseIntegerOnly(true);
         return result;
     }
+    
+    /**
+     * Enables excel style rounding mode (round half up)
+     *  on the Decimal Format if possible.
+     * This will work for Java 1.6, but isn't possible
+     *  on Java 1.5. 
+     */
+    public static void setExcelStyleRoundingMode(DecimalFormat format) {
+       try {
+          Method srm = format.getClass().getMethod("setRoundingMode", RoundingMode.class);
+          srm.invoke(format, RoundingMode.HALF_UP);
+       } catch(NoSuchMethodException e) {
+          // Java 1.5
+       } catch(IllegalAccessException iae) {
+          // Shouldn't happen
+          throw new RuntimeException("Unable to set rounding mode", iae);
+       } catch(InvocationTargetException ite) {
+          // Shouldn't happen
+          throw new RuntimeException("Unable to set rounding mode", ite);
+       } catch(SecurityException se) {
+          // Not much we can do here
+       }
+    }
+    
     /**
      * Format class for Excel's SSN format. This class mimics Excel's built-in
      * SSN formatting.

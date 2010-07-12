@@ -700,7 +700,7 @@ public class HSSFCell implements Cell {
     /**
      * get the value of the cell as a string - for numeric cells we throw an exception.
      * For blank cells we return an empty string.
-     * For formulaCells that are not string Formulas, we return empty String
+     * For formulaCells that are not string Formulas, we throw an exception
      */
     public String getStringCellValue()
     {
@@ -711,7 +711,7 @@ public class HSSFCell implements Cell {
     /**
      * get the value of the cell as a string - for numeric cells we throw an exception.
      * For blank cells we return an empty string.
-     * For formulaCells that are not string Formulas, we return empty String
+     * For formulaCells that are not string Formulas, we throw an exception
      */
     public HSSFRichTextString getRichStringCellValue() {
 
@@ -1079,12 +1079,16 @@ public class HSSFCell implements Cell {
                 if (note.getRow() == row && note.getColumn() == column) {
                     if(i < noteTxo.size()) {
                         TextObjectRecord txo = noteTxo.get(note.getShapeId());
-                        comment = new HSSFComment(note, txo);
-                        comment.setRow(note.getRow());
-                        comment.setColumn((short) note.getColumn());
-                        comment.setAuthor(note.getAuthor());
-                        comment.setVisible(note.getFlags() == NoteRecord.NOTE_VISIBLE);
-                        comment.setString(txo.getStr());
+                        if(txo != null){
+                            comment = new HSSFComment(note, txo);
+                            comment.setRow(note.getRow());
+                            comment.setColumn(note.getColumn());
+                            comment.setAuthor(note.getAuthor());
+                            comment.setVisible(note.getFlags() == NoteRecord.NOTE_VISIBLE);
+                            comment.setString(txo.getStr());     
+                        } else{
+                            log.log(POILogger.WARN, "Failed to match NoteRecord and TextObjectRecord, row: " + row + ", column: " + column);
+                         }
                     } else {
                         log.log(POILogger.WARN, "Failed to match NoteRecord and TextObjectRecord, row: " + row + ", column: " + column);
                     }

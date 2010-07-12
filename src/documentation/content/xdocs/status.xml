@@ -33,7 +33,58 @@
     </developers>
 
     <changes>
-        <release version="3.7-SNAPSHOT" date="2010-??-??">
+        <release version="3.7-beta2" date="2010-??-??">
+        </release>
+        <release version="3.7-beta1" date="2010-06-20">
+           <action dev="POI-DEVELOPERS" type="fix">49432 - Lazy caching of XSSFComment CTComment objects by reference, to make repeated comment searching faster</action>
+           <action dev="POI-DEVELOPERS" type="fix">Better handling of Outlook messages in HSMF when there's no recipient email address</action>
+           <action dev="POI-DEVELOPERS" type="fix">When formatting numbers with DataFormatter, handle brackets following colours</action>
+           <action dev="POI-DEVELOPERS" type="add">48574 - further XWPF support for tables, paragraphs, including enhanced support for adding new ones</action>
+           <action dev="POI-DEVELOPERS" type="add">48245 - tweak HWPF table cell detection to work across more files</action>
+           <action dev="POI-DEVELOPERS" type="add">48996 - initial support for External Name References in HSSF formula evaluation</action>
+           <action dev="POI-DEVELOPERS" type="fix">46664 - fix up Tab IDs when adding new sheets, so that print areas don't end up invalid</action>
+           <action dev="POI-DEVELOPERS" type="fix">45269 - improve replaceText on HWPF ranges</action>
+           <action dev="POI-DEVELOPERS" type="fix">47815 - correct documentation on what happens when you request a String from a non-string Formula cell</action>
+           <action dev="POI-DEVELOPERS" type="fix">49386 - avoid NPE when extracting OOXML file properties which are dates</action>
+           <action dev="POI-DEVELOPERS" type="fix">49377 - only call DecimalFormat.setRoundingMode on Java 1.6 - it's needed to match excel's rendering of numbers</action>
+           <action dev="POI-DEVELOPERS" type="fix">49378 - correct 1.6ism</action>
+           <action dev="POI-DEVELOPERS" type="add">Parse the HSMF headers chunk if present, and use it to find Dates in text extraction if needed</action>
+           <action dev="POI-DEVELOPERS" type="fix">48494 - detect and support time formats like HH:MM;HH:MM</action>
+           <action dev="POI-DEVELOPERS" type="fix">48494 - have ExcelExtractor make use of HSSFDataFormatter, so that numbers and dates come out closer to how Excel would render them</action>
+           <action dev="POI-DEVELOPERS" type="fix">48494 - have EventBasedExcelExtractor make use of HSSFDataFormatter, so that numbers and dates come out closer to how Excel would render them</action>
+           <action dev="POI-DEVELOPERS" type="fix">49096 - add clone support to Chart begin and end records, to allow cloning of more Chart containing sheets</action>
+           <action dev="POI-DEVELOPERS" type="add">List attachment names in the output of OutlookTextExtractor (to get attachment contents, use ExtractorFactory as normal)</action>
+           <action dev="POI-DEVELOPERS" type="fix">48872 - allow DateFormatter.formatRawCellContents to handle 1904 as well as 1900 dates</action>
+           <action dev="POI-DEVELOPERS" type="fix">48872 - handle MMMMM and elapsed time formatting rules in DataFormatter</action>
+           <action dev="POI-DEVELOPERS" type="fix">48872 - handle zero formatting rules, and better color detection in DataFormatter</action>
+           <action dev="POI-DEVELOPERS" type="fix">48872 - support for more kinds of formatting in DataFormatter</action>
+           <action dev="POI-DEVELOPERS" type="fix">43161 - fixed construction of the DIB picture header</action>
+           <action dev="POI-DEVELOPERS" type="add">49311 - initial support for reading AES-encrypted/write-protected OOXML files</action>
+           <action dev="POI-DEVELOPERS" type="fix">48718 - Make the creation of multiple, un-modified fonts in a row in XSSF match the old HSSF behaviour</action>
+           <action dev="POI-DEVELOPERS" type="fix">44916 - Allow access to the HSSFPatriarch from HSSFSheet once created</action>
+           <action dev="POI-DEVELOPERS" type="add">48779 - Allow you to get straight from a CellStyle to a Color, irrespective of if the Color is indexed or inline-defined</action>
+           <action dev="POI-DEVELOPERS" type="add">48924 - Allow access of the HWPF DateAndTime underlying date values</action>
+           <action dev="POI-DEVELOPERS" type="add">48926 - Initial support for the HWPF revision marks authors list</action>
+           <action dev="POI-DEVELOPERS" type="fix">49160 - Ensure that CTDigSigBlob is included in poi-ooxml jar</action>
+           <action dev="POI-DEVELOPERS" type="fix">49189 - Detect w:tab and w:cr entries in XWPF paragraphs, even when the XSD is silly and maps them to CTEmpty</action>
+           <action dev="POI-DEVELOPERS" type="fix">49273 - Correct handling for Font Character Sets with indicies greater than 127</action>
+           <action dev="POI-DEVELOPERS" type="add">49334 - Track the ValueRangeRecords of charts in HSSFChart, to allow the basic axis operations</action>
+           <action dev="POI-DEVELOPERS" type="add">49242 - Track the LinkDataRecords of charts in HSSFChart</action>
+           <action dev="POI-DEVELOPERS" type="add">Improved performance of XSSFWorkbook.write </action>
+           <action dev="POI-DEVELOPERS" type="fix">48846 - Avoid NPE when finding cell comments</action>
+           <action dev="POI-DEVELOPERS" type="fix">49325 - Ensure that CTPhoneticPr is included in poi-ooxml jar</action>
+           <action dev="POI-DEVELOPERS" type="fix">49191 - Fixed tests failing in non-english locales</action>
+           <action dev="POI-DEVELOPERS" type="add">48432 - Support for XSSF themes</action>
+           <action dev="POI-DEVELOPERS" type="add">49244 - Support for data validation for OOXML format</action>
+           <action dev="POI-DEVELOPERS" type="add">49066 - Worksheet/cell formatting, with view and HTML converter</action>
+           <action dev="POI-DEVELOPERS" type="fix">49020 - Workaround Excel outputting invalid XML in button definitions by not closing BR tags</action>
+           <action dev="POI-DEVELOPERS" type="fix">49050 - Improve performance of AbstractEscherHolderRecord when there are lots of Continue Records</action>
+           <action dev="POI-DEVELOPERS" type="fix">49194 - Correct text size limit for OOXML .xlsx files</action>
+           <action dev="POI-DEVELOPERS" type="fix">49254 - Fix CellUtils.setFont to use the correct type internally</action>
+           <action dev="POI-DEVELOPERS" type="fix">49139 - Properly support 4k big block size in POIFS</action>
+           <action dev="POI-DEVELOPERS" type="fix">48936 - Avoid writing malformed CDATA blocks in sharedStrings.xml</action>
+           <action dev="POI-DEVELOPERS" type="add">49026 - Added implementation for TEXT()  </action>
+           <action dev="POI-DEVELOPERS" type="add">49025 - Added implementation for TRUNC()  </action>
            <action dev="POI-DEVELOPERS" type="fix">49147 - Properly close internal InputStream in ExtractorFactory#createExtractor(File)</action>
            <action dev="POI-DEVELOPERS" type="fix">49138 - Fixed locale-sensitive formatters in PackagePropertiesPart</action>
            <action dev="POI-DEVELOPERS" type="fix">49153 - Ensure that CTVectorVariant is included in poi-ooxml-schemas.jar</action>
@@ -68,6 +119,7 @@
            <action dev="POI-DEVELOPERS" type="fix">48339 - fixed ExternalNameRecord to properly distinguish DDE data from OLE data items </action>
            <action dev="POI-DEVELOPERS" type="fix">47920 - allow editing workbooks embedded into PowerPoint files</action>
            <action dev="POI-DEVELOPERS" type="add">48343 - added implementation of SUBTOTAL function</action>
+           <action dev="POI-DEVELOPERS" type="fix">Switch to compiling the OOXML Schemas for Java 1.5</action>
         </release>
         <release version="3.6" date="2009-12-14">
            <action dev="POI-DEVELOPERS" type="fix">48332 - fixed XSSFSheet autoSizeColumn() to tolerate empty RichTextString</action>

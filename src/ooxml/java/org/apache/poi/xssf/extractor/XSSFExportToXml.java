@@ -255,7 +255,8 @@ public class XSSFExportToXml implements Comparator<String>{
     private boolean isValid(Document xml) throws SAXException{
         boolean isValid = false;
         try{
-            String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+            String language = XMLConstants.XMLNS_ATTRIBUTE_NS_URI; 
+            	//XMLConstants.W3C_XML_SCHEMA_NS_URI;
             SchemaFactory factory = SchemaFactory.newInstance(language);
 
             Source source = new DOMSource(map.getSchema());

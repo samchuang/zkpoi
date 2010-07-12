@@ -17,12 +17,13 @@
 package org.apache.poi.xssf.usermodel;
 
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
+import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.util.Internal;
 
 /**
  * Represents a color in SpreadsheetML
  */
-public class XSSFColor {
+public class XSSFColor implements Color {
 	
 	private CTColor ctColor;
 
@@ -43,6 +44,11 @@ public class XSSFColor {
     public XSSFColor(java.awt.Color clr) {
         this();
         ctColor.setRgb(new byte[]{(byte)clr.getRed(), (byte)clr.getGreen(), (byte)clr.getBlue()});
+    }
+
+    public XSSFColor(byte[] rgb) {
+        this();
+        ctColor.setRgb(rgb);
     }
 
     /**
@@ -81,6 +87,51 @@ public class XSSFColor {
 	}
 	
     /**
+     * Standard Alpha Red Green Blue ctColor value (ARGB) with applied tint.
+     */
+	public byte[] getRgbWithTint() {
+		byte[] rgb =ctColor.getRgb();
+		for(int i = 0; i < rgb.length; i++){
+			rgb[i] = applyTint(rgb[i] & 0xFF, ctColor.getTint());
+		}
+		return rgb;
+	}
+	
+	/**
+	 * Return the ARGB value in hex format, eg FF00FF00.
+	 * For indexed colours, returns null.
+	 */
+	public String getARGBHex() {
+	   StringBuffer sb = new StringBuffer();
+	   byte[] rgb = getRgb();
+	   if(rgb == null) {
+	      return null;
+	   }
+	   for(byte c : rgb) {
+	      int i = (int)c;
+	      if(i < 0) {
+	         i += 256;
+	      }
+	      String cs = Integer.toHexString(i);
+	      if(cs.length() == 1) {
+	         sb.append('0');
+	      }
+	      sb.append(cs);
+	   }
+	   return sb.toString().toUpperCase();
+	}
+
+	private static byte applyTint(int lum, double tint){
+		if(tint > 0){
+			return (byte)(lum * (1.0-tint) + (255 - 255 * (1.0-tint)));
+		} else if (tint < 0){
+			return (byte)(lum*(1+tint));
+		} else {
+			return (byte)lum;
+		}
+	}
+
+    /**
      * Standard Alpha Red Green Blue ctColor value (ARGB).
      */
 	public void setRgb(byte[] rgb) {
@@ -91,8 +142,8 @@ public class XSSFColor {
      * Index into the <clrScheme> collection, referencing a particular <sysClr> or
      *  <srgbClr> value expressed in the Theme part.
      */
-    public int getTheme() {
-		return (int)ctColor.getTheme();
+   public int getTheme() {
+      return (int)ctColor.getTheme();
 	}
 	
     /**
@@ -213,5 +264,4 @@ public class XSSFColor {
         XSSFColor cf = (XSSFColor)o;
         return ctColor.toString().equals(cf.getCTColor().toString());
     }
-
 }

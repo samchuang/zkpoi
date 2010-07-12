@@ -42,11 +42,14 @@ import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellRange;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Footer;
 import org.apache.poi.ss.usermodel.Header;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.SSCellRange;
 import org.apache.poi.util.Internal;
@@ -58,7 +61,41 @@ import org.apache.poi.xssf.usermodel.helpers.XSSFRowShifter;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBreak;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellFormula;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCol;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCols;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTComment;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCommentList;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidation;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidations;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDrawing;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTHeaderFooter;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTHyperlink;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTLegacyDrawing;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTMergeCell;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTMergeCells;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTOutlinePr;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageBreak;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageMargins;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageSetUpPr;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPane;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPrintOptions;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRow;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSelection;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetData;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetFormatPr;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetPr;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetProtection;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetView;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetViews;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellFormulaType;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STPane;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STPaneState;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorksheetDocument;
 
 /**
  * High level representation of a SpreadsheetML worksheet.
@@ -76,12 +113,13 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     protected CTSheet sheet;
     protected CTWorksheet worksheet;
 
-    private TreeMap<Integer, XSSFRow> rows;
+    private TreeMap<Integer, XSSFRow> _rows;
     private List<XSSFHyperlink> hyperlinks;
     private ColumnHelper columnHelper;
     private CommentsTable sheetComments;
     private Map<Integer, XSSFCell> sharedFormulas;
     private List<CellRangeAddress> arrayFormulas;
+    private XSSFDataValidationHelper dataValidationHelper;    
 
     /**
      * Creates new XSSFSheet   - called by XSSFWorkbook to create a sheet from scratch.
@@ -90,6 +128,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      */
     protected XSSFSheet() {
         super();
+        dataValidationHelper = new XSSFDataValidationHelper(this);
         onDocumentCreate();
     }
 
@@ -102,6 +141,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      */
     protected XSSFSheet(PackagePart part, PackageRelationship rel) {
         super(part, rel);
+        dataValidationHelper = new XSSFDataValidationHelper(this);
     }
 
     /**
@@ -135,9 +175,14 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         initRows(worksheet);
         columnHelper = new ColumnHelper(worksheet);
 
+        // Look for bits we're interested in
         for(POIXMLDocumentPart p : getRelations()){
-            if(p instanceof CommentsTable) sheetComments = (CommentsTable)p;
+            if(p instanceof CommentsTable) {
+               sheetComments = (CommentsTable)p;
+               break;
+            }
         }
+        
         // Process external hyperlinks for the sheet, if there are any
         initHyperlinks();
     }
@@ -154,12 +199,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     }
 
     private void initRows(CTWorksheet worksheet) {
-        rows = new TreeMap<Integer, XSSFRow>();
+        _rows = new TreeMap<Integer, XSSFRow>();
         sharedFormulas = new HashMap<Integer, XSSFCell>();
         arrayFormulas = new ArrayList<CellRangeAddress>();
         for (CTRow row : worksheet.getSheetData().getRowArray()) {
             XSSFRow r = new XSSFRow(row, this);
-            rows.put(r.getRowNum(), r);
+            _rows.put(r.getRowNum(), r);
         }
     }
 
@@ -463,7 +508,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      */
     public XSSFRow createRow(int rownum) {
         CTRow ctRow;
-        XSSFRow prev = rows.get(rownum);
+        XSSFRow prev = _rows.get(rownum);
         if(prev != null){
             ctRow = prev.getCTRow();
             ctRow.set(CTRow.Factory.newInstance());
@@ -472,7 +517,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         }
         XSSFRow r = new XSSFRow(ctRow, this);
         r.setRowNum(rownum);
-        rows.put(rownum, r);
+        _rows.put(rownum, r);
         return r;
     }
 
@@ -667,7 +712,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @return the number of the first logical row on the sheet, zero based
      */
     public int getFirstRowNum() {
-        return rows.size() == 0 ? 0 : rows.firstKey();
+        return _rows.size() == 0 ? 0 : _rows.firstKey();
     }
 
     /**
@@ -780,7 +825,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     }
 
     public int getLastRowNum() {
-        return rows.size() == 0 ? 0 : rows.lastKey();
+        return _rows.size() == 0 ? 0 : _rows.lastKey();
     }
 
     public short getLeftCol() {
@@ -908,7 +953,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @return the number of phsyically defined rows
      */
     public int getPhysicalNumberOfRows() {
-        return rows.size();
+        return _rows.size();
     }
 
     /**
@@ -937,7 +982,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @return <code>XSSFRow</code> representing the rownumber or <code>null</code> if its not defined on the sheet
      */
     public XSSFRow getRow(int rownum) {
-        return rows.get(rownum);
+        return _rows.get(rownum);
     }
 
     /**
@@ -1118,7 +1163,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     private short getMaxOutlineLevelRows(){
         short outlineLevel=0;
-        for(XSSFRow xrow : rows.values()){
+        for(XSSFRow xrow : _rows.values()){
             outlineLevel=xrow.getCTRow().getOutlineLevel()>outlineLevel? xrow.getCTRow().getOutlineLevel(): outlineLevel;
         }
         return outlineLevel;
@@ -1318,7 +1363,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
                 xcell.notifyArrayFormulaChanging(msg);
             }
         }
-        rows.remove(row.getRowNum());
+        _rows.remove(row.getRowNum());
     }
 
     /**
@@ -1340,7 +1385,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * Call getRowNum() on each row if you care which one it is.
      */
     public Iterator<Row> rowIterator() {
-        return (Iterator<Row>)(Iterator<? extends Row>)rows.values().iterator();
+        return (Iterator<Row>)(Iterator<? extends Row>) _rows.values().iterator();
     }
 
     /**
@@ -2117,12 +2162,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         rowShifter.updateFormulas(shifter);
         rowShifter.shiftMerged(startRow, endRow, n);
 
-        //rebuild the rows map
+        //rebuild the _rows map
         TreeMap<Integer, XSSFRow> map = new TreeMap<Integer, XSSFRow>();
-        for(XSSFRow r : rows.values()) {
+        for(XSSFRow r : _rows.values()) {
             map.put(r.getRowNum(), r);
         }
-        rows = map;
+        _rows = map;
     }
 
     /**
@@ -2401,13 +2446,10 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
             worksheet.getHyperlinks().setHyperlinkArray(ctHls);
         }
 
-        CTSheetData sheetData = worksheet.getSheetData();
-        ArrayList<CTRow> rArray = new ArrayList<CTRow>(rows.size());
-        for(XSSFRow row : rows.values()){
+        for(XSSFRow row : _rows.values()){
             row.onDocumentWrite();
-            rArray.add(row.getCTRow());
         }
-        sheetData.setRowArray(rArray.toArray(new CTRow[rArray.size()]));
+        ensureRowOrdering();
 
         XmlOptions xmlOptions = new XmlOptions(DEFAULT_XML_OPTIONS);
         xmlOptions.setSaveSyntheticDocumentElement(new QName(CTWorksheet.type.getName().getNamespaceURI(), "worksheet"));
@@ -2416,6 +2458,40 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         xmlOptions.setSaveSuggestedPrefixes(map);
 
         worksheet.save(out, xmlOptions);
+    }
+
+    /**
+     * ensure that the array of CTRow written to CTSheetData is ordered by row index
+     */
+    private void ensureRowOrdering(){
+        CTSheetData sheetData = worksheet.getSheetData();
+        // check if row indexes in CTSheetData match the internal model:
+        // rows in the internal model (_rows) are always ordered while
+        // CTRow beans held by CTSheetData may be not, for example, user can
+        // insert rows in random order, shift rows after insertion, etc.
+        boolean isOrdered = true;
+        if(sheetData.sizeOfRowArray() != _rows.size()) isOrdered = false;
+        else {
+            int i = 0;
+            CTRow[] xrow = sheetData.getRowArray();
+            for (XSSFRow row : _rows.values()) {
+                CTRow c1 = row.getCTRow();
+                CTRow c2 = xrow[i++];
+                if (c1.getR() != c2.getR()){
+                    isOrdered = false;
+                    break;
+                }
+            }
+        }
+        
+        if(!isOrdered){
+            CTRow[] cArray = new CTRow[_rows.size()];
+            int i = 0;
+            for(XSSFRow row : _rows.values()){
+                cArray[i++] = row.getCTRow();
+            }
+            sheetData.setRowArray(cArray);
+        }
     }
 
     /**
@@ -2794,4 +2870,49 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         String ref = ((XSSFCell)cell).getCTCell().getR();
         throw new IllegalArgumentException("Cell " + ref + " is not part of an array formula.");
     }
+
+
+	public DataValidationHelper getDataValidationHelper() {
+		return dataValidationHelper;
+	}
+    
+    public List<XSSFDataValidation> getDataValidations() {
+    	List<XSSFDataValidation> xssfValidations = new ArrayList<XSSFDataValidation>();
+    	CTDataValidations dataValidations = this.worksheet.getDataValidations();
+    	if( dataValidations!=null && dataValidations.getCount() > 0 ) {
+    		CTDataValidation[] dataValidationList = dataValidations.getDataValidationArray();
+    		for (CTDataValidation ctDataValidation : dataValidationList) {
+    			CellRangeAddressList addressList = new CellRangeAddressList();
+    			
+    			@SuppressWarnings("unchecked")
+    			List<String> sqref = ctDataValidation.getSqref();
+    			for (String stRef : sqref) {
+    				String[] regions = stRef.split(" ");
+    				for (int i = 0; i < regions.length; i++) {
+						String[] parts = regions[i].split(":");
+						CellReference begin = new CellReference(parts[0]);
+						CellReference end = parts.length > 1 ? new CellReference(parts[1]) : begin;
+						CellRangeAddress cellRangeAddress = new CellRangeAddress(begin.getRow(), end.getRow(), begin.getCol(), end.getCol());
+						addressList.addCellRangeAddress(cellRangeAddress);
+					}
+				}
+				XSSFDataValidation xssfDataValidation = new XSSFDataValidation(addressList, ctDataValidation);
+				xssfValidations.add(xssfDataValidation);
+			}
+    	}
+    	return xssfValidations;
+    }
+
+	public void addValidationData(DataValidation dataValidation) {
+		XSSFDataValidation xssfDataValidation = (XSSFDataValidation)dataValidation;		
+		CTDataValidations dataValidations = worksheet.getDataValidations();
+		if( dataValidations==null ) {
+			dataValidations = worksheet.addNewDataValidations();
+		}
+		int currentCount = dataValidations.getDataValidationArray().length;
+        CTDataValidation newval = dataValidations.addNewDataValidation();
+		newval.set(xssfDataValidation.getCtDdataValidation());
+		dataValidations.setCount(currentCount + 1);
+
+	}
 }

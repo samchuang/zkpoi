@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import org.apache.poi.hssf.HSSFTestDataSamples;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 
 import junit.framework.TestCase;
 
@@ -56,9 +57,11 @@ public final class TestHSSFDataFormatter extends TestCase {
 
 		// date value for July 8 1901 1:19 PM
 		double dateNum = 555.555;
+		// date value for July 8 1901 11:23 AM
+      double timeNum = 555.47431;
 
 		//valid date formats -- all should have "Jul" in output
-		String[] goodDatePatterns ={
+		String[] goodDatePatterns = {
 			"[$-F800]dddd\\,\\ mmmm\\ dd\\,\\ yyyy",
 			"mmm/d/yy\\ h:mm PM;@",
 			"mmmm/d/yy\\ h:mm;@",
@@ -78,6 +81,18 @@ public final class TestHSSFDataFormatter extends TestCase {
 			"mmmm/d/yyyy;@",
 			"[$-409]d\\-mmm\\-yyyy;@"
 		};
+		
+		//valid time formats - all should have 11:23 in output
+		String[] goodTimePatterns = {
+		   "HH:MM",
+		   "HH:MM:SS",
+		   "HH:MM;HH:MM;HH:MM", 
+		   // This is fun - blue if positive time,
+		   //  red if negative time or green for zero!
+         "[BLUE]HH:MM;[RED]HH:MM;[GREEN]HH:MM", 
+		   "yyyy-mm-dd hh:mm",
+         "yyyy-mm-dd hh:mm:ss",
+		};
 
 		// valid number formats
 		String[] goodNumPatterns = {
@@ -91,6 +106,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 				"0000.00000%",
 				"0.000E+00",
 				"0.00E+00",
+				"[BLACK]0.00;[COLOR 5]##.##",
 		};
 
 		// invalid date formats -- will throw exception in DecimalFormat ctor
@@ -110,6 +126,16 @@ public final class TestHSSFDataFormatter extends TestCase {
 			cell.setCellStyle(cellStyle);
 		}
 		row = sheet.createRow(1);
+		
+		// create cells with time patterns
+      for (int i = 0; i < goodTimePatterns.length; i++) {
+         HSSFCell cell = row.createCell(i);
+         cell.setCellValue(timeNum);
+         HSSFCellStyle cellStyle = wb.createCellStyle();
+         cellStyle.setDataFormat(format.getFormat(goodTimePatterns[i]));
+         cell.setCellStyle(cellStyle);
+      }
+      row = sheet.createRow(2);
 
 		// create cells with num patterns
 		for (int i = 0; i < goodNumPatterns.length; i++) {
@@ -119,7 +145,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 			cellStyle.setDataFormat(format.getFormat(goodNumPatterns[i]));
 			cell.setCellStyle(cellStyle);
 		}
-		row = sheet.createRow(2);
+		row = sheet.createRow(3);
 
 		// create cells with bad num patterns
 		for (int i = 0; i < badNumPatterns.length; i++) {
@@ -133,7 +159,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 		// Built in formats
 
 		{ // Zip + 4 format
-			row = sheet.createRow(3);
+			row = sheet.createRow(4);
 			HSSFCell cell = row.createCell(0);
 			cell.setCellValue(123456789);
 			HSSFCellStyle cellStyle = wb.createCellStyle();
@@ -142,7 +168,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 		}
 
 		{ // Phone number format
-			row = sheet.createRow(4);
+			row = sheet.createRow(5);
 			HSSFCell cell = row.createCell(0);
 			cell.setCellValue(5551234567D);
 			HSSFCellStyle cellStyle = wb.createCellStyle();
@@ -151,7 +177,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 		}
 
 		{ // SSN format
-			row = sheet.createRow(5);
+			row = sheet.createRow(6);
 			HSSFCell cell = row.createCell(0);
 			cell.setCellValue(444551234);
 			HSSFCellStyle cellStyle = wb.createCellStyle();
@@ -160,7 +186,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 		}
 
 		{ // formula cell
-			row = sheet.createRow(6);
+			row = sheet.createRow(7);
 			HSSFCell cell = row.createCell(0);
 			cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
 			cell.setCellFormula("SUM(12.25,12.25)/100");
@@ -180,21 +206,44 @@ public final class TestHSSFDataFormatter extends TestCase {
 		log("==== VALID DATE FORMATS ====");
 		while (it.hasNext()) {
 			Cell cell = it.next();
-            String fmtval = formatter.formatCellValue(cell);
-            log(fmtval);
+			String fmtval = formatter.formatCellValue(cell);
+			log(fmtval);
 
-			// should not be equal to "555.555"
-			assertTrue( ! "555.555".equals(fmtval));
+         // should not be equal to "555.555"
+         assertTrue( DateUtil.isCellDateFormatted(cell) );
+         assertTrue( ! "555.555".equals(fmtval));
 
-            String fmt = cell.getCellStyle().getDataFormatString();
-            //assert the correct month form, as in the original Excel format
-            String monthPtrn = fmt.indexOf("mmmm") != -1 ? "MMMM" : "MMM";
+			String fmt = cell.getCellStyle().getDataFormatString();
 
-            // this line is intended to compute how "July" would look like in the current locale
-            String jul = new SimpleDateFormat(monthPtrn).format(new GregorianCalendar(2010,6,15).getTime());
-			assertTrue( fmtval.indexOf(jul) > -1);
+			//assert the correct month form, as in the original Excel format
+			String monthPtrn = fmt.indexOf("mmmm") != -1 ? "MMMM" : "MMM";
+			// this line is intended to compute how "July" would look like in the current locale
+			String jul = new SimpleDateFormat(monthPtrn).format(new GregorianCalendar(2010,6,15).getTime());
+			// special case for MMMMM = 1st letter of month name
+			if(fmt.indexOf("mmmmm") > -1) {
+				jul = jul.substring(0,1);
+			}
+			// check we found july properly
+			assertTrue("Format came out incorrect - " + fmt, fmtval.indexOf(jul) > -1);
 		}
 
+		row = wb.getSheetAt(0).getRow(1);
+      it = row.cellIterator();
+      log("==== VALID TIME FORMATS ====");
+      while (it.hasNext()) {
+         Cell cell = it.next();
+         String fmt = cell.getCellStyle().getDataFormatString();
+         String fmtval = formatter.formatCellValue(cell);
+         log(fmtval);
+
+         // should not be equal to "555.47431"
+         assertTrue( DateUtil.isCellDateFormatted(cell) );
+         assertTrue( ! "555.47431".equals(fmtval));
+
+         // check we found the time properly
+         assertTrue("Format came out incorrect - " + fmt, fmtval.indexOf("11:23") > -1);
+      }
+      
 		// test number formats
 		row = wb.getSheetAt(0).getRow(1);
 		it = row.cellIterator();
@@ -208,7 +257,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 		}
 
 		// test bad number formats
-		row = wb.getSheetAt(0).getRow(2);
+		row = wb.getSheetAt(0).getRow(3);
 		it = row.cellIterator();
 		log("\n==== INVALID NUMBER FORMATS ====");
 		while (it.hasNext()) {
@@ -221,21 +270,21 @@ public final class TestHSSFDataFormatter extends TestCase {
 		}
 
 		// test Zip+4 format
-		row = wb.getSheetAt(0).getRow(3);
+		row = wb.getSheetAt(0).getRow(4);
 		HSSFCell cell = row.getCell(0);
 		log("\n==== ZIP FORMAT ====");
 		log(formatter.formatCellValue(cell));
 		assertEquals("12345-6789", formatter.formatCellValue(cell));
 
 		// test phone number format
-		row = wb.getSheetAt(0).getRow(4);
+		row = wb.getSheetAt(0).getRow(5);
 		cell = row.getCell(0);
 		log("\n==== PHONE FORMAT ====");
 		log(formatter.formatCellValue(cell));
 		assertEquals("(555) 123-4567", formatter.formatCellValue(cell));
 
 		// test SSN format
-		row = wb.getSheetAt(0).getRow(5);
+		row = wb.getSheetAt(0).getRow(6);
 		cell = row.getCell(0);
 		log("\n==== SSN FORMAT ====");
 		log(formatter.formatCellValue(cell));
@@ -250,7 +299,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 
 	public void testGetFormattedCellValueHSSFCellHSSFFormulaEvaluator() {
 		// test formula format
-		HSSFRow row = wb.getSheetAt(0).getRow(6);
+		HSSFRow row = wb.getSheetAt(0).getRow(7);
 		HSSFCell cell = row.getCell(0);
 		log("\n==== FORMULA CELL ====");
 
@@ -271,7 +320,7 @@ public final class TestHSSFDataFormatter extends TestCase {
 	 * format pattern cannot be parsed by DecimalFormat.
 	 */
 	public void testSetDefaultNumberFormat() {
-		HSSFRow row = wb.getSheetAt(0).getRow(2);
+		HSSFRow row = wb.getSheetAt(0).getRow(3);
 		Iterator<Cell> it = row.cellIterator();
 		Format defaultFormat = new DecimalFormat("Balance $#,#00.00 USD;Balance -$#,#00.00 USD");
 		formatter.setDefaultNumberFormat(defaultFormat);
@@ -302,6 +351,63 @@ public final class TestHSSFDataFormatter extends TestCase {
 		HSSFDataFormatter f = new HSSFDataFormatter();
 
 		assertEquals("2345", f.formatCellValue(cellA1));
+	}
+	
+	/**
+	 * Tests various formattings of dates and numbers
+	 */
+	public void testFromFile() {
+      HSSFWorkbook workbook = HSSFTestDataSamples.openSampleWorkbook("Formatting.xls");
+      HSSFSheet sheet = workbook.getSheetAt(0);
+	   
+      HSSFDataFormatter f = new HSSFDataFormatter();
+
+      // This one is one of the nasty auto-locale changing ones...
+      assertEquals("dd/mm/yyyy", sheet.getRow(1).getCell(0).getStringCellValue());
+      assertEquals("m/d/yy",     sheet.getRow(1).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("11/24/06",   f.formatCellValue(sheet.getRow(1).getCell(1)));
+      
+      assertEquals("yyyy/mm/dd", sheet.getRow(2).getCell(0).getStringCellValue());
+      assertEquals("yyyy/mm/dd", sheet.getRow(2).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("2006/11/24", f.formatCellValue(sheet.getRow(2).getCell(1)));
+      
+      assertEquals("yyyy-mm-dd", sheet.getRow(3).getCell(0).getStringCellValue());
+      assertEquals("yyyy\\-mm\\-dd", sheet.getRow(3).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("2006-11-24", f.formatCellValue(sheet.getRow(3).getCell(1)));
+      
+      assertEquals("yy/mm/dd", sheet.getRow(4).getCell(0).getStringCellValue());
+      assertEquals("yy/mm/dd", sheet.getRow(4).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("06/11/24", f.formatCellValue(sheet.getRow(4).getCell(1)));
+      
+      // Another builtin fun one
+      assertEquals("dd/mm/yy", sheet.getRow(5).getCell(0).getStringCellValue());
+      assertEquals("d/m/yy;@", sheet.getRow(5).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("24/11/06", f.formatCellValue(sheet.getRow(5).getCell(1)));
+      
+      assertEquals("dd-mm-yy", sheet.getRow(6).getCell(0).getStringCellValue());
+      assertEquals("dd\\-mm\\-yy", sheet.getRow(6).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("24-11-06", f.formatCellValue(sheet.getRow(6).getCell(1)));
+      
+      
+      // Another builtin fun one
+      assertEquals("nn.nn", sheet.getRow(9).getCell(0).getStringCellValue());
+      assertEquals("General", sheet.getRow(9).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("10.52", f.formatCellValue(sheet.getRow(9).getCell(1)));
+
+      // text isn't quite the format rule...
+      assertEquals("nn.nnn", sheet.getRow(10).getCell(0).getStringCellValue());
+      assertEquals("0.000", sheet.getRow(10).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("10.520", f.formatCellValue(sheet.getRow(10).getCell(1)));
+
+      // text isn't quite the format rule...
+      assertEquals("nn.n", sheet.getRow(11).getCell(0).getStringCellValue());
+      assertEquals("0.0", sheet.getRow(11).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("10.5", f.formatCellValue(sheet.getRow(11).getCell(1)));
+
+      // text isn't quite the format rule...
+      assertEquals("\u00a3nn.nn", sheet.getRow(12).getCell(0).getStringCellValue());
+      assertEquals("\"\u00a3\"#,##0.00", sheet.getRow(12).getCell(1).getCellStyle().getDataFormatString());
+      assertEquals("\u00a310.52", f.formatCellValue(sheet.getRow(12).getCell(1)));
 	}
 
 	private static void log(String msg) {

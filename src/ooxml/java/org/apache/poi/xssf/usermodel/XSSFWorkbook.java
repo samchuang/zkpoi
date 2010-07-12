@@ -61,6 +61,7 @@ import org.apache.poi.xssf.model.ExternalLink;
 import org.apache.poi.xssf.model.MapInfo;
 import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.model.ThemesTable;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -119,6 +120,8 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * e.g. fonts, cell styles, colors, etc.
      */
     private StylesTable stylesSource;
+
+    private ThemesTable theme;
 
     /**
      * TODO
@@ -250,6 +253,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
             for(POIXMLDocumentPart p : getRelations()){
                 if(p instanceof SharedStringsTable) sharedStringSource = (SharedStringsTable)p;
                 else if(p instanceof StylesTable) stylesSource = (StylesTable)p;
+                else if(p instanceof ThemesTable) theme = (ThemesTable)p;
                 else if(p instanceof CalculationChain) calcChain = (CalculationChain)p;
                 else if(p instanceof MapInfo) mapInfo = (MapInfo)p;
                 else if (p instanceof XSSFSheet) {
@@ -260,6 +264,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                 	bookNameToLinkIndex.put(el.getBookName(), el.getLinkIndex());
                 }
             }
+            stylesSource.setTheme(theme);
 
             if(sharedStringSource == null) {
                 //Create SST if it is missing
@@ -504,7 +509,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      */
     public XSSFFont createFont() {
         XSSFFont font = new XSSFFont();
-        font.putFont(stylesSource);
+        font.registerTo(stylesSource);
         return font;
     }
 
@@ -1245,6 +1250,13 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      */
     public StylesTable getStylesSource() {
         return this.stylesSource;
+    }
+
+    /**
+     * Returns the Theme of current workbook.
+     */
+    public ThemesTable getTheme() {
+        return theme;
     }
 
     /**

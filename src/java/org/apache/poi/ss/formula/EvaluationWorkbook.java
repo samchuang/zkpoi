@@ -49,6 +49,7 @@ public interface EvaluationWorkbook {
 	ExternalSheet getExternalSheet(int externSheetIndex);
 	int convertFromExternSheetIndex(int externSheetIndex);
 	int convertLastIndexFromExternSheetIndex(int externSheetIndex);
+	ExternalName getExternalName(int externSheetIndex, int externNameIndex);
 	EvaluationName getName(NamePtg namePtg);
 	String resolveNameXText(NameXPtg ptg);
 	Ptg[] getFormulaTokens(EvaluationCell cell);
@@ -66,11 +67,31 @@ public interface EvaluationWorkbook {
 		public String getWorkbookName() {
 			return _workbookName;
 		}
+		public String getLastSheetName() {
+			return _lastSheetName;
+		}
 		public String getSheetName() {
 			return _sheetName;
 		}
-		public String getLastSheetName() {
-			return _lastSheetName;
+	}
+	class ExternalName {
+		private final String _nameName;
+		private final int _nameNumber;
+		private final int _ix;
+
+		public ExternalName(String nameName, int nameNumber, int ix) {
+			_nameName = nameName;
+			_nameNumber = nameNumber;
+			_ix = ix;
+		}
+		public String getName() {
+			return _nameName;
+		}
+		public int getNumber() {
+			return _nameNumber;
+		}
+		public int getIx() {
+			return _ix;
 		}
 	}
 }

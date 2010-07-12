@@ -59,6 +59,7 @@ public final class TestOutlookTextExtractor extends TestCase {
       assertContains(text, "To: Kevin Roast <kevin.roast@alfresco.org>\n");
       assertEquals(-1, text.indexOf("CC:"));
       assertEquals(-1, text.indexOf("BCC:"));
+      assertEquals(-1, text.indexOf("Attachment:"));
       assertContains(text, "Subject: Test the content transformer\n");
       Calendar cal = new GregorianCalendar(2007, 5, 14, 9, 42, 55);
       SimpleDateFormat f = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss");
@@ -80,7 +81,7 @@ public final class TestOutlookTextExtractor extends TestCase {
       assertEquals(-1, text.indexOf("CC:"));
       assertEquals(-1, text.indexOf("BCC:"));
       assertContains(text, "Subject: test message\n");
-      assertEquals(-1, text.indexOf("Date:"));
+      assertContains(text, "Date: Fri, 6 Jul 2007 01:27:17 -0400\n");
       assertContains(text, "This is a test message.");
    }
 
@@ -167,8 +168,35 @@ public final class TestOutlookTextExtractor extends TestCase {
                "nick.burch@alfresco.com; 'Roy Wetherall' <roy.wetherall@alfresco.com>\n");
          assertEquals(-1, text.indexOf("BCC:"));
          assertContains(text, "Subject: This is a test message please ignore\n");
-         assertEquals(-1, text.indexOf("Date:"));
+         assertContains(text, "Date: Mon, 11 Jan 2010 16:25:07 +0000 (GMT)\n");
          assertContains(text, "The quick brown fox jumps over the lazy dog");
       }
+   }
+   
+   /**
+    * See also {@link org.apache.poi.extractor.TestExtractorFactory#testEmbeded()}
+    */
+   public void testWithAttachments() throws Exception {
+      POIFSFileSystem simple = new POIFSFileSystem(
+            new FileInputStream(samples.getFile("attachment_test_msg.msg"))
+      );
+      MAPIMessage msg = new MAPIMessage(simple);
+      OutlookTextExtactor ext = new OutlookTextExtactor(msg);
+      
+      // Check the normal bits
+      String text = ext.getText();
+      
+      assertContains(text, "From: Nicolas1");
+      assertContains(text, "To: 'nicolas1.23456@free.fr'");
+      assertEquals(-1, text.indexOf("CC:"));
+      assertEquals(-1, text.indexOf("BCC:"));
+      assertContains(text, "Subject: test");
+      assertEquals(-1, text.indexOf("Date:"));
+      assertContains(text, "Attachment: test-unicode.doc\n");
+      assertContains(text, "Attachment: pj1.txt\n");
+      assertContains(text, "contenu");
+      
+      // Embeded bits are checked in
+      //  TestExtractorFactory
    }
 }

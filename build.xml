@@ -51,7 +51,7 @@ under the License.
 
     <description>The Apache POI project Ant build.</description>
 
-    <property name="version.id" value="3.7-SNAPSHOT"/>
+    <property name="version.id" value="3.7-beta2"/>
 
     <property environment="env"/>
     <!-- the repository to download jars from -->
@@ -66,12 +66,14 @@ under the License.
     <property name="jdk.version.class" value="1.5" description="JDK version of generated class files"/>
     <property name="compile.debug" value="true"/>
 
+    <!-- issue warnings if source code contains unmappable characters for encoding ASCII  -->
+    <property name="java.source.encoding" value="ASCII"/>
+
     <!--
       JVM system properties for running tests,
       user.language and user.country are required as we have locale-sensitive formatters
     -->
-    <property name="user.language" value="en"/>
-    <property name="user.country" value="US"/>
+    <property name="poi.test.locale" value="-Duser.language=en -Duser.country=US"/>
     <property name="POI.testdata.path" value="test-data"/>
     <property name="java.awt.headless" value="true"/>
     
@@ -133,9 +135,9 @@ under the License.
     <property name="ooxml.jsr173.jar" location="${ooxml.lib}/geronimo-stax-api_1.0_spec-1.0.jar"/>
     <property name="ooxml.jsr173.url"
               value="${repository.m2}/maven2/org/apache/geronimo/specs/geronimo-stax-api_1.0_spec/1.0/geronimo-stax-api_1.0_spec-1.0.jar"/>
-    <property name="ooxml.schemas.jar" location="${ooxml.lib}/ooxml-schemas-1.0.jar"/>
+    <property name="ooxml.schemas.jar" location="${ooxml.lib}/ooxml-schemas-1.1.jar"/>
     <property name="ooxml.schemas.url"
-              value="${repository.m2}/maven2/org/apache/poi/ooxml-schemas/1.0/ooxml-schemas-1.0.jar"/>
+              value="${repository.m2}/maven2/org/apache/poi/ooxml-schemas/1.1/ooxml-schemas-1.1.jar"/>
 
     <!-- See http://www.ecma-international.org/publications/standards/Ecma-376.htm -->
     <!-- "Copy these file(s), free of charge" -->
@@ -144,8 +146,8 @@ under the License.
     <property name="ooxml.xsds.url"
               value="http://www.ecma-international.org/publications/files/ECMA-ST/Office%20Open%20XML%201st%20edition%20Part%204%20(PDF).zip"/>
     <property name="ooxml.xsds.src.dir" location="build/ooxml-xsds-src"/>
-    <property name="ooxml.xsds.src.jar" location="${ooxml.lib}/ooxml-schemas-src-1.0.jar"/>
-    <property name="ooxml.xsds.jar" location="${ooxml.lib}/ooxml-schemas-1.0.jar"/>
+    <property name="ooxml.xsds.src.jar" location="${ooxml.lib}/ooxml-schemas-src-1.1.jar"/>
+    <property name="ooxml.xsds.jar" location="${ooxml.lib}/ooxml-schemas-1.1.jar"/>
 
     <property name="maven.ooxml.xsds.version.id" value="1.0"/>
     <property name="maven.ooxml.xsds.jar" value="ooxml-schemas-${maven.ooxml.xsds.version.id}.jar"/>
@@ -159,8 +161,6 @@ under the License.
     <property name="halt.on.test.failure" value="true"/>
 
     <propertyset id="junit.properties">
-        <propertyref name="user.language"/>
-        <propertyref name="user.country"/>
         <propertyref name="POI.testdata.path"/>
         <propertyref name="java.awt.headless"/>
     </propertyset>
@@ -358,6 +358,7 @@ under the License.
         </condition>
     </target>
     <target name="fetch-ooxml-xsds" unless="ooxml-xsds.present"
+            depends="check-ooxml-xsds"
             description="Fetches needed OOXML xsd files from the Internet">
         <get src="${ooxml.xsds.url}" dest="${ooxml.xsds.ozip}"/>
         <unzip src="${ooxml.xsds.ozip}" dest="${ooxml.lib}">
@@ -366,7 +367,7 @@ under the License.
             </patternset>
         </unzip>
     </target>
-    <target name="check-compiled-ooxml-xsds">
+    <target name="check-compiled-ooxml-xsds" depends="fetch-ooxml-xsds">
         <condition property="ooxml-compiled-xsds.present">
             <or>
                 <and>
@@ -377,7 +378,7 @@ under the License.
         </condition>
     </target>
     <target name="compile-ooxml-xsds" unless="ooxml-compiled-xsds.present"
-            depends="check-jars,fetch-jars"
+            depends="check-jars,fetch-jars,check-compiled-ooxml-xsds"
             description="Unpacks the OOXML xsd files, and compiles them into XmlBeans">
         <property name="ooxml.xsds.tmp.dir" location="build/ooxml-xsds"/>
         <mkdir dir="${ooxml.xsds.tmp.dir}"/>
@@ -423,6 +424,7 @@ under the License.
                destdir="${main.output.dir}"
                srcdir="${main.src}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath refid="main.classpath"/>
         </javac>
@@ -431,6 +433,7 @@ under the License.
                destdir="${main.output.test.dir}"
                srcdir="${main.src.test}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath>
                 <path refid="main.classpath"/>
@@ -448,6 +451,7 @@ under the License.
                destdir="${scratchpad.output.dir}"
                srcdir="${scratchpad.src}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath refid="scratchpad.classpath"/>
         </javac>
@@ -456,6 +460,7 @@ under the License.
                destdir="${scratchpad.output.test.dir}"
                srcdir="${scratchpad.src.test}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath>
                 <path refid="scratchpad.classpath"/>
@@ -474,6 +479,7 @@ under the License.
                destdir="${contrib.output.dir}"
                srcdir="${contrib.src}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath refid="contrib.classpath"/>
         </javac>
@@ -483,6 +489,7 @@ under the License.
                destdir="${contrib.output.test.dir}"
                srcdir="${contrib.src.test}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath>
                 <path refid="contrib.classpath"/>
@@ -497,19 +504,26 @@ under the License.
                destdir="${examples.output.dir}"
                srcdir="${examples.src}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath>
                 <path refid="ooxml.classpath"/>
                 <pathelement path="${ooxml.output.dir}"/>
             </classpath>
         </javac>
+        <copy todir="${examples.output.dir}">
+          <fileset dir="${examples.src}">
+            <include name="**/*.css"/>
+          </fileset>
+        </copy>
     </target>
 
-    <target name="compile-ooxml" depends="compile-main,compile-scratchpad">
+    <target name="compile-ooxml" depends="compile-main,compile-scratchpad,compile-ooxml-xsds">
         <javac target="${jdk.version.class}"
                source="${jdk.version.source}"
                destdir="${ooxml.output.dir}"
                srcdir="${ooxml.src}"
+               encoding="${java.source.encoding}"
                debug="${compile.debug}">
             <classpath refid="ooxml.classpath"/>
         </javac>
@@ -518,6 +532,7 @@ under the License.
                destdir="${ooxml.output.test.dir}"
                srcdir="${ooxml.src.test}"
                debug="${compile.debug}"
+               encoding="${java.source.encoding}"
                fork="yes">
             <classpath>
                 <path refid="ooxml.classpath"/>
@@ -544,7 +559,9 @@ under the License.
         <!-- Compile -->
         <javac target="${jdk.version.class}" source="${jdk.version.source}"
                failonerror="true" destdir="${main.output.dir}" debug="on" fork="yes"
-               srcdir="${main.output.dir}"/>
+               srcdir="${main.output.dir}"
+               encoding="${java.source.encoding}">
+        </javac>
         <!-- Tidy up -->
         <delete file="${version.java}"/>
     </target>
@@ -566,6 +583,7 @@ under the License.
                failureproperty="main.test.failed" showoutput="true">
             <classpath refid="test.classpath"/>
             <syspropertyset refid="junit.properties"/>
+            <jvmarg value="${poi.test.locale}"/>
             <formatter type="plain"/>
             <batchtest todir="${main.reports.test}">
                 <fileset dir="${main.src.test}">
@@ -602,6 +620,7 @@ under the License.
                failureproperty="scratchpad.test.failed">
             <classpath refid="test.scratchpad.classpath"/>
             <syspropertyset refid="junit.properties"/>
+            <jvmarg value="${poi.test.locale}"/>
             <formatter type="plain"/>
             <batchtest todir="${scratchpad.reports.test}">
                 <fileset dir="${scratchpad.src.test}">
@@ -636,6 +655,7 @@ under the License.
                 <pathelement location="${contrib.output.test.dir}"/>
             </classpath>
             <syspropertyset refid="junit.properties"/>
+            <jvmarg value="${poi.test.locale}"/>
             <formatter type="plain"/>
             <batchtest todir="${contrib.reports.test}">
                 <fileset dir="${contrib.src.test}">
@@ -666,6 +686,7 @@ under the License.
                  failureproperty="ooxml.test.failed">
               <classpath refid="@{classpath}"/>
               <syspropertyset refid="junit.properties"/>
+              <jvmarg value="${poi.test.locale}"/>
               <formatter type="plain"/>
               <batchtest todir="${ooxml.reports.test}">
                   <fileset dir="${ooxml.src.test}">
@@ -691,6 +712,7 @@ under the License.
         <java classname="org.apache.poi.util.OOXMLLite" fork="yes">
             <classpath refid="test.ooxml.classpath"/>
             <syspropertyset refid="junit.properties"/>
+            <jvmarg value="${poi.test.locale}"/>
             <arg line="-ooxml ${ooxml.xsds.jar} -test ${ooxml.output.test.dir} -dest ${ooxml.lite.output.dir}"/>
         </java>
     </target>
@@ -1069,5 +1091,22 @@ under the License.
       <m2-install artifactId="poi-ooxml-schemas"/>
     </target>
     
+    <!-- Runs Apache Rat against the source code, to spot any files -->
+    <!--  which are missing the correct license headers -->
+    <!-- You need to download rat from http://incubator.apache.org/rat/ -->
+    <!--  and place the Rat jar into your ant lib before running -->
+    <target name="rat-check">
+       <typedef resource="org/apache/rat/anttasks/antlib.xml"
+             uri="antlib:org.apache.rat.anttasks"/>
+       <rat:report xmlns:rat="antlib:org.apache.rat.anttasks">
+           <fileset dir="src/">
+              <exclude name="documentation/content/xdocs/dtd/" />
+              <exclude name="documentation/content/xdocs/entity/" />
+              <exclude name="scratchpad/testcases/dummy.txt" />
+              <exclude name="contrib/testcases/dummy.txt" />
+              <exclude name="examples/lib/dummy.txt" />
+           </fileset>
+       </rat:report>
+    </target>
 </project>
 

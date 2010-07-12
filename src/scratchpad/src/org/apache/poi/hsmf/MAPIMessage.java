@@ -85,7 +85,7 @@ public class MAPIMessage extends POIDocument {
    }
    /**
     * Constructor for reading MSG Files from a POIFS filesystem
-    * @param in
+    * @param fs
     * @throws IOException
     */
    public MAPIMessage(POIFSFileSystem fs) throws IOException {
@@ -94,7 +94,8 @@ public class MAPIMessage extends POIDocument {
    /**
     * Constructor for reading MSG Files from a certain
     *  point within a POIFS filesystem
-    * @param in
+    * @param poifsDir
+    * @param fs
     * @throws IOException
     */
    public MAPIMessage(DirectoryNode poifsDir, POIFSFileSystem fs) throws IOException {
@@ -238,7 +239,11 @@ public class MAPIMessage extends POIDocument {
          if(email != null) {
             emails[i] = email;
          } else {
-            throw new ChunkNotFoundException("No email address holding chunks found for the " + (i+1) + "th recipient");
+            if(returnNullOnMissingChunk) {
+               emails[i] = null;
+            } else {
+               throw new ChunkNotFoundException("No email address holding chunks found for the " + (i+1) + "th recipient");
+            }
          }
       }
 
@@ -282,6 +287,17 @@ public class MAPIMessage extends POIDocument {
       return names;
    }
 
+   
+   /**
+    * 
+    */
+   public String[] getHeaders() throws ChunkNotFoundException {
+      String headers = getStringFromChunk(mainChunks.messageHeaders);
+      if(headers == null) {
+         return null;
+      }
+      return headers.split("\\r?\\n");
+   }
 
    /**
     * Gets the conversation topic of the parsed Outlook Message.
@@ -381,6 +397,7 @@ public class MAPIMessage extends POIDocument {
       boolean first = true;
 
       for(String s : l) {
+         if(s == null) continue;
          if(first) {
             first = false;
          } else {

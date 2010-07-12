@@ -1504,12 +1504,21 @@ public final class InternalSheet {
         List<RecordBase> records = getRecords();
         EscherAggregate r = EscherAggregate.createAggregate( records, loc, drawingManager );
         int startloc = loc;
-        while ( loc + 1 < records.size()
+//20100614, Henri Chen: there is not always an ObjRecord after a DrawingRecord
+/*        while ( loc + 1 < records.size()
                 && records.get( loc ) instanceof DrawingRecord
                 && records.get( loc + 1 ) instanceof ObjRecord )
         {
             loc += 2;
         }
+*/
+        boolean drawRecord = true;
+        while (loc + 1 < records.size() 
+        		&& ((drawRecord && records.get(loc) instanceof DrawingRecord)
+        		|| (!drawRecord && records.get(loc) instanceof ObjRecord))) {
+    		++loc;
+    		drawRecord = !drawRecord;
+       	}
         int endloc = loc-1;
         for(int i = 0; i < (endloc - startloc + 1); i++)
             records.remove(startloc);

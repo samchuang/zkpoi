@@ -85,7 +85,7 @@ public class XSSFFont implements Font {
         setFontName(DEFAULT_FONT_NAME);
         setFontHeight((double)DEFAULT_FONT_SIZE);
     }
-
+    
     /**
      * get the underlying CTFont font
      */
@@ -107,13 +107,13 @@ public class XSSFFont implements Font {
     /**
      * get character-set to use.
      *
-     * @return byte - character-set
+     * @return int - character-set (0-255)
      * @see org.apache.poi.ss.usermodel.FontCharset
      */
-    public byte getCharSet() {
+    public int getCharSet() {
         CTIntProperty charset = _ctFont.sizeOfCharsetArray() == 0 ? null : _ctFont.getCharsetArray(0);
         int val = charset == null ? FontCharset.ANSI.getValue() : FontCharset.valueOf(charset.getVal()).getValue();
-        return (byte)val;
+        return val;
     }
 
 
@@ -293,6 +293,19 @@ public class XSSFFont implements Font {
      * @see FontCharset
      */
     public void setCharSet(byte charset) {
+       int cs = (int)charset;
+       if(cs < 0) {
+          cs += 256;
+       }
+       setCharSet(cs);
+    }
+    /**
+     * set character-set to use.
+     *
+     * @param charset - charset
+     * @see FontCharset
+     */
+    public void setCharSet(int charset) {
         CTIntProperty charsetProperty = _ctFont.sizeOfCharsetArray() == 0 ? _ctFont.addNewCharset() : _ctFont.getCharsetArray(0);
         switch (charset) {
             case Font.ANSI_CHARSET:
@@ -503,10 +516,11 @@ public class XSSFFont implements Font {
 
 
     /**
-     * Register ourselfs in the style table
+     * Perform a registration of ourselves 
+     *  to the style table
      */
-    public long putFont(StylesTable styles) {
-        short idx = (short)styles.putFont(this);
+    public long registerTo(StylesTable styles) {
+        short idx = (short)styles.putFont(this, true);
         this._index = idx;
         return idx;
     }

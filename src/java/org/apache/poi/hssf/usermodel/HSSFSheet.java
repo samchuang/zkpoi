@@ -26,6 +26,7 @@ import java.text.AttributedString;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -38,6 +39,7 @@ import org.apache.poi.hssf.record.CellValueRecordInterface;
 import org.apache.poi.hssf.record.DVRecord;
 import org.apache.poi.hssf.record.EscherAggregate;
 import org.apache.poi.hssf.record.ExtendedFormatRecord;
+import org.apache.poi.hssf.record.NameRecord;
 import org.apache.poi.hssf.record.NoteRecord;
 import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.RowRecord;
@@ -51,15 +53,18 @@ import org.apache.poi.hssf.record.formula.FormulaShifter;
 import org.apache.poi.hssf.record.formula.Ptg;
 import org.apache.poi.hssf.util.PaneInformation;
 import org.apache.poi.hssf.util.Region;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.FormulaType;
+import org.apache.poi.ss.formula.PtgShifter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellRange;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.SSCellRange;
-import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
@@ -94,6 +99,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     private final TreeMap<Integer, HSSFRow> _rows;
     protected final InternalWorkbook _book;
     protected final HSSFWorkbook _workbook;
+    private HSSFPatriarch _patriarch;
     private int _firstrow;
     private int _lastrow;
 
@@ -374,13 +380,14 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * Creates a data validation object
      * @param dataValidation The Data validation object settings
      */
-    public void addValidationData(HSSFDataValidation dataValidation) {
+    public void addValidationData(DataValidation dataValidation) {
        if (dataValidation == null) {
            throw new IllegalArgumentException("objValidation must not be null");
        }
+       HSSFDataValidation hssfDataValidation = (HSSFDataValidation)dataValidation;
        DataValidityTable dvt = _sheet.getOrCreateDataValidityTable();
 
-       DVRecord dvRecord = dataValidation.createDVRecord(this);
+       DVRecord dvRecord = hssfDataValidation.createDVRecord(this);
        dvt.addDataValidation(dvRecord);
     }
 
@@ -1362,8 +1369,8 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
      * @param colSplit      Horizonatal position of split.
      * @param rowSplit      Vertical position of split.
-     * @param topRow        Top row visible in bottom pane
      * @param leftmostColumn   Left column visible in right pane.
+     * @param topRow        Top row visible in bottom pane
      */
     public void createFreezePane(int colSplit, int rowSplit, int leftmostColumn, int topRow) {
         validateColumn(colSplit);
@@ -1575,11 +1582,11 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
         _sheet.aggregateDrawingRecords(_book.getDrawingManager(), true);
         EscherAggregate agg = (EscherAggregate) _sheet.findFirstRecordBySid(EscherAggregate.sid);
-        HSSFPatriarch patriarch = new HSSFPatriarch(this, agg);
+        _patriarch = new HSSFPatriarch(this, agg);
         agg.clear();     // Initially the behaviour will be to clear out any existing shapes in the sheet when
                          // creating a new patriarch.
-        agg.setPatriarch(patriarch);
-        return patriarch;
+        agg.setPatriarch(_patriarch);
+        return _patriarch;
     }
 
     /**
@@ -1602,11 +1609,13 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         int found = _sheet.aggregateDrawingRecords(
                 _book.getDrawingManager(), false
         );
-        if(found == -1) {
+ //20100614, Henri Chen: DrawingRecord might has been convert 
+ //into EscherAggregate. Try to find it back!
+/*        if(found == -1) {
             // Workbook has drawing stuff, but this sheet doesn't
             return null;
         }
-
+*/
         // Grab our aggregate record, and wire it up
         EscherAggregate agg = (EscherAggregate) _sheet.findFirstRecordBySid(EscherAggregate.sid);
         return agg;
@@ -1625,11 +1634,13 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      *  start from scratch!
      */
     public HSSFPatriarch getDrawingPatriarch() {
+        if(_patriarch != null) return _patriarch;
+        
         EscherAggregate agg = getDrawingEscherAggregate();
         if(agg == null) return null;
 
-        HSSFPatriarch patriarch = new HSSFPatriarch(this, agg);
-        agg.setPatriarch(patriarch);
+        _patriarch = new HSSFPatriarch(this, agg);
+        agg.setPatriarch(_patriarch);
 
         // Have it process the records into high level objects
         //  as best it can do (this step may eat anything
@@ -1637,7 +1648,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         agg.convertRecordsToUserModel();
 
         // Return what we could cope with
-        return patriarch;
+        return _patriarch;
     }
 
     /**
@@ -1997,5 +2008,974 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             c.setCellType(Cell.CELL_TYPE_BLANK);
         }
         return result;
+    }
+
+	public DataValidationHelper getDataValidationHelper() {
+		return new HSSFDataValidationHelper(this);
+	}
+    
+    /**
+     * Shifts the merged regions left or right depending on mode
+     * <p>
+     * @param start
+     * @param end
+     * @param n
+     * @param horizontal
+     */
+    //20100525, henrichen@zkoss.org: add shift columns
+    protected List<CellRangeAddress[]> shiftMergedRegion(int tRow, int lCol, int bRow, int rCol, int n, boolean horizontal) {
+        List<CellRangeAddress[]> shiftedRegions = new ArrayList<CellRangeAddress[]>();
+        if (!horizontal) {
+        	int start = tRow;
+        	int end = bRow;
+        	int dstStart = start + n;
+	        //move merged regions completely if they fall within the new region boundaries when they are shifted
+	        for (int i = 0; i < getNumMergedRegions(); i++) {
+	        	CellRangeAddress merged = getMergedRegion(i);
+	        	
+	        	int firstCol = merged.getFirstColumn();
+	        	int lastCol = merged.getLastColumn();
+	        	if (firstCol < lCol || lastCol > rCol) { //not total cover, skip
+	        		continue;
+	        	}
+	        	int firstRow = merged.getFirstRow();
+	        	int lastRow = merged.getLastRow();
+	        	
+	            CellRangeAddress[] rngs = new CellRangeAddress[2]; //[0] old, [1] new
+	            boolean inStart= (firstRow >= start || lastRow >= start);
+	            boolean inEnd  = (firstRow <= end   || lastRow <= end);
+	            
+	            //not in moving area
+	            if (!inStart || !inEnd) {
+	            	if (n < 0 && !inStart) { //merge area in deleted area
+	            		if (lastRow >= dstStart) {
+	            			merged.setLastRow(dstStart - 1);
+	            			if (firstRow <= merged.getLastRow()) {
+	            				if (firstRow != merged.getLastRow() || lastCol != firstCol) {
+	            					rngs[1] = merged;
+	            				}
+	            			}
+	            			rngs[0] = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
+            				shiftedRegions.add(rngs);
+	            			removeMergedRegion(i);
+	            			i = i - 1; //back up now since we removed one
+	            		}
+	            	}
+	                continue;
+	            }
+
+	            //moving area
+	            if (firstRow >= start) {
+	            	merged.setFirstRow(firstRow + n);
+	            } else if (firstRow >= dstStart) {
+	            	merged.setFirstRow(dstStart);
+	            }
+	            merged.setLastRow(lastRow + n);
+	            if (merged.getFirstRow() != merged.getLastRow() || lastCol != firstCol) {
+	            	rngs[1] = merged;
+	            }
+    			rngs[0] = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
+	            //have to remove/add it back
+				shiftedRegions.add(rngs);
+	            removeMergedRegion(i);
+	            i = i -1; // we have to back up now since we removed one
+	        }
+        } else { //20100525, henrichen@zkoss.org: add shift columns
+        	int start = lCol;
+        	int end = rCol;
+        	int dstStart = start + n;
+	        //move merged regions completely if they fall within the new region boundaries when they are shifted
+	        for (int i = 0; i < getNumMergedRegions(); i++) {
+	            CellRangeAddress merged = getMergedRegion(i);
+	
+				int firstRow = merged.getFirstRow();
+				int lastRow = merged.getLastRow();
+	        	if (firstRow < tRow || lastRow > bRow) { //not total cover, skip
+	        		continue;
+	        	}
+				int firstCol = merged.getFirstColumn();
+				int lastCol = merged.getLastColumn();
+				
+	            CellRangeAddress[] rngs = new CellRangeAddress[2]; //[0] old, [1] new
+	            boolean inStart= (merged.getFirstColumn() >= start || merged.getLastColumn() >= start);
+	            boolean inEnd  = (merged.getFirstColumn() <= end   || merged.getLastColumn() <= end);
+	
+	             //don't check if it's not within the shifted area
+	            if (!inStart || !inEnd) {
+	            	if (n < 0 && !inStart) { //merge area in deleted area
+	            		if (lastCol >= dstStart) {
+	            			merged.setLastColumn(dstStart - 1);
+	            			if (firstCol <= merged.getLastColumn()) {
+	            				if (firstCol != merged.getLastColumn() || lastRow != firstRow) {
+	            					rngs[1] = merged;
+	            				}
+	            			}
+	            			rngs[0] = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
+            				shiftedRegions.add(rngs);
+	            			removeMergedRegion(i);
+	            			i = i - 1; //back up now since we removed one
+	            		}
+	            	}
+	                continue;
+	            }
+	
+	            //moving area
+	            if (firstCol >= start) {
+	            	merged.setFirstColumn(firstCol + n);
+	            } else if (firstCol >= dstStart) {
+	            	merged.setFirstColumn(dstStart);
+	            }
+	            merged.setLastColumn(lastCol + n);
+	            if (merged.getLastColumn() != merged.getFirstColumn() || firstRow != lastRow) {
+	            	rngs[1] = merged;
+	            }
+    			rngs[0] = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
+	            //have to remove/add it back
+				shiftedRegions.add(rngs);
+	            removeMergedRegion(i);
+	            i = i -1; // we have to back up now since we removed one
+	        }
+        }
+    	
+        //read so it doesn't get shifted again
+        Iterator<CellRangeAddress[]> iterator = shiftedRegions.iterator();
+        while (iterator.hasNext()) {
+            CellRangeAddress region = iterator.next()[1];
+            if (region != null) {
+            	this.addMergedRegion(region);
+            }
+        }
+        
+        return shiftedRegions;
+    }
+    /**
+     * Shifts the merged regions left or right depending on mode
+     * <p>
+     * @param start
+     * @param end
+     * @param n
+     * @param horizontal
+     */
+    //20100705, henrichen@zkoss.org: add shift columns
+    protected List<CellRangeAddress[]> shiftBothMergedRegion(int tRow, int lCol, int bRow, int rCol, int nRow, int nCol) {
+        List<CellRangeAddress[]> shiftedRegions = new ArrayList<CellRangeAddress[]>();
+        //move merged regions completely if they fall within the new region boundaries when they are shifted
+        final int dsttRow = tRow + nRow;
+        final int dstbRow = bRow + nRow;
+        final int dstlCol = lCol + nCol;
+        final int dstrCol = rCol + nCol;
+        
+        for (int i = 0; i < getNumMergedRegions(); i++) {
+        	CellRangeAddress merged = getMergedRegion(i);
+        	
+        	int firstRow = merged.getFirstRow();
+        	int lastRow = merged.getLastRow();
+        	int firstCol = merged.getFirstColumn();
+        	int lastCol = merged.getLastColumn();
+        	if (firstCol >= lCol && lastCol <= rCol && firstRow >= tRow && lastRow <= bRow) { //source total cover
+                CellRangeAddress[] rngs = new CellRangeAddress[2]; //[0] old, [1] new
+       			merged.setFirstColumn(firstCol  + nCol);
+       			merged.setLastColumn(lastCol + nCol);
+       			merged.setFirstRow(firstRow + nRow);
+       			merged.setLastRow(lastRow + nRow);
+    			rngs[1] = merged;
+       			rngs[0] = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
+    			shiftedRegions.add(rngs);
+       			removeMergedRegion(i);
+       			i = i - 1; //back up now since we removed one
+        		continue;
+        	}
+        	
+        	if (firstCol >= dstlCol && lastCol <= dstrCol && firstRow >= dsttRow && lastRow <= dstbRow) { //destination total cover
+                CellRangeAddress[] rngs = new CellRangeAddress[2]; //[0] old, [1] null
+       			rngs[0] = merged;
+    			shiftedRegions.add(rngs);
+       			removeMergedRegion(i);
+       			i = i - 1; //back up now since we removed one
+        		continue;
+        	}
+        	
+        	//destination partial cover (not allowed) 
+        	if (firstRow <= dstbRow && lastRow >= dsttRow && firstCol <= dstrCol && lastCol >= dstlCol) {
+        		throw new RuntimeException("Cannot change part of a merged cell.");
+        	}
+        }
+    	
+        //read so it doesn't get shifted again
+        Iterator<CellRangeAddress[]> iterator = shiftedRegions.iterator();
+        while (iterator.hasNext()) {
+            CellRangeAddress region = iterator.next()[1];
+            if (region != null) {
+            	this.addMergedRegion(region);
+            }
+        }
+        
+        return shiftedRegions;
+    }
+    //20100520, henrichen@zkoss.org: Shift rows only, don't handle formula
+    /**
+     * Shifts rows between startRow and endRow n number of rows.
+     * If you use a negative number, it will shift rows up.
+     * Code ensures that rows don't wrap around
+     *
+     * <p>
+     * Additionally shifts merged regions that are completely defined in these
+     * rows (ie. merged 2 cells on a row to be shifted).
+     * <p>
+     * TODO Might want to add bounds checking here
+     * @param startRow the row to start shifting
+     * @param endRow the row to end shifting
+     * @param n the number of rows to shift
+     * @param copyRowHeight whether to copy the row height during the shift
+     * @param resetOriginalRowHeight whether to set the original row's height to the default
+     * @param moveComments whether to move comments at the same time as the cells they are attached to
+     * @param clearRest whether clear the rest row after shifted endRow (meaningful only when n < 0)
+     * @return List of shifted merge ranges 
+     */
+    public List<CellRangeAddress[]> shiftRowsOnly(int startRow, int endRow, int n,
+            boolean copyRowHeight, boolean resetOriginalRowHeight, boolean moveComments, boolean clearRest) {
+        int s, inc;
+        if (n < 0) {
+            s = startRow;
+            inc = 1;
+        } else {
+            s = endRow;
+            inc = -1;
+        }
+        NoteRecord[] noteRecs;
+        if (moveComments) {
+            noteRecs = _sheet.getNoteRecords();
+        } else {
+            noteRecs = NoteRecord.EMPTY_ARRAY;
+        }
+
+        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(startRow, 0, endRow, SpreadsheetVersion.EXCEL97.getLastColumnIndex(), n, false);
+        _sheet.getPageSettings().shiftRowBreaks(startRow, endRow, n);
+        
+        for ( int rowNum = s; rowNum >= startRow && rowNum <= endRow && rowNum >= 0 && rowNum < 65536; rowNum += inc ) {
+            HSSFRow row = getRow( rowNum );
+            // notify all cells in this row that we are going to shift them,
+            // it can throw IllegalStateException if the operation is not allowed, for example,
+            // if the row contains cells included in a multi-cell array formula
+            if(row != null) notifyRowShifting(row);
+
+            final int newRowNum = rowNum + n;
+            final boolean inbound = newRowNum >= 0 && newRowNum <= SpreadsheetVersion.EXCEL97.getLastRowIndex();
+            
+            if (!inbound) {
+            	if (row != null) {
+                    if (resetOriginalRowHeight) {
+                        row.setHeight((short)-1);
+                    }
+                    row.removeAllCells();
+            	}
+            	continue;
+            }
+            
+            HSSFRow row2Replace = getRow( rowNum + n );
+            if (row != null) {
+	            if ( row2Replace == null )
+	                row2Replace = createRow( rowNum + n );
+	
+	            // Remove all the old cells from the row we'll
+	            //  be writing too, before we start overwriting
+	            //  any cells. This avoids issues with cells
+	            //  changing type, and records not being correctly
+	            //  overwritten
+	            row2Replace.removeAllCells();
+            } else {
+	            // If this row doesn't exist, shall also remove
+	            //  the empty destination row
+            	if (row2Replace != null) {
+            		removeRow(row2Replace);
+            	}
+	            continue; // Nothing to do for this row
+            }
+
+            // Fix up row heights if required
+            if (copyRowHeight) {
+                row2Replace.setHeight(row.getHeight());
+            }
+            if (resetOriginalRowHeight) {
+                row.setHeight((short)0xff);
+            }
+
+            // Copy each cell from the source row to
+            //  the destination row
+            for(Iterator<Cell> cells = row.cellIterator(); cells.hasNext(); ) {
+                HSSFCell cell = (HSSFCell)cells.next();
+                row.removeCell( cell );
+                CellValueRecordInterface cellRecord = cell.getCellValueRecord();
+                cellRecord.setRow( rowNum + n );
+                row2Replace.createCellFromRecord( cellRecord );
+                _sheet.addValueRecord( rowNum + n, cellRecord );
+
+                HSSFHyperlink link = cell.getHyperlink();
+                if(link != null){
+                    link.setFirstRow(link.getFirstRow() + n);
+                    link.setLastRow(link.getLastRow() + n);
+                }
+            }
+            // Now zap all the cells in the source row
+            row.removeAllCells();
+
+            // Move comments from the source row to the
+            //  destination row. Note that comments can
+            //  exist for cells which are null
+            if(moveComments) {
+                // This code would get simpler if NoteRecords could be organised by HSSFRow.
+                for(int i=noteRecs.length-1; i>=0; i--) {
+                    NoteRecord nr = noteRecs[i];
+                    if (nr.getRow() != rowNum) {
+                        continue;
+                    }
+                    HSSFComment comment = getCellComment(rowNum, nr.getColumn());
+                    if (comment != null) {
+                       comment.setRow(rowNum + n);
+                    }
+                }
+            }
+        }
+        //special case1: endRow < startRow
+        //special case2: (endRow - startRow + 1) < ABS(n)
+        if (n < 0) {
+        	if (endRow < startRow) { //special case1
+	    		final int orgStartRow = startRow + n;
+	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= endRow && rowNum >= 0 && rowNum < 65536; ++rowNum) {
+	                final HSSFRow row = getRow( rowNum );
+	                if (row != null) {
+	                	removeRow(row);
+	                }
+	            }
+            } else if (clearRest) { //special case 2
+            	final int orgStartRow = endRow + n + 1;
+            	if (orgStartRow <= startRow) {
+    	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= startRow && rowNum >= 0 && rowNum < 65536; ++rowNum) {
+    	                final HSSFRow row = getRow( rowNum );
+    	                if (row != null) {
+    	                	removeRow(row);
+    	                }
+    	            }
+            	}
+        	}
+        }
+        if ( endRow == _lastrow || endRow + n > _lastrow ) _lastrow = Math.min( endRow + n, SpreadsheetVersion.EXCEL97.getLastRowIndex() );
+        if ( startRow == _firstrow || startRow + n < _firstrow ) _firstrow = Math.max( startRow + n, 0 );
+
+        // Update any formulas on this sheet that point to
+        //  rows which have been moved
+        int sheetIndex = _workbook.getSheetIndex(this);
+        short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
+        PtgShifter shifter = new PtgShifter(externSheetIndex, startRow, endRow, n, 0, SpreadsheetVersion.EXCEL97.getLastColumnIndex(), 0, SpreadsheetVersion.EXCEL97);
+        updateNamesAfterCellShift(shifter);
+        
+        return shiftedRanges;
+    }
+    
+    //20100525, henrichen@zkoss.org: Shift columns only, don't handle formula
+    /**
+     * Shifts columns between startCol and endCol n number of columns.
+     * If you use a negative number, it will shift columns left.
+     * Code ensures that columns don't wrap around
+     *
+     * <p>
+     * Additionally shifts merged regions that are completely defined in these
+     * columns (ie. merged 2 cells on a column to be shifted).
+     * <p>
+     * @param startCol the column to start shifting
+     * @param endCol the column to end shifting; -1 means using the last available column number 
+     * @param n the number of rows to shift
+     * @param copyColWidth whether to copy the column width during the shift
+     * @param resetOriginalColWidth whether to set the original column's height to the default
+     * @param moveComments whether to move comments at the same time as the cells they are attached to
+     * @param clearRest whether clear cells after the shifted endCol (meaningful only when n < 0)
+     * @return List of shifted merge ranges
+     */
+    public List<CellRangeAddress[]> shiftColumnsOnly(int startCol, int endCol, int n,
+            boolean copyColWidth, boolean resetOriginalColWidth, boolean moveComments, boolean clearRest) {
+    	
+    	int maxColNum = -1;
+        for ( int rowNum = getFirstRowNum(), endRowNum = getLastRowNum(); rowNum <= endRowNum; ++rowNum ) {
+            HSSFRow row = getRow( rowNum );
+            
+            if (row == null) continue;
+            
+            if (endCol < 0) {
+	            final int colNum = row.getLastCellNum() - 1;
+	            if (colNum > maxColNum)
+	            	maxColNum = colNum;
+            }
+            
+            row.shiftCells(startCol, endCol, n, clearRest);
+        }
+        
+        if (endCol < 0) {
+        	endCol = maxColNum;
+        }
+        if (n > 0) {
+	        if (startCol > endCol) { //nothing to do
+	        	return Collections.emptyList();
+	        }
+        } else {
+        	if ((startCol + n) > endCol) { //nothing to do
+	        	return Collections.emptyList();
+        	}
+        }
+        
+        int s, inc;
+        if (n < 0) {
+            s = startCol;
+            inc = 1;
+        } else {
+            s = endCol;
+            inc = -1;
+        }
+        
+        NoteRecord[] noteRecs;
+        if (moveComments) {
+            noteRecs = _sheet.getNoteRecords();
+        } else {
+            noteRecs = NoteRecord.EMPTY_ARRAY;
+        }
+
+        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(0, startCol, SpreadsheetVersion.EXCEL97.getLastRowIndex(), endCol, n, true);
+        _sheet.getPageSettings().shiftColumnBreaks((short)startCol, (short)endCol, (short)n);
+
+        // Fix up column width and comment if required
+        if (moveComments || copyColWidth || resetOriginalColWidth) {
+        	final int defaultColumnWidth = getDefaultColumnWidth();
+	        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= SpreadsheetVersion.EXCEL97.getLastColumnIndex(); colNum += inc ) {
+	        	final int newColNum = colNum + n;
+		        if (copyColWidth) {
+		            setColumnWidth(newColNum, getColumnWidth(colNum));
+		        }
+		        if (resetOriginalColWidth) {
+		            setColumnWidth(colNum, defaultColumnWidth);
+		        }
+	            // Move comments from the source column to the
+	            //  destination column. Note that comments can
+	            //  exist for cells which are null
+	            if(moveComments) {
+	                for(int i=noteRecs.length-1; i>=0; i--) {
+	                    NoteRecord nr = noteRecs[i];
+	                    if (nr.getColumn() != colNum) {
+	                        continue;
+	                    }
+	                    HSSFComment comment = getCellComment(nr.getRow(), colNum);
+	                    if (comment != null) {
+	                       comment.setColumn(newColNum);
+	                    }
+	                }
+	            }
+	        }
+        }
+
+        // Update any formulas on this sheet that point to
+        // columns which have been moved
+        int sheetIndex = _workbook.getSheetIndex(this);
+        short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
+        PtgShifter shifter = new PtgShifter(externSheetIndex, 0, SpreadsheetVersion.EXCEL97.getLastRowIndex(), 0, startCol, endCol, n, SpreadsheetVersion.EXCEL97);
+        updateNamesAfterCellShift(shifter);
+        
+        return shiftedRanges;
+    }
+    
+    //20100701, henrichen@zkoss.org: Shift columns of a range
+    /**
+     * Shifts columns of a range between startCol and endCol n number of columns in the boundary of top row(tRow) and bottom row(bRow).
+     * If you use a negative number, it will shift columns left.
+     * Code ensures that columns don't wrap around
+     *
+     * <p>
+     * Additionally shifts merged regions that are completely defined in these
+     * columns (ie. merged 2 cells on a column to be shifted) within the specified boundary rows.
+     * <p>
+     * @param startCol the column to start shifting
+     * @param endCol the column to end shifting; -1 means using the last available column number 
+     * @param n the number of rows to shift
+     * @param tRow top boundary row index
+     * @param bRow bottom boundary row index
+     * @param copyColWidth whether to copy the column width during the shift
+     * @param resetOriginalColWidth whether to set the original column's height to the default
+     * @param moveComments whether to move comments at the same time as the cells they are attached to
+     * @param clearRest whether clear cells after the shifted endCol (meaningful only when n < 0)
+     * @return List of shifted merge ranges
+     */
+    public List<CellRangeAddress[]> shiftColumnsRange(int startCol, int endCol, int n, int tRow, int bRow,
+            boolean copyColWidth, boolean resetOriginalColWidth, boolean moveComments, boolean clearRest) {
+    	
+    	int startRow = Math.max(tRow, getFirstRowNum());
+    	int endRow = Math.min(bRow, getLastRowNum());
+    	int maxColNum = -1;
+        for ( int rowNum = startRow, endRowNum = endRow; rowNum <= endRowNum; ++rowNum ) {
+            HSSFRow row = getRow( rowNum );
+            
+            if (row == null) continue;
+            
+            if (endCol < 0) {
+	            final int colNum = row.getLastCellNum() - 1;
+	            if (colNum > maxColNum)
+	            	maxColNum = colNum;
+            }
+            
+            row.shiftCells(startCol, endCol, n, clearRest);
+        }
+        
+        if (endCol < 0) {
+        	endCol = maxColNum;
+        }
+        if (n > 0) {
+	        if (startCol > endCol) { //nothing to do
+	        	return Collections.emptyList();
+	        }
+        } else {
+        	if ((startCol + n) > endCol) { //nothing to do
+	        	return Collections.emptyList();
+        	}
+        }
+        
+        int s, inc;
+        if (n < 0) {
+            s = startCol;
+            inc = 1;
+        } else {
+            s = endCol;
+            inc = -1;
+        }
+        
+        NoteRecord[] noteRecs;
+        if (moveComments) {
+            noteRecs = _sheet.getNoteRecords();
+        } else {
+            noteRecs = NoteRecord.EMPTY_ARRAY;
+        }
+
+        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(tRow, startCol, bRow, endCol, n, true);
+        final boolean wholeColumn = tRow == 0 && bRow == SpreadsheetVersion.EXCEL97.getLastRowIndex(); 
+        if (wholeColumn) { 
+        	_sheet.getPageSettings().shiftColumnBreaks((short)startCol, (short)endCol, (short)n);
+        }
+
+        // Fix up column width and comment if required
+        if (moveComments || copyColWidth || resetOriginalColWidth) {
+        	final int defaultColumnWidth = getDefaultColumnWidth();
+	        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= SpreadsheetVersion.EXCEL97.getLastColumnIndex(); colNum += inc ) {
+	        	final int newColNum = colNum + n;
+	        	if (wholeColumn) {
+			        if (copyColWidth) {
+			            setColumnWidth(newColNum, getColumnWidth(colNum));
+			        }
+			        if (resetOriginalColWidth) {
+			            setColumnWidth(colNum, defaultColumnWidth);
+			        }
+	        	}
+	            // Move comments from the source column to the
+	            //  destination column. Note that comments can
+	            //  exist for cells which are null
+	            if(moveComments) {
+	                for(int i=noteRecs.length-1; i>=0; i--) {
+	                    NoteRecord nr = noteRecs[i];
+	                    if (nr.getColumn() != colNum || nr.getRow() < tRow || nr.getRow() > bRow) { //not in range
+	                        continue;
+	                    }
+	                    HSSFComment comment = getCellComment(nr.getRow(), colNum);
+	                    if (comment != null) {
+	                       comment.setColumn(newColNum);
+	                    }
+	                }
+	            }
+	        }
+        }
+
+        // Update any formulas on this sheet that point to
+        // columns which have been moved
+        int sheetIndex = _workbook.getSheetIndex(this);
+        short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
+        PtgShifter shifter = new PtgShifter(externSheetIndex, tRow, bRow, 0, startCol, endCol, n, SpreadsheetVersion.EXCEL97);
+        updateNamesAfterCellShift(shifter);
+        
+        return shiftedRanges;
+    }
+    
+    //20100520, henrichen@zkoss.org: Shift rows of a range
+    /**
+     * Shifts rows of a range between startRow and endRow n number of rows in the boundary of left column(lCol) and right column(rCol).
+     * If you use a negative number, it will shift rows up.
+     * Code ensures that rows don't wrap around
+     *
+     * <p>
+     * Additionally shifts merged regions that are completely defined in these
+     * rows (ie. merged 2 cells on a row to be shifted).
+     * <p>
+     * TODO Might want to add bounds checking here
+     * @param startRow the row to start shifting
+     * @param endRow the row to end shifting
+     * @param n the number of rows to shift
+     * @param lCol left boundary column
+     * @param rCol right boundary column
+     * @param copyRowHeight whether to copy the row height during the shift
+     * @param resetOriginalRowHeight whether to set the original row's height to the default
+     * @param moveComments whether to move comments at the same time as the cells they are attached to
+     * @param clearRest whether clear the rest row after shifted endRow (meaningful only when n < 0)
+     * @return List of shifted merge ranges 
+     */
+    public List<CellRangeAddress[]> shiftRowsRange(int startRow, int endRow, int n, int lCol, int rCol,
+            boolean copyRowHeight, boolean resetOriginalRowHeight, boolean moveComments, boolean clearRest) {
+        final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
+        if (endRow < 0) {
+        	endRow = maxrow;
+        }
+        if (n > 0) {
+	        if (startRow > endRow ) { //nothing to do
+	        	return Collections.emptyList();
+	        }
+        } else {
+        	if ((startRow + n) > endRow) { //nothing to do
+	        	return Collections.emptyList();
+        	}
+        }
+        
+        int s, inc;
+        if (n < 0) {
+            s = startRow;
+            inc = 1;
+        } else {
+            s = endRow;
+            inc = -1;
+        }
+        NoteRecord[] noteRecs;
+        if (moveComments) {
+            noteRecs = _sheet.getNoteRecords();
+        } else {
+            noteRecs = NoteRecord.EMPTY_ARRAY;
+        }
+
+        final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(startRow, lCol, endRow, rCol, n, false);
+        final boolean wholeRow = lCol == 0 && rCol == maxcol; 
+        if (wholeRow) { 
+        	_sheet.getPageSettings().shiftRowBreaks(startRow, endRow, n);
+        }
+        for ( int rowNum = s; rowNum >= startRow && rowNum <= endRow && rowNum >= 0 && rowNum <= maxrow; rowNum += inc ) {
+            HSSFRow row = getRow( rowNum );
+            // notify all cells in this row that we are going to shift them,
+            // it can throw IllegalStateException if the operation is not allowed, for example,
+            // if the row contains cells included in a multi-cell array formula
+            if(row != null) notifyRowShifting(row); //TODO: add lCol, rCol information
+
+            final int newRowNum = rowNum + n;
+            final boolean inbound = newRowNum >= 0 && newRowNum <= maxrow;
+            
+            if (!inbound) {
+            	if (row != null) {
+            		if (wholeRow) {
+	                    if (resetOriginalRowHeight) {
+	                        row.setHeight((short)-1); //default height
+	                    }
+	                    row.removeAllCells();
+            		} else {
+            			removeCells(row, lCol, rCol);
+            		}
+            	}
+            	continue;
+            }
+            
+            HSSFRow row2Replace = getRow( rowNum + n );
+            if (row != null) {
+	            if ( row2Replace == null )
+	                row2Replace = createRow( rowNum + n );
+	
+	            // Remove all the old cells from the row we'll
+	            //  be writing too, before we start overwriting
+	            //  any cells. This avoids issues with cells
+	            //  changing type, and records not being correctly
+	            //  overwritten
+	            if (wholeRow) {
+	            	row2Replace.removeAllCells();
+	            } else {
+	            	removeCells(row2Replace, lCol, rCol);
+	            }
+            } else {
+	            // If this row doesn't exist, shall also remove
+	            //  the empty destination row
+            	if (row2Replace != null) {
+            		if (wholeRow) {
+            			removeRow(row2Replace);
+            		} else {
+    	            	removeCells(row2Replace, lCol, rCol);
+            		}
+            	}
+	            continue; // Nothing to do for this row
+            }
+
+            // Fix up row heights if required
+            if (wholeRow) {
+	            if (copyRowHeight) {
+	                row2Replace.setHeight(row.getHeight());
+	            }
+	            if (resetOriginalRowHeight) {
+	                row.setHeight((short)0xff);
+	            }
+            }
+
+            // Copy each cell from the source row to
+            //  the destination row
+            if (wholeRow) {
+	            for(Iterator<Cell> cells = row.cellIterator(); cells.hasNext(); ) {
+	                HSSFCell cell = (HSSFCell)cells.next();
+	                row.removeCell( cell );
+	                CellValueRecordInterface cellRecord = cell.getCellValueRecord();
+	                cellRecord.setRow( rowNum + n );
+	                row2Replace.createCellFromRecord( cellRecord );
+	                _sheet.addValueRecord( rowNum + n, cellRecord );
+	
+	                HSSFHyperlink link = cell.getHyperlink();
+	                if(link != null){
+	                    link.setFirstRow(link.getFirstRow() + n);
+	                    link.setLastRow(link.getLastRow() + n);
+	                }
+	            }
+	            // Now zap all the cells in the source row
+	            row.removeAllCells();
+            } else {
+            	final int startCol = Math.max(row.getFirstCellNum(), lCol);
+            	final int endCol = Math.min(row.getLastCellNum(), rCol);
+	            for(int col = startCol; col <= endCol; ++col) {
+	                HSSFCell cell = (HSSFCell)row.getCell(col);
+	                if (cell == null) {
+	                	continue;
+	                }
+	                row.removeCell( cell );
+	                CellValueRecordInterface cellRecord = cell.getCellValueRecord();
+	                cellRecord.setRow( rowNum + n );
+	                row2Replace.createCellFromRecord( cellRecord );
+	                _sheet.addValueRecord( rowNum + n, cellRecord );
+	
+	                HSSFHyperlink link = cell.getHyperlink();
+	                if(link != null && link.getFirstColumn() >= lCol && link.getLastColumn() <= rCol){
+	                    link.setFirstRow(link.getFirstRow() + n);
+	                    link.setLastRow(link.getLastRow() + n);
+	                }
+	            }
+	            // Now zap the cells in the source row
+	            removeCells(row, lCol, rCol);
+            }
+
+            // Move comments from the source row to the
+            //  destination row. Note that comments can
+            //  exist for cells which are null
+            if(moveComments) {
+                // This code would get simpler if NoteRecords could be organised by HSSFRow.
+                for(int i=noteRecs.length-1; i>=0; i--) {
+                    NoteRecord nr = noteRecs[i];
+                    if (nr.getRow() != rowNum || nr.getColumn() < lCol || nr.getColumn() > rCol) {
+                        continue;
+                    }
+                    HSSFComment comment = getCellComment(rowNum, nr.getColumn());
+                    if (comment != null) {
+                       comment.setRow(rowNum + n);
+                    }
+                }
+            }
+        }
+        //special case1: endRow < startRow
+        //special case2: (endRow - startRow + 1) < ABS(n)
+        if (n < 0) {
+        	if (endRow < startRow) { //special case1
+	    		final int orgStartRow = startRow + n;
+	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= endRow && rowNum >= 0 && rowNum <= maxrow; ++rowNum) {
+	                final HSSFRow row = getRow( rowNum );
+	                if (row != null) {
+	                	if (wholeRow) {
+	                		removeRow(row);
+	                	} else {
+	                		removeCells(row, lCol, rCol);
+	                	}
+	                }
+	            }
+            } else if (clearRest) { //special case 2
+            	final int orgStartRow = endRow + n + 1;
+            	if (orgStartRow <= startRow) {
+    	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= startRow && rowNum >= 0 && rowNum <= maxrow; ++rowNum) {
+    	                final HSSFRow row = getRow( rowNum );
+    	                if (row != null) {
+    	                	if (wholeRow) {
+    	                		removeRow(row);
+    	                	} else {
+    	                		removeCells(row, lCol, rCol);
+    	                	}
+    	                }
+    	            }
+            	}
+        	}
+        }
+        if ( endRow == _lastrow || endRow + n > _lastrow ) _lastrow = Math.min( endRow + n, maxrow);
+        if ( startRow == _firstrow || startRow + n < _firstrow ) _firstrow = Math.max( startRow + n, 0 );
+
+        // Update any formulas on this sheet that point to
+        //  rows which have been moved
+        int sheetIndex = _workbook.getSheetIndex(this);
+        short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
+        PtgShifter shifter = new PtgShifter(externSheetIndex, startRow, endRow, n, lCol, rCol, 0, SpreadsheetVersion.EXCEL97);
+        updateNamesAfterCellShift(shifter);
+        
+        return shiftedRanges;
+    }
+    
+    //20100701, henrichen@zkoss.org: remove cells of the row between specified left column and right column
+    private void removeCells(Row row, int lCol, int rCol) {
+    	final int startCol = Math.max(row.getFirstCellNum(), lCol);
+    	final int endCol = Math.min(row.getLastCellNum(), rCol);
+		for(int col = startCol; col <= endCol; ++col) {
+			final Cell cell = row.getCell(col);
+			if (cell != null) {
+				row.removeCell(cell);
+			}
+		}
+    }
+
+    public List<CellRangeAddress[]> shiftBothRange(int tRow, int bRow, int nRow, int lCol, int rCol, int nCol,
+        boolean moveComments) {
+        if (nRow > 0) {
+	        if (tRow > bRow ) { //nothing to do
+	        	return Collections.emptyList();
+	        }
+        } else {
+        	if ((tRow + nRow) > bRow) { //nothing to do
+	        	return Collections.emptyList();
+        	}
+        }
+        
+        int s, inc;
+        if (nRow < 0) {
+            s = tRow;
+            inc = 1;
+        } else {
+            s = bRow;
+            inc = -1;
+        }
+        NoteRecord[] noteRecs;
+        if (moveComments) {
+            noteRecs = _sheet.getNoteRecords();
+        } else {
+            noteRecs = NoteRecord.EMPTY_ARRAY;
+        }
+
+        final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
+        final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+        final List<CellRangeAddress[]> shiftedRanges = shiftBothMergedRegion(tRow, lCol, bRow, rCol, nRow, nCol);
+        for ( int rowNum = s; rowNum >= tRow && rowNum <= bRow && rowNum >= 0 && rowNum <= maxrow; rowNum += inc ) {
+            HSSFRow row = getRow( rowNum );
+            // notify all cells in this row that we are going to shift them,
+            // it can throw IllegalStateException if the operation is not allowed, for example,
+            // if the row contains cells included in a multi-cell array formula
+            if(row != null) notifyRowShifting(row); //TODO: add lCol, rCol information
+
+            final int newRowNum = rowNum + nRow;
+            final boolean rowInbound = newRowNum >= 0 && newRowNum <= maxrow;
+            if (!rowInbound) {
+            	if (row != null) {
+           			removeCells(row, lCol, rCol);
+            	}
+            	continue;
+            }
+
+            final int dstlCol = Math.max(lCol + nCol, 0);
+            final int dstrCol = Math.min(rCol + nCol, maxcol);
+            final boolean colInbound = dstlCol > maxcol || dstrCol < 0;
+            
+            HSSFRow row2Replace = getRow( newRowNum );
+            if (row != null) {
+	            if ( row2Replace == null )
+	                row2Replace = createRow( newRowNum );
+	
+	            // Remove all the old cells from the row we'll
+	            //  be writing too, before we start overwriting
+	            //  any cells. This avoids issues with cells
+	            //  changing type, and records not being correctly
+	            //  overwritten
+	            if (colInbound) {
+	            	removeCells(row2Replace, dstlCol, dstrCol);
+	            }
+            } else {
+	            // If this row doesn't exist, shall also remove
+	            //  the empty destination row
+            	if (row2Replace != null) {
+            		if (colInbound) {
+            			removeCells(row2Replace, dstlCol, dstrCol);
+            		}
+            	}
+	            continue; // Nothing to do for this row
+            }
+
+            // Copy each cell from the source row to
+            //  the destination row
+        	final int startCol = Math.max(row.getFirstCellNum(), lCol);
+        	final int endCol = Math.min(row.getLastCellNum(), rCol);
+            for(int col = startCol; col <= endCol; ++col) {
+                HSSFCell cell = (HSSFCell)row.getCell(col);
+                if (cell == null) {
+                	continue;
+                }
+                row.removeCell( cell );
+                CellValueRecordInterface cellRecord = cell.getCellValueRecord();
+                cellRecord.setRow( rowNum + nRow );
+                int colNum = cellRecord.getColumn() + nCol;
+                if (colNum >= 0 && colNum <= maxcol) { //in bound
+                	cellRecord.setColumn((short) colNum);
+                }
+                row2Replace.createCellFromRecord( cellRecord );
+                _sheet.addValueRecord( rowNum + nRow, cellRecord );
+            }
+            // Now zap the cells in the source row
+            removeCells(row, lCol, rCol);
+
+            // Move comments from the source row to the
+            //  destination row. Note that comments can
+            //  exist for cells which are null
+            if(moveComments) {
+                // This code would get simpler if NoteRecords could be organised by HSSFRow.
+                for(int i=noteRecs.length-1; i>=0; i--) {
+                    NoteRecord nr = noteRecs[i];
+                    if (nr.getRow() != rowNum || nr.getColumn() < lCol || nr.getColumn() > rCol) {
+                        continue;
+                    }
+                    HSSFComment comment = getCellComment(rowNum, nr.getColumn());
+                    if (comment != null) {
+                    	comment.setRow(rowNum + nRow);
+                    	int colNum = nr.getColumn()+nCol;
+                    	if (colNum >= 0 && colNum <= maxcol) {
+                    		comment.setColumn(colNum);
+                    	}
+                    }
+                }
+            }
+        }
+        if ( bRow == _lastrow || bRow + nRow > _lastrow ) _lastrow = Math.min( bRow + nRow, maxrow);
+        if ( tRow == _firstrow || tRow + nRow < _firstrow ) _firstrow = Math.max( tRow + nRow, 0 );
+
+        // Update any formulas on this sheet that point to
+        //  rows which have been moved
+        int sheetIndex = _workbook.getSheetIndex(this);
+        short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
+        PtgShifter shifter = new PtgShifter(externSheetIndex, tRow, bRow, nRow, lCol, rCol, nCol, SpreadsheetVersion.EXCEL97);
+        updateNamesAfterCellShift(shifter);
+        
+        return shiftedRanges;
+    }
+    
+    /**
+     * Updates named ranges due to moving of cells
+     */
+    //20100705, henrichen@zkoss.org: update named references
+    private void updateNamesAfterCellShift(PtgShifter shifter) {
+    	InternalWorkbook book = getWorkbook().getWorkbook();
+        for (int i = 0 ; i < book.getNumNames() ; ++i){
+            NameRecord nr = book.getNameRecord(i);
+            Ptg[] ptgs = nr.getNameDefinition();
+            if (shifter.adjustFormula(ptgs, nr.getSheetNumber())) {
+                nr.setNameDefinition(ptgs);
+            }
+        }
     }
 }

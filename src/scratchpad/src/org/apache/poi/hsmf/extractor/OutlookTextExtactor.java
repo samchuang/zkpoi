@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.poi.POIOLE2TextExtractor;
 import org.apache.poi.hsmf.MAPIMessage;
+import org.apache.poi.hsmf.datatypes.AttachmentChunks;
 import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -86,13 +87,45 @@ public class OutlookTextExtactor extends POIOLE2TextExtractor {
          handleEmails(s, "BCC", msg.getDisplayBCC(), emails);
       } catch(ChunkNotFoundException e) {}
       
+      // Date - try two ways to find it
       try {
+         // First try via the proper chunk
          SimpleDateFormat f = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss");
          s.append("Date: " + f.format(msg.getMessageDate().getTime()) + "\n");
-      } catch(ChunkNotFoundException e) {}
+      } catch(ChunkNotFoundException e) {
+         try {
+            // Failing that try via the raw headers 
+            String[] headers = msg.getHeaders();
+            for(String header: headers) {
+               if(header.toLowerCase().startsWith("date:")) {
+                  s.append(
+                        "Date:" + 
+                        header.substring(header.indexOf(':')+1) +
+                        "\n"
+                  );
+                  break;
+               }
+            }
+         } catch(ChunkNotFoundException he) {
+            // We can't find the date, sorry...
+         }
+      }
+      
       try {
          s.append("Subject: " + msg.getSubject() + "\n");
       } catch(ChunkNotFoundException e) {}
+      
+      // Display attachment names
+      // To get the attachments, use ExtractorFactory
+      for(AttachmentChunks att : msg.getAttachmentFiles()) {
+         String ats = att.attachLongFileName.getValue();
+         if(att.attachMimeTag != null && 
+               att.attachMimeTag.getValue() != null) {
+            ats = att.attachMimeTag.getValue() + " = " + ats; 
+         }
+         s.append("Attachment: " + ats + "\n");
+      }
+      
       try {
          s.append("\n" + msg.getTextBody() + "\n");
       } catch(ChunkNotFoundException e) {}

@@ -535,8 +535,8 @@ public interface Sheet extends Iterable<Row> {
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
      * @param colSplit      Horizonatal position of split.
      * @param rowSplit      Vertical position of split.
-     * @param topRow        Top row visible in bottom pane
      * @param leftmostColumn   Left column visible in right pane.
+     * @param topRow        Top row visible in bottom pane
      */
     void createFreezePane(int colSplit, int rowSplit, int leftmostColumn, int topRow);
 
@@ -798,4 +798,12 @@ public interface Sheet extends Iterable<Row> {
      * @return the {@link CellRange} of cells affected by this change
      */
     CellRange<? extends Cell> removeArrayFormula(Cell cell);
+    
+    public DataValidationHelper getDataValidationHelper();
+
+	/**
+	 * Creates a data validation object
+	 * @param dataValidation The Data validation object settings
+	 */
+	public void addValidationData(DataValidation dataValidation);
 }

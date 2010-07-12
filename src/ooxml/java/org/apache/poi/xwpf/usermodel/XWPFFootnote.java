@@ -16,12 +16,12 @@
 ==================================================================== */
 package org.apache.poi.xwpf.usermodel;
 
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFtnEdn;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFtnEdn;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 
 public class XWPFFootnote implements Iterable<XWPFParagraph> {
     private List<XWPFParagraph> paragraphs = new ArrayList<XWPFParagraph>();
