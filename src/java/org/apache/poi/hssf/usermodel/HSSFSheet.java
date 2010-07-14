@@ -27,9 +27,12 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.poi.ddf.EscherRecord;
 import org.apache.poi.hssf.model.HSSFFormulaParser;
@@ -2013,7 +2016,14 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	public DataValidationHelper getDataValidationHelper() {
 		return new HSSFDataValidationHelper(this);
 	}
-    
+	
+	
+    //20100713, henrichen@zkoss.org: handle copy into inserted row/column
+	//copyOrigin of #insert
+	public final static int FORMAT_LEFTABOVE = 0;
+	public final static int FORMAT_RIGHTBELOW = 1;
+	public final static int FORMAT_NONE = -1;
+	
     /**
      * Shifts the merged regions left or right depending on mode
      * <p>
@@ -2212,6 +2222,33 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         
         return shiftedRegions;
     }
+    //20100713, henrichen@zkoss.org: copy style except border
+    private CellStyle copyFromStyleExceptBorder(CellStyle srcStyle) {
+    	if (srcStyle.getIndex() == 0) { //default one
+    		return srcStyle;
+    	}
+    	CellStyle dstStyle = _workbook.createCellStyle();
+		final short bb = dstStyle.getBorderBottom();
+		final short tb = dstStyle.getBorderTop();
+		final short lb = dstStyle.getBorderLeft();
+		final short rb = dstStyle.getBorderRight();
+		final short bc = dstStyle.getBottomBorderColor();
+		final short tc = dstStyle.getTopBorderColor();
+		final short lc = dstStyle.getLeftBorderColor();
+		final short rc = dstStyle.getRightBorderColor();
+		dstStyle.cloneStyleFrom(srcStyle);
+		dstStyle.setBorderBottom(bb);
+		dstStyle.setBorderTop(tb);
+		dstStyle.setBorderLeft(lb);
+		dstStyle.setBorderRight(rb);
+		dstStyle.setBottomBorderColor(bc);
+		dstStyle.setTopBorderColor(tc);
+		dstStyle.setLeftBorderColor(lc);
+		dstStyle.setRightBorderColor(rc);
+		
+		return dstStyle;
+    }
+    
     //20100520, henrichen@zkoss.org: Shift rows only, don't handle formula
     /**
      * Shifts rows between startRow and endRow n number of rows.
@@ -2230,10 +2267,18 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * @param resetOriginalRowHeight whether to set the original row's height to the default
      * @param moveComments whether to move comments at the same time as the cells they are attached to
      * @param clearRest whether clear the rest row after shifted endRow (meaningful only when n < 0)
+     * @param copyOrigin copy format from the above/below row for the inserted rows(meaningful only when n > 0)
      * @return List of shifted merge ranges 
      */
     public List<CellRangeAddress[]> shiftRowsOnly(int startRow, int endRow, int n,
-            boolean copyRowHeight, boolean resetOriginalRowHeight, boolean moveComments, boolean clearRest) {
+            boolean copyRowHeight, boolean resetOriginalRowHeight, boolean moveComments, boolean clearRest, int copyOrigin) {
+    	//prepare source format row
+    	final int srcRownum = n <= 0 ? -1 : copyOrigin == FORMAT_RIGHTBELOW ? startRow : copyOrigin == FORMAT_LEFTABOVE ? startRow - 1 : -1;
+    	final HSSFRow srcRow = srcRownum >= 0 ? getRow(srcRownum) : null;
+    	final Map<Integer, Cell> srcCells = srcRow != null ? copyRowCells(srcRow, srcRow.getFirstCellNum(), srcRow.getLastCellNum()) : null;
+    	final short srcHeight = srcRow != null ? srcRow.getHeight() : -1;
+    	final HSSFCellStyle srcStyle = srcRow != null ? srcRow.getRowStyle() : null;
+    	
         int s, inc;
         if (n < 0) {
             s = startRow;
@@ -2336,6 +2381,34 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
                 }
             }
         }
+        
+        //handle inserted rows
+        if (srcRow != null) {
+        	final int row2 = Math.min(startRow + n - 1, SpreadsheetVersion.EXCEL97.getLastRowIndex());
+        	for ( int rownum = startRow; rownum <= row2; ++rownum) {
+        		HSSFRow row = getRow(rownum);
+        		if (row == null) {
+        			row = createRow(rownum); 
+        		}
+        		row.setHeight(srcHeight); //height
+        		if (srcStyle != null) {
+        			row.setRowStyle((HSSFCellStyle)copyFromStyleExceptBorder(srcStyle));//style
+        		}
+        		if (srcCells != null) {
+	        		for (Entry<Integer, Cell> cellEntry : srcCells.entrySet()) {
+	        			final Cell srcCell = cellEntry.getValue();
+        				final CellStyle cellStyle = srcCell.getCellStyle();
+        				final int c = cellEntry.getKey().intValue();
+	        			Cell cell = row.getCell(c);
+	        			if (cell == null) {
+	        				cell = row.createCell(c);
+	        			}
+	        			cell.setCellStyle(copyFromStyleExceptBorder(cellStyle));
+	        		}
+        		}
+        	}
+        }
+        
         //special case1: endRow < startRow
         //special case2: (endRow - startRow + 1) < ABS(n)
         if (n < 0) {
@@ -2389,10 +2462,16 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * @param resetOriginalColWidth whether to set the original column's height to the default
      * @param moveComments whether to move comments at the same time as the cells they are attached to
      * @param clearRest whether clear cells after the shifted endCol (meaningful only when n < 0)
+     * @param copyOrigin copy format from the left/right column for the inserted column(meaningful only when n > 0)
      * @return List of shifted merge ranges
      */
     public List<CellRangeAddress[]> shiftColumnsOnly(int startCol, int endCol, int n,
-            boolean copyColWidth, boolean resetOriginalColWidth, boolean moveComments, boolean clearRest) {
+            boolean copyColWidth, boolean resetOriginalColWidth, boolean moveComments, boolean clearRest, int copyOrigin) {
+    	//prepared inserting column format
+    	final int srcCol = n <= 0 ? -1 : copyOrigin == FORMAT_RIGHTBELOW ? startCol : copyOrigin == FORMAT_LEFTABOVE ? startCol - 1 : -1; 
+    	final CellStyle colStyle = srcCol >= 0 ? getColumnStyle(srcCol) : null;
+    	final int colWidth = srcCol >= 0 ? getColumnWidth(srcCol) : -1; 
+    	final Map<Integer, Cell> cells = srcCol >= 0 ? new HashMap<Integer, Cell>() : null;
     	
     	int maxColNum = -1;
         for ( int rowNum = getFirstRowNum(), endRowNum = getLastRowNum(); rowNum <= endRowNum; ++rowNum ) {
@@ -2404,6 +2483,13 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	            final int colNum = row.getLastCellNum() - 1;
 	            if (colNum > maxColNum)
 	            	maxColNum = colNum;
+            }
+            
+            if (cells != null) {
+           		final Cell cell = row.getCell(srcCol);
+           		if (cell != null) {
+           			cells.put(new Integer(rowNum), cell);
+           		}
             }
             
             row.shiftCells(startCol, endCol, n, clearRest);
@@ -2470,6 +2556,32 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	        }
         }
 
+        //handle inserted columns
+        if (srcCol >= 0) {
+        	final int col2 = Math.min(startCol + n - 1, SpreadsheetVersion.EXCEL97.getLastColumnIndex());
+        	for (int col = startCol; col <= col2 ; ++col) {
+        		//copy the column width
+        		setColumnWidth(col, colWidth);
+        		if (colStyle != null) {
+        			setDefaultColumnStyle(col, copyFromStyleExceptBorder(colStyle));
+        		}
+        	}
+        	if (cells != null) {
+		        for (Entry<Integer, Cell> cellEntry : cells.entrySet()) {
+		            final HSSFRow row = getRow(cellEntry.getKey().intValue());
+		            final Cell srcCell = cellEntry.getValue();
+		            final CellStyle srcStyle = srcCell.getCellStyle();
+		        	for (int col = startCol; col <= col2; ++col) {
+		        		Cell dstCell = row.getCell(col);
+		        		if (dstCell == null) {
+		        			dstCell = row.createCell(col);
+		        		}
+		        		dstCell.setCellStyle(copyFromStyleExceptBorder(srcStyle));
+		        	}
+		        }
+        	}
+        }
+        
         // Update any formulas on this sheet that point to
         // columns which have been moved
         int sheetIndex = _workbook.getSheetIndex(this);
@@ -2499,10 +2611,17 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * @param resetOriginalColWidth whether to set the original column's height to the default
      * @param moveComments whether to move comments at the same time as the cells they are attached to
      * @param clearRest whether clear cells after the shifted endCol (meaningful only when n < 0)
+     * @param copyOrigin copy format from the left/right column for the inserted column(meaningful only when n > 0)
      * @return List of shifted merge ranges
      */
     public List<CellRangeAddress[]> shiftColumnsRange(int startCol, int endCol, int n, int tRow, int bRow,
-            boolean copyColWidth, boolean resetOriginalColWidth, boolean moveComments, boolean clearRest) {
+            boolean copyColWidth, boolean resetOriginalColWidth, boolean moveComments, boolean clearRest, int copyOrigin) {
+    	
+    	//prepared inserting column format
+    	final int srcCol = n <= 0 ? -1 : copyOrigin == FORMAT_RIGHTBELOW ? startCol : copyOrigin == FORMAT_LEFTABOVE ? startCol - 1 : -1;
+    	final CellStyle colStyle = srcCol >= 0 ? getColumnStyle(srcCol) : null;
+    	final int colWidth = srcCol >= 0 ? getColumnWidth(srcCol) : -1; 
+    	final Map<Integer, Cell> cells = srcCol >= 0 ? new HashMap<Integer, Cell>() : null;
     	
     	int startRow = Math.max(tRow, getFirstRowNum());
     	int endRow = Math.min(bRow, getLastRowNum());
@@ -2516,6 +2635,13 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	            final int colNum = row.getLastCellNum() - 1;
 	            if (colNum > maxColNum)
 	            	maxColNum = colNum;
+            }
+            
+            if (n > 0 && cells != null) {
+           		final Cell cell = row.getCell(srcCol);
+           		if (cell != null) {
+           			cells.put(new Integer(rowNum), cell);
+           		}
             }
             
             row.shiftCells(startCol, endCol, n, clearRest);
@@ -2587,6 +2713,32 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	        }
         }
 
+        //handle inserted columns
+        if (srcCol >= 0) {
+        	final int col2 = Math.min(startCol + n - 1, SpreadsheetVersion.EXCEL97.getLastColumnIndex()); 
+	        if (wholeColumn) {
+	        	for (int col = startCol; col <= col2 ; ++col) {
+	        		//copy the column width
+	        		setColumnWidth(col, colWidth);
+	        		setDefaultColumnStyle(col, copyFromStyleExceptBorder(colStyle));
+	        	}
+	        }
+	        if (cells != null) {
+		        for (Entry<Integer, Cell> cellEntry : cells.entrySet()) {
+		            final HSSFRow row = getRow(cellEntry.getKey().intValue());
+		            final Cell srcCell = cellEntry.getValue();
+		            final CellStyle srcStyle = srcCell.getCellStyle();
+		        	for (int col = startCol; col <= col2 ; ++col) {
+		        		Cell dstCell = row.getCell(col);
+		        		if (dstCell == null) {
+		        			dstCell = row.createCell(col);
+		        		}
+		        		dstCell.setCellStyle(copyFromStyleExceptBorder(srcStyle));
+		        	}
+		        }
+	        }
+        }
+        
         // Update any formulas on this sheet that point to
         // columns which have been moved
         int sheetIndex = _workbook.getSheetIndex(this);
@@ -2595,6 +2747,18 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         updateNamesAfterCellShift(shifter);
         
         return shiftedRanges;
+    }
+
+    //columnIndex -> Cell of this row
+    private Map<Integer, Cell> copyRowCells(Row row, int lCol, int rCol) {
+    	final Map<Integer, Cell> cells = new HashMap<Integer, Cell>();
+    	for(int c = lCol; c <= rCol; ++c) {
+    		final Cell cell = row.getCell(c);
+    		if (cell != null) {
+    			cells.put(new Integer(c), cell);
+    		}
+    	}
+    	return cells;
     }
     
     //20100520, henrichen@zkoss.org: Shift rows of a range
@@ -2617,10 +2781,18 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * @param resetOriginalRowHeight whether to set the original row's height to the default
      * @param moveComments whether to move comments at the same time as the cells they are attached to
      * @param clearRest whether clear the rest row after shifted endRow (meaningful only when n < 0)
+     * @param copyOrigin copy format from the above/below row for the inserted rows(meaningful only when n > 0)
      * @return List of shifted merge ranges 
      */
     public List<CellRangeAddress[]> shiftRowsRange(int startRow, int endRow, int n, int lCol, int rCol,
-            boolean copyRowHeight, boolean resetOriginalRowHeight, boolean moveComments, boolean clearRest) {
+            boolean copyRowHeight, boolean resetOriginalRowHeight, boolean moveComments, boolean clearRest, int copyOrigin) {
+    	//prepare source format row
+    	final int srcRownum = n <= 0 ? -1 : copyOrigin == FORMAT_RIGHTBELOW ? startRow : copyOrigin == FORMAT_LEFTABOVE ? startRow - 1 : -1;
+    	final HSSFRow srcRow = srcRownum >= 0 ? getRow(srcRownum) : null;
+    	final Map<Integer, Cell> srcCells = srcRow != null ? copyRowCells(srcRow, lCol, rCol) : null;
+    	final short srcHeight = srcRow != null ? srcRow.getHeight() : -1;
+    	final HSSFCellStyle srcStyle = srcRow != null ? srcRow.getRowStyle() : null;
+    	
         final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
         if (endRow < 0) {
         	endRow = maxrow;
@@ -2778,6 +2950,34 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
                 }
             }
         }
+        
+        //handle inserted rows
+        if (srcRow != null) {
+        	final int row2 = Math.min(startRow + n - 1, SpreadsheetVersion.EXCEL97.getLastRowIndex());
+        	for(int rownum = startRow; rownum <= row2; ++rownum) {
+        		HSSFRow row = getRow(rownum);
+        		if (row == null) {
+        			row = createRow(rownum); 
+        		}
+        		if (wholeRow) {
+        			row.setHeight(srcHeight);
+        			row.setRowStyle((HSSFCellStyle)copyFromStyleExceptBorder(srcStyle));
+        		}
+                if (srcCells != null) {
+	        		for(Entry<Integer, Cell> cellEntry : srcCells.entrySet()) {
+	        			final int colnum = cellEntry.getKey().intValue();
+	        			final Cell srcCell = cellEntry.getValue();
+	        			final CellStyle cellStyle = srcCell.getCellStyle(); 
+	        			Cell dstCell = row.getCell(colnum);
+	        			if (dstCell == null) {
+	        				dstCell = row.createCell(colnum);
+	        			}
+	        			dstCell.setCellStyle(copyFromStyleExceptBorder(cellStyle));
+	        		}
+                }
+        	}
+        }
+        
         //special case1: endRow < startRow
         //special case2: (endRow - startRow + 1) < ABS(n)
         if (n < 0) {
