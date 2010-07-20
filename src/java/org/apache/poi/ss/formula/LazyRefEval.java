@@ -20,15 +20,18 @@ package org.apache.poi.ss.formula;
 import org.apache.poi.hssf.record.formula.AreaI;
 import org.apache.poi.hssf.record.formula.AreaI.OffsetArea;
 import org.apache.poi.hssf.record.formula.eval.AreaEval;
+import org.apache.poi.hssf.record.formula.eval.HyperlinkEval;
 import org.apache.poi.hssf.record.formula.eval.RefEvalBase;
 import org.apache.poi.hssf.record.formula.eval.ValueEval;
 import org.apache.poi.hssf.util.CellReference;
+import org.apache.poi.ss.usermodel.Hyperlink;
 
 /**
 *
 * @author Josh Micich
+* @author henrichen@zkoss.org: HYPERLINK function
 */
-final class LazyRefEval extends RefEvalBase {
+final class LazyRefEval extends RefEvalBase implements HyperlinkEval {
 
 	private final SheetRefEvaluator _evaluator;
 
@@ -80,5 +83,15 @@ final class LazyRefEval extends RefEvalBase {
 		sb.append(cr.formatAsString());
 		sb.append("]");
 		return sb.toString();
+	}
+
+	//20100720, henrichen@zkoss.org: handle HYPERLINK function
+	private Hyperlink _hyperlink;
+	public void setHyperlink(Hyperlink hyperlink) {
+		_hyperlink = hyperlink;
+	}
+	
+	public Hyperlink getHyperlink() {
+		return _hyperlink;
 	}
 }

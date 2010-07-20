@@ -17,6 +17,13 @@
 
 package org.apache.poi.hssf.record.formula.functions;
 
+import org.apache.poi.hssf.record.formula.eval.BlankEval;
+import org.apache.poi.hssf.record.formula.eval.BoolEval;
+import org.apache.poi.hssf.record.formula.eval.ErrorEval;
+import org.apache.poi.hssf.record.formula.eval.EvaluationException;
+import org.apache.poi.hssf.record.formula.eval.HyperlinkEval;
+import org.apache.poi.hssf.record.formula.eval.NumberEval;
+import org.apache.poi.hssf.record.formula.eval.OperandResolver;
 import org.apache.poi.hssf.record.formula.eval.StringEval;
 import org.apache.poi.hssf.record.formula.eval.ValueEval;
 
@@ -35,15 +42,150 @@ import org.apache.poi.hssf.record.formula.eval.ValueEval;
  *  Returns last argument.  Leaves type unchanged (does not convert to {@link StringEval}).
  *
  * @author Wayne Clingingsmith
+ * @author henrichen@zkoss.org: Have to associate a Hyperlink data model so UI knows that is a hyperlink. 
  */
 public final class Hyperlink extends Var1or2ArgFunction {
 
 	public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0) {
+		//20100719, henrichen@zkoss.org: handle HYPERLINK function
+		if (arg0 instanceof HyperlinkEval) {
+			((HyperlinkEval)arg0).setHyperlink(new EvalHyperlink(srcRowIndex, srcColumnIndex, arg0, arg0));
+		}
 		return arg0;
 	}
 	public ValueEval evaluate(int srcRowIndex, int srcColumnIndex, ValueEval arg0, ValueEval arg1) {
 		// note - if last arg is MissingArgEval, result will be NumberEval.ZERO,
 		// but WorkbookEvaluator does that translation
+		
+		//20100719, henrichen@zkoss.org: handle HYPERLINK function
+		if (arg1 instanceof HyperlinkEval) {
+			((HyperlinkEval)arg1).setHyperlink(new EvalHyperlink(srcRowIndex, srcColumnIndex, arg0, arg1));
+		}
 		return arg1;
+	}
+	
+	private static class EvalHyperlink implements org.apache.poi.ss.usermodel.Hyperlink {
+		private int _row;
+		private int _col;
+		private String _address;
+		private String _label;
+		private int _type;
+		private EvalHyperlink(int row, int col, ValueEval addrEval, ValueEval labelEval) {
+			_address = (String) evaluateToString(addrEval, row, col);
+			_label = (String) evaluateToString(labelEval, row, col);
+			final String addr = _address.toLowerCase(); 
+			if (addr.startsWith("http://") || addr.startsWith("https://")) {
+				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_URL;
+			} else if (addr.startsWith("mailto://")) {
+				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_EMAIL;
+			} else if (addr.indexOf('!') > 0) {
+				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_DOCUMENT;
+			} else {
+				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_FILE;
+			}
+			_row = row;
+			_col = col;
+		}
+		@Override
+		public int getFirstColumn() {
+			return _col;
+		}
+
+		@Override
+		public int getFirstRow() {
+			return _row;
+		}
+
+		@Override
+		public int getLastColumn() {
+			return _col;
+		}
+
+		@Override
+		public int getLastRow() {
+			return _row;
+		}
+
+		@Override
+		public void setFirstColumn(int col) {
+			_col = col;
+		}
+
+		@Override
+		public void setFirstRow(int row) {
+			_row = row;
+			
+		}
+
+		@Override
+		public void setLastColumn(int col) {
+			setFirstColumn(col);
+		}
+
+		@Override
+		public void setLastRow(int row) {
+			setFirstRow(row);
+		}
+
+		@Override
+		public String getAddress() {
+			return _address;
+		}
+
+		@Override
+		public String getLabel() {
+			return _label;
+		}
+
+		@Override
+		public int getType() {
+			return _type;
+		}
+
+		@Override
+		public void setAddress(String address) {
+			_address = address;
+		}
+
+		@Override
+		public void setLabel(String label) {
+			_label = label;
+		}
+		
+		private ValueEval dereferenceResult(ValueEval eval, int srcRowNum, int srcColNum) {
+			ValueEval value;
+			try {
+				value = OperandResolver.getSingleValue(eval, srcRowNum, srcColNum);
+			} catch (EvaluationException e) {
+				return e.getErrorEval();
+			}
+			if (value == BlankEval.instance) {
+				// Note Excel behaviour here. A blank final final value is converted to zero.
+				return NumberEval.ZERO;
+				// Formulas _never_ evaluate to blank.  If a formula appears to have evaluated to
+				// blank, the actual value is empty string. This can be verified with ISBLANK().
+			}
+			return value;
+		}
+		
+		private Object evaluateToString(ValueEval eval, int row, int col) {
+			ValueEval eval0 = dereferenceResult(eval, row, col);
+			if (eval0 instanceof NumberEval) {
+				NumberEval ne = (NumberEval) eval0;
+				return ne.getStringValue();
+			}
+			if (eval0 instanceof BoolEval) {
+				BoolEval be = (BoolEval) eval0;
+				return be.getStringValue();
+			}
+			if (eval0 instanceof StringEval) {
+				StringEval ne = (StringEval) eval0;
+				return ne.getStringValue();
+			}
+			if (eval0 instanceof ErrorEval) {
+				return ErrorEval.getText(((ErrorEval)eval0).getErrorCode());
+			}
+			throw new RuntimeException("Unexpected eval class (" + eval0.getClass().getName() + ")");
+		}
 	}
 }

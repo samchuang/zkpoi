@@ -19,11 +19,13 @@ package org.apache.poi.hssf.record.formula.eval;
 
 import org.apache.poi.hssf.record.formula.Ptg;
 import org.apache.poi.hssf.record.formula.StringPtg;
+import org.apache.poi.ss.usermodel.Hyperlink;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
+ * @author henrichen@zkoss.org: handle HYPERLINK function
  */
-public final class StringEval implements StringValueEval {
+public final class StringEval implements StringValueEval, HyperlinkEval {
 
 	public static final StringEval EMPTY_INSTANCE = new StringEval("");
 
@@ -50,5 +52,15 @@ public final class StringEval implements StringValueEval {
 		sb.append(_value);
 		sb.append("]");
 		return sb.toString();
+	}
+	
+	//20100720, henrichen@zkoss.org: handle HYPERLINK function
+	private Hyperlink _hyperlink;
+	public void setHyperlink(Hyperlink hyperlink) {
+		_hyperlink = hyperlink;
+	}
+	
+	public Hyperlink getHyperlink() {
+		return _hyperlink;
 	}
 }

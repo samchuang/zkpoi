@@ -716,8 +716,9 @@ public final class HSSFRow implements Row {
             inc = -1;
         }
 
+        final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
         final int rowNum = getRowNum();
-        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum < 256; colNum += inc ) {
+        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= maxcol; colNum += inc ) {
         	HSSFCell cell = getCell(colNum, RETURN_NULL_AND_BLANK);
             // notify cell in this row that we are going to shift them,
             // it can throw IllegalStateException if the operation is not allowed, for example,
@@ -725,7 +726,7 @@ public final class HSSFRow implements Row {
             if(cell != null) notifyCellShifting(cell);
 
             final int newColNum = colNum + n;
-            final boolean inbound = newColNum >= 0 && newColNum <= SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+            final boolean inbound = newColNum >= 0 && newColNum <= maxcol;
             
             if (!inbound) {
             	if (cell != null) {
@@ -765,12 +766,12 @@ public final class HSSFRow implements Row {
                 link.setLastColumn(link.getLastColumn() + n);
             }
         }
-        //special case1: endRow < startRow
-        //special case2: (endRow - startRow + 1) < ABS(n)
+        //special case1: endCol < startCol
+        //special case2: (endCol - startCol + 1) < ABS(n)
         if (n < 0) {
         	if (endCol < startCol) { //special case1
 	    		final int replacedStartCol = startCol + n;
-	            for ( int colNum = replacedStartCol; colNum >= replacedStartCol && colNum <= endCol && colNum >= 0 && colNum < 65536; ++colNum) {
+	            for ( int colNum = replacedStartCol; colNum >= replacedStartCol && colNum <= endCol && colNum >= 0 && colNum <= maxcol; ++colNum) {
 	            	final HSSFCell cell = getCell(colNum, RETURN_NULL_AND_BLANK);
 	            	if (cell != null) {
 	            		removeCell(cell);
@@ -779,7 +780,7 @@ public final class HSSFRow implements Row {
             } else if (clearRest) { //special case 2
             	final int replacedStartCol = endCol + n + 1;
             	if (replacedStartCol <= startCol) {
-    	            for ( int colNum = replacedStartCol; colNum >= replacedStartCol && colNum <= startCol && colNum >= 0 && colNum < 65536; ++colNum) {
+    	            for ( int colNum = replacedStartCol; colNum >= replacedStartCol && colNum <= startCol && colNum >= 0 && colNum <= maxcol; ++colNum) {
     	            	final HSSFCell cell = getCell(colNum, RETURN_NULL_AND_BLANK);
     	            	if (cell != null) {
     	            		removeCell(cell);

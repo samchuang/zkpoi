@@ -18,12 +18,13 @@
 package org.apache.poi.hssf.record.formula.eval;
 
 import org.apache.poi.hssf.usermodel.HSSFErrorConstants;
+import org.apache.poi.ss.usermodel.Hyperlink;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
- *
+ * @author henrichen@zkoss.org: HYPERLINK function
  */
-public final class ErrorEval implements ValueEval {
+public final class ErrorEval implements ValueEval, HyperlinkEval {
 
     // convenient access to namespace
     private static final HSSFErrorConstants EC = null;
@@ -108,4 +109,14 @@ public final class ErrorEval implements ValueEval {
         sb.append("]");
         return sb.toString();
     }
+    
+	//20100720, henrichen@zkoss.org: handle HYPERLINK function
+	private Hyperlink _hyperlink;
+	public void setHyperlink(Hyperlink hyperlink) {
+		_hyperlink = hyperlink;
+	}
+	
+	public Hyperlink getHyperlink() {
+		return _hyperlink;
+	}
 }

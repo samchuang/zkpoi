@@ -75,6 +75,7 @@ import org.apache.poi.util.POILogFactory;
  * @author  Dan Sherman (dsherman at isisph.com)
  * @author  Brian Sanders (kestrel at burdell dot org) Active Cell support
  * @author  Yegor Kozlov cell comments support
+ * @author	henrichen@zkoss.org: handle HYPERLINK function
  */
 public class HSSFCell implements Cell {
     private static POILogger log = POILogFactory.getLogger(HSSFCell.class);
@@ -1238,4 +1239,12 @@ public class HSSFCell implements Cell {
         notifyArrayFormulaChanging(msg);
     }
 
+    //20100719, henrichen@zkoss.org: cache evaluated hyperlink for HYPERLINK function
+    private Hyperlink _hyperlink;
+    public void setEvalHyperlink(Hyperlink hyperlink) {
+    	_hyperlink = hyperlink;
+    }
+    public Hyperlink getEvalHyperlink() {
+    	return _hyperlink;
+    }
 }

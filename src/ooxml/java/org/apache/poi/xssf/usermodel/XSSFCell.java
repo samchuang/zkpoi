@@ -1036,4 +1036,13 @@ public final class XSSFCell implements Cell {
                 "You cannot change part of an array.";
         notifyArrayFormulaChanging(msg);
     }
+    
+    //20100719, henrichen@zkoss.org: cache evaluated hyperlink for HYPERLINK function
+    private Hyperlink _hyperlink;
+    public void setEvalHyperlink(Hyperlink hyperlink) {
+    	_hyperlink = hyperlink;
+    }
+    public Hyperlink getEvalHyperlink() {
+    	return _hyperlink;
+    }
 }

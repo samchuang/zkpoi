@@ -42,9 +42,11 @@ import org.apache.poi.hssf.record.CellValueRecordInterface;
 import org.apache.poi.hssf.record.DVRecord;
 import org.apache.poi.hssf.record.EscherAggregate;
 import org.apache.poi.hssf.record.ExtendedFormatRecord;
+import org.apache.poi.hssf.record.HyperlinkRecord;
 import org.apache.poi.hssf.record.NameRecord;
 import org.apache.poi.hssf.record.NoteRecord;
 import org.apache.poi.hssf.record.Record;
+import org.apache.poi.hssf.record.RecordBase;
 import org.apache.poi.hssf.record.RowRecord;
 import org.apache.poi.hssf.record.SCLRecord;
 import org.apache.poi.hssf.record.WSBoolRecord;
@@ -2294,10 +2296,12 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             noteRecs = NoteRecord.EMPTY_ARRAY;
         }
 
-        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(startRow, 0, endRow, SpreadsheetVersion.EXCEL97.getLastColumnIndex(), n, false);
+        final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+        final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
+        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(startRow, 0, endRow, maxcol, n, false);
         _sheet.getPageSettings().shiftRowBreaks(startRow, endRow, n);
         
-        for ( int rowNum = s; rowNum >= startRow && rowNum <= endRow && rowNum >= 0 && rowNum < 65536; rowNum += inc ) {
+        for ( int rowNum = s; rowNum >= startRow && rowNum <= endRow && rowNum >= 0 && rowNum <= maxrow; rowNum += inc ) {
             HSSFRow row = getRow( rowNum );
             // notify all cells in this row that we are going to shift them,
             // it can throw IllegalStateException if the operation is not allowed, for example,
@@ -2305,7 +2309,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             if(row != null) notifyRowShifting(row);
 
             final int newRowNum = rowNum + n;
-            final boolean inbound = newRowNum >= 0 && newRowNum <= SpreadsheetVersion.EXCEL97.getLastRowIndex();
+            final boolean inbound = newRowNum >= 0 && newRowNum <= maxrow;
             
             if (!inbound) {
             	if (row != null) {
@@ -2354,12 +2358,6 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
                 cellRecord.setRow( rowNum + n );
                 row2Replace.createCellFromRecord( cellRecord );
                 _sheet.addValueRecord( rowNum + n, cellRecord );
-
-                HSSFHyperlink link = cell.getHyperlink();
-                if(link != null){
-                    link.setFirstRow(link.getFirstRow() + n);
-                    link.setLastRow(link.getLastRow() + n);
-                }
             }
             // Now zap all the cells in the source row
             row.removeAllCells();
@@ -2409,37 +2407,42 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         	}
         }
         
+        // Shift Hyperlinks which have been moved
+        shiftHyperlinks(startRow, endRow, n, 0, maxcol, 0);
+        
         //special case1: endRow < startRow
         //special case2: (endRow - startRow + 1) < ABS(n)
         if (n < 0) {
         	if (endRow < startRow) { //special case1
 	    		final int orgStartRow = startRow + n;
-	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= endRow && rowNum >= 0 && rowNum < 65536; ++rowNum) {
+	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= endRow && rowNum >= 0 && rowNum <= maxrow; ++rowNum) {
 	                final HSSFRow row = getRow( rowNum );
 	                if (row != null) {
 	                	removeRow(row);
 	                }
 	            }
+	            removeHyperlinks(orgStartRow, endRow, 0, maxcol);
             } else if (clearRest) { //special case 2
             	final int orgStartRow = endRow + n + 1;
             	if (orgStartRow <= startRow) {
-    	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= startRow && rowNum >= 0 && rowNum < 65536; ++rowNum) {
+    	            for ( int rowNum = orgStartRow; rowNum >= orgStartRow && rowNum <= startRow && rowNum >= 0 && rowNum <= maxrow; ++rowNum) {
     	                final HSSFRow row = getRow( rowNum );
     	                if (row != null) {
     	                	removeRow(row);
     	                }
     	            }
+    	            removeHyperlinks(orgStartRow, startRow, 0, maxcol);
             	}
         	}
         }
-        if ( endRow == _lastrow || endRow + n > _lastrow ) _lastrow = Math.min( endRow + n, SpreadsheetVersion.EXCEL97.getLastRowIndex() );
+        if ( endRow == _lastrow || endRow + n > _lastrow ) _lastrow = Math.min( endRow + n, maxrow );
         if ( startRow == _firstrow || startRow + n < _firstrow ) _firstrow = Math.max( startRow + n, 0 );
 
         // Update any formulas on this sheet that point to
         //  rows which have been moved
         int sheetIndex = _workbook.getSheetIndex(this);
         short externSheetIndex = _book.checkExternSheet(sheetIndex, sheetIndex);
-        PtgShifter shifter = new PtgShifter(externSheetIndex, startRow, endRow, n, 0, SpreadsheetVersion.EXCEL97.getLastColumnIndex(), 0, SpreadsheetVersion.EXCEL97);
+        PtgShifter shifter = new PtgShifter(externSheetIndex, startRow, endRow, n, 0, maxcol, 0, SpreadsheetVersion.EXCEL97);
         updateNamesAfterCellShift(shifter);
         
         return shiftedRanges;
@@ -2524,13 +2527,15 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             noteRecs = NoteRecord.EMPTY_ARRAY;
         }
 
-        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(0, startCol, SpreadsheetVersion.EXCEL97.getLastRowIndex(), endCol, n, true);
+        final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
+        final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+        final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(0, startCol, maxrow, endCol, n, true);
         _sheet.getPageSettings().shiftColumnBreaks((short)startCol, (short)endCol, (short)n);
 
         // Fix up column width and comment if required
         if (moveComments || copyColWidth || resetOriginalColWidth) {
         	final int defaultColumnWidth = getDefaultColumnWidth();
-	        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= SpreadsheetVersion.EXCEL97.getLastColumnIndex(); colNum += inc ) {
+	        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= maxcol; colNum += inc ) {
 	        	final int newColNum = colNum + n;
 		        if (copyColWidth) {
 		            setColumnWidth(newColNum, getColumnWidth(colNum));
@@ -2558,7 +2563,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
         //handle inserted columns
         if (srcCol >= 0) {
-        	final int col2 = Math.min(startCol + n - 1, SpreadsheetVersion.EXCEL97.getLastColumnIndex());
+        	final int col2 = Math.min(startCol + n - 1, maxcol);
         	for (int col = startCol; col <= col2 ; ++col) {
         		//copy the column width
         		setColumnWidth(col, colWidth);
@@ -2579,6 +2584,23 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 		        		dstCell.setCellStyle(copyFromStyleExceptBorder(srcStyle));
 		        	}
 		        }
+        	}
+        }
+        
+        // Shift Hyperlinks which have been moved
+        shiftHyperlinks(0, maxrow, 0, startCol, endCol, n);
+        
+        //special case1: endCol < startCol
+        //special case2: (endCol - startCol + 1) < ABS(n)
+        if (n < 0) {
+        	if (endCol < startCol) { //special case1
+	    		final int replacedStartCol = startCol + n;
+	    		removeHyperlinks(0, maxrow, replacedStartCol, endCol);
+            } else if (clearRest) { //special case 2
+            	final int replacedStartCol = endCol + n + 1;
+            	if (replacedStartCol <= startCol) {
+    	    		removeHyperlinks(0, maxrow, replacedStartCol, startCol);
+            	}
         	}
         }
         
@@ -2676,8 +2698,10 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             noteRecs = NoteRecord.EMPTY_ARRAY;
         }
 
+        final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
+        final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
         final List<CellRangeAddress[]> shiftedRanges = shiftMergedRegion(tRow, startCol, bRow, endCol, n, true);
-        final boolean wholeColumn = tRow == 0 && bRow == SpreadsheetVersion.EXCEL97.getLastRowIndex(); 
+        final boolean wholeColumn = tRow == 0 && bRow == maxrow; 
         if (wholeColumn) { 
         	_sheet.getPageSettings().shiftColumnBreaks((short)startCol, (short)endCol, (short)n);
         }
@@ -2685,7 +2709,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         // Fix up column width and comment if required
         if (moveComments || copyColWidth || resetOriginalColWidth) {
         	final int defaultColumnWidth = getDefaultColumnWidth();
-	        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= SpreadsheetVersion.EXCEL97.getLastColumnIndex(); colNum += inc ) {
+	        for ( int colNum = s; colNum >= startCol && colNum <= endCol && colNum >= 0 && colNum <= maxcol; colNum += inc ) {
 	        	final int newColNum = colNum + n;
 	        	if (wholeColumn) {
 			        if (copyColWidth) {
@@ -2715,7 +2739,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
         //handle inserted columns
         if (srcCol >= 0) {
-        	final int col2 = Math.min(startCol + n - 1, SpreadsheetVersion.EXCEL97.getLastColumnIndex()); 
+        	final int col2 = Math.min(startCol + n - 1, maxcol); 
 	        if (wholeColumn) {
 	        	for (int col = startCol; col <= col2 ; ++col) {
 	        		//copy the column width
@@ -2738,6 +2762,24 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 		        }
 	        }
         }
+        
+        // Shift Hyperlinks which have been moved
+        shiftHyperlinks(tRow, bRow, 0, startCol, endCol, n);
+        
+        //special case1: endCol < startCol
+        //special case2: (endCol - startCol + 1) < ABS(n)
+        if (n < 0) {
+        	if (endCol < startCol) { //special case1
+	    		final int replacedStartCol = startCol + n;
+	    		removeHyperlinks(tRow, bRow, replacedStartCol, endCol);
+            } else if (clearRest) { //special case 2
+            	final int replacedStartCol = endCol + n + 1;
+            	if (replacedStartCol <= startCol) {
+    	    		removeHyperlinks(tRow, bRow, replacedStartCol, startCol);
+            	}
+        	}
+        }
+
         
         // Update any formulas on this sheet that point to
         // columns which have been moved
@@ -2900,12 +2942,6 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	                cellRecord.setRow( rowNum + n );
 	                row2Replace.createCellFromRecord( cellRecord );
 	                _sheet.addValueRecord( rowNum + n, cellRecord );
-	
-	                HSSFHyperlink link = cell.getHyperlink();
-	                if(link != null){
-	                    link.setFirstRow(link.getFirstRow() + n);
-	                    link.setLastRow(link.getLastRow() + n);
-	                }
 	            }
 	            // Now zap all the cells in the source row
 	            row.removeAllCells();
@@ -2922,12 +2958,6 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	                cellRecord.setRow( rowNum + n );
 	                row2Replace.createCellFromRecord( cellRecord );
 	                _sheet.addValueRecord( rowNum + n, cellRecord );
-	
-	                HSSFHyperlink link = cell.getHyperlink();
-	                if(link != null && link.getFirstColumn() >= lCol && link.getLastColumn() <= rCol){
-	                    link.setFirstRow(link.getFirstRow() + n);
-	                    link.setLastRow(link.getLastRow() + n);
-	                }
 	            }
 	            // Now zap the cells in the source row
 	            removeCells(row, lCol, rCol);
@@ -2978,6 +3008,9 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         	}
         }
         
+        // Shift Hyperlinks which have been moved
+        shiftHyperlinks(startRow, endRow, n, lCol, rCol, 0);
+        
         //special case1: endRow < startRow
         //special case2: (endRow - startRow + 1) < ABS(n)
         if (n < 0) {
@@ -2993,6 +3026,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 	                	}
 	                }
 	            }
+	            removeHyperlinks(orgStartRow, endRow, lCol, rCol);
             } else if (clearRest) { //special case 2
             	final int orgStartRow = endRow + n + 1;
             	if (orgStartRow <= startRow) {
@@ -3006,6 +3040,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     	                	}
     	                }
     	            }
+    	            removeHyperlinks(orgStartRow, startRow, lCol, rCol);
             	}
         	}
         }
@@ -3154,6 +3189,9 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         if ( bRow == _lastrow || bRow + nRow > _lastrow ) _lastrow = Math.min( bRow + nRow, maxrow);
         if ( tRow == _firstrow || tRow + nRow < _firstrow ) _firstrow = Math.max( tRow + nRow, 0 );
 
+        // Shift Hyperlinks which have been moved
+        shiftHyperlinks(tRow, bRow, nRow, lCol, rCol, nCol);
+        
         // Update any formulas on this sheet that point to
         //  rows which have been moved
         int sheetIndex = _workbook.getSheetIndex(this);
@@ -3177,5 +3215,52 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
                 nr.setNameDefinition(ptgs);
             }
         }
+    }
+    
+    //20100720, henrichen@zkoss.org: shift Hyperlinks
+    /**
+     * Shift Hyperlink of the specified range.
+     */
+    private void shiftHyperlinks(int tRow, int bRow, int nRow, int lCol, int rCol, int nCol) {
+    	final int maxcol = SpreadsheetVersion.EXCEL97.getLastColumnIndex();
+    	final int maxrow = SpreadsheetVersion.EXCEL97.getLastRowIndex();
+        for (Iterator<RecordBase> it = getSheet().getRecords().iterator(); it.hasNext(); ) {
+            RecordBase rec = it.next();
+            if (rec instanceof HyperlinkRecord){
+                final HyperlinkRecord link = (HyperlinkRecord)rec;
+                final int col = link.getFirstColumn();
+                final int row = link.getFirstRow();
+                if (inRange(row, tRow, bRow) && inRange(col, lCol, rCol)) {
+                	final int dstrow = row + nRow;
+                	final int dstcol = col + nCol;
+                	if (inRange(dstrow, 0, maxrow) && inRange(dstcol, 0, maxcol)) {
+                		link.setFirstColumn(dstcol);
+                		link.setFirstRow(dstrow);
+                		link.setLastColumn(dstcol);
+                		link.setLastRow(dstrow);
+                	} else {
+                		it.remove();
+                	}
+                }
+            }
+        }
+    }
+    
+    private void removeHyperlinks(int tRow, int bRow, int lCol, int rCol) {
+        for (Iterator<RecordBase> it = getSheet().getRecords().iterator(); it.hasNext(); ) {
+            RecordBase rec = it.next();
+            if (rec instanceof HyperlinkRecord){
+                final HyperlinkRecord link = (HyperlinkRecord)rec;
+                final int col = link.getFirstColumn();
+                final int row = link.getFirstRow();
+                if (inRange(row, tRow, bRow) && inRange(col, lCol, rCol)) {
+               		it.remove();
+                }
+            }
+        }
+    }
+    
+    private final boolean inRange(int val, int min, int max) {
+    	return min <= val && val <= max;
     }
 }
