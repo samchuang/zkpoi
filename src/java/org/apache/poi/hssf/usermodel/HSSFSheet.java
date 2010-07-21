@@ -83,7 +83,7 @@ import org.apache.poi.util.POILogger;
  * @author  Yegor Kozlov (yegor at apache.org) (Autosizing columns)
  * @author  Josh Micich
  * @author  Petr Udalau(Petr.Udalau at exigenservices.com) - set/remove array formulas
- * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
+ * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference; enhance HYPERLINK shift
  */
 public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     private static final POILogger log = POILogFactory.getLogger(HSSFSheet.class);
