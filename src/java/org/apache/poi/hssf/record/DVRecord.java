@@ -320,4 +320,24 @@ public final class DVRecord extends StandardRecord {
 	public Object clone() {
 		return cloneViaReserialise();
 	}
+	
+	//20100727, henrichen@zkoss.org: expose contents such as prompt title, error title, prompt text, error text, formula1, formula2
+	public String getPromptTitle() {
+		return _promptTitle.getString();
+	}
+	public String getErrorTitle() {
+		return _errorTitle.getString();
+	}
+	public String getPromptText() {
+		return _promptText.getString();
+	}
+	public String getErrorText() {
+		return _errorText.getString();
+	}
+	public Ptg[] getFormula1() {
+		return _formula1.getTokens();
+	}
+	public Ptg[] getFormula2() {
+		return _formula2.getTokens();
+	}
 }

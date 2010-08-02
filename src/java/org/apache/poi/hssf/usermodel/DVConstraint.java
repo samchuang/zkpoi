@@ -428,4 +428,36 @@ public class DVConstraint implements DataValidationConstraint {
         HSSFWorkbook wb = sheet.getWorkbook();
 		return HSSFFormulaParser.parse(formula, wb, FormulaType.CELL, wb.getSheetIndex(sheet));
 	}	
+
+	//20100728, henrichen@zkoss.org: shall handle constraint equals to avoid multiple DataValidations with same constraint
+	@Override
+	public int hashCode() {
+		return (_formula1 == null ? 0 : _formula1.hashCode()) ^
+				(_formula2 == null ? 0 : _formula2.hashCode()) ^
+				(_value1 == null ? 0 : _value1.hashCode()) ^
+				(_value2 == null ? 0 : _value2.hashCode()) ^
+				_validationType ^
+				_operator ^
+				(_explicitListValues == null ? 0 : _explicitListValues.hashCode());
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof DVConstraint)) {
+			return false;
+		}
+		final DVConstraint o = (DVConstraint) other;
+		return objEquals(_formula1, o._formula1)
+			&& objEquals(_formula2, o._formula2)
+			&& objEquals(_value1, o._value1)
+			&& objEquals(_value2, o._value2)
+			&& _validationType == o._validationType
+			&& _operator == o._operator
+			&& objEquals(_explicitListValues, o._explicitListValues);
+	}
+	private boolean objEquals(Object s1, Object s2) {
+		return s1 == s2 
+			|| (s1 != null && s1.equals(s2))
+			|| (s2 != null && s2.equals(s1));
+	}
 }

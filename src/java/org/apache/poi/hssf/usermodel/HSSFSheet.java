@@ -54,8 +54,10 @@ import org.apache.poi.hssf.record.WindowTwoRecord;
 import org.apache.poi.hssf.record.aggregates.DataValidityTable;
 import org.apache.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.apache.poi.hssf.record.aggregates.WorksheetProtectionBlock;
+import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
 import org.apache.poi.hssf.record.formula.FormulaShifter;
 import org.apache.poi.hssf.record.formula.Ptg;
+import org.apache.poi.hssf.usermodel.DVConstraint.FormulaPair;
 import org.apache.poi.hssf.util.PaneInformation;
 import org.apache.poi.hssf.util.Region;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -65,13 +67,17 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellRange;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.DataValidationConstraint.ValidationType;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.SSCellRange;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
+import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 
 /**
  * High level representation of a worksheet.
@@ -3262,5 +3268,98 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     
     private final boolean inRange(int val, int min, int max) {
     	return min <= val && val <= max;
+    }
+    
+    //20100727, Henri Chen: handle DataValidation
+    public List<DataValidation> getDataValidations() {
+    	final DataValidityTable tb = _sheet.getOrCreateDataValidityTable();
+    	final List<DataValidation> dataValidations = new ArrayList<DataValidation>(); 
+    	final RecordVisitor rv = new DVRecordVisitor(dataValidations); 
+    	tb.visitContainedRecords(rv); //populate the dataValidations list
+    	return dataValidations;
+    }
+    
+    private class DVRecordVisitor implements RecordVisitor {
+    	private List<DataValidation> _dataValidations;
+    	private DataValidationHelper _helper;
+    	
+    	private DVRecordVisitor(List<DataValidation> dataValidations) {
+    		_dataValidations = dataValidations;
+    		_helper = getDataValidationHelper();
+    	}
+    	
+		@Override
+		public void visitRecord(Record r) {
+			if (r instanceof DVRecord) {
+				final DVRecord dvRecord = (DVRecord) r;
+				final CellRangeAddressList regions = dvRecord.getCellRangeAddress();
+				final DataValidationConstraint constraint = createContraint(dvRecord); 
+				HSSFDataValidation dataValidation = new HSSFDataValidation(regions, constraint);
+				final boolean allowed = dvRecord.getEmptyCellAllowed();
+				final int errStyle = dvRecord.getErrorStyle();
+				final boolean showErr = dvRecord.getShowErrorOnInvalidValue();
+				final boolean showPrompt = dvRecord.getShowPromptOnCellSelected();
+				final boolean suppress = dvRecord.getSuppressDropdownArrow();
+				
+				final String promptTitle = dvRecord.getPromptTitle();
+				final String promptText = dvRecord.getPromptText();
+				final String errorTitle = dvRecord.getErrorTitle();
+				final String errorText = dvRecord.getErrorText();
+				if (showPrompt) {
+					dataValidation.createPromptBox(promptTitle, promptText);
+				}
+				if (showErr) {
+					dataValidation.createErrorBox(errorTitle, errorText);
+				}
+				dataValidation.setEmptyCellAllowed(allowed);
+				dataValidation.setErrorStyle(errStyle);
+				dataValidation.setShowErrorBox(showErr);
+				dataValidation.setShowPromptBox(showPrompt);
+				dataValidation.setSuppressDropDownArrow(suppress);
+				
+				_dataValidations.add(dataValidation);
+			}
+		}
+		
+		private DataValidationConstraint createContraint(DVRecord dvRecord) {
+			final int operatorType = dvRecord.getConditionOperator();
+			final int validationType = dvRecord.getDataType();
+			final boolean isExplicitValues = !dvRecord.getListExplicitFormula(); //whether list is given by excplicit values?
+			final Ptg[] formulaPtgs1 = dvRecord.getFormula1();
+			final Ptg[] formulaPtgs2 = dvRecord.getFormula2();
+			String formula1 = HSSFFormulaParser.toFormulaString(_workbook, formulaPtgs1);
+			String formula2 = formulaPtgs2 != null ? HSSFFormulaParser.toFormulaString(_workbook, formulaPtgs2) : null; 
+			switch(validationType) {
+				case ValidationType.ANY:
+					return _helper.createNumericConstraint(validationType, operatorType, formula1, formula2);
+					
+				case ValidationType.DECIMAL:
+					return _helper.createDecimalConstraint(operatorType, formula1, formula2);
+					
+				case ValidationType.INTEGER:
+					return _helper.createIntegerConstraint(operatorType, formula1, formula2);
+					
+				case ValidationType.TEXT_LENGTH:
+					return _helper.createTextLengthConstraint(operatorType, formula1, formula2);
+					
+				case ValidationType.DATE:
+					return _helper.createDateConstraint(operatorType, formula1, formula2, null /*dateFormat*/);
+					
+				case ValidationType.FORMULA:
+					return _helper.createCustomConstraint(formula1);
+					
+				case ValidationType.LIST:
+					if (isExplicitValues) {
+						final String[] listOfValues = formula1.split("\0");
+						return _helper.createExplicitListConstraint(listOfValues);
+					}
+					return _helper.createFormulaListConstraint(formula1);
+					
+				case ValidationType.TIME:
+					return _helper.createTimeConstraint(operatorType, formula1, formula2);
+			}
+			
+			return null;
+		}
     }
 }
