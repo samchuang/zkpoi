@@ -806,4 +806,11 @@ public interface Sheet extends Iterable<Row> {
 	 * @param dataValidation The Data validation object settings
 	 */
 	public void addValidationData(DataValidation dataValidation);
+
+
+    //20100713, henrichen@zkoss.org: handle copy into inserted row/column
+	//copyOrigin of #insert
+	public final static int FORMAT_LEFTABOVE = 0;
+	public final static int FORMAT_RIGHTBELOW = 1;
+	public final static int FORMAT_NONE = -1;
 }

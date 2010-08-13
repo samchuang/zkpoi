@@ -2025,13 +2025,6 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 		return new HSSFDataValidationHelper(this);
 	}
 	
-	
-    //20100713, henrichen@zkoss.org: handle copy into inserted row/column
-	//copyOrigin of #insert
-	public final static int FORMAT_LEFTABOVE = 0;
-	public final static int FORMAT_RIGHTBELOW = 1;
-	public final static int FORMAT_NONE = -1;
-	
     /**
      * Shifts the merged regions left or right depending on mode
      * <p>
