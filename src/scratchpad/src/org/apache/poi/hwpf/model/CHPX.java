@@ -36,12 +36,12 @@ public final class CHPX extends BytePropertyNode
 
   public CHPX(int fcStart, int fcEnd, CharIndexTranslator translator, byte[] grpprl)
   {
-    super(fcStart, fcEnd, translator, new SprmBuffer(grpprl));
+    super(fcStart, translator.lookIndexBackward(fcEnd), translator, new SprmBuffer(grpprl));
   }
 
   public CHPX(int fcStart, int fcEnd, CharIndexTranslator translator, SprmBuffer buf)
   {
-    super(fcStart, fcEnd, translator ,buf);
+    super(fcStart, translator.lookIndexBackward(fcEnd), translator ,buf);
   }
 
 
@@ -60,5 +60,10 @@ public final class CHPX extends BytePropertyNode
     CharacterProperties baseStyle = ss.getCharacterStyle(istd);
     CharacterProperties props = CharacterSprmUncompressor.uncompressCHP(baseStyle, getGrpprl(), 0);
     return props;
+  }
+  
+  public String toString() {
+      return "CHPX from " + getStart() + " to " + getEnd() + 
+         " (in bytes " + getStartBytes() + " to " + getEndBytes() + ")";
   }
 }

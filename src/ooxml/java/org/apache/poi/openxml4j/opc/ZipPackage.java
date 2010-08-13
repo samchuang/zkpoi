@@ -130,7 +130,7 @@ public final class ZipPackage extends Package {
 		Enumeration<? extends ZipEntry> entries = this.zipArchive.getEntries();
 		while (entries.hasMoreElements()) {
 			ZipEntry entry = entries.nextElement();
-			if (entry.getName().equals(
+			if (entry.getName().equalsIgnoreCase(
 					ContentTypeManager.CONTENT_TYPES_PART_NAME)) {
 				try {
 					this.contentTypeManager = new ZipContentTypeManager(
@@ -208,7 +208,7 @@ public final class ZipPackage extends Package {
 		try {
 			// We get an error when we parse [Content_Types].xml
 			// because it's not a valid URI.
-			if (entry.getName().equals(
+			if (entry.getName().equalsIgnoreCase(
 					ContentTypeManager.CONTENT_TYPES_PART_NAME)) {
 				return null;
 			}
@@ -218,7 +218,7 @@ public final class ZipPackage extends Package {
 			// We assume we can continue, even in degraded mode ...
 			logger.log(POILogger.WARN,"Entry "
 							+ entry.getName()
-							+ " is not valid, so this part won't be add to the package.");
+							+ " is not valid, so this part won't be add to the package.", e);
 			return null;
 		}
 	}
@@ -295,8 +295,11 @@ public final class ZipPackage extends Package {
 				// Save the final package to a temporary file
 				try {
 					save(tempFile);
-					this.zipArchive.close(); // Close the zip archive to be
-					// able to delete it
+					
+					// Close the current zip file, so we can
+					//  overwrite it on all platforms
+					this.zipArchive.close();
+					// Copy the new file over the old one
 					FileHelper.copyFile(tempFile, targetFile);
 				} finally {
 					// Either the save operation succeed or not, we delete the
@@ -312,7 +315,7 @@ public final class ZipPackage extends Package {
 				throw new InvalidOperationException(
 						"Can't close a package not previously open with the open() method !");
 			}
-		}
+		} 
 	}
 
 	/**

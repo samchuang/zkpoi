@@ -42,7 +42,12 @@ import org.apache.poi.hssf.record.common.UnicodeString;
 import org.apache.poi.hssf.record.formula.Area3DPtg;
 import org.apache.poi.hssf.record.formula.DeletedArea3DPtg;
 import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BaseTestBugzillaIssues;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Name;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.util.TempFile;
 
 /**
@@ -1733,5 +1738,103 @@ if(1==2) {
        assertEquals("'[\u0005$http://example.com/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
        assertEquals(234.0, row.getCell(1).getNumericCellValue());
 }
+    }
+    
+    /**
+     * Test for a file with NameRecord with NameCommentRecord comments
+     */
+    public void test49185() throws Exception {
+      HSSFWorkbook wb = openSample("49185.xls");
+      Name name = wb.getName("foobarName");
+      assertEquals("This is a comment", name.getComment());
+      
+      // Rename the name, comment comes with it
+      name.setNameName("ChangedName");
+      assertEquals("This is a comment", name.getComment());
+      
+      // Save and re-check
+      wb = writeOutAndReadBack(wb);
+      name = wb.getName("ChangedName");
+      assertEquals("This is a comment", name.getComment());
+      
+      // Now try to change it
+      name.setComment("Changed Comment");
+      assertEquals("Changed Comment", name.getComment());
+      
+      // Save and re-check
+      wb = writeOutAndReadBack(wb);
+      name = wb.getName("ChangedName");
+      assertEquals("Changed Comment", name.getComment());
+    }
+    
+    /**
+     * Vertically aligned text
+     */
+    public void test49524() throws Exception {
+       HSSFWorkbook wb = openSample("49524.xls");
+       Sheet s = wb.getSheetAt(0);
+       Row r = s.getRow(0);
+       Cell rotated = r.getCell(0);
+       Cell normal = r.getCell(1);
+       
+       // Check the current ones
+       assertEquals(0, normal.getCellStyle().getRotation());
+       assertEquals(0xff, rotated.getCellStyle().getRotation());
+       
+       // Add a new style, also rotated
+       CellStyle cs = wb.createCellStyle();
+       cs.setRotation((short)0xff);
+       Cell nc = r.createCell(2);
+       nc.setCellValue("New Rotated Text");
+       nc.setCellStyle(cs);
+       assertEquals(0xff, nc.getCellStyle().getRotation());
+       
+       // Write out and read back
+       wb = writeOutAndReadBack(wb);
+       
+       // Re-check
+       s = wb.getSheetAt(0);
+       r = s.getRow(0);
+       rotated = r.getCell(0);
+       normal = r.getCell(1);
+       nc = r.getCell(2);
+       
+       assertEquals(0, normal.getCellStyle().getRotation());
+       assertEquals(0xff, rotated.getCellStyle().getRotation());
+       assertEquals(0xff, nc.getCellStyle().getRotation());
+    }
+    
+    /**
+     * Setting the user style name on custom styles
+     */
+    public void test49689() throws Exception {
+       HSSFWorkbook wb = new HSSFWorkbook();
+       HSSFSheet s = wb.createSheet("Test");
+       HSSFRow r = s.createRow(0);
+       HSSFCell c = r.createCell(0);
+       
+       HSSFCellStyle cs1 = wb.createCellStyle();
+       HSSFCellStyle cs2 = wb.createCellStyle();
+       HSSFCellStyle cs3 = wb.createCellStyle();
+       
+       assertEquals(21, cs1.getIndex());
+       cs1.setUserStyleName("Testing");
+       
+       assertEquals(22, cs2.getIndex());
+       cs2.setUserStyleName("Testing 2");
+       
+       assertEquals(23, cs3.getIndex());
+       cs3.setUserStyleName("Testing 3");
+       
+       // Set one
+       c.setCellStyle(cs1);
+       
+       // Write out and read back
+       wb = writeOutAndReadBack(wb);
+       
+       // Re-check
+       assertEquals("Testing", wb.getCellStyleAt((short)21).getUserStyleName());
+       assertEquals("Testing 2", wb.getCellStyleAt((short)22).getUserStyleName());
+       assertEquals("Testing 3", wb.getCellStyleAt((short)23).getUserStyleName());
     }
 }

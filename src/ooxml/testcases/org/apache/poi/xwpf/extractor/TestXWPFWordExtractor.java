@@ -237,4 +237,29 @@ public class TestXWPFWordExtractor extends TestCase {
        // Now check the first paragraph in total
        assertTrue(extractor.getText().contains("a\tb\n"));
     }
+    
+    /**
+     * The output should not contain field codes, e.g. those specified in the
+     * w:instrText tag (spec sec. 17.16.23)
+     */
+    public void testNoFieldCodes() {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("FieldCodes.docx");
+        XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
+        String text = extractor.getText();
+        assertTrue(text.length() > 0);
+        assertFalse(text.contains("AUTHOR"));
+        assertFalse(text.contains("CREATEDATE"));
+    }
+    
+    /**
+     * The output should contain the values of simple fields, those specified
+     * with the fldSimple element (spec sec. 17.16.19)
+     */
+    public void testFldSimpleContent() {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("FldSimple.docx");
+        XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
+        String text = extractor.getText();
+        assertTrue(text.length() > 0);
+        assertTrue(text.contains("FldSimple.docx"));
+    }
 }

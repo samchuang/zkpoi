@@ -29,6 +29,7 @@ import org.apache.poi.hslf.extractor.PowerPointExtractor;
 import org.apache.poi.hsmf.extractor.OutlookTextExtactor;
 import org.apache.poi.hssf.extractor.EventBasedExcelExtractor;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
+import org.apache.poi.hwpf.extractor.Word6Extractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
@@ -54,6 +55,8 @@ public class TestExtractorFactory extends TestCase {
    private File xlsEmb;
 
    private File doc;
+   private File doc6;
+   private File doc95;
    private File docx;
    private File dotx;
    private File docEmb;
@@ -63,6 +66,7 @@ public class TestExtractorFactory extends TestCase {
 
    private File msg;
    private File msgEmb;
+   private File msgEmbMsg;
    
    private File vsd;
    
@@ -79,6 +83,8 @@ public class TestExtractorFactory extends TestCase {
 
       POIDataSamples wpTests = POIDataSamples.getDocumentInstance();
       doc = wpTests.getFile("SampleDoc.doc");
+      doc6 = wpTests.getFile("Word6.doc");
+      doc95 = wpTests.getFile("Word95.doc");
       docx = wpTests.getFile("SampleDoc.docx");
       dotx = wpTests.getFile("test.dotx");
       docEmb = wpTests.getFile("word_with_embeded.doc");
@@ -97,6 +103,7 @@ public class TestExtractorFactory extends TestCase {
       POIDataSamples olTests = POIDataSamples.getHSMFInstance();
       msg = olTests.getFile("quick.msg");
       msgEmb = olTests.getFile("attachment_test_msg.msg");
+      msgEmbMsg = olTests.getFile("attachment_msg_pdf.msg");
    }
 
    public void testFile() throws Exception {
@@ -135,6 +142,23 @@ public class TestExtractorFactory extends TestCase {
             ExtractorFactory.createExtractor(doc).getText().length() > 120
       );
 
+      assertTrue(
+            ExtractorFactory.createExtractor(doc6)
+            instanceof Word6Extractor
+      );
+      assertTrue(
+            ExtractorFactory.createExtractor(doc6).getText().length() > 20
+      );
+      
+      assertTrue(
+            ExtractorFactory.createExtractor(doc95)
+            instanceof Word6Extractor
+      );
+      assertTrue(
+            ExtractorFactory.createExtractor(doc95).getText().length() > 120
+      );
+          
+        
       assertTrue(
             ExtractorFactory.createExtractor(docx)
             instanceof XWPFWordExtractor
@@ -231,6 +255,22 @@ public class TestExtractorFactory extends TestCase {
 				ExtractorFactory.createExtractor(new FileInputStream(doc)).getText().length() > 120
 		);
 		
+        assertTrue(
+                ExtractorFactory.createExtractor(new FileInputStream(doc6))
+                instanceof Word6Extractor
+        );
+        assertTrue(
+                ExtractorFactory.createExtractor(new FileInputStream(doc6)).getText().length() > 20
+        );
+        
+        assertTrue(
+                ExtractorFactory.createExtractor(new FileInputStream(doc95))
+                instanceof Word6Extractor
+        );
+        assertTrue(
+                ExtractorFactory.createExtractor(new FileInputStream(doc95)).getText().length() > 120
+        );
+        
 		assertTrue(
 				ExtractorFactory.createExtractor(new FileInputStream(docx))
 				instanceof XWPFWordExtractor
@@ -311,6 +351,22 @@ public class TestExtractorFactory extends TestCase {
 				ExtractorFactory.createExtractor(new POIFSFileSystem(new FileInputStream(doc))).getText().length() > 120
 		);
 		
+        assertTrue(
+                ExtractorFactory.createExtractor(new POIFSFileSystem(new FileInputStream(doc6)))
+                instanceof Word6Extractor
+        );
+        assertTrue(
+                ExtractorFactory.createExtractor(new POIFSFileSystem(new FileInputStream(doc6))).getText().length() > 20
+        );
+        
+        assertTrue(
+                ExtractorFactory.createExtractor(new POIFSFileSystem(new FileInputStream(doc95)))
+                instanceof Word6Extractor
+        );
+        assertTrue(
+                ExtractorFactory.createExtractor(new POIFSFileSystem(new FileInputStream(doc95))).getText().length() > 120
+        );
+        
 		// PowerPoint
 		assertTrue(
 				ExtractorFactory.createExtractor(new POIFSFileSystem(new FileInputStream(ppt)))
@@ -480,51 +536,77 @@ public class TestExtractorFactory extends TestCase {
       embeds = ExtractorFactory.getEmbededDocsTextExtractors(ext);
 
       assertEquals(6, embeds.length);
-      int numWord = 0, numXls = 0, numPpt = 0;
+      int numWord = 0, numXls = 0, numPpt = 0, numMsg = 0;
       for(int i=0; i<embeds.length; i++) {
          assertTrue(embeds[i].getText().length() > 20);
 
          if(embeds[i] instanceof PowerPointExtractor) numPpt++;
          else if(embeds[i] instanceof ExcelExtractor) numXls++;
          else if(embeds[i] instanceof WordExtractor) numWord++;
+         else if(embeds[i] instanceof OutlookTextExtactor) numMsg++;
       }
       assertEquals(2, numPpt);
       assertEquals(2, numXls);
       assertEquals(2, numWord);
+      assertEquals(0, numMsg);
 
       // Word
       ext = (POIOLE2TextExtractor)
       ExtractorFactory.createExtractor(docEmb);
       embeds = ExtractorFactory.getEmbededDocsTextExtractors(ext);
 
-      numWord = 0; numXls = 0; numPpt = 0;
+      numWord = 0; numXls = 0; numPpt = 0; numMsg = 0;
       assertEquals(4, embeds.length);
       for(int i=0; i<embeds.length; i++) {
          assertTrue(embeds[i].getText().length() > 20);
          if(embeds[i] instanceof PowerPointExtractor) numPpt++;
          else if(embeds[i] instanceof ExcelExtractor) numXls++;
          else if(embeds[i] instanceof WordExtractor) numWord++;
+         else if(embeds[i] instanceof OutlookTextExtactor) numMsg++;
       }
       assertEquals(1, numPpt);
       assertEquals(2, numXls);
       assertEquals(1, numWord);
+      assertEquals(0, numMsg);
       
       // Outlook
       ext = (OutlookTextExtactor)
       ExtractorFactory.createExtractor(msgEmb);
       embeds = ExtractorFactory.getEmbededDocsTextExtractors(ext);
 
-      numWord = 0; numXls = 0; numPpt = 0;
+      numWord = 0; numXls = 0; numPpt = 0; numMsg = 0;
       assertEquals(1, embeds.length);
       for(int i=0; i<embeds.length; i++) {
          assertTrue(embeds[i].getText().length() > 20);
          if(embeds[i] instanceof PowerPointExtractor) numPpt++;
          else if(embeds[i] instanceof ExcelExtractor) numXls++;
          else if(embeds[i] instanceof WordExtractor) numWord++;
+         else if(embeds[i] instanceof OutlookTextExtactor) numMsg++;
       }
       assertEquals(0, numPpt);
       assertEquals(0, numXls);
       assertEquals(1, numWord);
+      assertEquals(0, numMsg);
+      
+      // Outlook with another outlook file in it
+      ext = (OutlookTextExtactor)
+      ExtractorFactory.createExtractor(msgEmbMsg);
+      embeds = ExtractorFactory.getEmbededDocsTextExtractors(ext);
+
+      numWord = 0; numXls = 0; numPpt = 0; numMsg = 0;
+      assertEquals(1, embeds.length);
+      for(int i=0; i<embeds.length; i++) {
+         assertTrue(embeds[i].getText().length() > 20);
+         if(embeds[i] instanceof PowerPointExtractor) numPpt++;
+         else if(embeds[i] instanceof ExcelExtractor) numXls++;
+         else if(embeds[i] instanceof WordExtractor) numWord++;
+         else if(embeds[i] instanceof OutlookTextExtactor) numMsg++;
+      }
+      assertEquals(0, numPpt);
+      assertEquals(0, numXls);
+      assertEquals(0, numWord);
+      assertEquals(1, numMsg);
+      
 
       // TODO - PowerPoint
       // TODO - Publisher

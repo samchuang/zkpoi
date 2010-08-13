@@ -67,7 +67,6 @@ import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.formula.FormulaType;
 import org.apache.poi.util.POILogFactory;
@@ -145,21 +144,6 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * See {@link MissingCellPolicy}
      */
     private MissingCellPolicy missingCellPolicy = HSSFRow.RETURN_NULL_AND_BLANK;
-
-
-    /** Extended windows meta file */
-    public static final int PICTURE_TYPE_EMF = 2;
-    /** Windows Meta File */
-    public static final int PICTURE_TYPE_WMF = 3;
-    /** Mac PICT format */
-    public static final int PICTURE_TYPE_PICT = 4;
-    /** JPEG format */
-    public static final int PICTURE_TYPE_JPEG = 5;
-    /** PNG format */
-    public static final int PICTURE_TYPE_PNG = 6;
-    /** Device independant bitmap */
-    public static final int PICTURE_TYPE_DIB = 7;
-
 
     private static POILogger log = POILogFactory.getLogger(HSSFWorkbook.class);
 
@@ -291,7 +275,8 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         }
 
         for (int i = 0 ; i < workbook.getNumNames() ; ++i){
-            HSSFName name = new HSSFName(this, workbook.getNameRecord(i));
+            NameRecord nameRecord = workbook.getNameRecord(i);
+            HSSFName name = new HSSFName(this, nameRecord, workbook.getNameCommentRecord(nameRecord));
             names.add(name);
         }
     }
@@ -740,7 +725,8 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      *
      * @param sheetname the name for the new sheet. Note - certain length limits
      * apply. See {@link #setSheetName(int, String)}.
-     *
+     * @see {@link org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
+	 *      for a safe way to create valid names
      * @return HSSFSheet representing the new sheet.
      * @throws IllegalArgumentException
      *             if there is already a sheet present with a case-insensitive
@@ -985,7 +971,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
         if (isNewRecord)
         {
-            HSSFName newName = new HSSFName(this, nameRecord);
+            HSSFName newName = new HSSFName(this, nameRecord, nameRecord.isBuiltInName() ? null : workbook.getNameCommentRecord(nameRecord));
             names.add(newName);
         }
 

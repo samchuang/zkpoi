@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.util.Internal;
+import org.apache.poi.xslf.usermodel.XSLFRelation;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -56,17 +57,6 @@ import org.openxmlformats.schemas.presentationml.x2006.main.SldMasterDocument;
  * WARNING - APIs expected to change rapidly
  */
 public class XSLFSlideShow extends POIXMLDocument {
-	public static final String MAIN_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml";
-        public static final String MACRO_CONTENT_TYPE = "application/vnd.ms-powerpoint.slideshow.macroEnabled.main+xml";
-        public static final String MACRO_TEMPLATE_CONTENT_TYPE = "application/vnd.ms-powerpoint.template.macroEnabled.main+xml";
-        public static final String PRESENTATIONML_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml";
-        public static final String PRESENTATIONML_TEMPLATE_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.template.main+xml";
-        public static final String PRESENTATION_MACRO_CONTENT_TYPE = "application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml";
-	public static final String NOTES_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml";
-	public static final String SLIDE_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.slide+xml";
-	public static final String SLIDE_LAYOUT_RELATION_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout";
-	public static final String NOTES_RELATION_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide";
-	public static final String COMMENT_RELATION_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments";
 
 	private PresentationDocument presentationDoc;
     /**
@@ -77,11 +67,15 @@ public class XSLFSlideShow extends POIXMLDocument {
 	public XSLFSlideShow(OPCPackage container) throws OpenXML4JException, IOException, XmlException {
 		super(container);
 		
+		if(getCorePart().getContentType().equals(XSLFRelation.THEME_MANAGER.getContentType())) {
+		   rebase(getPackage());
+		}
+		
 		presentationDoc =
 			PresentationDocument.Factory.parse(getCorePart().getInputStream());
 		
-        embedds = new LinkedList<PackagePart>();
-		for (CTSlideIdListEntry ctSlide : getSlideReferences().getSldIdList()) {
+      embedds = new LinkedList<PackagePart>();
+      for (CTSlideIdListEntry ctSlide : getSlideReferences().getSldIdList()) {
 	          PackagePart slidePart =
 	                getTargetPart(getCorePart().getRelationship(ctSlide.getId2()));
 	          
@@ -112,7 +106,12 @@ public class XSLFSlideShow extends POIXMLDocument {
 	 */
     @Internal
 	public CTSlideIdList getSlideReferences() {
-		return getPresentation().getSldIdLst();
+       if(! getPresentation().isSetSldIdLst()) {
+          getPresentation().setSldIdLst(
+             CTSlideIdList.Factory.newInstance()   
+          );
+       }
+       return getPresentation().getSldIdLst();
 	}
 	/**
 	 * Returns the references from the presentation to its
@@ -176,7 +175,7 @@ public class XSLFSlideShow extends POIXMLDocument {
 		PackagePart slidePart = getSlidePart(parentSlide);
 		
 		try {
-			notes = slidePart.getRelationshipsByType(NOTES_RELATION_TYPE);
+			notes = slidePart.getRelationshipsByType(XSLFRelation.NOTES.getRelation());
 		} catch(InvalidFormatException e) {
 			throw new IllegalStateException(e);
 		}
@@ -220,7 +219,7 @@ public class XSLFSlideShow extends POIXMLDocument {
 		PackagePart slidePart = getSlidePart(slide);
 		
 		try {
-			commentRels = slidePart.getRelationshipsByType(COMMENT_RELATION_TYPE);
+			commentRels = slidePart.getRelationshipsByType(XSLFRelation.COMMENTS.getRelation());
 		} catch(InvalidFormatException e) {
 			throw new IllegalStateException(e);
 		}

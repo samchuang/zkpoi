@@ -18,12 +18,10 @@ package org.apache.poi.xwpf.usermodel;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
-import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -44,9 +42,9 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRunTrackChange;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtContentRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSimpleField;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSpacing;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTextAlignment;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
@@ -123,6 +121,9 @@ public class XWPFParagraph implements IBodyElement{
       for (CTRunTrackChange c : paragraph.getInsList()) {
           rs.addAll( c.getRList() );
       }
+      for (CTSimpleField f : paragraph.getFldSimpleList()) {
+    	  rs.addAll( f.getRList() );
+      }
 
       // Get text of the paragraph
       for (int j = 0; j < rs.size(); j++) {
@@ -133,7 +134,13 @@ public class XWPFParagraph implements IBodyElement{
           while (c.toNextSelection()) {
               XmlObject o = c.getObject();
               if (o instanceof CTText) {
-                  text.append(((CTText) o).getStringValue());
+                  String tagName = o.getDomNode().getNodeName();
+                  // Field Codes (w:instrText, defined in spec sec. 17.16.23)
+                  //  come up as instances of CTText, but we don't want them
+                  //  in the normal text output
+                  if (!"w:instrText".equals(tagName)) {
+                     text.append(((CTText) o).getStringValue());
+                  }
               }
               if (o instanceof CTPTab) {
                   text.append("\t");
@@ -1133,10 +1140,10 @@ public class XWPFParagraph implements IBodyElement{
      */
     protected void addRun(CTR run){
     	int pos;
-    	pos = paragraph.getRArray().length;
+    	pos = paragraph.getRList().size();
     	paragraph.addNewR();
     	paragraph.setRArray(pos, run);
-    	for (CTText ctText: paragraph.getRArray(pos).getTArray()) {
+    	for (CTText ctText: paragraph.getRArray(pos).getTList()) {
 			this.text.append(ctText.getStringValue());	
 		}
     }
@@ -1156,7 +1163,7 @@ public class XWPFParagraph implements IBodyElement{
     		startChar = startPos.getChar();
     	int beginRunPos = 0, candCharPos = 0;
     	boolean newList = false;
-    	for (int runPos=startRun; runPos<paragraph.getRArray().length; runPos++) {
+    	for (int runPos=startRun; runPos<paragraph.getRList().size(); runPos++) {
     		int beginTextPos = 0,beginCharPos = 0, textPos = 0,  charPos = 0;	
 	    	CTR ctRun = paragraph.getRArray(runPos);
     		XmlCursor c = ctRun.newCursor();
@@ -1240,7 +1247,7 @@ public class XWPFParagraph implements IBodyElement{
     int charEnd	= segment.getEndChar();
     StringBuffer out = new StringBuffer();
     	for(int i=runBegin; i<=runEnd;i++){
-    		int startText=0, endText = paragraph.getRArray(i).getTArray().length-1;
+    		int startText=0, endText = paragraph.getRArray(i).getTList().size()-1;
     		if(i==runBegin)
     			startText=textBegin;
     		if(i==runEnd)

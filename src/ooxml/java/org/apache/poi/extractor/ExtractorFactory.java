@@ -38,6 +38,8 @@ import org.apache.poi.hsmf.datatypes.AttachmentChunks;
 import org.apache.poi.hsmf.extractor.OutlookTextExtactor;
 import org.apache.poi.hssf.extractor.EventBasedExcelExtractor;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
+import org.apache.poi.hwpf.OldWordFileFormatException;
+import org.apache.poi.hwpf.extractor.Word6Extractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -48,8 +50,8 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.Entry;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.xslf.XSLFSlideShow;
 import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
+import org.apache.poi.xslf.usermodel.XSLFRelation;
 import org.apache.poi.xssf.extractor.XSSFEventBasedExcelExtractor;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
@@ -153,52 +155,40 @@ public class ExtractorFactory {
 	}
 	
 	public static POIXMLTextExtractor createExtractor(OPCPackage pkg) throws IOException, OpenXML4JException, XmlException {
-		PackageRelationshipCollection core = 
-			pkg.getRelationshipsByType(CORE_DOCUMENT_REL);
-		if(core.size() != 1) {
-			throw new IllegalArgumentException("Invalid OOXML Package received - expected 1 core document, found " + core.size());
-		}
+       PackageRelationshipCollection core = 
+            pkg.getRelationshipsByType(CORE_DOCUMENT_REL);
+       if(core.size() != 1) {
+          throw new IllegalArgumentException("Invalid OOXML Package received - expected 1 core document, found " + core.size());
+       }
 
-        PackagePart corePart = pkg.getPart(core.getRelationship(0));
-        if (corePart.getContentType().equals(XSSFRelation.WORKBOOK.getContentType()) ||
-            corePart.getContentType().equals(XSSFRelation.MACRO_TEMPLATE_WORKBOOK.getContentType()) ||
-            corePart.getContentType().equals(XSSFRelation.MACRO_ADDIN_WORKBOOK.getContentType()) ||
-            corePart.getContentType().equals(XSSFRelation.TEMPLATE_WORKBOOK.getContentType()) ||
-            corePart.getContentType().equals(XSSFRelation.MACROS_WORKBOOK.getContentType())) {
-           if(getPreferEventExtractor()) {
-              return new XSSFEventBasedExcelExtractor(pkg);
-           } else {
-              return new XSSFExcelExtractor(pkg);
-           }
-        }
-
-        if(corePart.getContentType().equals(XWPFRelation.DOCUMENT.getContentType()) ||
-            corePart.getContentType().equals(XWPFRelation.TEMPLATE.getContentType()) ||
-            corePart.getContentType().equals(XWPFRelation.MACRO_DOCUMENT.getContentType()) ||
-            corePart.getContentType().equals(XWPFRelation.MACRO_TEMPLATE_DOCUMENT.getContentType()) ) {
-			return new XWPFWordExtractor(pkg);
-		}
-
-		if(corePart.getContentType().equals(XSLFSlideShow.MAIN_CONTENT_TYPE)) {
-			return new XSLFPowerPointExtractor(pkg);
-		}
-                if(corePart.getContentType().equals(XSLFSlideShow.MACRO_CONTENT_TYPE)) {
-                        return new XSLFPowerPointExtractor(pkg);
-                }
-                if(corePart.getContentType().equals(XSLFSlideShow.MACRO_TEMPLATE_CONTENT_TYPE)) {
-                        return new XSLFPowerPointExtractor(pkg);
-                }
-                if(corePart.getContentType().equals(XSLFSlideShow.PRESENTATIONML_CONTENT_TYPE)) {
-                        return new XSLFPowerPointExtractor(pkg);
-                }
-                if(corePart.getContentType().equals(XSLFSlideShow.PRESENTATIONML_TEMPLATE_CONTENT_TYPE)) {
-                        return new XSLFPowerPointExtractor(pkg);
-                }
-                if(corePart.getContentType().equals(XSLFSlideShow.PRESENTATION_MACRO_CONTENT_TYPE)) {
-                        return new XSLFPowerPointExtractor(pkg);
-                }
-
-		throw new IllegalArgumentException("No supported documents found in the OOXML package (found "+corePart.getContentType()+")");
+       PackagePart corePart = pkg.getPart(core.getRelationship(0));
+        
+       // Is it XSSF?
+       for(XSSFRelation rel : XSSFExcelExtractor.SUPPORTED_TYPES) {
+          if(corePart.getContentType().equals(rel.getContentType())) {
+             if(getPreferEventExtractor()) {
+                return new XSSFEventBasedExcelExtractor(pkg);
+             } else {
+                return new XSSFExcelExtractor(pkg);
+             }
+          }
+       }
+        
+       // Is it XWPF?
+       for(XWPFRelation rel : XWPFWordExtractor.SUPPORTED_TYPES) {
+          if(corePart.getContentType().equals(rel.getContentType())) {
+             return new XWPFWordExtractor(pkg);
+          }
+       }
+       
+       // Is it XSLF?
+       for(XSLFRelation rel : XSLFPowerPointExtractor.SUPPORTED_TYPES) {
+          if(corePart.getContentType().equals(rel.getContentType())) {
+             return new XSLFPowerPointExtractor(pkg);
+          }
+       }
+       
+       throw new IllegalArgumentException("No supported documents found in the OOXML package (found "+corePart.getContentType()+")");
 	}
 	
 	public static POIOLE2TextExtractor createExtractor(POIFSFileSystem fs) throws IOException {
@@ -218,7 +208,12 @@ public class ExtractorFactory {
 			   }
 			}
 			if(entry.getName().equals("WordDocument")) {
-				return new WordExtractor(poifsDir, fs);
+			    // Old or new style word document?
+			    try {
+			        return new WordExtractor(poifsDir, fs);
+			    } catch(OldWordFileFormatException e) {
+			        return new Word6Extractor(poifsDir, fs);
+			    }
 			}
 			if(entry.getName().equals("PowerPoint Document")) {
 				return new PowerPointExtractor(poifsDir, fs);
@@ -230,12 +225,12 @@ public class ExtractorFactory {
             return new PublisherTextExtractor(poifsDir, fs);
          }
 			if(
-			      entry.getName().equals("__substg1.0_1000001E") ||
-               entry.getName().equals("__substg1.0_1000001F") ||
-			      entry.getName().equals("__substg1.0_0047001E") ||
-               entry.getName().equals("__substg1.0_0047001F") ||
-			      entry.getName().equals("__substg1.0_0037001E") ||
-               entry.getName().equals("__substg1.0_0037001F")
+                entry.getName().equals("__substg1.0_1000001E") ||
+                entry.getName().equals("__substg1.0_1000001F") ||
+                entry.getName().equals("__substg1.0_0047001E") ||
+                entry.getName().equals("__substg1.0_0047001F") ||
+                entry.getName().equals("__substg1.0_0037001E") ||
+                entry.getName().equals("__substg1.0_0037001F")
 			) {
 			   return new OutlookTextExtactor(poifsDir, fs);
 			}
@@ -293,8 +288,10 @@ public class ExtractorFactory {
 		   MAPIMessage msg = ((OutlookTextExtactor)ext).getMAPIMessage();
 		   for(AttachmentChunks attachment : msg.getAttachmentFiles()) {
 		      if(attachment.attachData != null) {
-   		      byte[] data = attachment.attachData.getValue();
-   		      nonPOIFS.add( new ByteArrayInputStream(data) );
+   		         byte[] data = attachment.attachData.getValue();
+   		         nonPOIFS.add( new ByteArrayInputStream(data) );
+		      } else if(attachment.attachmentDirectory != null) {
+		          dirs.add(attachment.attachmentDirectory.getDirectory());
 		      }
 		   }
 		}

@@ -122,6 +122,7 @@ public final class BiffViewer {
 			case AxisParentRecord.sid:     return new AxisParentRecord(in);
 			case AxisRecord.sid:           return new AxisRecord(in);
 			case AxisUsedRecord.sid:       return new AxisUsedRecord(in);
+            case AutoFilterInfoRecord.sid: return new AutoFilterInfoRecord(in);
 			case BOFRecord.sid:            return new BOFRecord(in);
 			case BackupRecord.sid:         return new BackupRecord(in);
 			case BarRecord.sid:            return new BarRecord(in);
@@ -197,6 +198,7 @@ public final class BiffViewer {
 			case MulBlankRecord.sid:       return new MulBlankRecord(in);
 			case MulRKRecord.sid:          return new MulRKRecord(in);
 			case NameRecord.sid:           return new NameRecord(in);
+			case NameCommentRecord.sid:    return new NameCommentRecord(in);
 			case NoteRecord.sid:           return new NoteRecord(in);
 			case NumberRecord.sid:         return new NumberRecord(in);
 			case ObjRecord.sid:            return new ObjRecord(in);
