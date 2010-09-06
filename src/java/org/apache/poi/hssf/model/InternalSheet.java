@@ -350,6 +350,9 @@ public final class InternalSheet {
         RecordOrderer.addNewSheetRecord(records, _protectionBlock);
         if (log.check( POILogger.DEBUG ))
             log.log(POILogger.DEBUG, "sheet createSheet (existing file) exited");
+        
+        //20100826, henrichen@zkoss.org: handle the defaultColumnWidth
+        _columnInfos.setDefaultColumnWidth(this.defaultcolwidth.getColWidth()); 
     }
     private static void spillAggregate(RecordAggregate ra, final List<RecordBase> recs) {
         ra.visitContainedRecords(new RecordVisitor() {
@@ -454,6 +457,9 @@ public final class InternalSheet {
         _records = records;
         if (log.check( POILogger.DEBUG ))
             log.log(POILogger.DEBUG, "Sheet createsheet from scratch exit");
+        
+        //20100826, henrichen@zkoss.org: handle the defaultColumnWidth
+        _columnInfos.setDefaultColumnWidth(this.defaultcolwidth.getColWidth());
     }
 
     public RowRecordsAggregate getRowsAggregate() {

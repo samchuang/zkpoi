@@ -46,7 +46,7 @@ public final class ColumnInfoRecord extends StandardRecord {
      * Creates a column info record with default width and format
      */
     public ColumnInfoRecord() {
-        setColumnWidth(2275);
+        setColumnWidth(2275); //20100816, henrichen@zkoss.org: why 2275? DefaultColWidthRecord.getColWidth() return 8, shouldn't it be 8 * 256 = 2048?
         _options = 2;
         _xfIndex = 0x0f;
         field_6_reserved = 2; // seems to be the most common value

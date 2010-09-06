@@ -84,6 +84,8 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate {
 			ColumnInfoRecord ci = ( ColumnInfoRecord ) records.get(k);
 			rec.records.add(ci.clone());
 		}
+        //20100826, henrichen@zkoss.org: handle the defaultColumnWidth
+		rec._defaultColumnWidth256 = this._defaultColumnWidth256;
 		return rec;
 	}
 
@@ -322,6 +324,7 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate {
 
 			nci.setFirstColumn(targetColumnIx);
 			nci.setLastColumn(targetColumnIx);
+			nci.setColumnWidth(_defaultColumnWidth256); //20100826, henrichen@zkoss.org: use the value from the DeaultColWidthRecord
 			setColumnInfoFields( nci, xfIndex, width, level, hidden, collapsed );
 			insertColumn(k, nci);
 			attemptMergeColInfoRecords(k);
@@ -519,5 +522,11 @@ public final class ColumnInfoRecordsAggregate extends RecordAggregate {
 			result = Math.max(columnInfoRecord.getOutlineLevel(), result);
 		}
 		return result;
+	}
+
+	//20100826, henrichen@zkoss.org: add to pass defaultColumnWidth down here
+	private int _defaultColumnWidth256 = 2048;
+	public void setDefaultColumnWidth(int defaultColWidth) {
+		_defaultColumnWidth256 = defaultColWidth * 256;
 	}
 }
