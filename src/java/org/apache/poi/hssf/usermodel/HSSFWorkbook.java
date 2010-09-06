@@ -288,7 +288,9 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
         RecordStream rs = new RecordStream(records, recOffset);
         while (rs.hasNext()) {
             InternalSheet sheet = InternalSheet.createSheet(rs);
-            _sheets.add(new HSSFSheet(this, sheet));
+            //20100903, henrichen@zkoss.org: allow customize creating HSSFSheet 
+            //_sheets.add(new HSSFSheet(this, sheet));
+            _sheets.add(createHSSFSheet(this, sheet));
         }
 
         for (int i = 0 ; i < workbook.getNumNames() ; ++i){
@@ -642,7 +644,9 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
 
     public HSSFSheet createSheet()
     {
-        HSSFSheet sheet = new HSSFSheet(this);
+        //20100903, henrichen@zkoss.org: allow customize creating HSSFSheet 
+        //HSSFSheet sheet = new HSSFSheet(this);
+        HSSFSheet sheet = createHSSFSheet(this);
 
         _sheets.add(sheet);
         workbook.setSheetName(_sheets.size() - 1, "Sheet" + (_sheets.size() - 1));
@@ -752,8 +756,10 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
         if (workbook.doesContainsSheetName( sheetname, _sheets.size() ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
 
-        HSSFSheet sheet = new HSSFSheet(this);
-
+        //20100903, henrichen@zkoss.org: allow customize creating HSSFSheet 
+        //HSSFSheet sheet = new HSSFSheet(this);
+        HSSFSheet sheet = createHSSFSheet(this);
+        
         workbook.setSheetName(_sheets.size(), sheetname);
         _sheets.add(sheet);
         boolean isOnlySheet = _sheets.size() == 1;
@@ -1701,5 +1707,15 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      */
     public NameXPtg getNameXPtg(String name) {
         return workbook.getNameXPtg(name);
+    }
+    
+    //20100903, henrichen@zkoss.org: create sheet indirectly to allow extension
+    protected HSSFSheet createHSSFSheet(HSSFWorkbook workbook, InternalSheet sheet) {
+    	return new HSSFSheet(workbook, sheet);
+    }
+    
+    //20100903, henrichen@zkoss.org: create sheet indirectly to allow extension
+    protected HSSFSheet createHSSFSheet(HSSFWorkbook workbook) {
+    	return new HSSFSheet(workbook);
     }
 }
