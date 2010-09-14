@@ -414,16 +414,9 @@ public class CellNumberFormatter extends CellFormatter {
         return (int) Math.round(Math.pow(10, s.size()) - 1);
     }
 
-    //20100913, henrichen@zkoss.org: handle 0 in ???/??? text format
-    private static String oneDenominatorFmt(List<Special> denominatorSpecials) {
-    	int sz = denominatorSpecials.size() - 1;
-    	final StringBuffer sb = new StringBuffer(2+sz).append("%d");
-    	if (sz > 0) {
-	    	final char[] spaces = new char[sz];
-	    	Arrays.fill(spaces, 0, sz, ' ');
-	    	sb.append(spaces);
-    	}
-    	return sb.toString();
+    //20100913, henrichen@zkoss.org: handle 0 in ???/??? text format. denominator must left aligned
+    private static String leftAlignNumberFormat(List<Special> numSpecials) {
+        return "%-" + numSpecials.size() + "d";
     }
     
 	// 20100913, henrichen@zkoss.org: handle the ?/10 case 
@@ -895,7 +888,7 @@ public class CellNumberFormatter extends CellFormatter {
             writeSingleInteger(numeratorFmt, n, output, numeratorSpecials,
                     mods);
             //20100913, henrichen@zkoss.org: handle 0 in ???/??? text format
-            writeSingleInteger(d == 1 ? oneDenominatorFmt(denominatorSpecials) : denominatorFmt, d, output, denominatorSpecials,
+            writeSingleInteger(d == 1 ? leftAlignNumberFormat(denominatorSpecials) : denominatorFmt, d, output, denominatorSpecials,
                     mods);
         } catch (RuntimeException ignored) {
             ignored.printStackTrace();
@@ -936,7 +929,8 @@ public class CellNumberFormatter extends CellFormatter {
     private void writeInteger(StringBuffer result, StringBuffer output,
             List<Special> numSpecials, Set<StringMod> mods,
             boolean showCommas) {
-
+    	//20100914, henrichen@zkoss.org: repect the current locale
+    	final String comma = "" + Formatters.getGroupingSeparator();
         int pos = result.indexOf(".") - 1;
         if (pos < 0) {
             if (exponent != null && numSpecials == integerSpecials)
@@ -973,7 +967,9 @@ public class CellNumberFormatter extends CellFormatter {
                 lastOutputIntegerDigit = s;
             }
             if (followWithComma) {
-                mods.add(insertMod(s, zeroStrip ? " " : ",", StringMod.AFTER));
+            	//20100914, henrichen@zkoss.org: repect the current locale
+                //mods.add(insertMod(s, zeroStrip ? " " : ",", StringMod.AFTER));
+            	mods.add(insertMod(s, zeroStrip ? " " : comma, StringMod.AFTER));
                 followWithComma = false;
             }
             digit++;
@@ -987,7 +983,9 @@ public class CellNumberFormatter extends CellFormatter {
             if (showCommas) {
                 while (pos > 0) {
                     if (digit > 0 && digit % 3 == 0)
-                        extraLeadingDigits.insert(pos, ',');
+                    	//20100914, henrichen@zkoss.org: repect the current locale
+                        //extraLeadingDigits.insert(pos, ',');
+                    	extraLeadingDigits.insert(pos, comma);
                     digit++;
                     --pos;
                 }
@@ -1002,6 +1000,10 @@ public class CellNumberFormatter extends CellFormatter {
         int strip;
         ListIterator<Special> it;
         if (fractionalSpecials.size() > 0) {
+            //20100914, henrichen@zkoss.org: respect current Locale
+            final char dot = Formatters.getDecimalSeparator();
+            output.setCharAt(decimalPoint.pos, dot);
+
             digit = result.indexOf(".") + 1;
             if (exponent != null)
                 strip = result.indexOf("e") - 1;
