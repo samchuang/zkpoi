@@ -452,4 +452,13 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
         }
         setRowNum(rownum);
     }
+    
+    //20100915, henrichen@zkoss.org: remove all cells
+    public void removeAllCells() {
+    	_cells.clear();
+    }
+    //20100915, henrichen@zkoss.org: return cells TreeMap
+    public TreeMap<Integer, XSSFCell> getCells() {
+    	return _cells;
+    }
 }

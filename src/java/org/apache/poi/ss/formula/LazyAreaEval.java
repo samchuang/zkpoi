@@ -48,8 +48,11 @@ final class LazyAreaEval extends AreaEvalBase implements HyperlinkEval {
 
 	public ValueEval getRelativeValue(int relativeRowIndex, int relativeColumnIndex) {
 
-		int rowIx = (relativeRowIndex + getFirstRow() ) & 0xFFFF;
-		int colIx = (relativeColumnIndex + getFirstColumn() ) & 0x00FF;
+		//20100915, henrichen@zkoss.org: will not work in Excel 2007 with larger rows and columns
+		//int rowIx = (relativeRowIndex + getFirstRow() ) & 0xFFFF;
+		//int colIx = (relativeColumnIndex + getFirstColumn() ) & 0x00FF;
+		int rowIx = (relativeRowIndex + getFirstRow() );
+		int colIx = (relativeColumnIndex + getFirstColumn() );
 
 		return _evaluator.getEvalForCell(rowIx, colIx);
 	}

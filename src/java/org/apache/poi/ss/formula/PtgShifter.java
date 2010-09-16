@@ -47,7 +47,7 @@ public class PtgShifter {
 
 	public PtgShifter(int externSheetIndex, int firstRow, int lastRow, int rowAmount, int firstCol, int lastCol, int colAmount, SpreadsheetVersion ver) {
 		if (firstRow > lastRow) {
-			throw new IllegalArgumentException("firstRow, lastRow out of order");
+			throw new IllegalArgumentException("firstRow("+firstRow+") and lastRow("+lastRow+") out of order");
 		}
 		if (firstCol > lastCol) {
 			throw new IllegalArgumentException("firstCol, lastCol out of order");

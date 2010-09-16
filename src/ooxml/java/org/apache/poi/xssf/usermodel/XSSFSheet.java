@@ -2915,4 +2915,13 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		dataValidations.setCount(currentCount + 1);
 
 	}
+	
+	//20100914, henrichen@zkoss.org: expose _rows
+	protected TreeMap<Integer, XSSFRow> getRows() {
+		return _rows;
+	}
+	//20100904, henrichen@zkoss.org: expose _rows
+	protected void setRows(TreeMap<Integer, XSSFRow> rows) {
+		_rows = rows;
+	}
 }
