@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import org.apache.poi.hssf.record.formula.eval.BoolEval;
 import org.apache.poi.hssf.record.formula.eval.ErrorEval;
+import org.apache.poi.hssf.record.formula.eval.HyperlinkEval;
 import org.apache.poi.hssf.record.formula.eval.NumberEval;
 import org.apache.poi.hssf.record.formula.eval.StringEval;
 import org.apache.poi.hssf.record.formula.eval.ValueEval;
@@ -250,20 +251,28 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 	 */
 	private CellValue evaluateFormulaCellValue(Cell cell) {
 		ValueEval eval = _bookEvaluator.evaluate(new XSSFEvaluationCell((XSSFCell) cell));
+		//20100917, henrichen@zkoss.org: handle HYPERLINK function 
+		CellValue cv = null;
 		if (eval instanceof NumberEval) {
 			NumberEval ne = (NumberEval) eval;
-			return new CellValue(ne.getNumberValue());
+			cv = new CellValue(ne.getNumberValue());
 		}
 		if (eval instanceof BoolEval) {
 			BoolEval be = (BoolEval) eval;
-			return CellValue.valueOf(be.getBooleanValue());
+			cv =CellValue.valueOf(be.getBooleanValue());
 		}
 		if (eval instanceof StringEval) {
 			StringEval ne = (StringEval) eval;
-			return new CellValue(ne.getStringValue());
+			cv = new CellValue(ne.getStringValue());
 		}
 		if (eval instanceof ErrorEval) {
-			return CellValue.getError(((ErrorEval)eval).getErrorCode());
+			cv = CellValue.getError(((ErrorEval)eval).getErrorCode());
+		}
+		if (cv != null) {
+			if (eval instanceof HyperlinkEval) {
+				cv.setHyperlink(((HyperlinkEval)eval).getHyperlink());
+			}
+			return cv;
 		}
 		throw new RuntimeException("Unexpected eval class (" + eval.getClass().getName() + ")");
 	}
