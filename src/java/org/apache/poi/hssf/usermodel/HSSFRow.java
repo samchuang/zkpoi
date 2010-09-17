@@ -698,7 +698,7 @@ public final class HSSFRow implements Row {
      * @param clearRest whether clear the rest cells after the shifted endCol
      */
     public void shiftCells(int startCol, int endCol, int n, boolean clearRest) {
-    	final InternalSheet _sheet = sheet.getSheet();
+    	final InternalSheet internalSheet = sheet.getSheet();
     	if (endCol < 0) {
     		endCol = getLastCellNum() - 1;
     	}
@@ -754,10 +754,10 @@ public final class HSSFRow implements Row {
             }
             cells[colNum]=null;
             
-            _sheet.removeValueRecord(rowNum, cellRecord); //remove the record from the sheet
+            internalSheet.removeValueRecord(rowNum, cellRecord); //remove the record from the sheet
             cellRecord.setColumn((short)newColNum); //set new column
             addCell(cell);
-            _sheet.addValueRecord(rowNum, cellRecord);
+            internalSheet.addValueRecord(rowNum, cellRecord);
 
             //adjust hyperlink columns
             HSSFHyperlink link = cell.getHyperlink();

@@ -2920,7 +2920,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 	protected TreeMap<Integer, XSSFRow> getRows() {
 		return _rows;
 	}
-	//20100904, henrichen@zkoss.org: expose _rows
+	//20100914, henrichen@zkoss.org: expose _rows
 	protected void setRows(TreeMap<Integer, XSSFRow> rows) {
 		_rows = rows;
 	}
