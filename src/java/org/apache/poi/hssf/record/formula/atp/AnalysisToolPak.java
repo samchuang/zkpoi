@@ -22,6 +22,8 @@ import java.util.Map;
 
 import org.apache.poi.hssf.record.formula.eval.ValueEval;
 import org.apache.poi.hssf.record.formula.functions.FreeRefFunction;
+import org.apache.poi.hssf.record.formula.functions.Function;
+import org.apache.poi.hssf.record.formula.functions.NotImplementedFunction;
 import org.apache.poi.hssf.record.formula.udf.UDFFinder;
 import org.apache.poi.ss.formula.OperationEvaluationContext;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
@@ -35,14 +37,17 @@ public final class AnalysisToolPak implements UDFFinder {
 	public static final UDFFinder instance = new AnalysisToolPak();
 
 	private static final class NotImplemented implements FreeRefFunction {
-		private final String _functionName;
-
+		//private final String _functionName;
+		private final Function _notImplementedFunc;
+		
 		public NotImplemented(String functionName) {
-			_functionName = functionName;
+			//_functionName = functionName;
+			_notImplementedFunc = new NotImplementedFunction(functionName);
 		}
 
 		public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
-			throw new NotImplementedException(_functionName);
+			//throw new NotImplementedException(_functionName);
+			return _notImplementedFunc.evaluate(args, ec.getRowIndex(), ec.getColumnIndex());
 		}
 	};
 
