@@ -35,7 +35,7 @@ public final class NotImplementedFunction implements Function {
 	private static Class _funcClass;
 	static {
 		try {
-			_funcClass = Thread.currentThread().getClass().forName("org.zkoss.zss.formula.ELEvalFunction");
+			_funcClass = Thread.currentThread().getClass().forName("org.zkoss.zssex.formula.ELEvalFunction");
 		} catch (ClassNotFoundException e) {
 			//ignore
 		}		
