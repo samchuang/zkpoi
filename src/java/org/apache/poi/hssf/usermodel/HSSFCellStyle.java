@@ -24,6 +24,7 @@ import org.apache.poi.hssf.record.FontRecord;
 import org.apache.poi.hssf.record.StyleRecord;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.Font;
 
 /**
@@ -861,4 +862,56 @@ public final class HSSFCellStyle implements CellStyle {
 		}
 		return false;
 	}
+	
+	//20100921, henrichen@zkoss.org: fetch border color object
+    public HSSFColor getLeftBorderColorColor()
+    {
+        HSSFPalette pallette = new HSSFPalette(
+                _workbook.getCustomPalette()
+          );
+          return pallette.getColor(
+        		  getLeftBorderColor()
+          );
+    }
+
+	//20100921, henrichen@zkoss.org: fetch border color object
+    public HSSFColor getRightBorderColorColor()
+    {
+        HSSFPalette pallette = new HSSFPalette(
+                _workbook.getCustomPalette()
+          );
+          return pallette.getColor(
+        		  getRightBorderColor()
+          );
+    }
+	//20100921, henrichen@zkoss.org: fetch border color object
+    public HSSFColor getTopBorderColorColor()
+    {
+        HSSFPalette pallette = new HSSFPalette(
+                _workbook.getCustomPalette()
+          );
+          return pallette.getColor(
+        		  getTopBorderColor()
+          );
+    }
+	//20100921, henrichen@zkoss.org: fetch border color object
+    public HSSFColor getBottomBorderColorColor()
+    {
+        HSSFPalette pallette = new HSSFPalette(
+                _workbook.getCustomPalette()
+          );
+          return pallette.getColor(
+        		  getBottomBorderColor()
+          );
+    }
+    
+    //20100923, henrichen@zkoss.org: handle Color
+    public void setFillForegroundColor(HSSFColor color) {
+    	setFillForegroundColor(color.getIndex());
+    }
+    //20100923, henrichen@zkoss.org: handle Color
+    public void setFillBackgroundColor(HSSFColor color) {
+    	setFillBackgroundColor(color.getIndex());
+    }
+
 }

@@ -19,6 +19,7 @@ package org.apache.poi.xssf.usermodel;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -1414,5 +1415,24 @@ public class XSSFCellStyle implements CellStyle {
     private void extractColorFromTheme(XSSFColor originalColor){
         XSSFColor themeColor = _theme.getThemeColor(originalColor.getTheme());
         originalColor.setRgb(themeColor.getRgb());
+    }
+    
+    //20100921, henrichen@zkoss.org: add fetching border color object
+    public XSSFColor getLeftBorderColorColor() {
+        return getLeftBorderXSSFColor();
+    }
+
+    //20100921, henrichen@zkoss.org: add fetching border color object
+    public XSSFColor getRightBorderColorColor() {
+        return getRightBorderXSSFColor();
+    }
+    
+    //20100921, henrichen@zkoss.org: add fetching border color object
+    public XSSFColor getTopBorderColorColor() {
+        return getTopBorderXSSFColor();
+    }
+    //20100921, henrichen@zkoss.org: add fetching border color object
+    public XSSFColor getBottomBorderColorColor() {
+        return getBottomBorderXSSFColor();
     }
 }

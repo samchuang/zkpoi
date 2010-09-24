@@ -701,4 +701,10 @@ public interface CellStyle {
      *  XSSFCellStyle)
      */
     public void cloneStyleFrom(CellStyle source);
+
+    //20100921, henrichen@zkoss.org: fetch boarder color object
+    public Color getTopBorderColorColor();
+    public Color getBottomBorderColorColor();
+    public Color getRightBorderColorColor();
+    public Color getLeftBorderColorColor();
 }

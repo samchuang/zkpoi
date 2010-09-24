@@ -22,6 +22,9 @@ import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTColorScheme;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTSRgbColor;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTScRgbColor;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTSystemColor;
 import org.openxmlformats.schemas.drawingml.x2006.main.ThemeDocument;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTColor;
 
@@ -51,7 +54,11 @@ public class ThemesTable extends POIXMLDocumentPart {
             if (obj instanceof org.openxmlformats.schemas.drawingml.x2006.main.CTColor) {
                 if (cnt == idx) {
                     ctColor = (org.openxmlformats.schemas.drawingml.x2006.main.CTColor) obj;
-                    return new XSSFColor(ctColor.getSrgbClr().getVal());
+                    CTSRgbColor srgbClr = ctColor.getSrgbClr();
+                    if (srgbClr != null)
+                    	return new XSSFColor(srgbClr.getVal());
+                    else
+                    	break;
                 }
                 cnt++;
             }
