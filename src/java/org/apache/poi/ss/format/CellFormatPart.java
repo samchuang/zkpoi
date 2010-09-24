@@ -473,7 +473,7 @@ System.out.println("format locale: "+ldesc);
                         repl = " ";
                         break;
                     case '*': //!! We don't do this for real, we just put in 3 of them
-                        repl = expandChar(part);
+                        repl = ""; //expandChar(part); //20100924, henrichen@zkoss.org: DON'T expand, just clear it out!
                         break;
                     default:
                         repl = part;

@@ -46,18 +46,18 @@ import java.util.regex.Pattern;
  * text, with up to two decimal points); if it is a negative number, display
  * according to the second part (example: red text, with up to two decimal
  * points). If the value is text, display it as is. <dt>Three parts (example:
- * <tt>[Green]#.##;[Black]#.##;[Red]#.##</tt>) <dd>If the value is a positive
+ * <tt>[Green]#.##;[Red]#.##;[Black]#.##</tt>) <dd>If the value is a positive
  * number, display according to the first part (example: green text, with up to
- * two decimal points); if it is zero, display according to the second part
- * (example: black text, with up to two decimal points); if it is a negative
- * number, display according to the third part (example: red text, with up to
- * two decimal points). If the value is text, display it as is. <dt>Four parts
- * (example: <tt>[Green]#.##;[Black]#.##;[Red]#.##;[@]</tt>) <dd>If the value is
+ * two decimal points); if it is a negative
+ * number, display according to the second part (example: red text, with up to
+ * two decimal points); if it is zero, display according to the third part
+ * (example: black text, with up to two decimal points). If the value is text, display it as is. <dt>Four parts
+ * (example: <tt>[Green]#.##;[Red]#.##;[Black]#.##;[@]</tt>) <dd>If the value is
  * a positive number, display according to the first part (example: green text,
- * with up to two decimal points); if it is zero, display according to the
- * second part (example: black text, with up to two decimal points); if it is a
- * negative number, display according to the third part (example: red text, with
- * up to two decimal points). If the value is text, display according to the
+ * with up to two decimal points); if it is a
+ * negative number, display according to the second part (example: red text, with
+ * up to two decimal points); if it is zero, display according to the
+ * third part (example: black text, with up to two decimal points). If the value is text, display according to the
  * fourth part (example: text in the cell's usual color, with the text value
  * surround by brackets). </dl>
  * <p/>
@@ -168,15 +168,15 @@ public class CellFormat {
             break;
         case 3:
             posNumFmt = parts.get(0);
-            zeroNumFmt = parts.get(1);
-            negNumFmt = parts.get(2);
+            negNumFmt = parts.get(1);
+            zeroNumFmt = parts.get(2);
             textFmt = DEFAULT_TEXT_FORMAT;
             break;
         case 4:
         default:
             posNumFmt = parts.get(0);
-            zeroNumFmt = parts.get(1);
-            negNumFmt = parts.get(2);
+            negNumFmt = parts.get(1);
+            zeroNumFmt = parts.get(2);
             textFmt = parts.get(3);
             break;
         }

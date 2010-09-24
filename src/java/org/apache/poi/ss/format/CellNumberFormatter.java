@@ -652,7 +652,7 @@ public class CellNumberFormatter extends CellFormatter {
             if (numerator == null) {
                 writeFractional(result, output);
                 writeInteger(result, output, integerSpecials, mods,
-                        integerCommas);
+                        integerCommas, false);
             } else {
                 writeFraction(value, result, fractional, output, mods);
             }
@@ -747,7 +747,7 @@ public class CellNumberFormatter extends CellFormatter {
         FieldPosition fractionPos = new FieldPosition(
                 DecimalFormat.FRACTION_FIELD);
         decimalFmt.format(value, result, fractionPos);
-        writeInteger(result, output, integerSpecials, mods, integerCommas);
+        writeInteger(result, output, integerSpecials, mods, integerCommas, false);
         writeFractional(result, output);
 
         /*
@@ -812,7 +812,7 @@ public class CellNumberFormatter extends CellFormatter {
 
         StringBuffer exponentNum = new StringBuffer(result.substring(
                 signPos + 1));
-        writeInteger(exponentNum, output, exponentDigitSpecials, mods, false);
+        writeInteger(exponentNum, output, exponentDigitSpecials, mods, false, false);
     }
 
     private void writeFraction(double value, StringBuffer result,
@@ -824,7 +824,7 @@ public class CellNumberFormatter extends CellFormatter {
             // If fractional part is zero, and numerator doesn't have '0', write out
             // only the integer part and strip the rest.
             if (fractional == 0 && !hasChar('0', numeratorSpecials)) {
-                writeInteger(result, output, integerSpecials, mods, false);
+                writeInteger(result, output, integerSpecials, mods, false, false);
 
                 Special start = integerSpecials.get(integerSpecials.size() - 1);
                 Special end = denominatorSpecials.get(
@@ -861,7 +861,7 @@ public class CellNumberFormatter extends CellFormatter {
                     }
                 } else {
                     // Not removing the integer part -- print it out
-                    writeInteger(result, output, integerSpecials, mods, false);
+                    writeInteger(result, output, integerSpecials, mods, false, false);
                 }
             }
         }
@@ -923,12 +923,12 @@ public class CellNumberFormatter extends CellFormatter {
         StringBuffer sb = new StringBuffer();
         Formatter formatter = new Formatter(sb);
         formatter.format(LOCALE, fmt, num);
-        writeInteger(sb, output, numSpecials, mods, false);
+        writeInteger(sb, output, numSpecials, mods, false, true);
     }
 
     private void writeInteger(StringBuffer result, StringBuffer output,
             List<Special> numSpecials, Set<StringMod> mods,
-            boolean showCommas) {
+            boolean showCommas, boolean fraction) {//20100924, henrichen@zkoss.org: fraction has special treatment about zero
     	//20100914, henrichen@zkoss.org: repect the current locale
     	final String comma = "" + Formatters.getGroupingSeparator();
         int pos = result.indexOf(".") - 1;
@@ -945,7 +945,10 @@ public class CellNumberFormatter extends CellFormatter {
             if (resultCh != '0' && resultCh != ',')
                 break;
         }
-
+        //20100924, henrichen@zkoss.org: handle all zero case
+        final char posCh = !fraction && strip == pos && pos >= 0 ? result.charAt(pos) : '\000';
+        final boolean allZeros = posCh == '0' || posCh == ',';
+        
         ListIterator<Special> it = numSpecials.listIterator(numSpecials.size());
         boolean followWithComma = false;
         Special lastOutputIntegerDigit = null;
@@ -962,7 +965,7 @@ public class CellNumberFormatter extends CellFormatter {
             followWithComma = showCommas && digit > 0 && digit % 3 == 0;
             boolean zeroStrip = false;
             if (resultCh != '0' || s.ch == '0' || s.ch == '?' || pos >= strip) {
-                zeroStrip = s.ch == '?' && pos < strip;
+                zeroStrip = s.ch == '?' && (pos < strip || allZeros); //20100924, henrichen@zkoss.org: handle all zero case
                 output.setCharAt(s.pos, (zeroStrip ? ' ' : resultCh));
                 lastOutputIntegerDigit = s;
             }

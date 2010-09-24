@@ -115,10 +115,10 @@ public final class BuiltinFormats {
 		putFormat(m, 0x26, "#,##0_);[Red](#,##0)");
 		putFormat(m, 0x27, "#,##0.00_);(#,##0.00)");
 		putFormat(m, 0x28, "#,##0.00_);[Red](#,##0.00)");
-		putFormat(m, 0x29, "_(*#,##0_);_(*(#,##0);_(* \"-\"_);_(@_)");
-		putFormat(m, 0x2a, "_($*#,##0_);_($*(#,##0);_($* \"-\"_);_(@_)");
-		putFormat(m, 0x2b, "_(*#,##0.00_);_(*(#,##0.00);_(*\"-\"??_);_(@_)");
-		putFormat(m, 0x2c, "_($*#,##0.00_);_($*(#,##0.00);_($*\"-\"??_);_(@_)");
+		putFormat(m, 0x29, "_(* #,##0_);_(* (#,##0);_(* \"-\"_);_(@_)"); //20100924, henrichen@zkoss.org: space after *(star)
+		putFormat(m, 0x2a, "_($* #,##0_);_($* (#,##0);_($* \"-\"_);_(@_)"); //20100924, henrichen@zkoss.org: space after *(star)
+		putFormat(m, 0x2b, "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)"); //20100924, henrichen@zkoss.org: space after *(star)
+		putFormat(m, 0x2c, "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"); //20100924, henrichen@zkoss.org: space after *(star)
 		putFormat(m, 0x2d, "mm:ss");
 		putFormat(m, 0x2e, "[h]:mm:ss");
 		putFormat(m, 0x2f, "mm:ss.0");
