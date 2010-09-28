@@ -1414,7 +1414,9 @@ public class XSSFCellStyle implements CellStyle {
      */
     private void extractColorFromTheme(XSSFColor originalColor){
         XSSFColor themeColor = _theme.getThemeColor(originalColor.getTheme());
-        originalColor.setRgb(themeColor.getRgb());
+        if (themeColor != null) { //20100927, henrichen@zkoss.org: temeColor can be null 
+        	originalColor.setRgb(themeColor.getRgb());
+        }
     }
     
     //20100921, henrichen@zkoss.org: add fetching border color object

@@ -387,7 +387,12 @@ public class XSSFRichTextString implements RichTextString {
 
         for(int i = 0; i < st.sizeOfRArray(); i++){
             CTRElt r = st.getRArray(i);
-            if(i == index) return new XSSFFont(toCTFont(r.getRPr()));
+            //20100927, henrichen@zkoss.org: must check property of the text run
+//          if(i == index) return new XSSFFont(toCTFont(r.getRPr()));
+            if(i == index) {
+            	final CTRPrElt rpr =  r.getRPr(); //20100927, henrichen@zkoss.org: property of the text run
+           		return rpr != null ? new XSSFFont(toCTFont(rpr)) : null;
+            }
         }
         return null;
     }
