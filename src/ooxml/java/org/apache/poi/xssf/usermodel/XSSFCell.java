@@ -218,7 +218,14 @@ public final class XSSFCell implements Cell {
      *        will change the cell to a numeric cell and set its value.
      */
     public void setCellValue(double value) {
-        if(Double.isInfinite(value) || Double.isNaN(value)) {
+        if(Double.isInfinite(value)) {
+            // Excel does not support positive/negative infinities,
+            // rather, it gives a #DIV/0! error in these cases.
+            _cell.setT(STCellType.E);
+            _cell.setV(FormulaError.DIV0.getString());
+        } else if (Double.isNaN(value)){
+            // Excel does not support Not-a-Number (NaN),
+            // instead it immediately generates an #NUM! error.
             _cell.setT(STCellType.E);
             _cell.setV(FormulaError.NUM.getString());
         } else {
@@ -366,20 +373,27 @@ public final class XSSFCell implements Cell {
     /**
      * Creates a non shared formula from the shared formula counterpart
      *
+     * @param si Shared Group Index
      * @return non shared formula created for the given shared formula and this cell
      */
-    private String convertSharedFormula(int idx){
+    private String convertSharedFormula(int si){
         XSSFSheet sheet = getSheet();
-        XSSFCell sfCell = sheet.getSharedFormulaCell(idx);
-        if(sfCell == null){
-            throw new IllegalStateException("Shared Formula not found for group index " + idx);
-        }
-        String sharedFormula = sfCell.getCTCell().getF().getStringValue();
+
+        CTCellFormula f = sheet.getSharedFormula(si);
+        if(f == null) throw new IllegalStateException(
+                "Master cell of a shared formula with sid="+si+" was not found");
+
+        String sharedFormula = f.getStringValue();
+        //Range of cells which the shared formula applies to
+        String sharedFormulaRange = f.getRef();
+
+        CellRangeAddress ref = CellRangeAddress.valueOf(sharedFormulaRange);
+
         int sheetIndex = sheet.getWorkbook().getSheetIndex(sheet);
         XSSFEvaluationWorkbook fpb = XSSFEvaluationWorkbook.create(sheet.getWorkbook());
         Ptg[] ptgs = FormulaParser.parse(sharedFormula, fpb, FormulaType.CELL, sheetIndex);
         Ptg[] fmla = SharedFormulaRecord.convertSharedFormulas(ptgs,
-                getRowIndex() - sfCell.getRowIndex(), getColumnIndex() - sfCell.getColumnIndex());
+                getRowIndex() - ref.getFirstRow(), getColumnIndex() - ref.getFirstColumn());
         return FormulaRenderer.toFormulaString(fpb, fmla);
     }
 
@@ -707,11 +721,15 @@ public final class XSSFCell implements Cell {
      * @see #CELL_TYPE_ERROR
      */
     public void setCellType(int cellType) {
+        int prevType = getCellType();
+       
         if(isPartOfArrayFormulaGroup()){
             notifyArrayFormulaChanging();
         }
-
-        int prevType = getCellType();
+        if(prevType == CELL_TYPE_FORMULA && cellType != CELL_TYPE_FORMULA) {
+            getSheet().getWorkbook().onDeleteFormula(this);
+        }
+        
         switch (cellType) {
             case CELL_TYPE_BLANK:
                 setBlank();

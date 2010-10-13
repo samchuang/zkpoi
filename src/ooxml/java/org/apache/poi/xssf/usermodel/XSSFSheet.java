@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.POIXMLException;
+import org.apache.poi.hssf.record.PasswordRecord;
 import org.apache.poi.hssf.record.formula.FormulaShifter;
 import org.apache.poi.hssf.util.PaneInformation;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -52,6 +53,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.SSCellRange;
+import org.apache.poi.util.HexDump;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
@@ -83,7 +85,11 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     private List<XSSFHyperlink> hyperlinks;
     private ColumnHelper columnHelper;
     private CommentsTable sheetComments;
-    private Map<Integer, XSSFCell> sharedFormulas;
+    /**
+     * cache of master shared formulas in this sheet.
+     * Master shared formula is the first formula in a group of shared formulas is saved in the f element.
+     */
+    private Map<Integer, CTCellFormula> sharedFormulas;
     private List<CellRangeAddress> arrayFormulas;
     private XSSFDataValidationHelper dataValidationHelper;    
 
@@ -166,7 +172,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     private void initRows(CTWorksheet worksheet) {
         _rows = new TreeMap<Integer, XSSFRow>();
-        sharedFormulas = new HashMap<Integer, XSSFCell>();
+        sharedFormulas = new HashMap<Integer, CTCellFormula>();
         arrayFormulas = new ArrayList<CellRangeAddress>();
         for (CTRow row : worksheet.getSheetData().getRowList()) {
             XSSFRow r = new XSSFRow(row, this);
@@ -941,7 +947,40 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     public boolean getProtect() {
         return worksheet.isSetSheetProtection() && sheetProtectionEnabled();
     }
+ 
+    /**
+     * Enables sheet protection and sets the password for the sheet.
+     * Also sets some attributes on the {@link CTSheetProtection} that correspond to
+     * the default values used by Excel
+     * 
+     * @param password to set for protection. Pass <code>null</code> to remove protection
+     */
+    public void protectSheet(String password) {
+        	
+    	if(password != null) {
+    		CTSheetProtection sheetProtection = worksheet.addNewSheetProtection();
+    		sheetProtection.xsetPassword(stringToExcelPassword(password));
+    		sheetProtection.setSheet(true);
+    		sheetProtection.setScenarios(true);
+    		sheetProtection.setObjects(true);
+    	} else {
+    		worksheet.unsetSheetProtection();
+    	}
+    }
 
+	/**
+	 * Converts a String to a {@link STUnsignedShortHex} value that contains the {@link PasswordRecord#hashPassword(String)}
+	 * value in hexadecimal format
+	 *  
+	 * @param password the password string you wish convert to an {@link STUnsignedShortHex}
+	 * @return {@link STUnsignedShortHex} that contains Excel hashed password in Hex format
+	 */
+	private STUnsignedShortHex stringToExcelPassword(String password) {
+		STUnsignedShortHex hexPassword = STUnsignedShortHex.Factory.newInstance();
+		hexPassword.setStringValue(String.valueOf(HexDump.shortToHex(PasswordRecord.hashPassword(password))).substring(2));
+		return hexPassword;
+	}
+	
     /**
      * Returns the logical row ( 0-based).  If you ask for a row that is not
      * defined you get a null.  This is to say row 4 represents the fifth row on a sheet.
@@ -1315,7 +1354,11 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
                 mergeCellsArray[i - 1] = ctMergeCells.getMergeCellArray(i);
             }
         }
-        ctMergeCells.setMergeCellArray(mergeCellsArray);
+        if(mergeCellsArray.length > 0){
+            ctMergeCells.setMergeCellArray(mergeCellsArray);
+        } else{
+            worksheet.unsetMergeCells();
+        }
     }
 
     /**
@@ -2362,12 +2405,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     }
 
     /**
-     * Return a cell holding shared formula by shared group index
+     * Return a master shared formula by index
      *
      * @param sid shared group index
-     * @return a cell holding shared formula or <code>null</code> if not found
+     * @return a CTCellFormula bean holding shared formula or <code>null</code> if not found
      */
-    XSSFCell getSharedFormulaCell(int sid){
+    CTCellFormula getSharedFormula(int sid){
         return sharedFormulas.get(sid);
     }
 
@@ -2376,7 +2419,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         CTCell ct = cell.getCTCell();
         CTCellFormula f = ct.getF();
         if (f != null && f.getT() == STCellFormulaType.SHARED && f.isSetRef() && f.getStringValue() != null) {
-            sharedFormulas.put((int)f.getSi(), cell);
+            // save a detached  copy to avoid XmlValueDisconnectedException,
+            // this may happen when the master cell of a shared formula is changed
+            sharedFormulas.put((int)f.getSi(), (CTCellFormula)f.copy());
         }
         if (f != null && f.getT() == STCellFormulaType.ARRAY && f.getRef() != null) {
             arrayFormulas.add(CellRangeAddress.valueOf(f.getRef()));

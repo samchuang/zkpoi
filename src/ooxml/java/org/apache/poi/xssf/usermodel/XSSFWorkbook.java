@@ -51,6 +51,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.*;
 import org.apache.poi.xssf.model.CalculationChain;
 import org.apache.poi.xssf.model.MapInfo;
@@ -87,6 +88,12 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * Width of one character of the default font in pixels. Same for Calibry and Arial.
      */
     public static final float DEFAULT_CHARACTER_WIDTH = 7.0017f;
+
+    /**
+     * Excel silently truncates long sheet names to 31 chars.
+     * This constant is used to ensure uniqueness in the first 31 chars
+     */
+    private static final int MAX_SENSITIVE_SHEET_NAME_LEN = 31;
 
     /**
      * The underlying XML bean
@@ -458,7 +465,9 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     }
 
     public XSSFName createName() {
-        XSSFName name = new XSSFName(CTDefinedName.Factory.newInstance(), this);
+        CTDefinedName ctName = CTDefinedName.Factory.newInstance();
+        ctName.setName("");
+        XSSFName name = new XSSFName(ctName, this);
         namedRanges.add(name);
         return name;
     }
@@ -511,7 +520,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     }
 
     private CTSheet addSheet(String sheetname) {
-        validateSheetName(sheetname);
+        WorkbookUtil.validateSheetName(sheetname);
 
         CTSheet sheet = workbook.getSheets().addNewSheet();
         sheet.setName(sheetname);
@@ -824,7 +833,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         //delete the CTSheet reference from workbook.xml
         workbook.getSheets().removeSheet(index);
 
-        //calculation chain is auxilary, remove it as it may contain orfan references to deleted cells
+        //calculation chain is auxiliary, remove it as it may contain orphan references to deleted cells
         if(calcChain != null) {
             removeRelation(calcChain);
             calcChain = null;
@@ -1099,11 +1108,10 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * or contains /\?*[]
      *
      * @param sheet number (0 based)
-     * @see #validateSheetName(String)
      */
     public void setSheetName(int sheet, String name) {
         validateSheetIndex(sheet);
-        validateSheetName(name);
+        WorkbookUtil.validateSheetName(name);
         if (containsSheet(name, sheet ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
         workbook.getSheets().getSheetArray(sheet).setName(name);
@@ -1216,6 +1224,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 
     /**
      * Determines whether a workbook contains the provided sheet name.
+     * For the purpose of comparison, long names are truncated to 31 chars.
      *
      * @param name the name to test (case insensitive match)
      * @param excludeSheetIdx the sheet to exclude from the check or -1 to include all sheets in the check.
@@ -1225,62 +1234,21 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         CTSheet[] ctSheetArray = new CTSheet[workbook.getSheets().getSheetList().size()];
         workbook.getSheets().getSheetList().toArray(ctSheetArray);
         
+        if (name.length() > MAX_SENSITIVE_SHEET_NAME_LEN) {
+            name = name.substring(0, MAX_SENSITIVE_SHEET_NAME_LEN);
+        }
+
         for (int i = 0; i < ctSheetArray.length; i++) {
-            if (excludeSheetIdx != i && name.equalsIgnoreCase(ctSheetArray[i].getName()))
+            String ctName = ctSheetArray[i].getName();
+            if (ctName.length() > MAX_SENSITIVE_SHEET_NAME_LEN) {
+                ctName = ctName.substring(0, MAX_SENSITIVE_SHEET_NAME_LEN);
+            }
+
+            if (excludeSheetIdx != i && name.equalsIgnoreCase(ctName))
                 return true;
         }
         return false;
     }
-
-    /**
-     * Validates sheet name.
-     *
-     * <p>
-     * The character count <tt>MUST</tt> be greater than or equal to 1 and less than or equal to 31.
-     * The string MUST NOT contain the any of the following characters:
-     * <ul>
-     * <li> 0x0000 </li>
-     * <li> 0x0003 </li>
-     * <li> colon (:) </li>
-     * <li> backslash (\) </li>
-     * <li> asterisk (*) </li>
-     * <li> question mark (?) </li>
-     * <li> forward slash (/) </li>
-     * <li> opening square bracket ([) </li>
-     * <li> closing square bracket (]) </li>
-     * </ul>
-     * The string MUST NOT begin or end with the single quote (') character.
-     * </p>
-     *
-     * @param sheetName the name to validate
-     */
-    private static void validateSheetName(String sheetName) {
-        if (sheetName == null) {
-            throw new IllegalArgumentException("sheetName must not be null");
-        }
-        int len = sheetName.length();
-        if (len < 1 || len > 31) {
-            throw new IllegalArgumentException("sheetName '" + sheetName
-                    + "' is invalid - must be 1-30 characters long");
-        }
-        for (int i=0; i<len; i++) {
-            char ch = sheetName.charAt(i);
-            switch (ch) {
-                case '/':
-                case '\\':
-                case '?':
-                case '*':
-                case ']':
-                case '[':
-                    break;
-                default:
-                    // all other chars OK
-                    continue;
-            }
-            throw new IllegalArgumentException("Invalid char (" + ch
-                    + ") found at index (" + i + ") in sheet name '" + sheetName + "'");
-        }
-     }
 
     /**
      * Gets a boolean value that indicates whether the date systems used in the workbook starts in 1904.
@@ -1321,28 +1289,74 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         throw new RuntimeException("Not implemented yet");
     }
 
+    /**
+     * Check whether a sheet is hidden.
+     * <p>
+     * Note that a sheet could instead be set to be very hidden, which is different
+     *  ({@link #isSheetVeryHidden(int)})
+     * </p>
+     * @param sheetIx Number
+     * @return <code>true</code> if sheet is hidden
+     */
     public boolean isSheetHidden(int sheetIx) {
         validateSheetIndex(sheetIx);
         CTSheet ctSheet = sheets.get(sheetIx).sheet;
         return ctSheet.getState() == STSheetState.HIDDEN;
     }
 
+    /**
+     * Check whether a sheet is very hidden.
+     * <p>
+     * This is different from the normal hidden status
+     *  ({@link #isSheetHidden(int)})
+     * </p>
+     * @param sheetIx sheet index to check
+     * @return <code>true</code> if sheet is very hidden
+     */
     public boolean isSheetVeryHidden(int sheetIx) {
         validateSheetIndex(sheetIx);
         CTSheet ctSheet = sheets.get(sheetIx).sheet;
         return ctSheet.getState() == STSheetState.VERY_HIDDEN;
     }
 
+    /**
+     * Sets the visible state of this sheet.
+     * <p>
+     *   Calling <code>setSheetHidden(sheetIndex, true)</code> is equivalent to
+     *   <code>setSheetHidden(sheetIndex, Workbook.SHEET_STATE_HIDDEN)</code>.
+     * <br/>
+     *   Calling <code>setSheetHidden(sheetIndex, false)</code> is equivalent to
+     *   <code>setSheetHidden(sheetIndex, Workbook.SHEET_STATE_VISIBLE)</code>.
+     * </p>
+     *
+     * @param sheetIx   the 0-based index of the sheet
+     * @param hidden whether this sheet is hidden
+     * @see #setSheetHidden(int, int)
+     */
     public void setSheetHidden(int sheetIx, boolean hidden) {
-        validateSheetIndex(sheetIx);
-        CTSheet ctSheet = sheets.get(sheetIx).sheet;
-        ctSheet.setState(hidden ? STSheetState.HIDDEN : STSheetState.VISIBLE);
+        setSheetHidden(sheetIx, hidden ? SHEET_STATE_HIDDEN : SHEET_STATE_VISIBLE);
     }
 
-    public void setSheetHidden(int sheetIx, int hidden) {
+    /**
+     * Hide or unhide a sheet.
+     *
+     * <ul>
+     *  <li>0 - visible. </li>
+     *  <li>1 - hidden. </li>
+     *  <li>2 - very hidden.</li>
+     * </ul>
+     * @param sheetIx the sheet index (0-based)
+     * @param state one of the following <code>Workbook</code> constants:
+     *        <code>Workbook.SHEET_STATE_VISIBLE</code>,
+     *        <code>Workbook.SHEET_STATE_HIDDEN</code>, or
+     *        <code>Workbook.SHEET_STATE_VERY_HIDDEN</code>.
+     * @throws IllegalArgumentException if the supplied sheet index or state is invalid
+     */
+    public void setSheetHidden(int sheetIx, int state) {
         validateSheetIndex(sheetIx);
+        WorkbookUtil.validateSheetState(state);
         CTSheet ctSheet = sheets.get(sheetIx).sheet;
-        ctSheet.setState(STSheetState.Enum.forInt(hidden));
+        ctSheet.setState(STSheetState.Enum.forInt(state + 1));
     }
 
     /**

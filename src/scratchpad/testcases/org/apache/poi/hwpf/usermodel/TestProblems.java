@@ -21,6 +21,7 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.HWPFTestCase;
 import org.apache.poi.hwpf.HWPFTestDataSamples;
+import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.model.StyleSheet;
 
 /**
@@ -232,6 +233,38 @@ public final class TestProblems extends HWPFTestCase {
          }
       }
    }
+   
+   /**
+    * Bug #49936 - Problems with reading the header out of
+    *  the Header Stories
+    */
+   public void testProblemHeaderStories49936() throws Exception {
+      HWPFDocument doc = HWPFTestDataSamples.openSampleFile("HeaderFooterProblematic.doc");
+      HeaderStories hs = new HeaderStories(doc);
+      
+      assertEquals("", hs.getFirstHeader());
+      assertEquals("\r", hs.getEvenHeader());
+      assertEquals("", hs.getOddHeader());
+      
+      assertEquals("", hs.getFirstFooter());
+      assertEquals("", hs.getEvenFooter());
+      assertEquals("", hs.getOddFooter());
+      
+      WordExtractor ext = new WordExtractor(doc);
+      assertEquals("\n", ext.getHeaderText());
+      assertEquals("", ext.getFooterText());
+   }
+   
+   /**
+    * Bug #45877 - problematic PAPX with no parent set
+    */
+   public void testParagraphPAPXNoParent45877() throws Exception {
+      HWPFDocument doc = HWPFTestDataSamples.openSampleFile("Bug45877.doc");
+      assertEquals(17, doc.getRange().numParagraphs());
+      
+      assertEquals("First paragraph\r", doc.getRange().getParagraph(0).text());
+      assertEquals("After Crashing Part\r", doc.getRange().getParagraph(13).text());
+   }
 
    /**
     * Bug #48245 - don't include the text from the
@@ -305,6 +338,7 @@ public final class TestProblems extends HWPFTestCase {
       assertEquals(0, cell.getStartOffset());
       assertEquals(13, cell.getEndOffset());
       assertEquals("Row 1/Cell 1\u0007", cell.text());
+      assertEquals("Row 1/Cell 1\u0007", cell.getParagraph(0).text());
 
       cell = row.getCell(1);
       assertEquals(1, cell.numParagraphs());
@@ -313,6 +347,7 @@ public final class TestProblems extends HWPFTestCase {
       assertEquals(13, cell.getStartOffset());
       assertEquals(26, cell.getEndOffset());
       assertEquals("Row 1/Cell 2\u0007", cell.text());
+      assertEquals("Row 1/Cell 2\u0007", cell.getParagraph(0).text());
 
       cell = row.getCell(2);
       assertEquals(1, cell.numParagraphs());
@@ -321,6 +356,7 @@ public final class TestProblems extends HWPFTestCase {
       assertEquals(26, cell.getStartOffset());
       assertEquals(39, cell.getEndOffset());
       assertEquals("Row 1/Cell 3\u0007", cell.text());
+      assertEquals("Row 1/Cell 3\u0007", cell.getParagraph(0).text());
 
 
       // Onto row #2

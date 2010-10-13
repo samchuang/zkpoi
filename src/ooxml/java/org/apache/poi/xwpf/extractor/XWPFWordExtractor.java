@@ -20,17 +20,18 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.poi.POIXMLDocument;
-import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.POIXMLException;
+import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.model.XWPFCommentsDecorator;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.model.XWPFHyperlinkDecorator;
-import org.apache.poi.xwpf.model.XWPFParagraphDecorator;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFHyperlink;
+import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRelation;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
@@ -103,9 +104,25 @@ public class XWPFWordExtractor extends POIXMLTextExtractor {
 					extractHeaders(text, headerFooterPolicy);
 				}
 
-				XWPFParagraphDecorator decorator = new XWPFCommentsDecorator(
-						new XWPFHyperlinkDecorator(paragraph, null, fetchHyperlinks));
-				text.append(decorator.getText()).append('\n');
+				// Do the paragraph text
+				for(XWPFRun run : paragraph.getRuns()) {
+				   text.append(run.toString());
+				   if(run instanceof XWPFHyperlinkRun && fetchHyperlinks) {
+				      XWPFHyperlink link = ((XWPFHyperlinkRun)run).getHyperlink(document);
+				      if(link != null)
+				         text.append(" <" + link.getURL() + ">");
+				   }
+				}
+
+				// Add comments
+				XWPFCommentsDecorator decorator = new XWPFCommentsDecorator(paragraph, null);
+				text.append(decorator.getCommentText()).append('\n');
+				
+				// Do endnotes and footnotes
+				String footnameText = paragraph.getFootnoteText();
+			   if(footnameText != null && footnameText.length() > 0) {
+			      text.append(footnameText + "\n");
+			   }
 
 				if (ctSectPr!=null) {
 					extractFooters(text, headerFooterPolicy);
