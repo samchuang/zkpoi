@@ -24,6 +24,7 @@ import java.util.Stack;
 import org.apache.poi.hssf.record.formula.Area3DPtg;
 import org.apache.poi.hssf.record.formula.AreaErrPtg;
 import org.apache.poi.hssf.record.formula.AreaPtg;
+import org.apache.poi.hssf.record.formula.ArrayPtg;
 import org.apache.poi.hssf.record.formula.AttrPtg;
 import org.apache.poi.hssf.record.formula.BoolPtg;
 import org.apache.poi.hssf.record.formula.ControlPtg;
@@ -616,7 +617,11 @@ public final class WorkbookEvaluator {
 			// it is currently unsupported, and may not even get implemented here
 			throw new RuntimeException("ExpPtg currently not supported");
 		}
-
+		//20101014, henrichen@zkoss.org. bug #139: Unexpected ptg class RuntimeException when loading Excel file with special formula
+		if (ptg instanceof ArrayPtg) {
+			return new ArrayEval((ArrayPtg) ptg);
+		}
+		
 		throw new RuntimeException("Unexpected ptg class (" + ptg.getClass().getName() + ")");
 	}
     /**
