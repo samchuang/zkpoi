@@ -242,12 +242,19 @@ public final class XSSFRelation extends POIXMLRelation {
             "/xl/calcChain.xml",
             CalculationChain.class
     );
+    //20101018, henrichen@zkoss.org
     public static final XSSFRelation EXTERNAL_LINK = new XSSFRelation(
     		"application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml",
     		"http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink",
     		"/x1/externalLinks/externalLink#.xml",
     		ExternalLink.class
     );
+	public static final XSSFRelation CHARTS = new XSSFRelation(
+			"application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
+			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
+			"/xl/charts/chart#.xml",
+			XSSFChart.class
+	);
 
 	private XSSFRelation(String type, String rel, String defaultName, Class<? extends POIXMLDocumentPart> cls) {
         super(type, rel, defaultName, cls);

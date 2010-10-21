@@ -46,7 +46,6 @@ public class XWPFTable implements IBodyElement{
     protected List<XWPFTableRow> tableRows;
     protected List<String> styleIDs;
     protected IBody part;
-	private XWPFDocument document;
 
     public XWPFTable(CTTbl table, IBody part, int row, int col) {
         this(table, part);
@@ -71,12 +70,12 @@ public class XWPFTable implements IBodyElement{
         if (table.sizeOfTrArray() == 0)
             createEmptyTable(table);
 
-        for (CTRow row : table.getTrArray()) {
+        for (CTRow row : table.getTrList()) {
             StringBuffer rowText = new StringBuffer();
             XWPFTableRow tabRow = new XWPFTableRow(row, this);
             tableRows.add(tabRow);
-            for (CTTc cell : row.getTcArray()) {
-                for (CTP ctp : cell.getPArray()) {
+            for (CTTc cell : row.getTcList()) {
+                for (CTP ctp : cell.getPList()) {
                     XWPFParagraph p = new XWPFParagraph(ctp, part);
                     if (rowText.length() > 0) {
                         rowText.append('\t');
@@ -251,7 +250,7 @@ public class XWPFTable implements IBodyElement{
     /**
      * inserts a new tablerow 
      * @param pos
-     * @return
+     * @return  the inserted row
      */
     public XWPFTableRow insertNewTableRow(int pos){
     	if(pos >= 0 && pos <= tableRows.size()){
@@ -277,11 +276,6 @@ public class XWPFTable implements IBodyElement{
     	return false;
     }
 	
-    /**
-     * 
-     * @param pos
-     * @return
-     */
     public List<XWPFTableRow> getRows() {
         return tableRows;
     }
@@ -319,8 +313,6 @@ public class XWPFTable implements IBodyElement{
 	/**
 	 * returns the XWPFRow which belongs to the CTRow row
 	 * if this row is not existing in the table null will be returned
-	 * @param row
-	 * @return
 	 */
 	public XWPFTableRow getRow(CTRow row) {
 		for(int i=0; i<getRows().size(); i++){

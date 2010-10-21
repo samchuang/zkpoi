@@ -455,7 +455,13 @@ public interface Sheet extends Iterable<Row> {
      * @return true => protection enabled; false => protection disabled
      */
     boolean getProtect();
-
+    
+    /**
+     * Sets the protection enabled as well as the password
+     * @param password to set for protection. Pass <code>null</code> to remove protection
+     */
+    public void protectSheet(String password);
+    
     /**
      * Answer whether scenario protection is enabled or disabled
      *
@@ -807,5 +813,11 @@ public interface Sheet extends Iterable<Row> {
 	 */
 	public void addValidationData(DataValidation dataValidation);
 
-
+    /**
+     * Enable filtering for a range of cells
+     * 
+     * @param range the range of cells to filter
+     */
+    AutoFilter setAutoFilter(CellRangeAddress range);
+    
 }

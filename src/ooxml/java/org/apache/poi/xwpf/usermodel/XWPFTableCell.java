@@ -45,7 +45,7 @@ public class XWPFTableCell implements IBody {
         this.part = part;
         this.tableRow = tableRow;
         // NB: If a table cell does not include at least one block-level element, then this document shall be considered corrupt.
-        if(cell.getPArray().length<1)
+        if(cell.getPList().size()<1)
         	cell.addNewP();
         bodyElements = new ArrayList<IBodyElement>();
         paragraphs = new ArrayList<XWPFParagraph>();
@@ -74,6 +74,14 @@ public class XWPFTableCell implements IBody {
         return ctTc;
     }
 
+    /**
+     * returns an Iterator with paragraphs and tables
+     * @see org.apache.poi.xwpf.usermodel.IBody#getBodyElements()
+     */
+    public List<IBodyElement> getBodyElements(){
+      return Collections.unmodifiableList(bodyElements);
+    }
+    
     public void setParagraph(XWPFParagraph p) {
         if (ctTc.sizeOfPArray() == 0) {
             ctTc.addNewP();
@@ -83,10 +91,19 @@ public class XWPFTableCell implements IBody {
 
     /**
      * returns a list of paragraphs
-     * @return
      */
     public List<XWPFParagraph> getParagraphs(){
     		return paragraphs;
+    }
+    
+    /**
+     * Add a Paragraph to this Table Cell
+     * @return The paragraph which was added
+     */
+    public XWPFParagraph addParagraph() {
+       XWPFParagraph p = new XWPFParagraph(ctTc.addNewP(), this);
+       addParagraph(p);
+       return p;
     }
     
     /**
@@ -136,7 +153,7 @@ public class XWPFTableCell implements IBody {
     /**
      * add a new paragraph at position of the cursor
      * @param cursor
-     * @return
+     * @return the inserted paragraph
      */
     public XWPFParagraph insertNewParagraph(XmlCursor cursor){
     	if(!isCursorInTableCell(cursor))
@@ -172,11 +189,6 @@ public class XWPFTableCell implements IBody {
     	return newP;
     }
 
-	/**
-     * 
-     * @param cursor
-     * @return
-     */
 	public XWPFTable insertNewTbl(XmlCursor cursor) {
 		if(isCursorInTableCell(cursor)){
 			String uri = CTTbl.type.getName().getNamespaceURI();
@@ -214,8 +226,6 @@ public class XWPFTableCell implements IBody {
 	
 	/**
 	 * verifies that cursor is on the right position
-	 * @param cursor
-	 * @return
 	 */
 	private boolean isCursorInTableCell(XmlCursor cursor) {
 		XmlCursor verify = cursor.newCursor();
@@ -271,7 +281,7 @@ public class XWPFTableCell implements IBody {
 
 
 	/** 
-	 * @see org.apache.poi.xwpf.usermodel.IBodyPart#getTableArray(int)
+	 * @see org.apache.poi.xwpf.usermodel.IBody#getTableArray(int)
 	 */
 	public XWPFTable getTableArray(int pos) {
 		if(pos > 0 && pos < tables.size()){
@@ -282,7 +292,7 @@ public class XWPFTableCell implements IBody {
 
 
 	/** 
-	 * @see org.apache.poi.xwpf.usermodel.IBodyPart#getTables()
+	 * @see org.apache.poi.xwpf.usermodel.IBody#getTables()
 	 */
 	public List<XWPFTable> getTables() {
 		return Collections.unmodifiableList(tables);
@@ -296,7 +306,7 @@ public class XWPFTableCell implements IBody {
 	public void insertTable(int pos, XWPFTable table) {
 		bodyElements.add(pos, table);
 		int i;
-    	for (i = 0; i < ctTc.getTblArray().length; i++) {
+    	for (i = 0; i < ctTc.getTblList().size(); i++) {
 			CTTbl tbl = ctTc.getTblArray(i);
 			if(tbl == table.getCTTbl()){
 				break;
@@ -308,7 +318,7 @@ public class XWPFTableCell implements IBody {
 	public String getText(){
 		StringBuffer text = new StringBuffer();
 		for (XWPFParagraph p : paragraphs) {
-			text.append(p.readNewText());
+			text.append(p.getText());
 		}
 		return text.toString();
 	}
@@ -316,8 +326,6 @@ public class XWPFTableCell implements IBody {
 
 	/**
 	 * get the TableCell which belongs to the TableCell
-	 * @param o
-	 * @return
 	 */
 	public XWPFTableCell getTableCell(CTTc cell) {
 		XmlCursor cursor = cell.newCursor();

@@ -18,35 +18,30 @@ package org.apache.poi.xwpf.usermodel;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTEmpty;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFtnEdnRef;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHyperlink;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTInd;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTJc;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTOnOff;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPBdr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPTab;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPicture;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTProofErr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRunTrackChange;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtContentRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSimpleField;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSpacing;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTextAlignment;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
@@ -54,8 +49,6 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STJc;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STLineSpacingRule;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTextAlignment;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 
 /**
@@ -68,13 +61,7 @@ public class XWPFParagraph implements IBodyElement{
     protected XWPFDocument document;
     protected List<XWPFRun> runs;
     
-    /**
-     * TODO - replace with RichText String
-     */
-    private StringBuffer text = new StringBuffer();
-    private StringBuffer pictureText = new StringBuffer();
     private StringBuffer footnoteText = new StringBuffer();
-
 
     public XWPFParagraph(CTP prgrph) {
         this(prgrph, null);
@@ -93,109 +80,74 @@ public class XWPFParagraph implements IBodyElement{
         }
         
         runs = new ArrayList<XWPFRun>();
-        if (prgrph.getRList().size() > 0) {
-           for(CTR ctRun : prgrph.getRList()) {
-              runs.add(new XWPFRun(ctRun, this));
-           }
-        }
 
-        if (!isEmpty()) {
-           readNewText();
-        }
-    }
-    
-    protected String readNewText() {
-      StringBuffer text = new StringBuffer();
-      
-      // All the runs to loop over
-      // TODO - replace this with some sort of XPath expression
-      // to directly find all the CTRs, in the right order
-      ArrayList<CTR> rs = new ArrayList<CTR>();
-      rs.addAll( paragraph.getRList() );
-      
-      for (CTSdtRun sdt : paragraph.getSdtList()) {
-          CTSdtContentRun run = sdt.getSdtContent();
-          rs.addAll( run.getRList() );
-      }
-      for (CTRunTrackChange c : paragraph.getDelList()) {
-          rs.addAll( c.getRList() );
-      }
-      for (CTRunTrackChange c : paragraph.getInsList()) {
-          rs.addAll( c.getRList() );
-      }
-
-      // Get text of the paragraph
-      for (int j = 0; j < rs.size(); j++) {
-          // Grab the text and tabs of the paragraph
-          // Do so in a way that preserves the ordering
-          XmlCursor c = rs.get(j).newCursor();
-          c.selectPath("./*");
-          while (c.toNextSelection()) {
-              XmlObject o = c.getObject();
-              if (o instanceof CTText) {
-                  text.append(((CTText) o).getStringValue());
-              }
-              if (o instanceof CTPTab) {
-                  text.append("\t");
-              }
-              if (o instanceof CTEmpty) {
-                 // Some inline text elements get returned not as
-                 //  themselves, but as CTEmpty, owing to some odd
-                 //  definitions around line 5642 of the XSDs
-                 String tagName = o.getDomNode().getNodeName();
-                 if ("w:tab".equals(tagName)) {
-                    text.append("\t");
-                 }
-                 if ("w:cr".equals(tagName)) {
-                    text.append("\n");
-                 }
-              }
-              
-              // Check for bits that only apply when
-              //  attached to a core document
-              if(document != null) {
-                 //got a reference to a footnote
-                 if (o instanceof CTFtnEdnRef) {
-                     CTFtnEdnRef ftn = (CTFtnEdnRef) o;
-                     footnoteText.append("[").append(ftn.getId()).append(": ");
-                     XWPFFootnote footnote =
-                             ftn.getDomNode().getLocalName().equals("footnoteReference") ?
-                                     document.getFootnoteByID(ftn.getId().intValue()) :
-                                     document.getEndnoteByID(ftn.getId().intValue());
-   
-                     boolean first = true;
-                     for (XWPFParagraph p : footnote.getParagraphs()) {
-                         if (!first) {
-                             footnoteText.append("\n");
-                             first = false;
-                         }
-                         footnoteText.append(p.getText());
-                     }
-   
-                     footnoteText.append("]");
-                 }
-              }
+       // Get all our child nodes in order, and process them
+       //  into XWPFRuns where we can
+       XmlCursor c = paragraph.newCursor();
+       c.selectPath("child::*");
+       while (c.toNextSelection()) {
+          XmlObject o = c.getObject();
+          if(o instanceof CTR) {
+             runs.add(new XWPFRun((CTR)o, this));
           }
-
-          // Loop over pictures inside our
-          // paragraph, looking for text in them
-          for(CTPicture pict : rs.get(j).getPictList()) {
-              XmlObject[] t = pict
-                      .selectPath("declare namespace w='http://schemas.openxmlformats.org/wordprocessingml/2006/main' .//w:t");
-              for (int m = 0; m < t.length; m++) {
-                  NodeList kids = t[m].getDomNode().getChildNodes();
-                  for (int n = 0; n < kids.getLength(); n++) {
-                      if (kids.item(n) instanceof Text) {
-                          pictureText.append("\n");
-                          pictureText.append(kids.item(n).getNodeValue());
+          if(o instanceof CTHyperlink) {
+             CTHyperlink link = (CTHyperlink)o;
+             for(CTR r : link.getRList()) {
+                runs.add(new XWPFHyperlinkRun(link, r, this));
+             }
+          }
+          if(o instanceof CTSdtRun) {
+             CTSdtContentRun run = ((CTSdtRun)o).getSdtContent();
+             for(CTR r : run.getRList()) {
+                runs.add(new XWPFRun(r, this));
+             }
+          }
+          if(o instanceof CTRunTrackChange) {
+             for(CTR r : ((CTRunTrackChange)o).getRList()) {
+                runs.add(new XWPFRun(r, this));
+             }
+          }
+          if(o instanceof CTSimpleField) {
+             for(CTR r : ((CTSimpleField)o).getRList()) {
+                runs.add(new XWPFRun(r, this));
+             }
+          }
+       }
+       
+       // Look for bits associated with the runs
+       for(XWPFRun run : runs) {
+          CTR r = run.getCTR();
+          
+          // Check for bits that only apply when
+          //  attached to a core document
+          // TODO Make this nicer by tracking the XWPFFootnotes directly
+          if(document != null) {
+             c = r.newCursor();
+             c.selectPath("child::*");
+             while (c.toNextSelection()) {
+                XmlObject o = c.getObject();
+                if(o instanceof CTFtnEdnRef) {
+                   CTFtnEdnRef ftn = (CTFtnEdnRef)o;
+                   footnoteText.append("[").append(ftn.getId()).append(": ");
+                   XWPFFootnote footnote =
+                      ftn.getDomNode().getLocalName().equals("footnoteReference") ?
+                            document.getFootnoteByID(ftn.getId().intValue()) :
+                            document.getEndnoteByID(ftn.getId().intValue());
+   
+                   boolean first = true;
+                   for (XWPFParagraph p : footnote.getParagraphs()) {
+                      if (!first) {
+                         footnoteText.append("\n");
+                         first = false;
                       }
-                  }
-              }
+                      footnoteText.append(p.getText());
+                   }
+   
+                   footnoteText.append("]");
+                }
+             }
           }
       }
-      
-      this.text = text;
-      return text.toString();
     }
 
     @Internal
@@ -221,7 +173,10 @@ public class XWPFParagraph implements IBodyElement{
      */
     public String getText() {
         StringBuffer out = new StringBuffer();
-        out.append(text).append(footnoteText).append(pictureText);
+        for(XWPFRun run : runs) {
+           out.append(run.toString());
+        }
+        out.append(footnoteText);
         return out.toString();
     }
 	
@@ -275,14 +230,22 @@ public class XWPFParagraph implements IBodyElement{
      * paragraph
      */
     public String getParagraphText() {
-        return text.toString();
+       StringBuffer out = new StringBuffer();
+       for(XWPFRun run : runs) {
+          out.append(run.toString());
+       }
+       return out.toString();
     }
 
     /**
      * Returns any text from any suitable pictures in the paragraph
      */
     public String getPictureText() {
-        return pictureText.toString();
+       StringBuffer out = new StringBuffer();
+       for(XWPFRun run : runs) {
+          out.append(run.getPictureText());
+       }
+       return out.toString();
     }
 
     /**
@@ -1133,12 +1096,9 @@ public class XWPFParagraph implements IBodyElement{
      */
     protected void addRun(CTR run){
     	int pos;
-    	pos = paragraph.getRArray().length;
+    	pos = paragraph.getRList().size();
     	paragraph.addNewR();
     	paragraph.setRArray(pos, run);
-    	for (CTText ctText: paragraph.getRArray(pos).getTArray()) {
-			this.text.append(ctText.getStringValue());	
-		}
     }
     
     /**
@@ -1146,8 +1106,7 @@ public class XWPFParagraph implements IBodyElement{
      * If it finds the string, it will return true and the position of the String
      * will be saved in the parameter startPos.
      * @param searched
-     * @param pos
-     * @return
+     * @param startPos
      */
     public TextSegement searchText(String searched,PositionInParagraph startPos){
     	
@@ -1156,7 +1115,7 @@ public class XWPFParagraph implements IBodyElement{
     		startChar = startPos.getChar();
     	int beginRunPos = 0, candCharPos = 0;
     	boolean newList = false;
-    	for (int runPos=startRun; runPos<paragraph.getRArray().length; runPos++) {
+    	for (int runPos=startRun; runPos<paragraph.getRList().size(); runPos++) {
     		int beginTextPos = 0,beginCharPos = 0, textPos = 0,  charPos = 0;	
 	    	CTR ctRun = paragraph.getRArray(runPos);
     		XmlCursor c = ctRun.newCursor();
@@ -1212,7 +1171,7 @@ public class XWPFParagraph implements IBodyElement{
     /**
      * insert a new Run in RunArray
      * @param pos
-     * @return
+     * @return  the inserted run
      */
     public XWPFRun insertNewRun(int pos){
     	 if (pos >= 0 && pos <= paragraph.sizeOfRArray()) {
@@ -1228,8 +1187,7 @@ public class XWPFParagraph implements IBodyElement{
     
     /**
      * get a Text
-     * @param posList
-     * @return
+     * @param segment
      */
     public String getText(TextSegement segment){
     int runBegin = segment.getBeginRun();
@@ -1240,7 +1198,7 @@ public class XWPFParagraph implements IBodyElement{
     int charEnd	= segment.getEndChar();
     StringBuffer out = new StringBuffer();
     	for(int i=runBegin; i<=runEnd;i++){
-    		int startText=0, endText = paragraph.getRArray(i).getTArray().length-1;
+    		int startText=0, endText = paragraph.getRArray(i).getTList().size()-1;
     		if(i==runBegin)
     			startText=textBegin;
     		if(i==runEnd)
@@ -1263,7 +1221,7 @@ public class XWPFParagraph implements IBodyElement{
     /**
      * removes a Run at the position pos in the paragraph
      * @param pos
-     * @return
+     * @return true if the run was removed
      */
     public boolean removeRun(int pos){
     	 if (pos >= 0 && pos < paragraph.sizeOfRArray()){
@@ -1303,8 +1261,6 @@ public class XWPFParagraph implements IBodyElement{
 	
 	/**
 	 * adds a new Run to the Paragraph
-	 * @param r
-	 * @return
 	 */
 	public void addRun(XWPFRun r){
 		runs.add(r);
@@ -1312,8 +1268,6 @@ public class XWPFParagraph implements IBodyElement{
 	
 	/**
 	 * return the XWPFRun-Element which owns the CTR run-Element
-	 * @param r
-	 * @return
 	 */
 	public XWPFRun getRun(CTR r){
 		for(int i=0; i < getRuns().size(); i++){

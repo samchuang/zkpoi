@@ -96,22 +96,22 @@ public class TestXWPFWordExtractor extends TestCase {
         XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
 
         // Now check contents
-        // TODO - fix once correctly handling contents
         extractor.setFetchHyperlinks(false);
         assertEquals(
-//				"This is a test document\nThis bit is in bold and italic\n" +
-//				"Back to normal\nWe have a hyperlink here, and another.\n",
-                "This is a test document\nThis bit is in bold and italic\n" +
-                        "Back to normal\nWe have a  here, and .hyperlinkanother\n",
+				"This is a test document.\nThis bit is in bold and italic\n" +
+				"Back to normal\n" +
+				"This contains BOLD, ITALIC and BOTH, as well as RED and YELLOW text.\n" +
+				"We have a hyperlink here, and another.\n",
                 extractor.getText()
         );
 
+        // One hyperlink is a real one, one is just to the top of page
         extractor.setFetchHyperlinks(true);
         assertEquals(
-//				"This is a test document\nThis bit is in bold and italic\n" +
-//				"Back to normal\nWe have a hyperlink here, and another.\n",
-                "This is a test document\nThis bit is in bold and italic\n" +
-                        "Back to normal\nWe have a  here, and .hyperlink <http://poi.apache.org/>another\n",
+				"This is a test document.\nThis bit is in bold and italic\n" +
+				"Back to normal\n" +
+				"This contains BOLD, ITALIC and BOTH, as well as RED and YELLOW text.\n" +
+				"We have a hyperlink <http://poi.apache.org/> here, and another.\n",
                 extractor.getText()
         );
     }
@@ -236,5 +236,30 @@ public class TestXWPFWordExtractor extends TestCase {
        
        // Now check the first paragraph in total
        assertTrue(extractor.getText().contains("a\tb\n"));
+    }
+    
+    /**
+     * The output should not contain field codes, e.g. those specified in the
+     * w:instrText tag (spec sec. 17.16.23)
+     */
+    public void testNoFieldCodes() {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("FieldCodes.docx");
+        XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
+        String text = extractor.getText();
+        assertTrue(text.length() > 0);
+        assertFalse(text.contains("AUTHOR"));
+        assertFalse(text.contains("CREATEDATE"));
+    }
+    
+    /**
+     * The output should contain the values of simple fields, those specified
+     * with the fldSimple element (spec sec. 17.16.19)
+     */
+    public void testFldSimpleContent() {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("FldSimple.docx");
+        XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
+        String text = extractor.getText();
+        assertTrue(text.length() > 0);
+        assertTrue(text.contains("FldSimple.docx"));
     }
 }

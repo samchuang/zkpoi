@@ -17,6 +17,8 @@
 
 package org.apache.poi.xssf.usermodel;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.apache.poi.POIXMLDocumentPart;
@@ -28,6 +30,7 @@ import org.apache.poi.ss.usermodel.BaseTestBugzillaIssues;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,6 +38,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.XSSFITestDataProvider;
 import org.apache.poi.xssf.XSSFTestDataSamples;
+import org.apache.poi.xssf.model.CalculationChain;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellFill;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 
@@ -396,5 +400,186 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
              fail();
           } catch(IllegalStateException e) {}
        }
+    }
+
+    /**
+     * A problem file from a non-standard source (a scientific instrument that saves its
+     * output as an .xlsx file) that have two issues:
+     * 1. The Content Type part name is lower-case:  [content_types].xml
+     * 2. The file appears to use backslashes as path separators
+     *
+     * The OPC spec tolerates both of these peculiarities, so does POI
+     */
+    public void test49609() throws Exception {
+        XSSFWorkbook wb =  XSSFTestDataSamples.openSampleWorkbook("49609.xlsx");
+        assertEquals("FAM", wb.getSheetName(0));
+        assertEquals("Cycle", wb.getSheetAt(0).getRow(0).getCell(1).getStringCellValue());
+
+    }
+
+    public void test49783() throws Exception {
+        Workbook wb =  XSSFTestDataSamples.openSampleWorkbook("49783.xlsx");
+        Sheet sheet = wb.getSheetAt(0);
+        FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
+        Cell cell;
+
+        cell = sheet.getRow(0).getCell(0);
+        assertEquals("#REF!*#REF!", cell.getCellFormula());
+        assertEquals(Cell.CELL_TYPE_ERROR, evaluator.evaluateInCell(cell).getCellType());
+        assertEquals("#REF!", FormulaError.forInt(cell.getErrorCellValue()).getString());
+
+        Name nm1 = wb.getName("sale_1");
+        assertNotNull("name sale_1 should be present", nm1);
+        assertEquals("Sheet1!#REF!", nm1.getRefersToFormula());
+        Name nm2 = wb.getName("sale_2");
+        assertNotNull("name sale_2 should be present", nm2);
+        assertEquals("Sheet1!#REF!", nm2.getRefersToFormula());
+
+        cell = sheet.getRow(1).getCell(0);
+        assertEquals("sale_1*sale_2", cell.getCellFormula());
+        assertEquals(Cell.CELL_TYPE_ERROR, evaluator.evaluateInCell(cell).getCellType());
+        assertEquals("#REF!", FormulaError.forInt(cell.getErrorCellValue()).getString());
+    }
+    
+    /**
+     * Creating a rich string of "hello world" and applying
+     *  a font to characters 1-5 means we have two strings,
+     *  "hello" and " world". As such, we need to apply
+     *  preserve spaces to the 2nd bit, lest we end up
+     *  with something like "helloworld" !
+     */
+    public void test49941() throws Exception {
+       XSSFWorkbook wb = new XSSFWorkbook();
+       XSSFSheet s = wb.createSheet();
+       XSSFRow r = s.createRow(0);
+       XSSFCell c = r.createCell(0);
+       
+       // First without fonts
+       c.setCellValue(
+             new XSSFRichTextString(" with spaces ")
+       );
+       assertEquals(" with spaces ", c.getRichStringCellValue().toString());
+       assertEquals(0, c.getRichStringCellValue().getCTRst().sizeOfRArray());
+       assertEquals(true, c.getRichStringCellValue().getCTRst().isSetT());
+       // Should have the preserve set
+       assertEquals(
+             1,
+             c.getRichStringCellValue().getCTRst().xgetT().getDomNode().getAttributes().getLength()
+       );
+       assertEquals(
+             "preserve",
+             c.getRichStringCellValue().getCTRst().xgetT().getDomNode().getAttributes().item(0).getNodeValue()
+       );
+       
+       // Save and check
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       s = wb.getSheetAt(0);
+       r = s.getRow(0);
+       c = r.getCell(0);
+       assertEquals(" with spaces ", c.getRichStringCellValue().toString());
+       assertEquals(0, c.getRichStringCellValue().getCTRst().sizeOfRArray());
+       assertEquals(true, c.getRichStringCellValue().getCTRst().isSetT());
+       
+       // Change the string
+       c.setCellValue(
+             new XSSFRichTextString("hello world")
+       );
+       assertEquals("hello world", c.getRichStringCellValue().toString());
+       // Won't have preserve
+       assertEquals(
+             0,
+             c.getRichStringCellValue().getCTRst().xgetT().getDomNode().getAttributes().getLength()
+       );
+       
+       // Apply a font
+       XSSFFont f = wb.createFont();
+       f.setBold(true);
+       c.getRichStringCellValue().applyFont(0, 5, f);
+       assertEquals("hello world", c.getRichStringCellValue().toString());
+       // Does need preserving on the 2nd part
+       assertEquals(2, c.getRichStringCellValue().getCTRst().sizeOfRArray());
+       assertEquals(
+             0,
+             c.getRichStringCellValue().getCTRst().getRArray(0).xgetT().getDomNode().getAttributes().getLength()
+       );
+       assertEquals(
+             1,
+             c.getRichStringCellValue().getCTRst().getRArray(1).xgetT().getDomNode().getAttributes().getLength()
+       );
+       assertEquals(
+             "preserve",
+             c.getRichStringCellValue().getCTRst().getRArray(1).xgetT().getDomNode().getAttributes().item(0).getNodeValue()
+       );
+       
+       // Save and check
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       s = wb.getSheetAt(0);
+       r = s.getRow(0);
+       c = r.getCell(0);
+       assertEquals("hello world", c.getRichStringCellValue().toString());
+    }
+    
+    /**
+     * Repeatedly writing the same file which has styles
+     * TODO Currently failing
+     */
+    public void DISABLEDtest49940() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("styles.xlsx");
+       assertEquals(3, wb.getNumberOfSheets());
+       assertEquals(10, wb.getStylesSource().getNumCellStyles());
+       
+       ByteArrayOutputStream b1 = new ByteArrayOutputStream();
+       ByteArrayOutputStream b2 = new ByteArrayOutputStream();
+       ByteArrayOutputStream b3 = new ByteArrayOutputStream();
+       wb.write(b1);
+       wb.write(b2);
+       wb.write(b3);
+       
+       for(byte[] data : new byte[][] {
+             b1.toByteArray(), b2.toByteArray(), b3.toByteArray()
+       }) {
+          ByteArrayInputStream bais = new ByteArrayInputStream(data);
+          wb = new XSSFWorkbook(bais);
+          assertEquals(3, wb.getNumberOfSheets());
+          assertEquals(10, wb.getStylesSource().getNumCellStyles());
+       }
+    }
+
+    /**
+     * Various ways of removing a cell formula should all zap
+     *  the calcChain entry.
+     */
+    public void test49966() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("shared_formulas.xlsx");
+       XSSFSheet sheet = wb.getSheetAt(0);
+       
+       // CalcChain has lots of entries
+       CalculationChain cc = wb.getCalculationChain();
+       assertEquals("A2", cc.getCTCalcChain().getCArray(0).getR());
+       assertEquals("A3", cc.getCTCalcChain().getCArray(1).getR());
+       assertEquals("A4", cc.getCTCalcChain().getCArray(2).getR());
+       assertEquals("A5", cc.getCTCalcChain().getCArray(3).getR());
+       assertEquals("A6", cc.getCTCalcChain().getCArray(4).getR());
+       assertEquals("A7", cc.getCTCalcChain().getCArray(5).getR());
+       
+       // Try various ways of changing the formulas
+       // If it stays a formula, chain entry should remain
+       // Otherwise should go
+       sheet.getRow(1).getCell(0).setCellFormula("A1"); // stay
+       sheet.getRow(2).getCell(0).setCellFormula(null);  // go
+       sheet.getRow(3).getCell(0).setCellType(Cell.CELL_TYPE_FORMULA); // stay
+       sheet.getRow(4).getCell(0).setCellType(Cell.CELL_TYPE_STRING);  // go
+       sheet.getRow(5).removeCell(
+             sheet.getRow(5).getCell(0)  // go
+       );
+       
+       // Save and check
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       sheet = wb.getSheetAt(0);
+       
+       cc = wb.getCalculationChain();
+       assertEquals("A2", cc.getCTCalcChain().getCArray(0).getR());
+       assertEquals("A4", cc.getCTCalcChain().getCArray(1).getR());
+       assertEquals("A7", cc.getCTCalcChain().getCArray(2).getR());
     }
 }

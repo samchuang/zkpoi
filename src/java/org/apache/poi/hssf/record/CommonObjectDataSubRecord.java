@@ -32,7 +32,13 @@ public final class CommonObjectDataSubRecord extends SubRecord {
     public final static short sid = 0x0015;
 
     private static final BitField locked    = BitFieldFactory.getInstance(0x0001);
+    private static final BitField defaultSize = BitFieldFactory.getInstance(0x0004);
+    private static final BitField published = BitFieldFactory.getInstance(0x0008); 
     private static final BitField printable = BitFieldFactory.getInstance(0x0010);
+    private static final BitField disabled  = BitFieldFactory.getInstance(0x0080);
+    private static final BitField uiobj     = BitFieldFactory.getInstance(0x0100);
+    private static final BitField recalcobj = BitFieldFactory.getInstance(0x0200);
+    private static final BitField recalcobjalways = BitFieldFactory.getInstance(0x1000);
     private static final BitField autofill  = BitFieldFactory.getInstance(0x2000);
     private static final BitField autoline  = BitFieldFactory.getInstance(0x4000);
 
@@ -110,8 +116,14 @@ public final class CommonObjectDataSubRecord extends SubRecord {
             .append("0x").append(HexDump.toHex(  getOption ()))
             .append(" (").append( getOption() ).append(" )");
         buffer.append(System.getProperty("line.separator")); 
-        buffer.append("         .locked                   = ").append(isLocked()).append('\n'); 
+        buffer.append("         .locked                   = ").append(isLocked()).append('\n');
+        buffer.append("         .defaultSize              = ").append(isDefaultSize()).append('\n');
+        buffer.append("         .published                = ").append(isPublished()).append('\n');
         buffer.append("         .printable                = ").append(isPrintable()).append('\n'); 
+        buffer.append("         .disabled                 = ").append(isDisabled()).append('\n');
+        buffer.append("         .uiobj                    = ").append(isUiObj()).append('\n');
+        buffer.append("         .recalcobj                = ").append(isRecalcObj()).append('\n');
+        buffer.append("         .recalcobjalways          = ").append(isRecalcObjAlways()).append('\n');
         buffer.append("         .autofill                 = ").append(isAutofill()).append('\n'); 
         buffer.append("         .autoline                 = ").append(isAutoline()).append('\n'); 
         buffer.append("    .reserved1            = ")
@@ -399,5 +411,111 @@ public final class CommonObjectDataSubRecord extends SubRecord {
     public boolean isAutoline()
     {
         return autoline.isSet(field_3_option);
+    }
+
+    /**
+     * Sets the recalcObj field value.
+     * whether update obj on load of the sheet.
+     */
+    public void setRecalcObj(boolean value)
+    {
+        field_3_option = recalcobj.setShortBoolean(field_3_option, value);
+    }
+
+    /**
+     * whether update obj on load of the sheet.
+     * @return  the uiobj field value.
+     */
+    public boolean isRecalcObj()
+    {
+        return recalcobj.isSet(field_3_option);
+    }
+
+    /**
+     * Sets the recalcObjAlways field value.
+     * whether update obj on associated cell changes.
+     */
+    public void setRecalcObjAlways(boolean value)
+    {
+        field_3_option = recalcobjalways.setShortBoolean(field_3_option, value);
+    }
+
+    /**
+     * whether update obj on associated cell changes.
+     * @return  the uiobj field value.
+     */
+    public boolean isRecalcObjAlways()
+    {
+        return recalcobjalways.isSet(field_3_option);
+    }
+
+    /**
+     * Sets the uiobj field value.
+     * whether an app inserted object
+     */
+    public void setUiObj(boolean value)
+    {
+        field_3_option = uiobj.setShortBoolean(field_3_option, value);
+    }
+
+    /**
+     * whether an app inserted object
+     * @return  the uiobj field value.
+     */
+    public boolean isUiObj()
+    {
+        return uiobj.isSet(field_3_option);
+    }
+
+    /**
+     * Sets the disabled field value.
+     * whether object uses an automatic line style
+     */
+    public void setDisabled(boolean value)
+    {
+        field_3_option = disabled.setShortBoolean(field_3_option, value);
+    }
+
+    /**
+     * whether object is disabled
+     * @return  the disabled field value.
+     */
+    public boolean isDisabled()
+    {
+        return disabled.isSet(field_3_option);
+    }
+
+    /**
+     * Sets the published field value.
+     */
+    public void setPublished(boolean value)
+    {
+        field_3_option = published.setShortBoolean(field_3_option, value);
+    }
+
+    /**
+     * whether chart object published along with sheet. 
+     * @return  the publishd field value.
+     */
+    public boolean isPublished()
+    {
+        return published.isSet(field_3_option);
+    }
+
+    /**
+     * Set whether the application is expected to choose the object’s size.
+     */
+    public void setDefaultSize(boolean value)
+    {
+        field_3_option = defaultSize.setShortBoolean(field_3_option, value);
+    }
+
+    /** 
+     * whether the application is expected to choose the object’s size     
+     * @return  the defaultSize field value.
+     */
+    public boolean isDefaultSize()
+    {
+        return defaultSize.isSet(field_3_option);
     }
 }

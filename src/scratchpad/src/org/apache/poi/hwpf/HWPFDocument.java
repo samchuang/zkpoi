@@ -17,26 +17,43 @@
 
 package org.apache.poi.hwpf;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.PushbackInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.ByteArrayInputStream;
-
 import java.util.Iterator;
+import java.util.List;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.POIDocument;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.hwpf.model.CHPBinTable;
+import org.apache.poi.hwpf.model.CPSplitCalculator;
+import org.apache.poi.hwpf.model.ComplexFileTable;
+import org.apache.poi.hwpf.model.DocumentProperties;
+import org.apache.poi.hwpf.model.EscherRecordHolder;
+import org.apache.poi.hwpf.model.FSPATable;
+import org.apache.poi.hwpf.model.FontTable;
+import org.apache.poi.hwpf.model.GenericPropertyNode;
+import org.apache.poi.hwpf.model.ListTables;
+import org.apache.poi.hwpf.model.PAPBinTable;
+import org.apache.poi.hwpf.model.PicturesTable;
+import org.apache.poi.hwpf.model.PlexOfCps;
+import org.apache.poi.hwpf.model.PropertyNode;
+import org.apache.poi.hwpf.model.RevisionMarkAuthorTable;
+import org.apache.poi.hwpf.model.SavedByTable;
+import org.apache.poi.hwpf.model.SectionTable;
+import org.apache.poi.hwpf.model.ShapesTable;
+import org.apache.poi.hwpf.model.StyleSheet;
+import org.apache.poi.hwpf.model.TextPiece;
+import org.apache.poi.hwpf.model.TextPieceTable;
+import org.apache.poi.hwpf.model.io.HWPFFileSystem;
+import org.apache.poi.hwpf.model.io.HWPFOutputStream;
+import org.apache.poi.hwpf.usermodel.HWPFList;
+import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.poifs.common.POIFSConstants;
-
-import org.apache.poi.hwpf.model.*;
-import org.apache.poi.hwpf.model.io.*;
-import org.apache.poi.hwpf.usermodel.*;
+import org.apache.poi.poifs.filesystem.DirectoryNode;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 
 /**
@@ -46,16 +63,10 @@ import org.apache.poi.hwpf.usermodel.*;
  *
  * @author Ryan Ackley
  */
-public final class HWPFDocument extends POIDocument
-//  implements Cloneable
+public final class HWPFDocument extends HWPFDocumentCore
 {
-  /** The FIB */
-  protected FileInformationBlock _fib;
   /** And for making sense of CP lengths in the FIB */
   protected CPSplitCalculator _cpSplit;
-
-  /** main document stream buffer*/
-  protected byte[] _mainStream;
 
   /** table stream buffer*/
   protected byte[] _tableStream;
@@ -71,24 +82,6 @@ public final class HWPFDocument extends POIDocument
   protected ComplexFileTable _cft;
 
   protected TextPieceTable _tpt;
-
-  /** Contains formatting properties for text*/
-  protected CHPBinTable _cbt;
-
-  /** Contains formatting properties for paragraphs*/
-  protected PAPBinTable _pbt;
-
-  /** Contains formatting properties for sections.*/
-  protected SectionTable _st;
-
-  /** Holds styles for this document.*/
-  protected StyleSheet _ss;
-
-  /** Holds fonts for this document.*/
-  protected FontTable _ft;
-
-  /** Hold list tables */
-  protected ListTables _lt;
 
   /** Holds the save history for this document. */
   protected SavedByTable _sbt;
@@ -110,29 +103,7 @@ public final class HWPFDocument extends POIDocument
 
   protected HWPFDocument()
   {
-     super(null, null);
-  }
-
-  /**
-   * Takens an InputStream, verifies that it's not RTF, builds a
-   *  POIFSFileSystem from it, and returns that.
-   */
-  public static POIFSFileSystem verifyAndBuildPOIFS(InputStream istream) throws IOException {
-	// Open a PushbackInputStream, so we can peek at the first few bytes
-	PushbackInputStream pis = new PushbackInputStream(istream,6);
-	byte[] first6 = new byte[6];
-	pis.read(first6);
-
-	// Does it start with {\rtf ? If so, it's really RTF
-	if(first6[0] == '{' && first6[1] == '\\' && first6[2] == 'r'
-		&& first6[3] == 't' && first6[4] == 'f') {
-		throw new IllegalArgumentException("The document is really a RTF file");
-	}
-
-	// OK, so it's not RTF
-	// Open a POIFSFileSystem on the (pushed back) stream
-	pis.unread(first6);
-	return new POIFSFileSystem(pis);
+     super();
   }
 
   /**
@@ -171,21 +142,16 @@ public final class HWPFDocument extends POIDocument
    */
   public HWPFDocument(DirectoryNode directory, POIFSFileSystem pfilesystem) throws IOException
   {
-    // Sort out the hpsf properties
+    // Load the main stream and FIB
+    // Also handles HPSF bits
 	super(directory, pfilesystem);
 
-    // read in the main stream.
-    DocumentEntry documentProps = (DocumentEntry)
-       directory.getEntry("WordDocument");
-    _mainStream = new byte[documentProps.getSize()];
-
-    directory.createDocumentInputStream("WordDocument").read(_mainStream);
-
-    // Create our FIB, and check for the doc being encrypted
-    _fib = new FileInformationBlock(_mainStream);
+    // Do the CP Split
     _cpSplit = new CPSplitCalculator(_fib);
-    if(_fib.isFEncrypted()) {
-    	throw new EncryptedDocumentException("Cannot process encrypted word files!");
+    
+    // Is this document too old for us?
+    if(_fib.getNFib() < 106) {
+        throw new OldWordFileFormatException("The document is too old - Word 95 or older. Try HWPFOldDocument instead?");
     }
 
     // use the fib to determine the name of the table stream.
@@ -293,15 +259,11 @@ public final class HWPFDocument extends POIDocument
     }
   }
 
-  public StyleSheet getStyleSheet()
+  public TextPieceTable getTextTable()
   {
-    return _ss;
+    return _cft.getTextPieceTable();
   }
 
-  public FileInformationBlock getFileInformationBlock()
-  {
-    return _fib;
-  }
   public CPSplitCalculator getCPSplitCalculator()
   {
 	return _cpSplit;
@@ -319,8 +281,7 @@ public final class HWPFDocument extends POIDocument
    */
   public Range getOverallRange() {
 	  // hack to get the ending cp of the document, Have to revisit this.
-	  java.util.List text = _tpt.getTextPieces();
-	  PropertyNode p = (PropertyNode)text.get(text.size() - 1);
+      PropertyNode p =  _tpt.getTextPieces().get(_tpt.getTextPieces().size() - 1);
 
       return new Range(0, p.getEnd(), this);
   }
@@ -394,21 +355,16 @@ public final class HWPFDocument extends POIDocument
    */
   public int characterLength()
   {
-    java.util.List textPieces = _tpt.getTextPieces();
-    Iterator textIt = textPieces.iterator();
+    List<TextPiece> textPieces = _tpt.getTextPieces();
+    Iterator<TextPiece> textIt = textPieces.iterator();
 
     int length = 0;
     while(textIt.hasNext())
     {
-      TextPiece tp = (TextPiece)textIt.next();
+      TextPiece tp = textIt.next();
       length += tp.characterLength();
     }
     return length;
-  }
-
-  public ListTables getListTables()
-  {
-    return _lt;
   }
 
   /**
@@ -607,26 +563,6 @@ public final class HWPFDocument extends POIDocument
     pfs.writeFilesystem(out);
   }
 
-  public CHPBinTable getCharacterTable()
-  {
-    return _cbt;
-  }
-
-  public PAPBinTable getParagraphTable()
-  {
-    return _pbt;
-  }
-
-  public SectionTable getSectionTable()
-  {
-    return _st;
-  }
-
-  public TextPieceTable getTextTable()
-  {
-    return _cft.getTextPieceTable();
-  }
-
   public byte[] getDataStream()
   {
     return _dataStream;
@@ -643,11 +579,6 @@ public final class HWPFDocument extends POIDocument
       _lt = new ListTables();
     }
     return _lt.addList(list.getListData(), list.getOverride());
-  }
-
-  public FontTable getFontTable()
-  {
-    return _ft;
   }
 
   public void delete(int start, int length)
@@ -691,17 +622,4 @@ public final class HWPFDocument extends POIDocument
       t.printStackTrace();
     }
   }
-
-//  public Object clone()
-//    throws CloneNotSupportedException
-//  {
-//    _tpt;
-//
-//    _cbt;
-//
-//    _pbt;
-//
-//    _st;
-//
-//  }
 }

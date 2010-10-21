@@ -122,6 +122,7 @@ public final class BiffViewer {
 			case AxisParentRecord.sid:     return new AxisParentRecord(in);
 			case AxisRecord.sid:           return new AxisRecord(in);
 			case AxisUsedRecord.sid:       return new AxisUsedRecord(in);
+			case AutoFilterInfoRecord.sid: return new AutoFilterInfoRecord(in);
 			case BOFRecord.sid:            return new BOFRecord(in);
 			case BackupRecord.sid:         return new BackupRecord(in);
 			case BarRecord.sid:            return new BarRecord(in);
@@ -133,6 +134,7 @@ public final class BiffViewer {
 			case BoundSheetRecord.sid:     return new BoundSheetRecord(in);
 			case CFHeaderRecord.sid:       return new CFHeaderRecord(in);
 			case CFRuleRecord.sid:         return new CFRuleRecord(in);
+			case Chart3DRecord.sid:        return new Chart3DRecord(in);
 			case CalcCountRecord.sid:      return new CalcCountRecord(in);
 			case CalcModeRecord.sid:       return new CalcModeRecord(in);
 			case CategorySeriesAxisRecord.sid: return new CategorySeriesAxisRecord(in);
@@ -142,6 +144,8 @@ public final class BiffViewer {
 			case ColumnInfoRecord.sid:     return new ColumnInfoRecord(in);
 			case ContinueRecord.sid:       return new ContinueRecord(in);
 			case CountryRecord.sid:        return new CountryRecord(in);
+			case CRNCountRecord.sid:       return new CRNCountRecord(in);
+			case CRNRecord.sid:            return new CRNRecord(in);
 			case DBCellRecord.sid:         return new DBCellRecord(in);
 			case DSFRecord.sid:            return new DSFRecord(in);
 			case DatRecord.sid:            return new DatRecord(in);
@@ -190,6 +194,7 @@ public final class BiffViewer {
 			case LabelSSTRecord.sid:       return new LabelSSTRecord(in);
 			case LeftMarginRecord.sid:     return new LeftMarginRecord(in);
 			case LegendRecord.sid:         return new LegendRecord(in);
+			case LineRecord.sid:           return new LineRecord(in);
 			case LineFormatRecord.sid:     return new LineFormatRecord(in);
 			case LinkedDataRecord.sid:     return new LinkedDataRecord(in);
 			case MMSRecord.sid:            return new MMSRecord(in);
@@ -197,14 +202,18 @@ public final class BiffViewer {
 			case MulBlankRecord.sid:       return new MulBlankRecord(in);
 			case MulRKRecord.sid:          return new MulRKRecord(in);
 			case NameRecord.sid:           return new NameRecord(in);
+			case NameCommentRecord.sid:    return new NameCommentRecord(in);
 			case NoteRecord.sid:           return new NoteRecord(in);
 			case NumberRecord.sid:         return new NumberRecord(in);
+			case ObjectProtectRecord.sid:  return new ObjectProtectRecord(in);
 			case ObjRecord.sid:            return new ObjRecord(in);
 			case ObjectLinkRecord.sid:     return new ObjectLinkRecord(in);
 			case PaletteRecord.sid:        return new PaletteRecord(in);
 			case PaneRecord.sid:           return new PaneRecord(in);
 			case PasswordRecord.sid:       return new PasswordRecord(in);
 			case PasswordRev4Record.sid:   return new PasswordRev4Record(in);
+			case PieRecord.sid:            return new PieRecord(in);
+			case PieFormatRecord.sid:      return new PieFormatRecord(in);
 			case PlotAreaRecord.sid:       return new PlotAreaRecord(in);
 			case PlotGrowthRecord.sid:     return new PlotGrowthRecord(in);
 			case PrecisionRecord.sid:      return new PrecisionRecord(in);
@@ -214,6 +223,7 @@ public final class BiffViewer {
 			case ProtectRecord.sid:        return new ProtectRecord(in);
 			case ProtectionRev4Record.sid: return new ProtectionRev4Record(in);
 			case RKRecord.sid:             return new RKRecord(in);
+			case RecalcIdRecord.sid:       return new RecalcIdRecord(in);
 			case RefModeRecord.sid:        return new RefModeRecord(in);
 			case RefreshAllRecord.sid:     return new RefreshAllRecord(in);
 			case RightMarginRecord.sid:    return new RightMarginRecord(in);
@@ -221,6 +231,8 @@ public final class BiffViewer {
 			case SCLRecord.sid:            return new SCLRecord(in);
 			case SSTRecord.sid:            return new SSTRecord(in);
 			case SaveRecalcRecord.sid:     return new SaveRecalcRecord(in);
+			case ScatterRecord.sid:        return new ScatterRecord(in);
+			case ScenarioProtectRecord.sid: return new ScenarioProtectRecord(in);
 			case SelectionRecord.sid:      return new SelectionRecord(in);
 			case SeriesIndexRecord.sid:    return new SeriesIndexRecord(in);
 			case SeriesListRecord.sid:     return new SeriesListRecord(in);
@@ -241,6 +253,9 @@ public final class BiffViewer {
 			case TopMarginRecord.sid:      return new TopMarginRecord(in);
 			case UnitsRecord.sid:          return new UnitsRecord(in);
 			case UseSelFSRecord.sid:       return new UseSelFSRecord(in);
+			case UncalcedRecord.sid:       return new UncalcedRecord(in);
+			case UserSViewBegin.sid:       return new UserSViewBegin(in);
+			case UserSViewEnd.sid:         return new UserSViewEnd(in);
 			case VCenterRecord.sid:        return new VCenterRecord(in);
 			case ValueRangeRecord.sid:     return new ValueRangeRecord(in);
 			case VerticalPageBreakRecord.sid: return new VerticalPageBreakRecord(in);
@@ -253,12 +268,13 @@ public final class BiffViewer {
 
 			// chart
 			case CatLabRecord.sid:         return new CatLabRecord(in);
+			case Chart3DBarShapeRecord.sid:      return new Chart3DBarShapeRecord(in);
 			case ChartEndBlockRecord.sid:  return new ChartEndBlockRecord(in);
 			case ChartEndObjectRecord.sid: return new ChartEndObjectRecord(in);
 			case ChartFRTInfoRecord.sid:   return new ChartFRTInfoRecord(in);
 			case ChartStartBlockRecord.sid: return new ChartStartBlockRecord(in);
 			case ChartStartObjectRecord.sid: return new ChartStartObjectRecord(in);
-
+			
 			// pivot table
 			case StreamIDRecord.sid:        return new StreamIDRecord(in);
 			case ViewSourceRecord.sid:      return new ViewSourceRecord(in);
@@ -277,7 +293,7 @@ public final class BiffViewer {
 		private final boolean _noint;
 		private final boolean _out;
 		private final boolean _rawhex;
-        private final boolean _noHeader;
+		private final boolean _noHeader;
 		private final File _file;
 
 		private CommandArgs(boolean biffhex, boolean noint, boolean out, boolean rawhex, boolean noHeader, File file) {
@@ -286,7 +302,7 @@ public final class BiffViewer {
 			_out = out;
 			_rawhex = rawhex;
 			_file = file;
-            _noHeader = noHeader;
+			_noHeader = noHeader;
 		}
 
 		public static CommandArgs parse(String[] args) throws CommandParseException {
@@ -295,7 +311,7 @@ public final class BiffViewer {
 			boolean noint = false;
 			boolean out = false;
 			boolean rawhex = false;
-            boolean noheader = false;
+			boolean noheader = false;
 			File file = null;
 			for (int i=0; i<nArgs; i++) {
 				String arg = args[i];
@@ -342,9 +358,9 @@ public final class BiffViewer {
 		public boolean shouldOutputRawHexOnly() {
 			return _rawhex;
 		}
-        public boolean suppressHeader() {
-            return _noHeader;
-        }
+		public boolean suppressHeader() {
+			return _noHeader;
+		}
 		public File getFile() {
 			return _file;
 		}

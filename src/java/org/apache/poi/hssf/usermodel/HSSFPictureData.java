@@ -50,7 +50,7 @@ public class HSSFPictureData implements PictureData
      *
      * @param blip the underlying blip record containing the bitmap data.
      */
-    HSSFPictureData( EscherBlipRecord blip )
+    public HSSFPictureData( EscherBlipRecord blip )
     {
         this.blip = blip;
     }
@@ -81,10 +81,8 @@ public class HSSFPictureData implements PictureData
     * @see #getFormat
     * @return 'wmf', 'jpeg' etc depending on the format. never <code>null</code>
     */
-    public String suggestFileExtension()
-    {
-        switch (blip.getRecordId())
-        {
+    public String suggestFileExtension() {
+        switch (blip.getRecordId()) {
             case EscherMetafileBlip.RECORD_ID_WMF:
                 return "wmf";
             case EscherMetafileBlip.RECORD_ID_EMF:
@@ -101,5 +99,26 @@ public class HSSFPictureData implements PictureData
                 return "";
         }
     }
+    
+    /**
+     * Returns the mime type for the image
+     */
+    public String getMimeType() {
+       switch (blip.getRecordId()) {
+           case EscherMetafileBlip.RECORD_ID_WMF:
+               return "image/x-wmf";
+           case EscherMetafileBlip.RECORD_ID_EMF:
+               return "image/x-emf";
+           case EscherMetafileBlip.RECORD_ID_PICT:
+               return "image/x-pict";
+           case EscherBitmapBlip.RECORD_ID_PNG:
+               return "image/png";
+           case EscherBitmapBlip.RECORD_ID_JPEG:
+               return "image/jpeg";
+           case EscherBitmapBlip.RECORD_ID_DIB:
+               return "image/bmp";
+           default:
+               return "image/unknown";
+       }
+    }
 }
-

@@ -17,13 +17,12 @@
 
 package org.apache.poi.hwpf.extractor;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.poi.POIOLE2TextExtractor;
 import org.apache.poi.hwpf.HWPFDocument;
@@ -40,7 +39,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
  * You should use either getParagraphText() or getText() unless
  *  you have a strong reason otherwise.
  *
- * @author Nick Burch (nick at torchbox dot com)
+ * @author Nick Burch
  */
 public final class WordExtractor extends POIOLE2TextExtractor {
 	private POIFSFileSystem fs;
@@ -133,7 +132,7 @@ public final class WordExtractor extends POIOLE2TextExtractor {
                 return getParagraphText(r);
         }
 
-        private String[] getParagraphText(Range r) {
+        protected static String[] getParagraphText(Range r) {
                 String[] ret;
                 ret = new String[r.numParagraphs()];
                 for (int i = 0; i < ret.length; i++) {
@@ -215,10 +214,7 @@ public final class WordExtractor extends POIOLE2TextExtractor {
 	public String getTextFromPieces() {
     	StringBuffer textBuf = new StringBuffer();
 
-    	Iterator textPieces = doc.getTextTable().getTextPieces().iterator();
-    	while (textPieces.hasNext()) {
-    		TextPiece piece = (TextPiece) textPieces.next();
-
+    	for(TextPiece piece : doc.getTextTable().getTextPieces()) {
     		String encoding = "Cp1252";
     		if (piece.isUnicode()) {
     			encoding = "UTF-16LE";
@@ -249,22 +245,22 @@ public final class WordExtractor extends POIOLE2TextExtractor {
 	 *  but slightly slower than getTextFromPieces().
 	 */
 	public String getText() {
-		StringBuffer ret = new StringBuffer();
+	   StringBuffer ret = new StringBuffer();
 
-		ret.append(getHeaderText());
+	   ret.append(getHeaderText());
 
-                ArrayList<String> text = new ArrayList<String>();
-                text.addAll(Arrays.asList(getParagraphText()));
-                text.addAll(Arrays.asList(getFootnoteText()));
-                text.addAll(Arrays.asList(getEndnoteText()));
+	   ArrayList<String> text = new ArrayList<String>();
+	   text.addAll(Arrays.asList(getParagraphText()));
+	   text.addAll(Arrays.asList(getFootnoteText()));
+	   text.addAll(Arrays.asList(getEndnoteText()));
 
-		for(String p : text) {
-			ret.append(p);
-		}
+	   for(String p : text) {
+	      ret.append(p);
+	   }
 
-		ret.append(getFooterText());
+	   ret.append(getFooterText());
 
-		return ret.toString();
+	   return ret.toString();
 	}
 
 	/**

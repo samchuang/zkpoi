@@ -101,6 +101,14 @@ public class Paragraph extends Range implements Cloneable {
     _istd = papx.getIstd();
   }
 
+  protected Paragraph(PAPX papx, Range parent, int start)
+  {
+    super(Math.max(parent._start, start), Math.min(parent._end, papx.getEnd()), parent);
+    _props = papx.getParagraphProperties(_doc.getStyleSheet());
+    _papx = papx.getSprmBuf();
+    _istd = papx.getIstd();
+  }
+
   public short getStyleIndex()
   {
     return _istd;
@@ -426,15 +434,34 @@ public class Paragraph extends Range implements Cloneable {
     _papx.updateSprm(SPRM_DCS, dcs.toShort());
   }
 
+  /**
+   * Returns the ilfo, an index to the document's hpllfo, which
+   *  describes the automatic number formatting of the paragraph.
+   * A value of zero means it isn't numbered.
+   */
   public int getIlfo()
-   {
+  {
      return _props.getIlfo();
-   }
+  }
 
-   public int getIlvl()
-   {
+  /**
+   * Returns the multi-level indent for the paragraph. Will be
+   *  zero for non-list paragraphs, and the first level of any
+   *  list. Subsequent levels in hold values 1-8.
+   */
+  public int getIlvl()
+  {
      return _props.getIlvl();
-   }
+  }
+
+  /**
+   * Returns the heading level (1-8), or 9 if the paragraph
+   *  isn't in a heading style.
+   */
+  public int getLvl()
+  {
+     return _props.getLvl();
+  }
 
   void setTableRowEnd(TableProperties props)
   {

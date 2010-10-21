@@ -52,6 +52,7 @@ import org.apache.poi.ss.util.CellReference.NameType;
  *  @author Peter M. Murray (pete at quantrix dot com)
  *  @author Pavel Krupets (pkrupets at palmtreebusiness dot com)
  *  @author Josh Micich
+ *  @author David Lewis (DLewis400 at gmail dot com)
  *  @author Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
 public final class FormulaParser {
@@ -430,8 +431,12 @@ public final class FormulaParser {
 		SimpleRangePart part1 = parseSimpleRangePart();
 		if (part1 == null) {
 			if (sheetIden != null) {
-				throw new FormulaParseException("Cell reference expected after sheet name at index "
-						+ _pointer + ".");
+                if(look == '#'){  // error ref like MySheet!#REF!
+                    return new ParseNode(ErrPtg.valueOf(parseErrorLiteral()));    
+                } else {
+                    throw new FormulaParseException("Cell reference expected after sheet name at index "
+                            + _pointer + ".");
+                }
 			}
 			return parseNonRange(savePointer);
 		}
@@ -551,7 +556,8 @@ public final class FormulaParser {
 		// which will either be named ranges or functions
 		StringBuilder sb = new StringBuilder();
 
-		if (!Character.isLetter(look)) {
+		// defined names may begin with a letter or underscore
+		if (!Character.isLetter(look) && look != '_') {
 			throw expected("number, string, or defined name");
 		}
 		while (isValidDefinedNameChar(look)) {
@@ -677,7 +683,7 @@ public final class FormulaParser {
 				hasDigits = true;
 			} else if (Character.isLetter(ch)) {
 				hasLetters = true;
-			} else if (ch =='$') {
+			} else if (ch =='$' || ch =='_') {
 				//
 			} else {
 				break;

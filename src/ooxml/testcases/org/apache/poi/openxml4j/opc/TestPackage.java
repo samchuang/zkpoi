@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 
 import org.apache.poi.openxml4j.OpenXML4JTestDataSamples;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.opc.internal.ContentTypeManager;
 import org.apache.poi.openxml4j.opc.internal.FileHelper;
 import org.apache.poi.util.TempFile;
@@ -59,7 +60,7 @@ public final class TestPackage extends TestCase {
 
 		// Compare the original and newly saved document
 		assertTrue(targetFile.exists());
-		//ZipFileAssert.assertEquals(originalFile, targetFile);
+		ZipFileAssert.assertEquals(new File(originalFile), targetFile);
 		assertTrue(targetFile.delete());
 	}
 
@@ -102,43 +103,43 @@ public final class TestPackage extends TestCase {
 	public void testCreatePackageAddPart() throws Exception {
 		File targetFile = OpenXML4JTestDataSamples.getOutputFile("TestCreatePackageTMP.docx");
 
-		File expectedFileFile = OpenXML4JTestDataSamples.getOutputFile("TestCreatePackageOUTPUT.docx");
+		File expectedFile = OpenXML4JTestDataSamples.getSampleFile("TestCreatePackageOUTPUT.docx");
 
-		// Zap the target file, in case of an earlier run
-		if(targetFile.exists()) targetFile.delete();
+        // Zap the target file, in case of an earlier run
+        if(targetFile.exists()) targetFile.delete();
 
-		// Create a package
-		OPCPackage pkg = OPCPackage.create(targetFile);
-		PackagePartName corePartName = PackagingURIHelper
-				.createPartName("/word/document.xml");
+        // Create a package
+        OPCPackage pkg = OPCPackage.create(targetFile);
+        PackagePartName corePartName = PackagingURIHelper
+                .createPartName("/word/document.xml");
 
-		pkg.addRelationship(corePartName, TargetMode.INTERNAL,
-				PackageRelationshipTypes.CORE_DOCUMENT, "rId1");
+        pkg.addRelationship(corePartName, TargetMode.INTERNAL,
+                PackageRelationshipTypes.CORE_DOCUMENT, "rId1");
 
-		PackagePart corePart = pkg
-				.createPart(
-						corePartName,
-						"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml");
+        PackagePart corePart = pkg
+                .createPart(
+                        corePartName,
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml");
 
-		Document doc = DocumentHelper.createDocument();
-		Namespace nsWordprocessinML = new Namespace("w",
-				"http://schemas.openxmlformats.org/wordprocessingml/2006/main");
-		Element elDocument = doc.addElement(new QName("document",
-				nsWordprocessinML));
-		Element elBody = elDocument.addElement(new QName("body",
-				nsWordprocessinML));
-		Element elParagraph = elBody.addElement(new QName("p",
-				nsWordprocessinML));
-		Element elRun = elParagraph
-				.addElement(new QName("r", nsWordprocessinML));
-		Element elText = elRun.addElement(new QName("t", nsWordprocessinML));
-		elText.setText("Hello Open XML !");
+        Document doc = DocumentHelper.createDocument();
+        Namespace nsWordprocessinML = new Namespace("w",
+                "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+        Element elDocument = doc.addElement(new QName("document",
+                nsWordprocessinML));
+        Element elBody = elDocument.addElement(new QName("body",
+                nsWordprocessinML));
+        Element elParagraph = elBody.addElement(new QName("p",
+                nsWordprocessinML));
+        Element elRun = elParagraph
+                .addElement(new QName("r", nsWordprocessinML));
+        Element elText = elRun.addElement(new QName("t", nsWordprocessinML));
+        elText.setText("Hello Open XML !");
 
-		StreamHelper.saveXmlInStream(doc, corePart.getOutputStream());
-		pkg.close();
+        StreamHelper.saveXmlInStream(doc, corePart.getOutputStream());
+        pkg.close();
 
-		//ZipFileAssert.assertEquals(expectedFile, targetFile);
-		assertTrue(targetFile.delete());
+        ZipFileAssert.assertEquals(expectedFile, targetFile);
+        assertTrue(targetFile.delete());
 	}
 
 	/**
@@ -239,7 +240,7 @@ public final class TestPackage extends TestCase {
 
 		File inputFile = OpenXML4JTestDataSamples.getSampleFile("TestOpenPackageINPUT.docx");
 
-		File expectedFile = OpenXML4JTestDataSamples.getOutputFile("TestOpenPackageOUTPUT.docx");
+		File expectedFile = OpenXML4JTestDataSamples.getSampleFile("TestOpenPackageOUTPUT.docx");
 
 		// Copy the input file in the output directory
 		FileHelper.copyFile(inputFile, targetFile);
@@ -285,7 +286,7 @@ public final class TestPackage extends TestCase {
 			fail();
 		}
 
-		//ZipFileAssert.assertEquals(expectedFile, targetFile);
+		ZipFileAssert.assertEquals(expectedFile, targetFile);
 		assertTrue(targetFile.delete());
 	}
 
@@ -305,7 +306,7 @@ public final class TestPackage extends TestCase {
 
 		// Compare the original and newly saved document
 		assertTrue(targetFile.exists());
-		//ZipFileAssert.assertEquals(originalFile, targetFile);
+		ZipFileAssert.assertEquals(new File(originalFile), targetFile);
 		assertTrue(targetFile.delete());
 	}
 
@@ -345,7 +346,7 @@ public final class TestPackage extends TestCase {
 
 		// Compare the original and newly saved document
 		assertTrue(targetFile.exists());
-		//ZipFileAssert.assertEquals(targetFile, tempFile);
+		ZipFileAssert.assertEquals(targetFile, tempFile);
 		assertTrue(targetFile.delete());
 	}
 
@@ -443,6 +444,65 @@ public final class TestPackage extends TestCase {
 		// Don't save modifications
 		p.revert();
 	}
+	
+	/**
+	 * Test that we can open a file by path, and then
+	 *  write changes to it.
+	 */
+	public void testOpenFileThenOverwrite() throws Exception {
+        File tempFile = File.createTempFile("poiTesting","tmp");
+        File origFile = OpenXML4JTestDataSamples.getSampleFile("TestPackageCommon.docx");
+        FileHelper.copyFile(origFile, tempFile);
+        
+        // Open the temp file
+        OPCPackage p = OPCPackage.open(tempFile.toString(), PackageAccess.READ_WRITE);
+        // Close it
+        p.close();
+        // Delete it
+        assertTrue(tempFile.delete());
+        
+        // Reset
+        FileHelper.copyFile(origFile, tempFile);
+        p = OPCPackage.open(tempFile.toString(), PackageAccess.READ_WRITE);
+        
+        // Save it to the same file - not allowed
+        try {
+            p.save(tempFile);
+            fail("You shouldn't be able to call save(File) to overwrite the current file");
+        } catch(InvalidOperationException e) {}
+
+        p.close();
+        // Delete it
+        assertTrue(tempFile.delete());
+        
+        
+        // Open it read only, then close and delete - allowed
+        FileHelper.copyFile(origFile, tempFile);
+        p = OPCPackage.open(tempFile.toString(), PackageAccess.READ);
+        p.close();
+        assertTrue(tempFile.delete());
+	}
+    /**
+     * Test that we can open a file by path, save it
+     *  to another file, then delete both
+     */
+    public void testOpenFileThenSaveDelete() throws Exception {
+        File tempFile = File.createTempFile("poiTesting","tmp");
+        File tempFile2 = File.createTempFile("poiTesting","tmp");
+        File origFile = OpenXML4JTestDataSamples.getSampleFile("TestPackageCommon.docx");
+        FileHelper.copyFile(origFile, tempFile);
+        
+        // Open the temp file
+        OPCPackage p = OPCPackage.open(tempFile.toString(), PackageAccess.READ_WRITE);
+
+        // Save it to a different file
+        p.save(tempFile2);
+        p.close();
+        
+        // Delete both the files
+        assertTrue(tempFile.delete());
+        assertTrue(tempFile2.delete());
+    }
 
 	private static ContentTypeManager getContentTypeManager(OPCPackage pkg) throws Exception {
 		Field f = OPCPackage.class.getDeclaredField("contentTypeManager");

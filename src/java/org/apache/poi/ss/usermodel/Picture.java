@@ -51,4 +51,10 @@ public interface Picture {
 
     ClientAnchor getPreferredSize();
 
+    //20101015, henrichen@zkoss.org
+    PictureData getPictureData();
+    String getName();
+    String getAlt();
+    ClientAnchor getClientAnchor();
+
 }

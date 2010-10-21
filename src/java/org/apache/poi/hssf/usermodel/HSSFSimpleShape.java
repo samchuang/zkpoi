@@ -32,7 +32,7 @@ public class HSSFSimpleShape
     public final static short       OBJECT_TYPE_RECTANGLE          = 2;
     public final static short       OBJECT_TYPE_OVAL               = 3;
 //    public final static short       OBJECT_TYPE_ARC                = 4;
-//    public final static short       OBJECT_TYPE_CHART              = 5;
+    public final static short       OBJECT_TYPE_CHART              = 5;
 //    public final static short       OBJECT_TYPE_TEXT               = 6;
 //    public final static short       OBJECT_TYPE_BUTTON             = 7;
     public final static short       OBJECT_TYPE_PICTURE            = 8;
@@ -46,7 +46,7 @@ public class HSSFSimpleShape
 //    public final static short       OBJECT_TYPE_SCROLL_BAR         = 17;
 //    public final static short       OBJECT_TYPE_LIST_BOX           = 18;
 //    public final static short       OBJECT_TYPE_GROUP_BOX          = 19;
-//    public final static short       OBJECT_TYPE_COMBO_BOX          = 20;
+    public final static short       OBJECT_TYPE_COMBO_BOX          = 20;
     public final static short       OBJECT_TYPE_COMMENT            = 25;
 //    public final static short       OBJECT_TYPE_MICROSOFT_OFFICE_DRAWING = 30;
 

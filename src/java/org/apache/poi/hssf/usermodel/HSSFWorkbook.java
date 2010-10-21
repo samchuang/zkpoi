@@ -67,9 +67,9 @@ import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.formula.FormulaType;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
@@ -146,21 +146,6 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      * See {@link MissingCellPolicy}
      */
     private MissingCellPolicy missingCellPolicy = HSSFRow.RETURN_NULL_AND_BLANK;
-
-
-    /** Extended windows meta file */
-    public static final int PICTURE_TYPE_EMF = 2;
-    /** Windows Meta File */
-    public static final int PICTURE_TYPE_WMF = 3;
-    /** Mac PICT format */
-    public static final int PICTURE_TYPE_PICT = 4;
-    /** JPEG format */
-    public static final int PICTURE_TYPE_JPEG = 5;
-    /** PNG format */
-    public static final int PICTURE_TYPE_PNG = 6;
-    /** Device independant bitmap */
-    public static final int PICTURE_TYPE_DIB = 7;
-
 
     private static POILogger log = POILogFactory.getLogger(HSSFWorkbook.class);
 
@@ -294,7 +279,8 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
         }
 
         for (int i = 0 ; i < workbook.getNumNames() ; ++i){
-            HSSFName name = new HSSFName(this, workbook.getNameRecord(i));
+            NameRecord nameRecord = workbook.getNameRecord(i);
+            HSSFName name = new HSSFName(this, nameRecord, workbook.getNameCommentRecord(nameRecord));
             names.add(name);
         }
     }
@@ -343,7 +329,8 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
       * contained strings will be written to the Shared String tabel (SSTRecord) within
       * the Workbook.
       *
-      * @param wb sheet's matching low level Workbook structure containing the SSTRecord.
+      * @param records a collection of sheet's records.
+      * @param offset the offset to search at 
       * @see org.apache.poi.hssf.record.LabelRecord
       * @see org.apache.poi.hssf.record.LabelSSTRecord
       * @see org.apache.poi.hssf.record.SSTRecord
@@ -575,6 +562,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
 
     public void setSheetHidden(int sheetIx, int hidden) {
         validateSheetIndex(sheetIx);
+        WorkbookUtil.validateSheetState(hidden);
         workbook.setSheetHidden(sheetIx, hidden);
     }
 
@@ -745,7 +733,8 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      *
      * @param sheetname the name for the new sheet. Note - certain length limits
      * apply. See {@link #setSheetName(int, String)}.
-     *
+     * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
+     *  for a safe way to create valid names
      * @return HSSFSheet representing the new sheet.
      * @throws IllegalArgumentException
      *             if there is already a sheet present with a case-insensitive
@@ -992,7 +981,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
 
         if (isNewRecord)
         {
-            HSSFName newName = new HSSFName(this, nameRecord);
+            HSSFName newName = new HSSFName(this, nameRecord, nameRecord.isBuiltInName() ? null : workbook.getNameCommentRecord(nameRecord));
             names.add(newName);
         }
 
@@ -1600,30 +1589,29 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      * @param escherRecords the escher records.
      * @param pictures the list to populate with the pictures.
      */
-    private void searchForPictures(List escherRecords, List<HSSFPictureData> pictures)
+    private void searchForPictures(List<EscherRecord> escherRecords, List<HSSFPictureData> pictures)
     {
-        Iterator recordIter = escherRecords.iterator();
-        while (recordIter.hasNext())
-        {
-            Object obj = recordIter.next();
-            if (obj instanceof EscherRecord)
+        for(EscherRecord escherRecord : escherRecords) {
+
+            if (escherRecord instanceof EscherBSERecord)
             {
-                EscherRecord escherRecord = (EscherRecord) obj;
-
-                if (escherRecord instanceof EscherBSERecord)
+                EscherBlipRecord blip = ((EscherBSERecord) escherRecord).getBlipRecord();
+                if (blip != null)
                 {
-                    EscherBlipRecord blip = ((EscherBSERecord) escherRecord).getBlipRecord();
-                    if (blip != null)
-                    {
-                        // TODO: Some kind of structure.
-                        pictures.add(new HSSFPictureData(blip));
-                    }
+                    // TODO: Some kind of structure.
+                    HSSFPictureData picture = new HSSFPictureData(blip);
+					pictures.add(picture);
+                } else {
+                	pictures.add(null);
                 }
-
-                // Recursive call.
-                searchForPictures(escherRecord.getChildRecords(), pictures);
+                
+                
             }
+
+            // Recursive call.
+            searchForPictures(escherRecord.getChildRecords(), pictures);
         }
+        
     }
 
     /**

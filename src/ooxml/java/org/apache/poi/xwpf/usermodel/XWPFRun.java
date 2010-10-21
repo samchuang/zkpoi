@@ -17,12 +17,25 @@
 package org.apache.poi.xwpf.usermodel;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.xml.namespace.QName;
+
+import org.apache.poi.POIXMLException;
 import org.apache.poi.util.Internal;
+import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlString;
+import org.apache.xmlbeans.impl.values.XmlAnyTypeImpl;
+import org.openxmlformats.schemas.drawingml.x2006.picture.CTPicture;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTEmpty;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFonts;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHpsMeasure;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTOnOff;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPTab;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSignedHpsMeasure;
@@ -34,6 +47,8 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBrType;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STUnderline;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STVerticalAlignRun;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 /**
  * XWPFRun object defines a region of text with a common set of properties
@@ -42,7 +57,9 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STVerticalAlignRun
  */
 public class XWPFRun {
     private CTR run;
+    private String pictureText;
     private XWPFParagraph paragraph;
+    private List<XWPFPicture> pictures;
 
     /**
      * @param r the CTR bean which holds the run attributes
@@ -51,6 +68,53 @@ public class XWPFRun {
     public XWPFRun(CTR r, XWPFParagraph p) {
         this.run = r;
         this.paragraph = p;
+        
+        // Look for any text in any of our pictures or drawings
+        StringBuffer text = new StringBuffer();
+        List<XmlObject> pictTextObjs = new ArrayList<XmlObject>();
+        pictTextObjs.addAll(r.getPictList());
+        pictTextObjs.addAll(r.getDrawingList());
+        for(XmlObject o : pictTextObjs) {
+           XmlObject[] t = o
+                 .selectPath("declare namespace w='http://schemas.openxmlformats.org/wordprocessingml/2006/main' .//w:t");
+           for (int m = 0; m < t.length; m++) {
+              NodeList kids = t[m].getDomNode().getChildNodes();
+              for (int n = 0; n < kids.getLength(); n++) {
+                 if (kids.item(n) instanceof Text) {
+                    if(text.length() > 0)
+                       text.append("\n");
+                    text.append(kids.item(n).getNodeValue());
+                 }
+              }
+           }
+        }
+        pictureText = text.toString();
+        
+        // Do we have any embedded pictures?
+        // (They're a different CTPicture, under the drawingml namespace)
+        pictures = new ArrayList<XWPFPicture>();
+        for(XmlObject o : pictTextObjs) {
+           XmlObject[] picts = o
+                 .selectPath("declare namespace pic='http://schemas.openxmlformats.org/drawingml/2006/picture' .//pic:pic");
+           for(XmlObject pict : picts) {
+              if(pict instanceof XmlAnyTypeImpl) {
+                 // Pesky XmlBeans bug - see Bugzilla #49934
+                 try {
+                    pict = org.openxmlformats.schemas.drawingml.x2006.picture.CTPicture.Factory.parse(
+                          pict.toString()
+                    );
+                 } catch(XmlException e) {
+                    throw new POIXMLException(e);
+                 }
+              }
+              if(pict instanceof org.openxmlformats.schemas.drawingml.x2006.picture.CTPicture) {
+                 XWPFPicture picture = new XWPFPicture(
+                       (org.openxmlformats.schemas.drawingml.x2006.picture.CTPicture)pict, p
+                 );
+                 pictures.add(picture);
+              }
+           }
+        }
     }
 
     /**
@@ -69,6 +133,19 @@ public class XWPFRun {
     public XWPFParagraph getParagraph() {
         return paragraph;
     }
+    
+    /**
+     * For isBold, isItalic etc
+     */
+    private boolean isCTOnOff(CTOnOff onoff) {
+       if(! onoff.isSetVal())
+          return true;
+       if(onoff.getVal() == STOnOff.ON)
+          return true;
+       if(onoff.getVal() == STOnOff.TRUE)
+          return true;
+       return false;
+    }
 
     /**
      * Whether the bold property shall be applied to all non-complex script
@@ -78,7 +155,9 @@ public class XWPFRun {
      */
     public boolean isBold() {
         CTRPr pr = run.getRPr();
-        return pr != null && pr.isSetB();
+        if(pr == null || !pr.isSetB())
+           return false;
+        return isCTOnOff(pr.getB());
     }
 
     /**
@@ -120,6 +199,13 @@ public class XWPFRun {
         return run.sizeOfTArray() == 0 ? null : run.getTArray(pos)
                 .getStringValue();
     }
+    
+    /**
+     * Returns text embedded in pictures
+     */
+    public String getPictureText() {
+        return pictureText;
+    }
 
     /**
      * Sets the text of this text run
@@ -127,7 +213,7 @@ public class XWPFRun {
      * @param value the literal text which shall be displayed in the document
      */
     public void setText(String value) {
-	setText(value,run.getTArray().length);
+       setText(value,run.getTList().size());
     }
 
     /**
@@ -140,6 +226,7 @@ public class XWPFRun {
 	if(pos > run.sizeOfTArray()) throw new ArrayIndexOutOfBoundsException("Value too large for the parameter position in XWPFRun.setText(String value,int pos)");
         CTText t = (pos < run.sizeOfTArray() && pos >= 0) ? run.getTArray(pos) : run.addNewT();
         t.setStringValue(value);
+        preserveSpaces(t);
     }
 
     
@@ -151,7 +238,9 @@ public class XWPFRun {
      */
     public boolean isItalic() {
         CTRPr pr = run.getRPr();
-        return pr != null && pr.isSetI();
+        if(pr == null || !pr.isSetI())
+           return false;
+        return isCTOnOff(pr.getI());
     }
 
     /**
@@ -227,7 +316,9 @@ public class XWPFRun {
      */
     public boolean isStrike() {
         CTRPr pr = run.getRPr();
-        return pr != null && pr.isSetStrike();
+        if(pr == null || !pr.isSetStrike())
+           return false;
+        return isCTOnOff(pr.getStrike());
     }
 
     /**
@@ -471,6 +562,75 @@ public class XWPFRun {
     public void removeCarriageReturn() {
 	//TODO
     }    
-
     
+    /**
+     * Returns the embedded pictures of the run. These
+     *  are pictures which reference an external, 
+     *  embedded picture image such as a .png or .jpg
+     */
+    public List<XWPFPicture> getEmbeddedPictures() {
+       return pictures;
+    }
+
+    /**
+     * Add the xml:spaces="preserve" attribute if the string has leading or trailing white spaces
+     *
+     * @param xs    the string to check
+     */
+    static void preserveSpaces(XmlString xs) {
+        String text = xs.getStringValue();
+        if (text != null && (text.startsWith(" ") || text.endsWith(" "))) {
+            XmlCursor c = xs.newCursor();
+            c.toNextToken();
+            c.insertAttributeWithValue(new QName("http://www.w3.org/XML/1998/namespace", "space"), "preserve");
+            c.dispose();
+        }
+    }
+
+    /**
+     * Returns the string version of the text, with tabs and
+     *  carriage returns in place of their xml equivalents.
+     */
+    public String toString() {
+       StringBuffer text = new StringBuffer();
+       
+       // Grab the text and tabs of the text run
+       // Do so in a way that preserves the ordering
+       XmlCursor c = run.newCursor();
+       c.selectPath("./*");
+       while (c.toNextSelection()) {
+           XmlObject o = c.getObject();
+           if (o instanceof CTText) {
+               String tagName = o.getDomNode().getNodeName();
+               // Field Codes (w:instrText, defined in spec sec. 17.16.23)
+               //  come up as instances of CTText, but we don't want them
+               //  in the normal text output
+               if (!"w:instrText".equals(tagName)) {
+                  text.append(((CTText) o).getStringValue());
+               }
+           }
+           if (o instanceof CTPTab) {
+               text.append("\t");
+           }
+           if (o instanceof CTEmpty) {
+              // Some inline text elements get returned not as
+              //  themselves, but as CTEmpty, owing to some odd
+              //  definitions around line 5642 of the XSDs
+              String tagName = o.getDomNode().getNodeName();
+              if ("w:tab".equals(tagName)) {
+                 text.append("\t");
+              }
+              if ("w:cr".equals(tagName)) {
+                 text.append("\n");
+              }
+           }
+       }
+       
+       // Any picture text?
+       if(pictureText != null && pictureText.length() > 0) {
+          text.append("\n").append(pictureText);
+       }
+       
+       return text.toString();
+    }
 }

@@ -20,8 +20,11 @@ package org.apache.poi.hssf.model;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.poi.ddf.EscherBSERecord;
 import org.apache.poi.ddf.EscherBoolProperty;
@@ -57,6 +60,7 @@ import org.apache.poi.hssf.record.HyperlinkRecord;
 import org.apache.poi.hssf.record.InterfaceEndRecord;
 import org.apache.poi.hssf.record.InterfaceHdrRecord;
 import org.apache.poi.hssf.record.MMSRecord;
+import org.apache.poi.hssf.record.NameCommentRecord;
 import org.apache.poi.hssf.record.NameRecord;
 import org.apache.poi.hssf.record.PaletteRecord;
 import org.apache.poi.hssf.record.PasswordRecord;
@@ -166,6 +170,11 @@ public final class InternalWorkbook {
     private WriteAccessRecord writeAccess;
     private WriteProtectRecord writeProtect;
 
+    /**
+     * Hold the {@link NameCommentRecord}s indexed by the name of the {@link NameRecord} to which they apply.
+     */
+    private final Map<String, NameCommentRecord> commentRecords;
+
     private InternalWorkbook() {
     	records     = new WorkbookRecordList();
 
@@ -177,6 +186,7 @@ public final class InternalWorkbook {
 		maxformatid = -1;
 		uses1904datewindowing = false;
 		escherBSERecords = new ArrayList<EscherBSERecord>();
+		commentRecords = new LinkedHashMap<String, NameCommentRecord>();
     }
 
     /**
@@ -262,7 +272,7 @@ public final class InternalWorkbook {
                     // LinkTable can start with either of these
                     if (log.check( POILogger.DEBUG ))
                         log.log(DEBUG, "found SupBook record at " + k);
-                    retval.linkTable = new LinkTable(recs, k, retval.records);
+                    retval.linkTable = new LinkTable(recs, k, retval.records, retval.commentRecords);
                     k+=retval.linkTable.getRecordCount() - 1;
                     continue;
                 case FormatRecord.sid :
@@ -300,6 +310,13 @@ public final class InternalWorkbook {
                     if (log.check( POILogger.DEBUG ))
                         log.log(DEBUG, "found FileSharing at " + k);
                     retval.fileShare = (FileSharingRecord) rec;
+                    break;
+
+                case NameCommentRecord.sid:
+                    final NameCommentRecord ncr = (NameCommentRecord) rec;
+                    if (log.check( POILogger.DEBUG ))
+                        log.log(DEBUG, "found NameComment at " + k);
+                    retval.commentRecords.put(ncr.getNameText(), ncr);
                 default :
             }
             records.add(rec);
@@ -855,7 +872,7 @@ public final class InternalWorkbook {
                 continue;
             }
             if(!(r instanceof StyleRecord)) {
-                return null;
+                continue;
             }
             StyleRecord sr = (StyleRecord)r;
             if(sr.getXFIndex() == xfIndex) {
@@ -1832,6 +1849,14 @@ public final class InternalWorkbook {
         return linkTable.getNameRecord(index);
     }
 
+    /** gets the name comment record
+     * @param nameRecord name record who's comment is required.
+     * @return name comment record or <code>null</code> if there isn't one for the given name.
+     */
+    public NameCommentRecord getNameCommentRecord(final NameRecord nameRecord){
+        return commentRecords.get(nameRecord.getNameText());
+    }
+
     /** creates new name
      * @return new name record
      */
@@ -1847,11 +1872,6 @@ public final class InternalWorkbook {
     {
 
         LinkTable linkTable = getOrCreateLinkTable();
-        if(linkTable.nameAlreadyExists(name)) {
-            throw new IllegalArgumentException(
-                "You are trying to assign a duplicated name record: "
-                + name.getNameText());
-        }
         linkTable.addName(name);
 
         return name;
@@ -1868,7 +1888,7 @@ public final class InternalWorkbook {
 
         NameRecord name = new NameRecord(builtInName, sheetNumber);
 
-        while(linkTable.nameAlreadyExists(name)) {
+        if(linkTable.nameAlreadyExists(name)) {
             throw new RuntimeException("Builtin (" + builtInName
                     + ") already exists for sheet (" + sheetNumber + ")");
         }
@@ -1887,6 +1907,22 @@ public final class InternalWorkbook {
             records.remove(idx + nameIndex);
             linkTable.removeName(nameIndex);
         }
+    }
+
+    /**
+     * If a {@link NameCommentRecord} is added or the name it references
+     *  is renamed, then this will update the lookup cache for it.
+     */
+    public void updateNameCommentRecordCache(final NameCommentRecord commentRecord) {
+       if(commentRecords.containsValue(commentRecord)) {
+          for(Entry<String,NameCommentRecord> entry : commentRecords.entrySet()) {
+             if(entry.getValue().equals(commentRecord)) {
+                commentRecords.remove(entry.getKey());
+                break;
+             }
+          }
+       }
+       commentRecords.put(commentRecord.getNameText(), commentRecord);
     }
 
     /**
@@ -2052,6 +2088,10 @@ public final class InternalWorkbook {
                     Object er = it.next();
                     if(er instanceof EscherDggRecord) {
                         dgg = (EscherDggRecord)er;
+                    } 
+                    //20101015, henrichen@zkoss.org: populate blipstore (EscherBSERecord)
+                    else if (er instanceof EscherContainerRecord && ((EscherContainerRecord)er).getRecordId() == (short)0xF001) {
+   	                	populateBSERecords((EscherContainerRecord)er);
                     }
                 }
 
@@ -2346,4 +2386,14 @@ public final class InternalWorkbook {
         }
     }
 
+    //20101015, henrichen@zkoss.org
+	private void populateBSERecords(EscherContainerRecord er) {
+		for(final Iterator<EscherRecord> it = er.getChildIterator(); it.hasNext();) {
+			EscherRecord record = it.next(); 
+			if (record instanceof EscherBSERecord) {
+		        // maybe we don't need that as an instance variable anymore
+		        escherBSERecords.add( (EscherBSERecord) record );
+			}
+		}
+	}
 }

@@ -17,6 +17,8 @@
 
 package org.apache.poi.ddf;
 
+import org.apache.poi.util.BitField;
+import org.apache.poi.util.BitFieldFactory;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.LittleEndian;
 
@@ -196,5 +198,56 @@ public class EscherSpRecord
     public void setFlags( int field_2_flags )
     {
         this.field_2_flags = field_2_flags;
+    }
+    
+    //20101015, henrichen@zkoss.org: enhance to provide easy access API
+    private static final BitField group = BitFieldFactory.getInstance(FLAG_GROUP);
+    private static final BitField child = BitFieldFactory.getInstance(FLAG_CHILD);
+    private static final BitField patriarch = BitFieldFactory.getInstance(FLAG_PATRIARCH);
+    private static final BitField deleted = BitFieldFactory.getInstance(FLAG_DELETED);
+    private static final BitField oleshape = BitFieldFactory.getInstance(FLAG_OLESHAPE);
+    private static final BitField havemaster = BitFieldFactory.getInstance(FLAG_HAVEMASTER);
+    private static final BitField fliphoriz = BitFieldFactory.getInstance(FLAG_FLIPHORIZ);
+    private static final BitField flipvert = BitFieldFactory.getInstance(FLAG_FLIPVERT);
+    private static final BitField connector = BitFieldFactory.getInstance(FLAG_CONNECTOR);
+    private static final BitField haveanchor = BitFieldFactory.getInstance(FLAG_HAVEANCHOR);
+    private static final BitField backgroud = BitFieldFactory.getInstance(FLAG_BACKGROUND);
+    private static final BitField hasshapetype = BitFieldFactory.getInstance(FLAG_HASSHAPETYPE);
+
+    public boolean isGroup() {
+    	return group.isSet(field_2_flags);
+    }
+    public boolean isChild() {
+    	return child.isSet(field_2_flags);
+    }
+    public boolean isPatriarch() {
+    	return patriarch.isSet(field_2_flags);
+    }
+    public boolean isDeleted() {
+    	return deleted.isSet(field_2_flags);
+    }
+    public boolean isOleShape() {
+    	return oleshape.isSet(field_2_flags);
+    }
+    public boolean isHaveMaster() {
+    	return havemaster.isSet(field_2_flags);
+    }
+    public boolean isFlipH() {
+    	return fliphoriz.isSet(field_2_flags);
+    }
+    public boolean isFlipV() {
+    	return flipvert.isSet(field_2_flags);
+    }
+    public boolean isConnector() {
+    	return connector.isSet(field_2_flags);
+    }
+    public boolean isHaveAnchor() {
+    	return haveanchor.isSet(field_2_flags);
+    }
+    public boolean isBackgroud() {
+    	return backgroud.isSet(field_2_flags);
+    }
+    public boolean isHasSpt() {
+    	return hasshapetype.isSet(field_2_flags);
     }
 }

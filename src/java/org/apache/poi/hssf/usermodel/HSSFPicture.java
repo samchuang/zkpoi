@@ -19,9 +19,13 @@ package org.apache.poi.hssf.usermodel;
 
 import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 import org.apache.poi.ddf.EscherBSERecord;
+import org.apache.poi.ddf.EscherBlipRecord;
+import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Picture;
+import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.util.ImageUtils;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
@@ -60,7 +64,7 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
     /**
      * Constructs a picture object.
      */
-    HSSFPicture( HSSFShape parent, HSSFAnchor anchor )
+    public HSSFPicture( HSSFShape parent, HSSFAnchor anchor )
     {
         super( parent, anchor );
         setShapeType(OBJECT_TYPE_PICTURE);
@@ -221,4 +225,36 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
         int type = bse.getBlipTypeWin32();
         return ImageUtils.getImageDimension(new ByteArrayInputStream(data), type);
     }
+
+    //20101014, henrichen@zkoss.org: picture name and alt
+    public PictureData getPictureData() {
+		final int pictureIndex = getPictureIndex();
+		final EscherBSERecord bseRecord = 
+			_patriarch._sheet.getWorkbook().getWorkbook().getBSERecord(pictureIndex);
+        final EscherBlipRecord blip = bseRecord != null ? bseRecord.getBlipRecord() : null;
+        return blip != null ? new HSSFPictureData(blip) : null;
+    }
+    
+	private String _name;
+    private String _alt;
+    
+    public String getName() {
+		return _name;
+	}
+
+	public void setName(String name) {
+		this._name = name;
+	}
+
+	public String getAlt() {
+		return _alt;
+	}
+
+	public void setAlt(String alt) {
+		this._alt = alt;
+	}
+	
+	public ClientAnchor getClientAnchor() {
+		return (ClientAnchor) getAnchor();
+	}
 }

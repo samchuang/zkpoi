@@ -111,33 +111,33 @@ public class StylesTable extends POIXMLDocumentPart {
 			doc = StyleSheetDocument.Factory.parse(is);
 			// Grab all the different bits we care about
 			if(doc.getStyleSheet().getNumFmts() != null)
-			for (CTNumFmt nfmt : doc.getStyleSheet().getNumFmts().getNumFmtArray()) {
+			for (CTNumFmt nfmt : doc.getStyleSheet().getNumFmts().getNumFmtList()) {
 				numberFormats.put((int)nfmt.getNumFmtId(), nfmt.getFormatCode());
 			}
 			if(doc.getStyleSheet().getFonts() != null){
 				int idx = 0;
-				for (CTFont font : doc.getStyleSheet().getFonts().getFontArray()) {
+				for (CTFont font : doc.getStyleSheet().getFonts().getFontList()) {
 					XSSFFont f = new XSSFFont(font, idx);
 					fonts.add(f);
 					idx++;
 				}
 			}
 			if(doc.getStyleSheet().getFills() != null)
-			for (CTFill fill : doc.getStyleSheet().getFills().getFillArray()) {
+			for (CTFill fill : doc.getStyleSheet().getFills().getFillList()) {
 				fills.add(new XSSFCellFill(fill));
 			}
 			if(doc.getStyleSheet().getBorders() != null)
-			for (CTBorder border : doc.getStyleSheet().getBorders().getBorderArray()) {
+			for (CTBorder border : doc.getStyleSheet().getBorders().getBorderList()) {
 				borders.add(new XSSFCellBorder(border));
 			}
             CTCellXfs cellXfs = doc.getStyleSheet().getCellXfs();
-            if(cellXfs != null) xfs.addAll(Arrays.asList(cellXfs.getXfArray()));
+            if(cellXfs != null) xfs.addAll(cellXfs.getXfList());
 
             CTCellStyleXfs cellStyleXfs = doc.getStyleSheet().getCellStyleXfs();
-            if(cellStyleXfs != null) styleXfs.addAll(Arrays.asList(cellStyleXfs.getXfArray()));
+            if(cellStyleXfs != null) styleXfs.addAll(cellStyleXfs.getXfList());
 
             CTDxfs styleDxfs = doc.getStyleSheet().getDxfs();
-			if(styleDxfs != null) dxfs.addAll(Arrays.asList(styleDxfs.getDxfArray()));
+			if(styleDxfs != null) dxfs.addAll(styleDxfs.getDxfList());
 
 		} catch (XmlException e) {
 			throw new IOException(e.getLocalizedMessage());
@@ -183,6 +183,8 @@ public class StylesTable extends POIXMLDocumentPart {
 	 *  registration is requested.
 	 * This allows people to create several fonts
 	 *  then customise them later.
+	 * Note - End Users probably want to call
+	 *  {@link XSSFFont#registerTo(StylesTable)}
 	 */
 	public int putFont(XSSFFont font, boolean forceRegistration) {
 		int idx = -1;
@@ -193,8 +195,10 @@ public class StylesTable extends POIXMLDocumentPart {
 		if (idx != -1) {
 			return idx;
 		}
+		
+		idx = fonts.size();
 		fonts.add(font);
-		return fonts.size() - 1;
+		return idx;
 	}
 	public int putFont(XSSFFont font) {
 		return putFont(font, false);
@@ -280,7 +284,9 @@ public class StylesTable extends POIXMLDocumentPart {
 	 * get the size of cell styles
 	 */
 	public int getNumCellStyles(){
-		return styleXfs.size();
+        // Each cell style has a unique xfs entry
+        // Several might share the same styleXfs entry
+        return xfs.size();
 	}
 
 	/**

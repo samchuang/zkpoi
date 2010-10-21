@@ -42,6 +42,7 @@ import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTPicture;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTShape;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTTwoCellAnchor;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.STEditAs;
+import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 
 /**
@@ -77,7 +78,9 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      */
     protected XSSFDrawing(PackagePart part, PackageRelationship rel) throws IOException, XmlException {
         super(part, rel);
-        drawing = CTDrawing.Factory.parse(part.getInputStream());
+        //20101018, henrichen@zkoss.org: will not create all associated CTxxx XmlObject will NOT parse from XxxDocument
+        //drawing = CTDrawing.Factory.parse(part.getInputStream());
+        drawing = WsDrDocument.Factory.parse(part.getInputStream()).getWsDr();
     }
 
     /**

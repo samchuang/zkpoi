@@ -29,6 +29,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackageRelationship;
+import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.ImageUtils;
@@ -320,4 +321,16 @@ public final class XSSFPicture extends XSSFShape implements Picture {
         return ctPicture.getSpPr();
     }
 
+    //20101015, henrichen@zkoss.org
+    public String getName() {
+    	//TODO XSSFPicture#getName()
+    	return ctPicture.getNvPicPr().getCNvPr().getName();
+    }
+    public String getAlt() {
+    	//TODO XSSFPicture#getAlt()
+    	return ctPicture.getNvPicPr().getCNvPr().getDescr();
+    }
+    public ClientAnchor getClientAnchor() {
+    	return (ClientAnchor)getAnchor();
+    }
 }

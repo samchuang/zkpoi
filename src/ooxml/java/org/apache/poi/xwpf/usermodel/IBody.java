@@ -19,13 +19,10 @@ package org.apache.poi.xwpf.usermodel;
 
 import java.util.List;
 
-import org.apache.poi.POIXMLDocumentPart;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
-
-
 
 /**
  * <p>
@@ -43,16 +40,23 @@ public interface IBody {
 	 * returns the Part, to which the body belongs, which you need for adding relationship to other parts
 	 * Actually it is needed of the class XWPFTableCell. Because you have to know to which part the tableCell
 	 * belongs.
-	 * @return
+	 * @return the Part, to which the body belongs
 	 */
 	IBody getPart();
 	
 	/**
 	 * get the PartType of the body, for example
 	 * DOCUMENT, HEADER, FOOTER,	FOOTNOTE, 
-	 * @return
+	 * @return the PartType of the body
 	 */
 	BodyType getPartType();
+	
+   /**
+    * Returns an Iterator with paragraphs and tables, 
+    *  in the order that they occur in the text.
+    */
+   public List<IBodyElement> getBodyElements();
+
 	/**
 	 * Returns the paragraph(s) that holds
 	 *  the text of the header or footer.
@@ -82,7 +86,6 @@ public interface IBody {
 	 * the method will return this table
 	 * if there is no corresponding {@link XWPFTable} the method will return null 
 	 * @param ctTable
-	 * @return
 	 */
 	public XWPFTable getTable(CTTbl ctTable);
 	
@@ -99,14 +102,12 @@ public interface IBody {
       /**
        *inserts a new paragraph at position of the cursor
        * @param cursor
-       * @return
        */
       public XWPFParagraph insertNewParagraph(XmlCursor cursor);
       
       /**
        * inserts a new Table at the cursor position.
        * @param cursor
-       * @return
        */
   	public XWPFTable insertNewTbl(XmlCursor cursor);
 
@@ -120,12 +121,8 @@ public interface IBody {
 	/**
 	 * returns the TableCell to which the Table belongs
 	 * @param cell
-	 * @return
 	 */
 	XWPFTableCell getTableCell(CTTc cell);
-  	
-
-	
 	
 }
 

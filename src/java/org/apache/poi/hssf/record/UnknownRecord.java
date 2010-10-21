@@ -57,6 +57,7 @@ public final class UnknownRecord extends StandardRecord {
 	public static final int SHEETEXT_0862        = 0x0862; // OOO calls this SHEETLAYOUT
 	public static final int SHEETPROTECTION_0867 = 0x0867;
 	public static final int HEADER_FOOTER_089C   = 0x089C;
+    public static final int CODENAME_1BA         = 0x01BA;
 
 	private int _sid;
 	private byte[] _rawData;
@@ -139,7 +140,6 @@ public final class UnknownRecord extends StandardRecord {
 			case SORT_0090: return "SORT"; // Sorting Options
 			case 0x0094: return "LHRECORD"; // .WK? File Conversion Information
 			case STANDARDWIDTH_0099: return "STANDARDWIDTH"; //Standard Column Width
-			case 0x009D: return "AUTOFILTERINFO"; // Drop-Down Arrow Count
 			case SCL_00A0: return "SCL"; // Window Zoom Magnification
 			case 0x00AE: return "SCENMAN"; // Scenario Output Data
 
@@ -241,6 +241,7 @@ public final class UnknownRecord extends StandardRecord {
 			case 0x101B:
 			case 0x101D:
 			case 0x101E:
+			case 0x101F:
 			case 0x1020:
 			case 0x1021:
 			case 0x1022:

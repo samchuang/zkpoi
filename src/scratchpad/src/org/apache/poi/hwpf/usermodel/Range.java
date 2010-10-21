@@ -20,11 +20,7 @@ package org.apache.poi.hwpf.usermodel;
 import org.apache.poi.util.LittleEndian;
 
 import org.apache.poi.hwpf.HWPFDocument;
-
-import org.apache.poi.hwpf.usermodel.CharacterRun;
-import org.apache.poi.hwpf.usermodel.Paragraph;
-import org.apache.poi.hwpf.usermodel.ParagraphProperties;
-import org.apache.poi.hwpf.usermodel.Section;
+import org.apache.poi.hwpf.HWPFDocumentCore;
 
 import org.apache.poi.hwpf.model.CPSplitCalculator;
 import org.apache.poi.hwpf.model.FileInformationBlock;
@@ -77,13 +73,13 @@ public class Range { // TODO -instantiable superclass
 	protected int _end;
 
 	/** The document this range blongs to. */
-	protected HWPFDocument _doc;
+	protected HWPFDocumentCore _doc;
 
 	/** Have we loaded the section indexes yet */
 	boolean _sectionRangeFound;
 
 	/** All sections that belong to the document this Range belongs to. */
-	protected List _sections;
+	protected List<SEPX> _sections;
 
 	/** The start index in the sections list for this Range */
 	protected int _sectionStart;
@@ -95,7 +91,7 @@ public class Range { // TODO -instantiable superclass
 	protected boolean _parRangeFound;
 
 	/** All paragraphs that belong to the document this Range belongs to. */
-	protected List _paragraphs;
+	protected List<PAPX> _paragraphs;
 
 	/** The start index in the paragraphs list for this Range */
 	protected int _parStart;
@@ -107,7 +103,7 @@ public class Range { // TODO -instantiable superclass
 	protected boolean _charRangeFound;
 
 	/** All CharacterRuns that belong to the document this Range belongs to. */
-	protected List _characters;
+	protected List<CHPX> _characters;
 
 	/** The start index in the characterRuns list for this Range */
 	protected int _charStart;
@@ -119,7 +115,7 @@ public class Range { // TODO -instantiable superclass
 	protected boolean _textRangeFound;
 
 	/** All text pieces that belong to the document this Range belongs to. */
-	protected List _text;
+	protected List<TextPiece> _text;
 
 	/** The start index in the text list for this Range. */
 	protected int _textStart;
@@ -144,7 +140,7 @@ public class Range { // TODO -instantiable superclass
 	 * @param doc
 	 *            The HWPFDocument the range is based on.
 	 */
-	public Range(int start, int end, HWPFDocument doc) {
+	public Range(int start, int end, HWPFDocumentCore doc) {
 		_start = start;
 		_end = end;
 		_doc = doc;
@@ -205,29 +201,29 @@ public class Range { // TODO -instantiable superclass
 			case TYPE_PARAGRAPH:
 				_parStart = parent._parStart + startIdx;
 				_parEnd = parent._parStart + endIdx;
-				_start = ((PropertyNode) _paragraphs.get(_parStart)).getStart();
-				_end = ((PropertyNode) _paragraphs.get(_parEnd)).getEnd();
+				_start = _paragraphs.get(_parStart).getStart();
+				_end = _paragraphs.get(_parEnd).getEnd();
 				_parRangeFound = true;
 				break;
 			case TYPE_CHARACTER:
 				_charStart = parent._charStart + startIdx;
 				_charEnd = parent._charStart + endIdx;
-				_start = ((PropertyNode) _characters.get(_charStart)).getStart();
-				_end = ((PropertyNode) _characters.get(_charEnd)).getEnd();
+				_start = _characters.get(_charStart).getStart();
+				_end = _characters.get(_charEnd).getEnd();
 				_charRangeFound = true;
 				break;
 			case TYPE_SECTION:
 				_sectionStart = parent._sectionStart + startIdx;
 				_sectionEnd = parent._sectionStart + endIdx;
-				_start = ((PropertyNode) _sections.get(_sectionStart)).getStart();
-				_end = ((PropertyNode) _sections.get(_sectionEnd)).getEnd();
+				_start = _sections.get(_sectionStart).getStart();
+				_end = _sections.get(_sectionEnd).getEnd();
 				_sectionRangeFound = true;
 				break;
 			case TYPE_TEXT:
 				_textStart = parent._textStart + startIdx;
 				_textEnd = parent._textStart + endIdx;
-				_start = ((PropertyNode) _text.get(_textStart)).getStart();
-				_end = ((PropertyNode) _text.get(_textEnd)).getEnd();
+				_start = _text.get(_textStart).getStart();
+				_end = _text.get(_textEnd).getEnd();
 				_textRangeFound = true;
 				break;
 		}
@@ -259,7 +255,7 @@ public class Range { // TODO -instantiable superclass
 		initText();
 
 		for (int i = _textStart; i < _textEnd; i++) {
-			TextPiece piece = (TextPiece) _text.get(i);
+			TextPiece piece = _text.get(i);
 			if (piece.isUnicode())
 				return true;
 		}
@@ -278,7 +274,7 @@ public class Range { // TODO -instantiable superclass
 		StringBuffer sb = new StringBuffer();
 
 		for (int x = _textStart; x < _textEnd; x++) {
-			TextPiece piece = (TextPiece) _text.get(x);
+			TextPiece piece = _text.get(x);
 
 			// Figure out where in this piece the text
 			// we're after lives
@@ -395,7 +391,7 @@ public class Range { // TODO -instantiable superclass
 	{
 		initAll();
 
-		TextPiece tp = (TextPiece) _text.get(_textStart);
+		TextPiece tp = _text.get(_textStart);
 		StringBuffer sb = tp.getStringBuffer();
 
 		// Since this is the first item in our list, it is safe to assume that
@@ -426,7 +422,7 @@ public class Range { // TODO -instantiable superclass
 		initAll();
 
 		int listIndex = _textEnd - 1;
-		TextPiece tp = (TextPiece) _text.get(listIndex);
+		TextPiece tp = _text.get(listIndex);
 		StringBuffer sb = tp.getStringBuffer();
 
 		int insertIndex = _end - tp.getStart();
@@ -460,7 +456,7 @@ public class Range { // TODO -instantiable superclass
 	// throws UnsupportedEncodingException
 	{
 		initAll();
-		PAPX papx = (PAPX) _paragraphs.get(_parStart);
+		PAPX papx = _paragraphs.get(_parStart);
 		short istd = papx.getIstd();
 
 		StyleSheet ss = _doc.getStyleSheet();
@@ -487,7 +483,7 @@ public class Range { // TODO -instantiable superclass
 	// throws UnsupportedEncodingException
 	{
 		initAll();
-		PAPX papx = (PAPX) _paragraphs.get(_parEnd - 1);
+		PAPX papx = _paragraphs.get(_parEnd - 1);
 		short istd = papx.getIstd();
 
 		StyleSheet ss = _doc.getStyleSheet();
@@ -609,12 +605,12 @@ public class Range { // TODO -instantiable superclass
 		int numTextPieces = _text.size();
 
 		for (int x = _charStart; x < numRuns; x++) {
-			CHPX chpx = (CHPX) _characters.get(x);
+			CHPX chpx = _characters.get(x);
 			chpx.adjustForDelete(_start, _end - _start);
 		}
 
 		for (int x = _parStart; x < numParagraphs; x++) {
-			PAPX papx = (PAPX) _paragraphs.get(x);
+			PAPX papx = _paragraphs.get(x);
 			// System.err.println("Paragraph " + x + " was " + papx.getStart() +
 			// " -> " + papx.getEnd());
 			papx.adjustForDelete(_start, _end - _start);
@@ -623,7 +619,7 @@ public class Range { // TODO -instantiable superclass
 		}
 
 		for (int x = _sectionStart; x < numSections; x++) {
-			SEPX sepx = (SEPX) _sections.get(x);
+			SEPX sepx = _sections.get(x);
 			// System.err.println("Section " + x + " was " + sepx.getStart() +
 			// " -> " + sepx.getEnd());
 			sepx.adjustForDelete(_start, _end - _start);
@@ -632,7 +628,7 @@ public class Range { // TODO -instantiable superclass
 		}
 
 		for (int x = _textStart; x < numTextPieces; x++) {
-			TextPiece piece = (TextPiece) _text.get(x);
+			TextPiece piece = _text.get(x);
 			piece.adjustForDelete(_start, _end - _start);
 		}
 
@@ -787,11 +783,15 @@ public class Range { // TODO -instantiable superclass
 	 */
 	public CharacterRun getCharacterRun(int index) {
 		initCharacterRuns();
-		CHPX chpx = (CHPX) _characters.get(index + _charStart);
+		CHPX chpx = _characters.get(index + _charStart);
+        
+        if (chpx == null) {
+            return null;
+        }
 
 		int[] point = findRange(_paragraphs, _parStart, Math.max(chpx.getStart(), _start), chpx
 				.getEnd());
-		PAPX papx = (PAPX) _paragraphs.get(point[0]);
+		PAPX papx = _paragraphs.get(point[0]);
 		short istd = papx.getIstd();
 
 		CharacterRun chp = new CharacterRun(chpx, _doc.getStyleSheet(), istd, this);
@@ -808,7 +808,7 @@ public class Range { // TODO -instantiable superclass
 	 */
 	public Section getSection(int index) {
 		initSections();
-		SEPX sepx = (SEPX) _sections.get(index + _sectionStart);
+		SEPX sepx = _sections.get(index + _sectionStart);
 		Section sep = new Section(sepx, this);
 		return sep;
 	}
@@ -823,14 +823,18 @@ public class Range { // TODO -instantiable superclass
 
 	public Paragraph getParagraph(int index) {
 		initParagraphs();
-		PAPX papx = (PAPX) _paragraphs.get(index + _parStart);
+		PAPX papx = _paragraphs.get(index + _parStart);
 
 		ParagraphProperties props = papx.getParagraphProperties(_doc.getStyleSheet());
 		Paragraph pap = null;
 		if (props.getIlfo() > 0) {
 			pap = new ListEntry(papx, this, _doc.getListTables());
 		} else {
-			pap = new Paragraph(papx, this);
+            if (((index + _parStart)==0) && papx.getStart()>0) {
+                pap = new Paragraph(papx, this, 0);
+            } else {
+    			pap = new Paragraph(papx, this);
+            }
 		}
 
 		return pap;
@@ -963,23 +967,28 @@ public class Range { // TODO -instantiable superclass
 	 * @return An int array of length 2. The first int is the start index and
 	 *         the second int is the end index.
 	 */
-	private int[] findRange(List rpl, int min, int start, int end) {
+	private int[] findRange(List<? extends PropertyNode> rpl, int min, int start, int end) {
 		int x = min;
-		PropertyNode node = (PropertyNode) rpl.get(x);
-		while (node.getEnd() <= start && x < rpl.size() - 1) {
+		PropertyNode node = rpl.get(x);
+
+		while (node==null || (node.getEnd() <= start && x < rpl.size() - 1)) {
 			x++;
-			node = (PropertyNode) rpl.get(x);
+			node = rpl.get(x);
 		}
+
+        if (node.getStart()>end) {
+            return new int[] {0, 0};
+        }
 
 		if (node.getEnd() <= start) {
 			return new int[] { rpl.size(), rpl.size() };
 		}
 
 		int y = x;
-		node = (PropertyNode) rpl.get(y);
-		while (node.getEnd() < end && y < rpl.size() - 1) {
+		node = rpl.get(y);
+		while (node==null || (node.getEnd() < end && y < rpl.size() - 1)) {
 			y++;
-			node = (PropertyNode) rpl.get(y);
+			node = rpl.get(y);
 		}
 		return new int[] { x, y + 1 };
 	}
@@ -1004,6 +1013,8 @@ public class Range { // TODO -instantiable superclass
 	 *            The (signed) value that should be added to the FIB CCP fields
 	 */
 	protected void adjustFIB(int adjustment) {
+	    assert (_doc instanceof HWPFDocument);
+	    
 		// update the FIB.CCPText field (this should happen once per adjustment,
 		// so we don't want it in
 		// adjustForInsert() or it would get updated multiple times if the range
@@ -1011,7 +1022,7 @@ public class Range { // TODO -instantiable superclass
 		// without this, OpenOffice.org (v. 2.2.x) does not see all the text in
 		// the document
 
-		CPSplitCalculator cpS = _doc.getCPSplitCalculator();
+		CPSplitCalculator cpS = ((HWPFDocument)_doc).getCPSplitCalculator();
 		FileInformationBlock fib = _doc.getFileInformationBlock();
 
 		// Do for each affected part
@@ -1057,17 +1068,14 @@ public class Range { // TODO -instantiable superclass
 	}
 
 	public int getStartOffset() {
-
 		return _start;
 	}
 
 	public int getEndOffset() {
-
 		return _end;
 	}
 
-	protected HWPFDocument getDocument() {
-
+	protected HWPFDocumentCore getDocument() {
 		return _doc;
 	}
 }

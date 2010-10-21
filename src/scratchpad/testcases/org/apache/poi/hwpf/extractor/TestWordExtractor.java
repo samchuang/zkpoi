@@ -19,13 +19,12 @@ package org.apache.poi.hwpf.extractor;
 
 import junit.framework.TestCase;
 
+import org.apache.poi.POIDataSamples;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.HWPFTestDataSamples;
+import org.apache.poi.hwpf.OldWordFileFormatException;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.POIDataSamples;
-
-import java.io.FileInputStream;
 
 /**
  * Test the different routes to extracting text
@@ -53,7 +52,7 @@ public final class TestWordExtractor extends TestCase {
 
 	// Well behaved document
 	private WordExtractor extractor;
-	// Corrupted document - can't do paragraph based stuff
+	// Slightly iffy document
 	private WordExtractor extractor2;
 	// A word doc embeded in an excel file
 	private String filename3;
@@ -94,8 +93,11 @@ public final class TestWordExtractor extends TestCase {
 			assertEquals(p_text1[i], text[i]);
 		}
 
-		// On second one, should fall back
-		assertEquals(1, extractor2.getParagraphText().length);
+		// Lots of paragraphs with only a few lines in them
+		assertEquals(24, extractor2.getParagraphText().length);
+		assertEquals("as d\r\n", extractor2.getParagraphText()[16]);
+      assertEquals("as d\r\n", extractor2.getParagraphText()[17]);
+      assertEquals("as d\r\n", extractor2.getParagraphText()[18]);
 	}
 
 	/**
@@ -104,8 +106,11 @@ public final class TestWordExtractor extends TestCase {
 	public void testGetText() {
 		assertEquals(p_text1_block, extractor.getText());
 
-		// On second one, should fall back to text piece
-		assertEquals(extractor2.getTextFromPieces(), extractor2.getText());
+		// For the 2nd, should give similar answers for
+		//  the two methods, differing only in line endings
+		assertEquals(
+		      extractor2.getTextFromPieces().replaceAll("[\\r\\n]", ""), 
+		      extractor2.getText().replaceAll("[\\r\\n]", ""));
 	}
 
 	/**
@@ -237,4 +242,76 @@ public final class TestWordExtractor extends TestCase {
 
 		assertTrue(b.toString().contains("TestComment"));
 	}
+	
+	public void testWord95() throws Exception {
+	    // Too old for the default
+	    try {
+    		extractor = new WordExtractor(
+    				POIDataSamples.getDocumentInstance().openResourceAsStream("Word95.doc")
+    		);
+    		fail();
+	    } catch(OldWordFileFormatException e) {}
+		
+		// Can work with the special one
+	    Word6Extractor w6e = new Word6Extractor(
+                POIDataSamples.getDocumentInstance().openResourceAsStream("Word95.doc")
+        );
+		String text = w6e.getText();
+		
+		assertTrue(text.contains("The quick brown fox jumps over the lazy dog"));
+        assertTrue(text.contains("Paragraph 2"));
+        assertTrue(text.contains("Paragraph 3. Has some RED text and some BLUE BOLD text in it"));
+        assertTrue(text.contains("Last (4th) paragraph"));
+        
+        String[] tp = w6e.getParagraphText();
+        assertEquals(7, tp.length);
+        assertEquals("The quick brown fox jumps over the lazy dog\r\n", tp[0]);
+        assertEquals("\r\n", tp[1]);
+        assertEquals("Paragraph 2\r\n", tp[2]);
+        assertEquals("\r\n", tp[3]);
+        assertEquals("Paragraph 3. Has some RED text and some BLUE BOLD text in it.\r\n", tp[4]);
+        assertEquals("\r\n", tp[5]);
+        assertEquals("Last (4th) paragraph.\r\n", tp[6]);
+	}
+	
+	public void testWord6() throws Exception {
+        // Too old for the default
+        try {
+    		extractor = new WordExtractor(
+    				POIDataSamples.getDocumentInstance().openResourceAsStream("Word6.doc")
+    		);
+            fail();
+        } catch(OldWordFileFormatException e) {}
+        
+        Word6Extractor w6e = new Word6Extractor(
+                POIDataSamples.getDocumentInstance().openResourceAsStream("Word6.doc")
+        );
+        String text = w6e.getText();
+        
+        assertTrue(text.contains("The quick brown fox jumps over the lazy dog"));
+        
+        String[] tp = w6e.getParagraphText();
+        assertEquals(1, tp.length);
+        assertEquals("The quick brown fox jumps over the lazy dog\r\n", tp[0]);
+	}
+
+    public void testFastSaved() throws Exception {
+        extractor = new WordExtractor(
+                POIDataSamples.getDocumentInstance().openResourceAsStream("rasp.doc")
+        );
+
+        String text = extractor.getText();
+        assertTrue(text.contains("\u0425\u0425\u0425\u0425\u0425"));
+        assertTrue(text.contains("\u0423\u0423\u0423\u0423\u0423"));
+    }
+
+    public void testFirstParagraphFix() throws Exception {
+        extractor = new WordExtractor(
+                POIDataSamples.getDocumentInstance().openResourceAsStream("MBD001D0B89.doc")
+        );
+
+        String text = extractor.getText();
+
+        assertTrue(text.startsWith("\u041f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435"));
+    }
 }

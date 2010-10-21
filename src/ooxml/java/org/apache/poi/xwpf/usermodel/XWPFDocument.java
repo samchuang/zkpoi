@@ -16,6 +16,7 @@
 ==================================================================== */
 package org.apache.poi.xwpf.usermodel;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +53,6 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTComment;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDocument1;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFtnEdn;
@@ -179,7 +179,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
                 else if(relation.equals(XWPFRelation.COMMENT.getRelation())){
                     CommentsDocument cmntdoc = CommentsDocument.Factory.parse(p.getPackagePart().getInputStream());
-                    for(CTComment ctcomment : cmntdoc.getComments().getCommentArray()) {
+                    for(CTComment ctcomment : cmntdoc.getComments().getCommentList()) {
                         comments.add(new XWPFComment(ctcomment));
                     }
                 }
@@ -217,13 +217,13 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
             if(relation.equals(XWPFRelation.FOOTNOTE.getRelation())){
                 FootnotesDocument footnotesDocument = FootnotesDocument.Factory.parse(p.getPackagePart().getInputStream());
 
-                for(CTFtnEdn ctFtnEdn : footnotesDocument.getFootnotes().getFootnoteArray()) {
+                for(CTFtnEdn ctFtnEdn : footnotesDocument.getFootnotes().getFootnoteList()) {
                     footnotes.put(ctFtnEdn.getId().intValue(), new XWPFFootnote(this, ctFtnEdn));
                 }
             } else if (relation.equals(XWPFRelation.ENDNOTE.getRelation())){
                 EndnotesDocument endnotesDocument = EndnotesDocument.Factory.parse(p.getPackagePart().getInputStream());
 
-                for(CTFtnEdn ctFtnEdn : endnotesDocument.getEndnotes().getEndnoteArray()) {
+                for(CTFtnEdn ctFtnEdn : endnotesDocument.getEndnotes().getEndnoteList()) {
                     endnotes.put(ctFtnEdn.getId().intValue(), new XWPFFootnote(this, ctFtnEdn));
                 }
             }
@@ -280,7 +280,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     /**
      * returns an Iterator with paragraphs and tables
      * @see org.apache.poi.xwpf.usermodel.IBody#getBodyElements()
-     * @return
      */
     public List<IBodyElement> getBodyElements(){
     	return Collections.unmodifiableList(bodyElements);
@@ -295,7 +294,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     
  	/**
  	 * @see org.apache.poi.xwpf.usermodel.IBody#getTables()
- 	 * @return
  	 */
  	public List<XWPFTable> getTables(){
  		return Collections.unmodifiableList(tables);
@@ -313,52 +311,32 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
  	
  	/**
  	 * 
- 	 * @return
+ 	 * @return  the list of footers
  	 */
  	public List<XWPFFooter> getFooterList(){
  		return Collections.unmodifiableList(footers);
  	}
  	
- 	/**
- 	 * 
- 	 * @param pos
- 	 * @return
- 	 */
  	public XWPFFooter getFooterArray(int pos){
  		return footers.get(pos);
  	}
  	
  	/**
  	 * 
- 	 * @return
+ 	 * @return  the list of headers
  	 */
  	public List<XWPFHeader> getHeaderList(){
  		return Collections.unmodifiableList(headers);
  	}
  	
- 	/**
- 	 * 
- 	 * @param pos
- 	 * @return
- 	 */
  	public XWPFHeader getHeaderArray(int pos){
  		return headers.get(pos);
  	}
  	
- 	/**
- 	 * 
- 	 * @param table
- 	 * @return
- 	 */
     public String getTblStyle(XWPFTable table){
     	return table.getStyleID();
     }
 
-    /**
-     * 
-     * @param id
-     * @return
-     */
     public XWPFHyperlink getHyperlinkByID(String id) {
         Iterator<XWPFHyperlink> iter = hyperlinks.iterator();
         while(iter.hasNext())
@@ -371,36 +349,18 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
         return null;
     }
 
-    /**
-     * 
-     * @param id
-     * @return
-     */
     public XWPFFootnote getFootnoteByID(int id) {
         return footnotes.get(id);
     }
 
-    /**
-     * 
-     * @param id
-     * @return
-     */
     public XWPFFootnote getEndnoteByID(int id) {
         return endnotes.get(id);
     }
 
-    /**
-     * 
-     * @return
-     */
     public Collection<XWPFFootnote> getFootnotes() {
         return Collections.unmodifiableCollection(footnotes == null ? new ArrayList<XWPFFootnote>() : footnotes.values());
     }
 
-    /**
-     * 
-     * @return
-     */
     public XWPFHyperlink[] getHyperlinks() {
         return hyperlinks.toArray(
                 new XWPFHyperlink[hyperlinks.size()]
@@ -547,7 +507,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     /**
      * add a new paragraph at position of the cursor
      * @param cursor
-     * @return
      */
     public XWPFParagraph insertNewParagraph(XmlCursor cursor){
     	if(isCursorInBody(cursor)){
@@ -583,11 +542,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     	return null;
     }
 
-	/**
-     * 
-     * @param cursor
-     * @return
-     */
 	public XWPFTable insertNewTbl(XmlCursor cursor) {
 		if(isCursorInBody(cursor)){
 			String uri = CTTbl.type.getName().getNamespaceURI();
@@ -626,7 +580,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	/**
 	 * verifies that cursor is on the right position
 	 * @param cursor
-	 * @return
 	 */
 	private boolean isCursorInBody(XmlCursor cursor) {
 		XmlCursor verify = cursor.newCursor();
@@ -642,7 +595,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	/**
 	 * get position of the paragraph
 	 * @param p
-	 * @return
 	 */
 	public Integer getPosOfParagraph(XWPFParagraph p){
     	int i, pos = 0;
@@ -740,8 +692,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     }
     
     /**
-     * get the LastParagraph of the document
-     * @return
+     * @return the LastParagraph of the document
      */
     public XWPFParagraph getLastParagraph(){
     	int lastPos = paragraphs.toArray().length - 1;
@@ -787,8 +738,9 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
         }
     }
     
- /**Replace content of table in array tables at position pos with a 
-     * @param pos, table
+    /**Replace content of table in array tables at position pos with a
+     * @param pos
+     * @param table
      */
     public void setTable(int pos, XWPFTable table){
     	tables.set(pos, table);
@@ -938,13 +890,13 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
 	/**
 	 * inserts an existing XWPFTable to the arrays bodyElements and tables
-	 * @param i
+	 * @param pos
 	 * @param table
 	 */
 	public void insertTable(int pos, XWPFTable table) {
 		bodyElements.add(pos, table);
 		int i;
-    	for (i = 0; i < ctDocument.getBody().getTblArray().length; i++) {
+    	for (i = 0; i < ctDocument.getBody().getTblList().size(); i++) {
 			CTTbl tbl = ctDocument.getBody().getTblArray(i);
 			if(tbl == table.getCTTbl()){
 				break;
@@ -953,10 +905,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 		tables.add(i, table);
 	}
     
-	/**
-	 * 
-	 * @return
-	 */
     public List<XWPFPictureData> getAllPictures() {
     	if(pictures == null){
     		pictures = new ArrayList<XWPFPictureData>();
@@ -970,8 +918,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     }
     
     /**
-     * get all Pictures in this package
-     * @return
+     * @return  all Pictures in this package
      */
     public List<XWPFPictureData> getAllPackagePictures(){
     	List<XWPFPictureData> pkgpictures = new ArrayList<XWPFPictureData>();
@@ -995,43 +942,35 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
      */
     public int addPicture(InputStream is, int format) throws IOException, InvalidFormatException {
         int imageNumber = getNextPicNameNumber(format);
-        XWPFPictureData img = (XWPFPictureData)createRelationship(XWPFPictureData.RELATIONS[format], XWPFFactory.getInstance(), imageNumber, true);
+        XWPFPictureData img = (XWPFPictureData)createRelationship(XWPFPictureData.RELATIONS[format], XWPFFactory.getInstance(), imageNumber, false);
         OutputStream out = img.getPackagePart().getOutputStream();
         IOUtils.copy(is, out);
         out.close();
         pictures.add(img);
         return getAllPictures().size()-1;
-       
     }
     
     /**
      * Adds a picture to the document.
      *
-     * @param is                The stream to read image from
+     * @param pictureData       The bytes to read image from
      * @param format            The format of the picture.
      *
      * @return the index to this picture (0 based), the added picture can be obtained from {@link #getAllPictures()} .
      * @throws InvalidFormatException 
      */
     public int addPicture(byte[] pictureData, int format) throws InvalidFormatException {
-        int imageNumber = getNextPicNameNumber(format);
-        XWPFPictureData img = (XWPFPictureData)createRelationship(XWPFPictureData.RELATIONS[format], XWPFFactory.getInstance(), imageNumber, false);
         try {
-            OutputStream out = img.getPackagePart().getOutputStream();
-            out.write(pictureData);
-            out.close();
+           return addPicture(new ByteArrayInputStream(pictureData), format);
         } catch (IOException e){
             throw new POIXMLException(e);
         }
-        
-        pictures.add(img);
-        return getAllPictures().size()-1;
     }
     
     /**
      * get the next free ImageNumber
      * @param format
-     * @return
+     * @return the next free ImageNumber
      * @throws InvalidFormatException 
      */
     public int getNextPicNameNumber(int format) throws InvalidFormatException{
@@ -1066,48 +1005,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     }
     
     /**
-     * Add the picture to  drawing relations
-     *
-     * @param img the PictureData of the Picture,
-     * @throws InvalidFormatException 
-     */
-    public PackageRelationship addPictureReference(byte[] pictureData, int format) throws InvalidFormatException{
-    	int imageNumber = getNextPicNameNumber(format);
-        XWPFPictureData img = (XWPFPictureData)createRelationship(XWPFPictureData.RELATIONS[format], XWPFFactory.getInstance(), imageNumber, false);
-        PackageRelationship rel = null;
-        try {
-            OutputStream out = img.getPackagePart().getOutputStream();
-            out.write(pictureData);
-             out.close();
-             rel = img.getPackageRelationship();
-             pictures.add(img);
-         } catch (IOException e){
-             throw new POIXMLException(e);
-         }
-          return rel;
-    }
-          
-      /**
-       * Add the picture to  drawing relations
-       *
-       * @param img the PictureData of the Picture,
-     * @throws InvalidFormatException 
-     * @throws IOException 
-       */
-      public PackageRelationship addPictureReference(InputStream is, int format) throws InvalidFormatException, IOException{
-    	  
-    	  PackageRelationship rel = null;
-    	  int imageNumber = getNextPicNameNumber(format);
-    	  XWPFPictureData img = (XWPFPictureData)createRelationship(XWPFPictureData.RELATIONS[format], XWPFFactory.getInstance(), imageNumber, false);
-    	  OutputStream out = img.getPackagePart().getOutputStream();
-    	  IOUtils.copy(is, out);
-    	  out.close();
-    	  rel = img.getPackageRelationship();
-    	  pictures.add(img);
-        return rel;      
-      }
-	
-    /**
      *  getNumbering
      * @return numbering
      */
@@ -1117,7 +1014,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
 	/**
 	 * get Styles 
-	 * @return
+	 * @return  styles for this document
 	 */
 	public XWPFStyles getStyles(){
 		return styles;
@@ -1125,8 +1022,9 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	
 	/**
 	 *  get the paragraph with the CTP class p
+     *
 	 * @param p
-	 * @return
+	 * @return  the paragraph with the CTP class p
 	 */
 	public XWPFParagraph getParagraph(CTP p){
 		for(int i=0; i<getParagraphs().size(); i++){
@@ -1139,7 +1037,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	 * get a table by its CTTbl-Object
 	 * @param ctTbl
 	 * @see org.apache.poi.xwpf.usermodel.IBody#getTable(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl)
-	 * @return
+	 * @return a table by its CTTbl-Object or null
 	 */
     public XWPFTable getTable(CTTbl ctTbl) {
 		for(int i=0; i<tables.size(); i++){
@@ -1162,7 +1060,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	 * @see org.apache.poi.xwpf.usermodel.IBody#getParagraphArray(int)
 	 */
 	public XWPFParagraph getParagraphArray(int pos) {
-		if(pos > 0 && pos < paragraphs.size()){		
+		if(pos >= 0 && pos < paragraphs.size()){		
 			return paragraphs.get(pos);
 		}
 		return null;
@@ -1182,8 +1080,8 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
 	/**
 	 * get the PartType of the body, for example
-	 * DOCUMENT, HEADER, FOOTER,	FOOTNOTE, 
-	 * @return
+	 * DOCUMENT, HEADER, FOOTER,	FOOTNOTE,
+     *
 	 * @see org.apache.poi.xwpf.usermodel.IBody#getPartType()
 	 */
 	public BodyType getPartType() {
@@ -1192,8 +1090,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
 	/**
 	 * get the TableCell which belongs to the TableCell
-	 * @param o
-	 * @return
+	 * @param cell
 	 */
 	public XWPFTableCell getTableCell(CTTc cell) {
 		XmlCursor cursor = cell.newCursor();

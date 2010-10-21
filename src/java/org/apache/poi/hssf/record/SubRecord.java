@@ -57,6 +57,13 @@ public abstract class SubRecord {
 				return new NoteStructureSubRecord(in, secondUShort);
 			case LbsDataSubRecord.sid:
 				return new LbsDataSubRecord(in, secondUShort, cmoOt);
+            case FtCblsSubRecord.sid:
+                return new FtCblsSubRecord(in, secondUShort);
+            //20101014, henrichen@zkoss.org
+            case FtCfSubRecord.sid: 
+                return new FtCfSubRecord(in, secondUShort);
+            case FtPioGrbitSubRecord.sid: 
+                return new FtPioGrbitSubRecord(in, secondUShort);
 		}
 		return new UnknownSubRecord(in, sid, secondUShort);
 	}

@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.xslf.usermodel.XSLFRelation;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdListEntry;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideMasterIdListEntry;
 
@@ -35,7 +36,7 @@ public class TestXSLFSlideShow extends TestCase {
 	public void testContainsMainContentType() throws Exception {
 		boolean found = false;
 		for(PackagePart part : pack.getParts()) {
-			if(part.getContentType().equals(XSLFSlideShow.MAIN_CONTENT_TYPE)) {
+			if(part.getContentType().equals(XSLFRelation.MAIN.getContentType())) {
 				found = true;
 			}
 			//System.out.println(part);
@@ -66,14 +67,17 @@ public class TestXSLFSlideShow extends TestCase {
 		
 		// Should have 1 master
 		assertEquals(1, xml.getSlideMasterReferences().sizeOfSldMasterIdArray());
-		assertEquals(1, xml.getSlideMasterReferences().getSldMasterIdArray().length);
+		assertEquals(1, xml.getSlideMasterReferences().getSldMasterIdList().size());
 		
 		// Should have three sheets
 		assertEquals(2, xml.getSlideReferences().sizeOfSldIdArray());
-		assertEquals(2, xml.getSlideReferences().getSldIdArray().length);
+		assertEquals(2, xml.getSlideReferences().getSldIdList().size());
 		
 		// Check they're as expected
-		CTSlideIdListEntry[] slides = xml.getSlideReferences().getSldIdArray();
+		CTSlideIdListEntry[] slides = new CTSlideIdListEntry[
+		    xml.getSlideReferences().getSldIdList().size()];
+		xml.getSlideReferences().getSldIdList().toArray(slides);
+		
 		assertEquals(256, slides[0].getId());
 		assertEquals(257, slides[1].getId());
 		assertEquals("rId2", slides[0].getId2());
@@ -88,8 +92,10 @@ public class TestXSLFSlideShow extends TestCase {
 		assertNotNull(xml.getNotes(slides[1]));
 		
 		// And again for the master
-		CTSlideMasterIdListEntry[] masters =
-			xml.getSlideMasterReferences().getSldMasterIdArray();
+		CTSlideMasterIdListEntry[] masters = new CTSlideMasterIdListEntry[
+			xml.getSlideMasterReferences().getSldMasterIdList().size()];
+		xml.getSlideMasterReferences().getSldMasterIdList().toArray(masters);
+		
 		assertEquals(2147483648l, masters[0].getId());
 		assertEquals("rId1", masters[0].getId2());
 		assertNotNull(xml.getSlideMaster(masters[0]));

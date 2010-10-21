@@ -17,6 +17,8 @@
 
 package org.apache.poi.hssf.model;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -75,6 +77,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
+import org.zkoss.lang.Classes;
+import org.zkoss.lang.Library;
 
 /**
  * Low level model implementation of a Sheet (one workbook contains many sheets)
@@ -1489,7 +1493,13 @@ public final class InternalSheet {
      * @param createIfMissing Should one be created if missing?
      */
     public int aggregateDrawingRecords(DrawingManager2 drawingManager, boolean createIfMissing) {
-        int loc = findFirstRecordLocBySid(DrawingRecord.sid);
+//20101014, henrichen@zkoss.org: EscherAggregate could have been created and insert into records    	
+        int loc = findFirstRecordLocBySid(EscherAggregate.sid);
+        if (loc >= 0) {
+        	return loc;
+        }  
+        
+        loc = findFirstRecordLocBySid(DrawingRecord.sid);
         boolean noDrawingRecordsFound = (loc == -1);
         if (noDrawingRecordsFound) {
             if(!createIfMissing) {
@@ -1508,6 +1518,10 @@ public final class InternalSheet {
             return loc;
         }
         List<RecordBase> records = getRecords();
+//20101013, henrichen@zkoss.org: handle EscherAggregate for ZK
+        if (mergeRecordsIntoEscherAggregate(records, loc, drawingManager)) {
+        	return loc;
+        }
         EscherAggregate r = EscherAggregate.createAggregate( records, loc, drawingManager );
         int startloc = loc;
 //20100614, Henri Chen: there is not always an ObjRecord after a DrawingRecord
@@ -1627,5 +1641,26 @@ public final class InternalSheet {
         NoteRecord[] result = new NoteRecord[temp.size()];
         temp.toArray(result);
         return result;
+    }
+
+    //20101013, henrichen@zkoss.org: merge drawing records into a fake EscherAggregate record if possible 
+    @SuppressWarnings("unchecked")
+	private boolean mergeRecordsIntoEscherAggregate(List<RecordBase> records, int loc, DrawingManager2 drawingManager) {
+	    final String clsName = Library.getProperty("org.zkoss.zss.model.EscherAggregate.class", "org.zkoss.zssex.model.impl.ZKEscherAggregate");
+	    if (clsName != null) {
+	    	try {
+	    		final Class cls = Classes.forNameByThread(clsName);
+				final Object r = cls.getConstructor(DrawingManager2.class).newInstance(drawingManager);
+				final Method m = Classes.getMethodInPublic(cls, "mergeRecordsIntoEscherAggregate", new Class[] {List.class, int.class, DrawingManager2.class});
+				m.invoke(r, records, new Integer(loc), drawingManager);
+	        	return true;
+	    	} catch (InvocationTargetException e) {
+	    		throw new RuntimeException(e.getCause());
+			} catch (Exception ex) {
+				//ignore, falling to return false
+				log.log(POILogger.DEBUG, ex);
+			}
+	    }
+	    return false;
     }
 }

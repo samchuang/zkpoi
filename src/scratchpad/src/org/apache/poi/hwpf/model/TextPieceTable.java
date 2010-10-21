@@ -22,8 +22,8 @@ import org.apache.poi.poifs.common.POIFSConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -33,8 +33,9 @@ import java.util.List;
  *
  * @author Ryan Ackley
  */
-public final class TextPieceTable implements CharIndexTranslator {
-	protected ArrayList _textPieces = new ArrayList();
+public class TextPieceTable implements CharIndexTranslator {
+	protected ArrayList<TextPiece> _textPieces = new ArrayList<TextPiece>();
+    protected ArrayList<TextPiece> _textPiecesFCOrder = new ArrayList<TextPiece>();
 	// int _multiple;
 	int _cpMin;
 
@@ -97,69 +98,25 @@ public final class TextPieceTable implements CharIndexTranslator {
 
 		// In the interest of our sanity, now sort the text pieces
 		// into order, if they're not already
-		TextPiece[] tp = (TextPiece[]) _textPieces.toArray(new TextPiece[_textPieces.size()]);
-		Arrays.sort(tp);
-		for (int i = 0; i < tp.length; i++) {
-			_textPieces.set(i, tp[i]);
-		}
+        Collections.sort(_textPieces);
+        _textPiecesFCOrder = new ArrayList<TextPiece>(_textPieces);
+        Collections.sort(_textPiecesFCOrder, new FCComparator());
 	}
 
 	public int getCpMin() {
 		return _cpMin;
 	}
 
-	public List getTextPieces() {
+	public List<TextPiece> getTextPieces() {
 		return _textPieces;
 	}
 
-	/**
-	 * Is the text at the given Character offset unicode, or plain old ascii? In
-	 * a very evil fashion, you have to actually know this to make sense of
-	 * character and paragraph properties :(
-	 *
-	 * @param cp
-	 *            The character offset to check about
-	 */
-	public boolean isUnicodeAtCharOffset(int cp) {
-		boolean lastWas = false;
-
-		Iterator it = _textPieces.iterator();
-		while (it.hasNext()) {
-			TextPiece tp = (TextPiece) it.next();
-			// If the text piece covers the character, all good
-			if (tp.getStart() <= cp && tp.getEnd() >= cp) {
-				return tp.isUnicode();
-			}
-			// Otherwise keep track for the last one
-			lastWas = tp.isUnicode();
-		}
-
-		// If they ask off the end, just go with the last one...
-		return lastWas;
-	}
-
-	public boolean isUnicodeAtByteOffset(int bytePos) {
-		boolean lastWas = false;
-
-		Iterator it = _textPieces.iterator();
-		while (it.hasNext()) {
-			TextPiece tp = (TextPiece) it.next();
-			int curByte = tp.getPieceDescriptor().getFilePosition();
-			int pieceEnd = curByte + tp.bytesLength();
-
-			// If the text piece covers the character, all good
-			if (curByte <= bytePos && pieceEnd > bytePos) {
-				return tp.isUnicode();
-			}
-			// Otherwise keep track for the last one
-			lastWas = tp.isUnicode();
-			// Move along
-			curByte = pieceEnd;
-		}
-
-		// If they ask off the end, just go with the last one...
-		return lastWas;
-	}
+    public void add(TextPiece piece) {
+        _textPieces.add(piece);
+        _textPiecesFCOrder.add(piece);
+        Collections.sort(_textPieces);
+        Collections.sort(_textPiecesFCOrder, new FCComparator());
+    }
 
 	public byte[] writeTo(HWPFOutputStream docStream) throws IOException {
 
@@ -168,7 +125,7 @@ public final class TextPieceTable implements CharIndexTranslator {
 
 		int size = _textPieces.size();
 		for (int x = 0; x < size; x++) {
-			TextPiece next = (TextPiece) _textPieces.get(x);
+			TextPiece next = _textPieces.get(x);
 			PieceDescriptor pd = next.getPieceDescriptor();
 
 			int offset = docStream.getOffset();
@@ -209,7 +166,7 @@ public final class TextPieceTable implements CharIndexTranslator {
 	public int adjustForInsert(int listIndex, int length) {
 		int size = _textPieces.size();
 
-		TextPiece tp = (TextPiece) _textPieces.get(listIndex);
+		TextPiece tp = _textPieces.get(listIndex);
 
 		// Update with the new end
 		tp.setEnd(tp.getEnd() + length);
@@ -240,30 +197,110 @@ public final class TextPieceTable implements CharIndexTranslator {
 		return false;
 	}
 
-	public int getCharIndex(int bytePos) {
-		int charCount = 0;
+    public int getCharIndex(int bytePos) {
+        return getCharIndex(bytePos, 0);
+    }
 
-		Iterator it = _textPieces.iterator();
-		while (it.hasNext()) {
-			TextPiece tp = (TextPiece) it.next();
+    public int getCharIndex(int bytePos, int startCP) {
+        int charCount = 0;
+
+        bytePos = lookIndexForward(bytePos);
+
+        for(TextPiece tp : _textPieces) {
+            int pieceStart = tp.getPieceDescriptor().getFilePosition();
+
+            int bytesLength = tp.bytesLength();
+            int pieceEnd = pieceStart + bytesLength;
+
+            int toAdd;
+
+            if (bytePos< pieceStart || bytePos > pieceEnd) {
+                toAdd = bytesLength;
+            } else if (bytePos > pieceStart && bytePos < pieceEnd) {
+               toAdd = (bytePos - pieceStart);
+            } else {
+                toAdd = bytesLength - (pieceEnd - bytePos);
+            }
+
+            if (tp.isUnicode()) {
+                charCount += toAdd / 2;
+            } else {
+                charCount += toAdd;
+            }
+
+            if (bytePos>=pieceStart && bytePos<=pieceEnd && charCount>=startCP) {
+                break;
+            }
+        }
+
+        return charCount;
+    }
+
+    public int lookIndexForward(int bytePos) {
+        for(TextPiece tp : _textPiecesFCOrder) {
 			int pieceStart = tp.getPieceDescriptor().getFilePosition();
-			if (pieceStart >= bytePos) {
-				break;
+
+            if (bytePos > pieceStart + tp.bytesLength()) {
+                continue;
+            }
+
+			if (pieceStart > bytePos) {
+				bytePos = pieceStart;
 			}
 
-			int bytesLength = tp.bytesLength();
-			int pieceEnd = pieceStart + bytesLength;
+            break;
+        }
+        return bytePos;
+    }
 
-			int toAdd = bytePos > pieceEnd ? bytesLength : bytesLength - (pieceEnd - bytePos);
+    public int lookIndexBackward(int bytePos) {
+        int lastEnd = 0;
 
-			if (tp.isUnicode()) {
-				charCount += toAdd / 2;
-			} else {
-				charCount += toAdd;
+        for(TextPiece tp : _textPiecesFCOrder) {
+			int pieceStart = tp.getPieceDescriptor().getFilePosition();
+
+            if (bytePos > pieceStart + tp.bytesLength()) {
+                lastEnd = pieceStart + tp.bytesLength();
+                continue;
+            }
+
+			if (pieceStart > bytePos) {
+				bytePos = lastEnd;
 			}
-		}
 
-		return charCount;
-	}
+            break;
+        }
 
+        return bytePos;
+    }
+
+    public boolean isIndexInTable(int bytePos) {
+        for(TextPiece tp : _textPiecesFCOrder) {
+			int pieceStart = tp.getPieceDescriptor().getFilePosition();
+
+            if (bytePos > pieceStart + tp.bytesLength()) {
+                continue;
+            }
+
+			if (pieceStart > bytePos) {
+				return false;
+			}
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static class FCComparator implements Comparator<TextPiece> {
+        public int compare(TextPiece textPiece, TextPiece textPiece1) {
+            if (textPiece.getPieceDescriptor().fc>textPiece1.getPieceDescriptor().fc) {
+                return 1;
+            } else if (textPiece.getPieceDescriptor().fc<textPiece1.getPieceDescriptor().fc) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
 }
