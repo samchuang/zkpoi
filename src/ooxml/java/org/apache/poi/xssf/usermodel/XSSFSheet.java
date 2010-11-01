@@ -170,11 +170,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         hyperlinks = new ArrayList<XSSFHyperlink>();
     }
 
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     private void initRows(CTWorksheet worksheet) {
         _rows = new TreeMap<Integer, XSSFRow>();
         sharedFormulas = new HashMap<Integer, CTCellFormula>();
         arrayFormulas = new ArrayList<CellRangeAddress>();
-        for (CTRow row : worksheet.getSheetData().getRowList()) {
+        for (CTRow row : worksheet.getSheetData().getRowArray()) {
             XSSFRow r = new XSSFRow(row, this);
             _rows.put(r.getRowNum(), r);
         }
@@ -184,6 +185,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * Read hyperlink relations, link them with CTHyperlink beans in this worksheet
      * and initialize the internal array of XSSFHyperlink objects
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     private void initHyperlinks() {
         hyperlinks = new ArrayList<XSSFHyperlink>();
 
@@ -194,7 +196,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
                 getPackagePart().getRelationshipsByType(XSSFRelation.SHEET_HYPERLINKS.getRelation());
 
             // Turn each one into a XSSFHyperlink
-            for(CTHyperlink hyperlink : worksheet.getHyperlinks().getHyperlinkList()) {
+            for(CTHyperlink hyperlink : worksheet.getHyperlinks().getHyperlinkArray()) {
                 PackageRelationship hyperRel = null;
                 if(hyperlink.getId() != null) {
                     hyperRel = hyperRels.getRelationshipByID(hyperlink.getId());
@@ -542,14 +544,14 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      *
      * @return column indexes of all the vertical page breaks, never <code>null</code>
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public int[] getColumnBreaks() {
         if (!worksheet.isSetColBreaks() || worksheet.getColBreaks().sizeOfBrkArray() == 0) {
             return new int[0];
         }
 
-        CTBreak[] brkArray = new  CTBreak[worksheet.getColBreaks().getBrkList().size()];
-        worksheet.getColBreaks().getBrkList().toArray(brkArray);
-        
+        CTBreak[] brkArray = worksheet.getColBreaks().getBrkArray();
+
         int[] breaks = new int[brkArray.length];
         for (int i = 0 ; i < brkArray.length ; i++) {
             CTBreak brk = brkArray[i];
@@ -998,14 +1000,13 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      *
      * @return row indexes of all the horizontal page breaks, never <code>null</code>
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public int[] getRowBreaks() {
         if (!worksheet.isSetRowBreaks() || worksheet.getRowBreaks().sizeOfBrkArray() == 0) {
             return new int[0];
         }
 
-        CTBreak[] brkArray = new CTBreak[worksheet.getRowBreaks().getBrkList().size()];
-        worksheet.getRowBreaks().getBrkList().toArray(brkArray);
-        
+        CTBreak[] brkArray = worksheet.getRowBreaks().getBrkArray();
         int[] breaks = new int[brkArray.length];
         for (int i = 0 ; i < brkArray.length ; i++) {
             CTBreak brk = brkArray[i];
@@ -1179,11 +1180,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     }
 
 
-    private short getMaxOutlineLevelCols(){
-        CTCols ctCols=worksheet.getColsArray(0);
-        short outlineLevel=0;
-        for(CTCol col: ctCols.getColList()){
-            outlineLevel=col.getOutlineLevel()>outlineLevel? col.getOutlineLevel(): outlineLevel;
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
+    private short getMaxOutlineLevelCols() {
+        CTCols ctCols = worksheet.getColsArray(0);
+        short outlineLevel = 0;
+        for (CTCol col : ctCols.getColArray()) {
+            outlineLevel = col.getOutlineLevel() > outlineLevel ? col.getOutlineLevel() : outlineLevel;
         }
         return outlineLevel;
     }
@@ -1326,10 +1328,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     /**
      * Removes a page break at the indicated column
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public void removeColumnBreak(int column) {
-        CTBreak[] brkArray = new CTBreak[getSheetTypeColumnBreaks().getBrkList().size()]; 
-        getSheetTypeColumnBreaks().getBrkList().toArray(brkArray);
-        
+        CTBreak[] brkArray = getSheetTypeColumnBreaks().getBrkArray();
         for (int i = 0 ; i < brkArray.length ; i++) {
             if (brkArray[i].getId() == column) {
                 getSheetTypeColumnBreaks().removeBrk(i);
@@ -1383,10 +1384,10 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     /**
      * Removes the page break at the indicated row
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public void removeRowBreak(int row) {
         CTPageBreak pgBreak = worksheet.isSetRowBreaks() ? worksheet.getRowBreaks() : worksheet.addNewRowBreaks();
-        CTBreak[] brkArray = new CTBreak[pgBreak.getBrkList().size()];
-        pgBreak.getBrkList().toArray(brkArray);
+        CTBreak[] brkArray = pgBreak.getBrkArray();
         for (int i = 0 ; i < brkArray.length ; i++) {
             if (brkArray[i].getId() == row) {
                 pgBreak.removeBrk(i);
@@ -2139,6 +2140,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param copyRowHeight whether to copy the row height during the shift
      * @param resetOriginalRowHeight whether to set the original row's height to the default
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public void shiftRows(int startRow, int endRow, int n, boolean copyRowHeight, boolean resetOriginalRowHeight) {
         for (Iterator<Row> it = rowIterator() ; it.hasNext() ; ) {
             XSSFRow row = (XSSFRow)it.next();
@@ -2159,7 +2161,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
             if(sheetComments != null){
                 //TODO shift Note's anchor in the associated /xl/drawing/vmlDrawings#.vml
                 CTCommentList lst = sheetComments.getCTComments().getCommentList();
-                for (CTComment comment : lst.getCommentList()) {
+                for (CTComment comment : lst.getCommentArray()) {
                     CellReference ref = new CellReference(comment.getRef());
                     if(ref.getRow() == rownum){
                         ref = new CellReference(rownum + n, ref.getCol());
@@ -2283,9 +2285,10 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      *
      * @param value <code>true</code> if this sheet is selected
      */
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public void setSelected(boolean value) {
         CTSheetViews views = getSheetTypeSheetViews();
-        for (CTSheetView view : views.getSheetViewList()) {
+        for (CTSheetView view : views.getSheetViewArray()) {
             view.setTabSelected(value);
         }
     }
@@ -2361,10 +2364,11 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      */
     private CTSheetView getDefaultSheetView() {
         CTSheetViews views = getSheetTypeSheetViews();
-        if (views == null || views.getSheetViewList() == null || views.getSheetViewList().size() <= 0) {
+        int sz = views == null ? 0 : views.sizeOfSheetViewArray();
+        if (sz  == 0) {
             return null;
         }
-        return views.getSheetViewArray(views.getSheetViewList().size() - 1);
+        return views.getSheetViewArray(sz - 1);
     }
 
     /**
@@ -2438,9 +2442,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     protected void write(OutputStream out) throws IOException {
 
-        if(worksheet.getColsList().size() == 1) {
+        if(worksheet.sizeOfColsArray() == 1) {
             CTCols col = worksheet.getColsArray(0);
-            if(col.getColList().size() == 0) {
+            if(col.sizeOfColArray() == 0) {
                 worksheet.setColsArray(null);
             }
         }
@@ -2891,11 +2895,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		return dataValidationHelper;
 	}
     
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public List<XSSFDataValidation> getDataValidations() {
     	List<XSSFDataValidation> xssfValidations = new ArrayList<XSSFDataValidation>();
     	CTDataValidations dataValidations = this.worksheet.getDataValidations();
     	if( dataValidations!=null && dataValidations.getCount() > 0 ) {
-    		for (CTDataValidation ctDataValidation : dataValidations.getDataValidationList()) {
+    		for (CTDataValidation ctDataValidation : dataValidations.getDataValidationArray()) {
     			CellRangeAddressList addressList = new CellRangeAddressList();
     			
     			@SuppressWarnings("unchecked")
@@ -2923,7 +2928,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		if( dataValidations==null ) {
 			dataValidations = worksheet.addNewDataValidations();
 		}
-		int currentCount = dataValidations.getDataValidationList().size();
+		int currentCount = dataValidations.sizeOfDataValidationArray();
         CTDataValidation newval = dataValidations.addNewDataValidation();
 		newval.set(xssfDataValidation.getCtDdataValidation());
 		dataValidations.setCount(currentCount + 1);
