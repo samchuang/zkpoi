@@ -1353,7 +1353,7 @@ public final class HSSFChart implements ChartInfo {
 		}
 		return null;
 	}
-	
+	//20101015, henrichen@zkoss.org: new constructor
 	public HSSFChart(HSSFSheet sheet, ChartRecord chart, LegendRecord legend, 
 		ChartTitleFormatRecord chartTitleFormat, SeriesTextRecord chartTitleText, 
 		List<Object[]> seriesList, List<ValueRangeRecord> valueRanges, Record chartType, Chart3DRecord chart3d) {
@@ -1362,6 +1362,7 @@ public final class HSSFChart implements ChartInfo {
 		this.legendRecord = legend;
 		this.chartTitleFormat = chartTitleFormat;
 		this.chartTitleText = chartTitleText;
+		this.shapeRecord = chartType;
 		this.type = getChartType(chartType);
 		this.chart3d = chart3d;
 		for(Object[] seriesObj : seriesList) {
@@ -1386,5 +1387,11 @@ public final class HSSFChart implements ChartInfo {
 	//20101018, henrichen:
 	public Chart3DRecord getChart3D() {
 		return this.chart3d;
+	}
+
+	//20101101, henrichen@zkoss.org: reserve shape record information
+	private Record shapeRecord; //Area, Pie, Bar, Line, Scatter ...
+	public Record getShapeRecord() {
+		return shapeRecord;
 	}
 }

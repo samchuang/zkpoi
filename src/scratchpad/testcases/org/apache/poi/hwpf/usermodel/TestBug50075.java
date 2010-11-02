@@ -14,31 +14,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
+package org.apache.poi.hwpf.usermodel;
 
-package org.apache.poi.poifs.poibrowser;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.HWPFTestDataSamples;
+import org.apache.poi.hwpf.model.ListFormatOverride;
+import org.apache.poi.hwpf.model.ListLevel;
 
-import java.awt.*;
-import javax.swing.*;
+import junit.framework.TestCase;
 
-/**
- * <p>Contains various (well, just one at the moment) static utility
- * methods.</p>
- *
- * @author Rainer Klute <a
- * href="mailto:klute@rainer-klute.de">&lt;klute@rainer-klute.de&gt;</a>
- */
-public class Util {
+public class TestBug50075 extends TestCase
+{
 
-    /**
-     * <p>Makes a Swing component inverted by swapping its foreground
-     * and background colors. Hint: Depending on your needs it might
-     * also be a good idea to call <tt>c.setOpaque(true)</tt>.</p>
-     */
-    public static void invert(JComponent c) {
-        Color invBackground = c.getForeground();
-        Color invForeground = c.getBackground();
-        c.setBackground(invBackground);
-        c.setForeground(invForeground);
-    }
+  public void test() {
+    HWPFDocument doc = HWPFTestDataSamples.openSampleFile("Bug50075.doc");
+    Range range = doc.getRange();
+    assertEquals(1, range.numParagraphs());
+    ListEntry entry = (ListEntry) range.getParagraph(0);
+    ListFormatOverride override = doc.getListTables().getOverride(entry.getIlfo());
+    ListLevel level = doc.getListTables().getLevel(override.getLsid(), entry.getIlvl());
+    
+    // the bug reproduces, if this call fails with NullPointerException
+    level.getNumberText();
+  }
+  
 }
-
