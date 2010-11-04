@@ -41,6 +41,7 @@ import org.apache.poi.hssf.record.formula.Ptg;
 import org.apache.poi.ss.usermodel.ChartInfo;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressBase;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBoolean;
 
 /**
  * Has methods for construction of a chart object.
@@ -1354,9 +1355,10 @@ public final class HSSFChart implements ChartInfo {
 		return null;
 	}
 	//20101015, henrichen@zkoss.org: new constructor
+	private TextRecord titleTextRecord;
 	public HSSFChart(HSSFSheet sheet, ChartRecord chart, LegendRecord legend, 
 		ChartTitleFormatRecord chartTitleFormat, SeriesTextRecord chartTitleText, 
-		List<Object[]> seriesList, List<ValueRangeRecord> valueRanges, Record chartType, Chart3DRecord chart3d) {
+		List<Object[]> seriesList, List<ValueRangeRecord> valueRanges, Record chartType, Chart3DRecord chart3d, TextRecord titleTextRecord) {
 		this.chartRecord = chart;
 		this.sheet = sheet;
 		this.legendRecord = legend;
@@ -1365,6 +1367,7 @@ public final class HSSFChart implements ChartInfo {
 		this.shapeRecord = chartType;
 		this.type = getChartType(chartType);
 		this.chart3d = chart3d;
+		this.titleTextRecord = titleTextRecord;
 		for(Object[] seriesObj : seriesList) {
 			final SeriesRecord r = (SeriesRecord) seriesObj[0];
 			final HSSFSeries ser = new HSSFSeries( (SeriesRecord)r );
@@ -1394,4 +1397,14 @@ public final class HSSFChart implements ChartInfo {
 	public Record getShapeRecord() {
 		return shapeRecord;
 	}
+	
+	//20101102, henrichen@zkoss.org: explore legend position
+	public int getLegendPos() {
+		return legendRecord.getType();
+	}
+
+	//20100102, henrichen@zkoss.org: whether NOT show the title
+    public boolean isAutoTitleDeleted() {
+    	return titleTextRecord != null ? titleTextRecord.isAutoLabelDeleted() : false;
+    }
 }

@@ -30,10 +30,13 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBar3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarSer;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBoolean;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBubbleChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTChartSpace;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTDoughnutChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegend;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegendPos;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLine3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineSer;
@@ -52,6 +55,7 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTView3D;
 import org.openxmlformats.schemas.drawingml.x2006.chart.ChartSpaceDocument;
+import org.openxmlformats.schemas.drawingml.x2006.chart.STLegendPos;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
@@ -91,6 +95,12 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 	    	}
     	}
     	return null;
+    }
+    
+    public int getLegendPos() {
+    	final CTLegend legend = _ctChart.getLegend();
+    	final CTLegendPos pos = legend.getLegendPos();
+    	return pos.getVal().intValue();
     }
     
     public boolean getChart3D() {
@@ -141,6 +151,11 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
     	}
     	
     	return XSSFChartType.Unknown;
+    }
+
+    public boolean isAutoTitleDeleted() {
+    	final CTBoolean b = _ctChart.getAutoTitleDeleted();
+    	return b != null ? b.getVal() : false; 
     }
     
     private XmlObject getChartObj() {
