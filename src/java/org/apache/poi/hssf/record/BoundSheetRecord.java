@@ -15,18 +15,18 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
-import org.apache.poi.util.StringUtil;
-import org.apache.poi.ss.util.WorkbookUtil;
+import org.zkoss.poi.ss.util.WorkbookUtil;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * Title:        Bound Sheet Record (aka BundleSheet) (0x0085)<P>
@@ -85,7 +85,7 @@ public final class BoundSheetRecord extends StandardRecord {
 	/**
 	 * Set the sheetname for this sheet.  (this appears in the tabs at the bottom)
 	 * @param sheetName the name of the sheet
-	 * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
+	 * @see org.zkoss.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
 	 *      for a safe way to create valid names
 	 * @throws IllegalArgumentException if sheet name will cause excel to crash.
 	 */

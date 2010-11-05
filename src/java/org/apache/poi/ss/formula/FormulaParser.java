@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.poi.hssf.record.constant.ErrorConstant;
-import org.apache.poi.hssf.record.formula.*;
-import org.apache.poi.hssf.record.formula.function.FunctionMetadata;
-import org.apache.poi.hssf.record.formula.function.FunctionMetadataRegistry;
-import org.apache.poi.hssf.usermodel.HSSFErrorConstants;
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.util.AreaReference;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.CellReference.NameType;
+import org.zkoss.poi.hssf.record.constant.ErrorConstant;
+import org.zkoss.poi.hssf.record.formula.*;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadata;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadataRegistry;
+import org.zkoss.poi.hssf.usermodel.HSSFErrorConstants;
+import org.zkoss.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.util.AreaReference;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.util.CellReference.NameType;
 
 /**
  * This class parses a formula string into a List of tokens in RPN order.
@@ -664,7 +664,7 @@ public final class FormulaParser {
 	/**
 	 * Matches a zero or one letter-runs followed by zero or one digit-runs.
 	 * Either or both runs man optionally be prefixed with a single '$'.
-	 * (copied+modified from {@link org.apache.poi.ss.util.CellReference#CELL_REF_PATTERN})
+	 * (copied+modified from {@link org.zkoss.poi.ss.util.CellReference#CELL_REF_PATTERN})
 	 */
 	private static final Pattern CELL_REF_PATTERN = Pattern.compile("(\\$?[A-Za-z]+)?(\\$?[0-9]+)?");
 

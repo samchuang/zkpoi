@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.eventusermodel;
+package org.zkoss.poi.hssf.eventusermodel;
 
 import java.io.InputStream;
 import java.io.IOException;
 
-import org.apache.poi.hssf.eventusermodel.HSSFUserException;
-import org.apache.poi.hssf.record.*;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hssf.eventusermodel.HSSFUserException;
+import org.zkoss.poi.hssf.record.*;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * Low level event based HSSF reader.  Pass either a DocumentInputStream to
@@ -97,7 +97,7 @@ public class HSSFEventFactory {
 	 * the method will return just as with <code>abortableProcessEvents</code>, but no
 	 * user code or <code>HSSFUserException</code> will be passed back.
 	 *
-	 * @see org.apache.poi.poifs.filesystem.POIFSFileSystem#createDocumentInputStream(String)
+	 * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem#createDocumentInputStream(String)
 	 * @param req an Instance of HSSFRequest which has your registered listeners
 	 * @param in  a DocumentInputStream obtained from POIFS's POIFSFileSystem object
 	 */
@@ -113,7 +113,7 @@ public class HSSFEventFactory {
 	/**
 	 * Processes a DocumentInputStream into essentially Record events.
 	 *
-	 * @see org.apache.poi.poifs.filesystem.POIFSFileSystem#createDocumentInputStream(String)
+	 * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem#createDocumentInputStream(String)
 	 * @param req an Instance of HSSFRequest which has your registered listeners
 	 * @param in  a DocumentInputStream obtained from POIFS's POIFSFileSystem object
 	 * @return    numeric user-specified result code.
@@ -126,7 +126,7 @@ public class HSSFEventFactory {
 	/**
 	 * Processes a DocumentInputStream into essentially Record events.
 	 *
-	 * @see org.apache.poi.poifs.filesystem.POIFSFileSystem#createDocumentInputStream(String)
+	 * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem#createDocumentInputStream(String)
 	 * @param req an Instance of HSSFRequest which has your registered listeners
 	 * @param in  a DocumentInputStream obtained from POIFS's POIFSFileSystem object
 	 * @return    numeric user-specified result code.

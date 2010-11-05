@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.NamePtg;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
+import org.zkoss.poi.hssf.record.formula.NamePtg;
+import org.zkoss.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
 
 /**
  * Abstracts a workbook for the purpose of converting formula to text.<br/>

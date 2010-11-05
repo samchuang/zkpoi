@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.constant;
+package org.zkoss.poi.hssf.record.constant;
 
-import org.apache.poi.hssf.usermodel.HSSFErrorConstants;
+import org.zkoss.poi.hssf.usermodel.HSSFErrorConstants;
 /**
  * Represents a constant error code value as encoded in a constant values array. <p/>
  * 

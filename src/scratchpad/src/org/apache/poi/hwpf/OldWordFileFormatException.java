@@ -14,9 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hwpf;
+package org.zkoss.poi.hwpf;
 
-import org.apache.poi.OldFileFormatException;
+import org.zkoss.poi.OldFileFormatException;
 
 public class OldWordFileFormatException extends OldFileFormatException {
     public OldWordFileFormatException(String s) {

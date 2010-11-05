@@ -14,22 +14,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hwpf;
+package org.zkoss.poi.hwpf;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.hwpf.model.ComplexFileTable;
-import org.apache.poi.hwpf.model.OldCHPBinTable;
-import org.apache.poi.hwpf.model.OldPAPBinTable;
-import org.apache.poi.hwpf.model.OldSectionTable;
-import org.apache.poi.hwpf.model.PieceDescriptor;
-import org.apache.poi.hwpf.model.TextPiece;
-import org.apache.poi.hwpf.model.TextPieceTable;
-import org.apache.poi.hwpf.usermodel.Range;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hwpf.model.ComplexFileTable;
+import org.zkoss.poi.hwpf.model.OldCHPBinTable;
+import org.zkoss.poi.hwpf.model.OldPAPBinTable;
+import org.zkoss.poi.hwpf.model.OldSectionTable;
+import org.zkoss.poi.hwpf.model.PieceDescriptor;
+import org.zkoss.poi.hwpf.model.TextPiece;
+import org.zkoss.poi.hwpf.model.TextPieceTable;
+import org.zkoss.poi.hwpf.usermodel.Range;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Provides very simple support for old (Word 6 / Word 95)

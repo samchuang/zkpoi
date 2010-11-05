@@ -15,24 +15,24 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf;
+package org.zkoss.poi.hdgf;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.POIDocument;
-import org.apache.poi.hdgf.chunks.ChunkFactory;
-import org.apache.poi.hdgf.pointers.Pointer;
-import org.apache.poi.hdgf.pointers.PointerFactory;
-import org.apache.poi.hdgf.streams.PointerContainingStream;
-import org.apache.poi.hdgf.streams.Stream;
-import org.apache.poi.hdgf.streams.StringsStream;
-import org.apache.poi.hdgf.streams.TrailerStream;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.POIDocument;
+import org.zkoss.poi.hdgf.chunks.ChunkFactory;
+import org.zkoss.poi.hdgf.pointers.Pointer;
+import org.zkoss.poi.hdgf.pointers.PointerFactory;
+import org.zkoss.poi.hdgf.streams.PointerContainingStream;
+import org.zkoss.poi.hdgf.streams.Stream;
+import org.zkoss.poi.hdgf.streams.StringsStream;
+import org.zkoss.poi.hdgf.streams.TrailerStream;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * See
@@ -109,7 +109,7 @@ public final class HDGFDiagram extends POIDocument {
 
 	/**
 	 * Prints out some simple debug on the base contents of the file.
-	 * @see org.apache.poi.hdgf.dev.VSDDumper
+	 * @see org.zkoss.poi.hdgf.dev.VSDDumper
 	 */
 	public void debug() {
 		System.err.println("Trailer is at " + trailerPointer.getOffset());

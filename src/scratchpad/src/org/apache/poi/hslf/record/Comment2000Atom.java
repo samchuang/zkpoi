@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
-import org.apache.poi.hslf.util.SystemTimeUtils;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hslf.util.SystemTimeUtils;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * An atomic record containing information about a comment.

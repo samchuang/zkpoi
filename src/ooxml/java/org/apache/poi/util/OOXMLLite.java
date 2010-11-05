@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.lang.reflect.Field;
+
+import org.zkoss.poi.util.IOUtils;
 
 /**
  * Build a 'lite' version of the ooxml-schemas.jar

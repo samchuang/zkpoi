@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.util.HashSet;
 import java.io.IOException;
 
-import org.apache.poi.hwpf.model.io.*;
 
 
-import org.apache.poi.hwpf.model.types.FIBAbstractType;
+import org.zkoss.poi.hwpf.model.io.*;
+import org.zkoss.poi.hwpf.model.types.FIBAbstractType;
 
 /**
  * The File Information Block (FIB). Holds pointers

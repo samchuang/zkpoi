@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc;
+package org.zkoss.poi.openxml4j.opc;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,13 +23,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
-import org.apache.poi.openxml4j.opc.internal.PackagePropertiesPart;
-import org.apache.poi.openxml4j.opc.internal.ZipContentTypeManager;
-import org.apache.poi.openxml4j.util.Nullable;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.openxml4j.opc.internal.PackagePropertiesPart;
+import org.zkoss.poi.openxml4j.opc.internal.ZipContentTypeManager;
+import org.zkoss.poi.openxml4j.util.Nullable;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * @deprecated (name clash with {@link java.lang.Package} use {@link OPCPackage} instead.

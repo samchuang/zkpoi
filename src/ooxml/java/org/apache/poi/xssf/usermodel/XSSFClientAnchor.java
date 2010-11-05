@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.util.Internal;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.util.Internal;
 
 /**
  * A client anchor is attached to an excel worksheet.  It anchors against

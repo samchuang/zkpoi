@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.io.IOException;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.hwpf.model.io.HWPFOutputStream;
-import org.apache.poi.hwpf.usermodel.CharacterProperties;
-import org.apache.poi.hwpf.usermodel.ParagraphProperties;
-import org.apache.poi.hwpf.sprm.ParagraphSprmUncompressor;
-import org.apache.poi.hwpf.sprm.CharacterSprmUncompressor;
+import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.hwpf.sprm.CharacterSprmUncompressor;
+import org.zkoss.poi.hwpf.sprm.ParagraphSprmUncompressor;
+import org.zkoss.poi.hwpf.usermodel.CharacterProperties;
+import org.zkoss.poi.hwpf.usermodel.ParagraphProperties;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Represents a document's stylesheet. A word documents formatting is stored as

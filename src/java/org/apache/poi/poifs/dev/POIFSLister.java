@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.dev;
+package org.zkoss.poi.poifs.dev;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.DocumentNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * A lister of the entries in POIFS files.

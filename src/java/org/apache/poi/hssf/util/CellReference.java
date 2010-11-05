@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
 /**
  * Common conversion functions between Excel style A1, C27 style
@@ -24,7 +24,7 @@ package org.apache.poi.hssf.util;
  * @author  Avik Sengupta
  * @author  Dennis Doubleday (patch to seperateRowColumns())
  */
-public final class CellReference extends org.apache.poi.ss.util.CellReference {
+public final class CellReference extends org.zkoss.poi.ss.util.CellReference {
     /**
      * Create an cell ref from a string representation.  Sheet names containing special characters should be
      * delimited and escaped as per normal syntax rules for formulas.

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.util;
+package org.zkoss.poi.xssf.util;
 
 public class NumericRanges {
 

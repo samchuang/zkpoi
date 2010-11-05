@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.functions;
+package org.zkoss.poi.hssf.record.formula.functions;
 
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.hssf.record.formula.eval.EvaluationException;
-import org.apache.poi.hssf.record.formula.eval.MissingArgEval;
-import org.apache.poi.hssf.record.formula.eval.NumberEval;
-import org.apache.poi.hssf.record.formula.eval.OperandResolver;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.hssf.record.formula.eval.EvaluationException;
+import org.zkoss.poi.hssf.record.formula.eval.MissingArgEval;
+import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
+import org.zkoss.poi.hssf.record.formula.eval.OperandResolver;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
 
 /**
  * Implementation for the Excel function TIME
@@ -67,7 +67,7 @@ public final class TimeFunc extends Fixed3ArgFunction {
 	 * @return An Excel representation of a time of day.
 	 * If the time value represents more than a day, the days are removed from
 	 * the result, leaving only the time of day component.
-	 * @throws org.apache.poi.hssf.record.formula.eval.EvaluationException
+	 * @throws org.zkoss.poi.hssf.record.formula.eval.EvaluationException
 	 * If any of the arguments are greater than 32767 or the hours
 	 * minutes and seconds when combined form a time value less than 0, the function
 	 * evaluates to an error.

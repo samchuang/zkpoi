@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 /**
  * The superclass of all sheet container records - Slide, Notes, MainMaster, etc.

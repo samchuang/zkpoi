@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
-import org.apache.poi.hslf.*;
-import org.apache.poi.hslf.record.*;
+import org.zkoss.poi.hslf.*;
+import org.zkoss.poi.hslf.record.*;
 
 /**
  * Uses record level code to locate SlideListWithText entries.

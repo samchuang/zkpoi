@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
-import org.apache.poi.hslf.*;
-import org.apache.poi.hslf.model.textproperties.BitMaskTextProp;
-import org.apache.poi.hslf.model.textproperties.TextProp;
-import org.apache.poi.hslf.model.textproperties.TextPropCollection;
-import org.apache.poi.hslf.record.*;
+import org.zkoss.poi.hslf.*;
+import org.zkoss.poi.hslf.model.textproperties.BitMaskTextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextPropCollection;
+import org.zkoss.poi.hslf.record.*;
 
 import java.util.LinkedList;
 

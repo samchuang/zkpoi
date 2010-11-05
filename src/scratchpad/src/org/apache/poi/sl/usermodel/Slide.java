@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.sl.usermodel;
+package org.zkoss.poi.sl.usermodel;
 
 public interface Slide extends Sheet {
 	public Notes getNotes();

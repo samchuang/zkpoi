@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.cf;
+package org.zkoss.poi.hssf.record.cf;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**
  * 

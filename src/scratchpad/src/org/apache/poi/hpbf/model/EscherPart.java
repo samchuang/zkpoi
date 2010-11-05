@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.model;
+package org.zkoss.poi.hpbf.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.poi.ddf.DefaultEscherRecordFactory;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.ddf.DefaultEscherRecordFactory;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
 
 /**
  * Parent class of all Escher parts

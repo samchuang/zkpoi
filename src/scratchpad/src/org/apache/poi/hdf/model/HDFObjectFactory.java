@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.model;
+package org.zkoss.poi.hdf.model;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,12 +23,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hdf.event.HDFLowLevelParsingListener;
-import org.apache.poi.hdf.model.hdftypes.*;
-import org.apache.poi.hdf.model.util.ParsingState;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hdf.event.HDFLowLevelParsingListener;
+import org.zkoss.poi.hdf.model.hdftypes.*;
+import org.zkoss.poi.hdf.model.util.ParsingState;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * The Object Factory takes in a stream and creates the low level objects

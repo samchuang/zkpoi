@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
 
 /**
  * Used for non-formula cells, primarily to keep track of the referencing (formula) cells.

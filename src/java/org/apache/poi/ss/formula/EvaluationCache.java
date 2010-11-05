@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.eval.BlankEval;
-import org.apache.poi.hssf.record.formula.eval.BoolEval;
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.hssf.record.formula.eval.NumberEval;
-import org.apache.poi.hssf.record.formula.eval.StringEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.ss.formula.FormulaCellCache.IEntryOperation;
-import org.apache.poi.ss.formula.FormulaUsedBlankCellSet.BookSheetKey;
-import org.apache.poi.ss.formula.PlainCellCache.Loc;
+import org.zkoss.poi.hssf.record.formula.eval.BlankEval;
+import org.zkoss.poi.hssf.record.formula.eval.BoolEval;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
+import org.zkoss.poi.hssf.record.formula.eval.StringEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.usermodel.HSSFCell;
+import org.zkoss.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.zkoss.poi.ss.formula.FormulaCellCache.IEntryOperation;
+import org.zkoss.poi.ss.formula.FormulaUsedBlankCellSet.BookSheetKey;
+import org.zkoss.poi.ss.formula.PlainCellCache.Loc;
 
 /**
  * Performance optimisation for {@link HSSFFormulaEvaluator}. This class stores previously

@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.property;
+package org.zkoss.poi.poifs.property;
 
 /**
  * This interface defines methods for finding and setting sibling

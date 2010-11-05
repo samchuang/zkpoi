@@ -16,12 +16,12 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.ddf.EscherBitmapBlip;
-import org.apache.poi.ddf.EscherBlipRecord;
-import org.apache.poi.ddf.EscherMetafileBlip;
-import org.apache.poi.ss.usermodel.PictureData;
+import org.zkoss.poi.ddf.EscherBitmapBlip;
+import org.zkoss.poi.ddf.EscherBlipRecord;
+import org.zkoss.poi.ddf.EscherMetafileBlip;
+import org.zkoss.poi.ss.usermodel.PictureData;
 
 /**
  * Represents binary data stored in the file.  Eg. A GIF, JPEG etc...

@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.model;
+package org.zkoss.poi.hpbf.model;
 
 import java.io.IOException;
 
-import org.apache.poi.hpbf.model.qcbits.QCBit;
-import org.apache.poi.hpbf.model.qcbits.QCPLCBit;
-import org.apache.poi.hpbf.model.qcbits.QCTextBit;
-import org.apache.poi.hpbf.model.qcbits.UnknownQCBit;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hpbf.model.qcbits.QCBit;
+import org.zkoss.poi.hpbf.model.qcbits.QCPLCBit;
+import org.zkoss.poi.hpbf.model.qcbits.QCTextBit;
+import org.zkoss.poi.hpbf.model.qcbits.UnknownQCBit;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Quill -> QuillSub -> CONTENTS

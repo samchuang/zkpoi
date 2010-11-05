@@ -17,17 +17,17 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 import java.io.*;
 
 import java.util.*;
 
-import org.apache.poi.hpsf.ClassID;
-import org.apache.poi.poifs.dev.POIFSViewable;
-import org.apache.poi.poifs.property.DirectoryProperty;
-import org.apache.poi.poifs.property.DocumentProperty;
-import org.apache.poi.poifs.property.Property;
+import org.zkoss.poi.hpsf.ClassID;
+import org.zkoss.poi.poifs.dev.POIFSViewable;
+import org.zkoss.poi.poifs.property.DirectoryProperty;
+import org.zkoss.poi.poifs.property.DocumentProperty;
+import org.zkoss.poi.poifs.property.Property;
 
 /**
  * Simple implementation of DirectoryEntry

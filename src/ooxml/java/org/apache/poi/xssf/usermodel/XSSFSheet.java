@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,40 +30,40 @@ import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLException;
-import org.apache.poi.hssf.record.PasswordRecord;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.hssf.util.PaneInformation;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellRange;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataValidation;
-import org.apache.poi.ss.usermodel.DataValidationHelper;
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.Header;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.SSCellRange;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.xssf.model.CommentsTable;
-import org.apache.poi.xssf.usermodel.helpers.ColumnHelper;
-import org.apache.poi.xssf.usermodel.helpers.XSSFRowShifter;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.hssf.record.PasswordRecord;
+import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.hssf.util.PaneInformation;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
+import org.zkoss.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.CellRange;
+import org.zkoss.poi.ss.usermodel.CellStyle;
+import org.zkoss.poi.ss.usermodel.DataValidation;
+import org.zkoss.poi.ss.usermodel.DataValidationHelper;
+import org.zkoss.poi.ss.usermodel.Footer;
+import org.zkoss.poi.ss.usermodel.Header;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.util.CellRangeAddressList;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.util.SSCellRange;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.xssf.model.CommentsTable;
+import org.zkoss.poi.xssf.usermodel.helpers.ColumnHelper;
+import org.zkoss.poi.xssf.usermodel.helpers.XSSFRowShifter;
 
 /**
  * High level representation of a SpreadsheetML worksheet.
@@ -96,7 +96,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     /**
      * Creates new XSSFSheet   - called by XSSFWorkbook to create a sheet from scratch.
      *
-     * @see org.apache.poi.xssf.usermodel.XSSFWorkbook#createSheet()
+     * @see org.zkoss.poi.xssf.usermodel.XSSFWorkbook#createSheet()
      */
     protected XSSFSheet() {
         super();
@@ -465,8 +465,8 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      *  need to assign it to a cell though
      *
      * @deprecated since Nov 2009 this method is not compatible with the common SS interfaces,
-     * use {@link org.apache.poi.xssf.usermodel.XSSFDrawing#createCellComment
-     *  (org.apache.poi.ss.usermodel.ClientAnchor)} instead
+     * use {@link org.zkoss.poi.xssf.usermodel.XSSFDrawing#createCellComment
+     *  (org.zkoss.poi.ss.usermodel.ClientAnchor)} instead
      */
     @Deprecated
     public XSSFComment createComment() {
@@ -478,7 +478,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      *
      * @param rownum  row number
      * @return High level {@link XSSFRow} object representing a row in the sheet
-     * @see #removeRow(org.apache.poi.ss.usermodel.Row)
+     * @see #removeRow(org.zkoss.poi.ss.usermodel.Row)
      */
     public XSSFRow createRow(int rownum) {
         CTRow ctRow;
@@ -503,10 +503,10 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param leftmostColumn   Left column visible in right pane.
      * @param activePane    Active pane.  One of: PANE_LOWER_RIGHT,
      *                      PANE_UPPER_RIGHT, PANE_LOWER_LEFT, PANE_UPPER_LEFT
-     * @see org.apache.poi.ss.usermodel.Sheet#PANE_LOWER_LEFT
-     * @see org.apache.poi.ss.usermodel.Sheet#PANE_LOWER_RIGHT
-     * @see org.apache.poi.ss.usermodel.Sheet#PANE_UPPER_LEFT
-     * @see org.apache.poi.ss.usermodel.Sheet#PANE_UPPER_RIGHT
+     * @see org.zkoss.poi.ss.usermodel.Sheet#PANE_LOWER_LEFT
+     * @see org.zkoss.poi.ss.usermodel.Sheet#PANE_LOWER_RIGHT
+     * @see org.zkoss.poi.ss.usermodel.Sheet#PANE_UPPER_LEFT
+     * @see org.zkoss.poi.ss.usermodel.Sheet#PANE_UPPER_RIGHT
      */
     public void createSplitPane(int xSplitPos, int ySplitPos, int leftmostColumn, int topRow, int activePane) {
         createFreezePane(xSplitPos, ySplitPos, leftmostColumn, topRow);
@@ -2298,7 +2298,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      *
      * @param cellRef cell region
      * @param comment the comment to assign
-     * @deprecated since Nov 2009 use {@link XSSFCell#setCellComment(org.apache.poi.ss.usermodel.Comment)} instead
+     * @deprecated since Nov 2009 use {@link XSSFCell#setCellComment(org.zkoss.poi.ss.usermodel.Comment)} instead
      */
     @Deprecated
     public static void setCellComment(String cellRef, XSSFComment comment) {

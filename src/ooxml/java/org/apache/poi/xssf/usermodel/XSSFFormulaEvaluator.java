@@ -15,24 +15,24 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.util.Iterator;
 
-import org.apache.poi.hssf.record.formula.eval.BoolEval;
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.hssf.record.formula.eval.HyperlinkEval;
-import org.apache.poi.hssf.record.formula.eval.NumberEval;
-import org.apache.poi.hssf.record.formula.eval.StringEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.hssf.record.formula.udf.UDFFinder;
-import org.apache.poi.ss.formula.IStabilityClassifier;
-import org.apache.poi.ss.formula.WorkbookEvaluator;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellValue;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.hssf.record.formula.eval.BoolEval;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.hssf.record.formula.eval.HyperlinkEval;
+import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
+import org.zkoss.poi.hssf.record.formula.eval.StringEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.formula.IStabilityClassifier;
+import org.zkoss.poi.ss.formula.WorkbookEvaluator;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.CellValue;
+import org.zkoss.poi.ss.usermodel.FormulaEvaluator;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
 
 /**
  * Evaluates formula cells.<p/>
@@ -55,7 +55,7 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 	 * @param stabilityClassifier used to optimise caching performance. Pass <code>null</code>
 	 * for the (conservative) assumption that any cell may have its definition changed after
 	 * evaluation begins.
-	 * @deprecated (Sep 2009) (reduce overloading) use {@link #create(XSSFWorkbook, org.apache.poi.ss.formula.IStabilityClassifier, org.apache.poi.hssf.record.formula.udf.UDFFinder)} 
+	 * @deprecated (Sep 2009) (reduce overloading) use {@link #create(XSSFWorkbook, org.zkoss.poi.ss.formula.IStabilityClassifier, org.zkoss.poi.hssf.record.formula.udf.UDFFinder)} 
 	 */
     @Deprecated
     public XSSFFormulaEvaluator(XSSFWorkbook workbook, IStabilityClassifier stabilityClassifier) {
@@ -140,7 +140,7 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 	 * </pre>
 	 * Be aware that your cell will hold both the formula,
 	 *  and the result. If you want the cell replaced with
-	 *  the result of the formula, use {@link #evaluate(org.apache.poi.ss.usermodel.Cell)} }
+	 *  the result of the formula, use {@link #evaluate(org.zkoss.poi.ss.usermodel.Cell)} }
 	 * @param cell The cell to evaluate
 	 * @return The type of the formula result (the cell's type remains as HSSFCell.CELL_TYPE_FORMULA however)
 	 */
@@ -167,7 +167,7 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 	 * </pre>
 	 * Be aware that your cell value will be changed to hold the
 	 *  result of the formula. If you simply want the formula
-	 *  value computed for you, use {@link #evaluateFormulaCell(org.apache.poi.ss.usermodel.Cell)} }
+	 *  value computed for you, use {@link #evaluateFormulaCell(org.zkoss.poi.ss.usermodel.Cell)} }
 	 * @param cell
 	 */
 	public XSSFCell evaluateInCell(Cell cell) {

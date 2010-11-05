@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.eval.NameEval;
-import org.apache.poi.hssf.record.formula.eval.NameXEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.hssf.record.formula.functions.FreeRefFunction;
-import org.apache.poi.ss.formula.OperationEvaluationContext;
-import org.apache.poi.ss.formula.eval.NotImplementedException;
+import org.zkoss.poi.hssf.record.formula.eval.NameEval;
+import org.zkoss.poi.hssf.record.formula.eval.NameXEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.OperationEvaluationContext;
+import org.zkoss.poi.ss.formula.eval.NotImplementedException;
 /**
  *
  * Common entry point for all user-defined (non-built-in) functions (where

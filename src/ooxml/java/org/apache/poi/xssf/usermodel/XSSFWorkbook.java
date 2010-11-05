@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,32 +33,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLException;
-import org.apache.poi.POIXMLProperties;
-import org.apache.poi.hssf.record.formula.SheetNameFormatter;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
-import org.apache.poi.openxml4j.opc.PackagingURIHelper;
-import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.util.*;
-import org.apache.poi.xssf.model.CalculationChain;
-import org.apache.poi.xssf.model.ExternalLink;
-import org.apache.poi.xssf.model.MapInfo;
-import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.model.ThemesTable;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -76,6 +50,32 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbookProtection;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STSheetState;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
+import org.zkoss.poi.POIXMLDocument;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.POIXMLProperties;
+import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipTypes;
+import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
+import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.ss.usermodel.Workbook;
+import org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.util.WorkbookUtil;
+import org.zkoss.poi.util.*;
+import org.zkoss.poi.xssf.model.CalculationChain;
+import org.zkoss.poi.xssf.model.ExternalLink;
+import org.zkoss.poi.xssf.model.MapInfo;
+import org.zkoss.poi.xssf.model.SharedStringsTable;
+import org.zkoss.poi.xssf.model.StylesTable;
+import org.zkoss.poi.xssf.model.ThemesTable;
 
 /**
  * High level representation of a SpreadsheetML workbook.  This is the first object most users
@@ -147,7 +147,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     /**
      * The policy to apply in the event of missing or
      *  blank cells when fetching from a row.
-     * See {@link org.apache.poi.ss.usermodel.Row.MissingCellPolicy}
+     * See {@link org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy}
      */
     private MissingCellPolicy _missingCellPolicy = Row.RETURN_NULL_AND_BLANK;
 
@@ -498,7 +498,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * Returns the instance of XSSFDataFormat for this workbook.
      *
      * @return the XSSFDataFormat object
-     * @see org.apache.poi.ss.usermodel.DataFormat
+     * @see org.zkoss.poi.ss.usermodel.DataFormat
      */
     public XSSFDataFormat createDataFormat() {
         if (formatter == null)

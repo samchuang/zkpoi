@@ -15,18 +15,18 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.dev;
+package org.zkoss.poi.hdgf.dev;
 
 import java.io.FileInputStream;
 
-import org.apache.poi.hdgf.HDGFDiagram;
-import org.apache.poi.hdgf.chunks.Chunk;
-import org.apache.poi.hdgf.chunks.Chunk.Command;
-import org.apache.poi.hdgf.pointers.Pointer;
-import org.apache.poi.hdgf.streams.ChunkStream;
-import org.apache.poi.hdgf.streams.PointerContainingStream;
-import org.apache.poi.hdgf.streams.Stream;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hdgf.HDGFDiagram;
+import org.zkoss.poi.hdgf.chunks.Chunk;
+import org.zkoss.poi.hdgf.chunks.Chunk.Command;
+import org.zkoss.poi.hdgf.pointers.Pointer;
+import org.zkoss.poi.hdgf.streams.ChunkStream;
+import org.zkoss.poi.hdgf.streams.PointerContainingStream;
+import org.zkoss.poi.hdgf.streams.Stream;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * Developer helper class to dump out the pointer+stream structure

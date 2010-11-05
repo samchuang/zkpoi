@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 /**
  * Interface to define how a record can indicate it cares about what its

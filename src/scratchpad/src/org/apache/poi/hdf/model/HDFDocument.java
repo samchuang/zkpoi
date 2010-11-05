@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.model;
+package org.zkoss.poi.hdf.model;
 
 import java.io.InputStream;
 import java.io.IOException;
 
-import org.apache.poi.hdf.event.HDFParsingListener;
-import org.apache.poi.hdf.event.EventBridge;
+import org.zkoss.poi.hdf.event.EventBridge;
+import org.zkoss.poi.hdf.event.HDFParsingListener;
 
 public final class HDFDocument
 {

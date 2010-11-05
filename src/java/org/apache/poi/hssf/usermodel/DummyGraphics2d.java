@@ -16,7 +16,7 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

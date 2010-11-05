@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
-import org.apache.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.hssf.record.RecordInputStream;
 
 /**
  * Implementation of the cell range address lists,like is described
@@ -30,11 +30,11 @@ import org.apache.poi.hssf.record.RecordInputStream;
  * range address (called an ADDR structure) contains 4 16-bit-values.
  * </p>
  * 
- * @deprecated use {@link org.apache.poi.ss.util.CellRangeAddressList}
+ * @deprecated use {@link org.zkoss.poi.ss.util.CellRangeAddressList}
  * 
  * @author Dragos Buleandra (dragos.buleandra@trade2b.ro)
  */
-public class CellRangeAddressList extends org.apache.poi.ss.util.CellRangeAddressList {
+public class CellRangeAddressList extends org.zkoss.poi.ss.util.CellRangeAddressList {
 	public CellRangeAddressList(int firstRow, int lastRow, int firstCol, int lastCol) {
 		super(firstRow,lastRow,firstCol,lastCol);
 	}

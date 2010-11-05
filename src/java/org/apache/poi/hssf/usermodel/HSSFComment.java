@@ -14,12 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.NoteRecord;
-import org.apache.poi.hssf.record.TextObjectRecord;
-import org.apache.poi.ss.usermodel.Comment;
-import org.apache.poi.ss.usermodel.RichTextString;
+import org.zkoss.poi.hssf.record.NoteRecord;
+import org.zkoss.poi.hssf.record.TextObjectRecord;
+import org.zkoss.poi.ss.usermodel.Comment;
+import org.zkoss.poi.ss.usermodel.RichTextString;
 
 /**
  * Represents a cell comment - a sticky note associated with a cell.

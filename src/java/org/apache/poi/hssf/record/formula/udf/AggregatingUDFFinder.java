@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.udf;
+package org.zkoss.poi.hssf.record.formula.udf;
 
-import org.apache.poi.hssf.record.formula.functions.FreeRefFunction;
+import org.zkoss.poi.hssf.record.formula.functions.FreeRefFunction;
 
 /**
  * Collects add-in libraries and VB macro functions together into one UDF finder

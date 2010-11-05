@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.dev;
+package org.zkoss.poi.hssf.dev;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.poi.hssf.record.ContinueRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordFactory;
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hssf.record.ContinueRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RecordFactory;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * This is a low-level debugging class, which simply prints

@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.util.List;
 
-import org.apache.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.Record;
 /**
  * Simplifies iteration over a sequence of <tt>Record</tt> objects.
  *

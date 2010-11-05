@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.ss.usermodel.PrintSetup;
-import org.apache.poi.util.LittleEndianOutput;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
+import org.zkoss.poi.ss.usermodel.PrintSetup;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:        PAGESETUP (0x00A1)<p/>

@@ -14,14 +14,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.usermodel.extensions;
+package org.zkoss.poi.xssf.usermodel.extensions;
 
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellAlignment;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STHorizontalAlignment;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STVerticalAlignment;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.util.Internal;
+import org.zkoss.poi.ss.usermodel.HorizontalAlignment;
+import org.zkoss.poi.ss.usermodel.VerticalAlignment;
+import org.zkoss.poi.util.Internal;
 
 
 /**

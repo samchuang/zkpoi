@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.eval;
+package org.zkoss.poi.hssf.record.formula.eval;
 
-import org.apache.poi.hssf.record.formula.function.FunctionMetadata;
-import org.apache.poi.hssf.record.formula.function.FunctionMetadataRegistry;
-import org.apache.poi.hssf.record.formula.functions.*;
-import org.apache.poi.ss.formula.eval.NotImplementedException;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadata;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadataRegistry;
+import org.zkoss.poi.hssf.record.formula.functions.*;
+import org.zkoss.poi.ss.formula.eval.NotImplementedException;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;

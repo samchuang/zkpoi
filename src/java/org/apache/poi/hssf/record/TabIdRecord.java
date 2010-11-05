@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title: Sheet Tab Index Array Record (0x013D)<p/>

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.util.*;
 import java.util.List;

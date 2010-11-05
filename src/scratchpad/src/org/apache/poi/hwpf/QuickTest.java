@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf;
+package org.zkoss.poi.hwpf;
 
 import java.io.*;
 
-import org.apache.poi.hwpf.usermodel.*;
+import org.zkoss.poi.hwpf.usermodel.*;
 
 public final class QuickTest
 {

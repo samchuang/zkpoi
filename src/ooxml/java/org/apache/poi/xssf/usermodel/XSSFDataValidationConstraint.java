@@ -14,13 +14,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.util.Arrays;
 
-import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STDataValidationType;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STDataValidationOperator.Enum;
+import org.zkoss.poi.ss.usermodel.DataValidationConstraint;
 
 /**
  * @author <a href="rjankiraman@emptoris.com">Radhakrishnan J</a>

@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 import java.util.Iterator;
 
-import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.cont.ContinuableRecord;
-import org.apache.poi.hssf.record.cont.ContinuableRecordOutput;
-import org.apache.poi.util.IntMapper;
-import org.apache.poi.util.LittleEndianConsts;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.hssf.record.cont.ContinuableRecord;
+import org.zkoss.poi.hssf.record.cont.ContinuableRecordOutput;
+import org.zkoss.poi.util.IntMapper;
+import org.zkoss.poi.util.LittleEndianConsts;
 
 /**
  * Title:        Static String Table Record (0x00FC)<p/>
@@ -37,8 +37,8 @@ import org.apache.poi.util.LittleEndianConsts;
  * @author Marc Johnson (mjohnson at apache dot org)
  * @author Glen Stampoultzis (glens at apache.org)
  *
- * @see org.apache.poi.hssf.record.LabelSSTRecord
- * @see org.apache.poi.hssf.record.ContinueRecord
+ * @see org.zkoss.poi.hssf.record.LabelSSTRecord
+ * @see org.zkoss.poi.hssf.record.ContinueRecord
  */
 public final class SSTRecord extends ContinuableRecord {
     public static final short sid = 0x00FC;

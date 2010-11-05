@@ -15,8 +15,8 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
-import org.apache.poi.ss.usermodel.ErrorConstants;
+package org.zkoss.poi.hssf.usermodel;
+import org.zkoss.poi.ss.usermodel.ErrorConstants;
 
 /**
  * Contains raw Excel error codes (as defined in OOO's excelfileformat.pdf (2.5.6)

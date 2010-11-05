@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi;
+package org.zkoss.poi;
 
 /**
  * Common Parent for Text Extractors
@@ -22,10 +22,10 @@ package org.apache.poi;
  * You will typically find the implementation of
  *  a given format's text extractor under
  *  org.apache.poi.[format].extractor .
- * @see org.apache.poi.hssf.extractor.ExcelExtractor
- * @see org.apache.poi.hslf.extractor.PowerPointExtractor
- * @see org.apache.poi.hdgf.extractor.VisioTextExtractor
- * @see org.apache.poi.hwpf.extractor.WordExtractor
+ * @see org.zkoss.poi.hssf.extractor.ExcelExtractor
+ * @see org.zkoss.poi.hslf.extractor.PowerPointExtractor
+ * @see org.zkoss.poi.hdgf.extractor.VisioTextExtractor
+ * @see org.zkoss.poi.hwpf.extractor.WordExtractor
  */
 public abstract class POITextExtractor {
 	/** The POIDocument that's open */

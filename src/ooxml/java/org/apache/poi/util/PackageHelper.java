@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
-import org.apache.poi.openxml4j.opc.*;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.POIXMLException;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.*;
+import org.zkoss.poi.util.IOUtils;
+import org.zkoss.poi.util.TempFile;
 
 import java.io.*;
 import java.net.URI;

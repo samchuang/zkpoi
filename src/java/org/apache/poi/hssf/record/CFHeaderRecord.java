@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.cf.CellRangeUtil;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.cf.CellRangeUtil;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.util.CellRangeAddressList;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Conditional Formatting Header record CFHEADER (0x01B0)

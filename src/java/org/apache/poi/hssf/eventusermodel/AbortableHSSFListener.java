@@ -16,10 +16,10 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.eventusermodel;
+package org.zkoss.poi.hssf.eventusermodel;
 
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.eventusermodel.HSSFUserException;
+import org.zkoss.poi.hssf.eventusermodel.HSSFUserException;
+import org.zkoss.poi.hssf.record.Record;
 
 /**
  * Abstract class for use with the HSSFRequest and HSSFEventFactory, which
@@ -30,9 +30,9 @@ import org.apache.poi.hssf.eventusermodel.HSSFUserException;
  * This should then be registered with the HSSFRequest (associating
  * it with Record SID's) as usual.
  *
- * @see org.apache.poi.hssf.eventusermodel.HSSFEventFactory
- * @see org.apache.poi.hssf.eventusermodel.HSSFRequest
- * @see org.apache.poi.hssf.eventusermodel.HSSFUserException
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFEventFactory
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFRequest
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFUserException
  *
  * @author Carey Sublette (careysub@earthling.net)
  */

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,15 +24,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.util.Internal;
-import org.apache.poi.xssf.model.CommentsTable;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTConnector;
@@ -44,6 +35,15 @@ import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTTwoCellAn
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.STEditAs;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.ss.usermodel.Drawing;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.xssf.model.CommentsTable;
 
 /**
  * Represents a SpreadsheetML drawing
@@ -60,7 +60,7 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
     /**
      * Create a new SpreadsheetML drawing
      *
-     * @see org.apache.poi.xssf.usermodel.XSSFSheet#createDrawingPatriarch()
+     * @see org.zkoss.poi.xssf.usermodel.XSSFSheet#createDrawingPatriarch()
      */
     protected XSSFDrawing() {
         super();
@@ -146,7 +146,7 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      *
      * @param anchor    the client anchor describes how this picture is attached to the sheet.
      * @param pictureIndex the index of the picture in the workbook collection of pictures,
-     *   {@link org.apache.poi.xssf.usermodel.XSSFWorkbook#getAllPictures()} .
+     *   {@link org.zkoss.poi.xssf.usermodel.XSSFWorkbook#getAllPictures()} .
      *
      * @return  the newly created picture shape.
      */
@@ -172,7 +172,7 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      * Add the indexed picture to this drawing relations
      *
      * @param pictureIndex the index of the picture in the workbook collection of pictures,
-     *   {@link org.apache.poi.xssf.usermodel.XSSFWorkbook#getAllPictures()} .
+     *   {@link org.zkoss.poi.xssf.usermodel.XSSFWorkbook#getAllPictures()} .
      */
     protected PackageRelationship addPictureReference(int pictureIndex){
         XSSFWorkbook wb = (XSSFWorkbook)getParent().getParent();

@@ -17,9 +17,9 @@
 ==================================================================== */
         
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:        Calc Count Record
@@ -32,7 +32,7 @@ import org.apache.poi.util.LittleEndianOutput;
  * @author Andrew C. Oliver (acoliver at apache dot org)
  * @author Jason Height (jheight at chariot dot net dot au)
  * @version 2.0-pre
- * @see org.apache.poi.hssf.record.CalcModeRecord
+ * @see org.zkoss.poi.hssf.record.CalcModeRecord
  */
 
 public final class CalcCountRecord

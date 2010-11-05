@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.rmi.UnexpectedException;
 
-import org.apache.poi.hpsf.wellknown.SectionIDMap;
+import org.zkoss.poi.hpsf.wellknown.SectionIDMap;
 
 /**
  * <p>Factory class to create instances of {@link SummaryInformation},

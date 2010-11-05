@@ -15,22 +15,22 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
-import org.apache.poi.ddf.EscherProperty;
-import org.apache.poi.ddf.EscherSimpleProperty;
-import org.apache.poi.hssf.record.CommonObjectDataSubRecord;
-import org.apache.poi.hssf.record.NoteRecord;
-import org.apache.poi.hssf.record.NoteStructureSubRecord;
-import org.apache.poi.hssf.record.ObjRecord;
-import org.apache.poi.hssf.record.SubRecord;
-import org.apache.poi.hssf.usermodel.HSSFComment;
-import org.apache.poi.hssf.usermodel.HSSFShape;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.ddf.EscherProperty;
+import org.zkoss.poi.ddf.EscherSimpleProperty;
+import org.zkoss.poi.hssf.record.CommonObjectDataSubRecord;
+import org.zkoss.poi.hssf.record.NoteRecord;
+import org.zkoss.poi.hssf.record.NoteStructureSubRecord;
+import org.zkoss.poi.hssf.record.ObjRecord;
+import org.zkoss.poi.hssf.record.SubRecord;
+import org.zkoss.poi.hssf.usermodel.HSSFComment;
+import org.zkoss.poi.hssf.usermodel.HSSFShape;
 
 /**
  * Represents a cell comment.

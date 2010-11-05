@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.eval;
+package org.zkoss.poi.ss.formula.eval;
 
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.zkoss.poi.ss.usermodel.FormulaEvaluator;
 
 /**
  * An exception thrown by implementors of {@link FormulaEvaluator} when attempting to evaluate

@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.model;
+package org.zkoss.poi.xwpf.model;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,15 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFFactory;
-import org.apache.poi.xwpf.usermodel.XWPFFooter;
-import org.apache.poi.xwpf.usermodel.XWPFHeader;
-import org.apache.poi.xwpf.usermodel.XWPFHeaderFooter;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRelation;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHdrFtr;
@@ -46,6 +37,15 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.FtrDocument;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.HdrDocument;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STHdrFtr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STHdrFtr.Enum;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.xwpf.usermodel.XWPFDocument;
+import org.zkoss.poi.xwpf.usermodel.XWPFFactory;
+import org.zkoss.poi.xwpf.usermodel.XWPFFooter;
+import org.zkoss.poi.xwpf.usermodel.XWPFHeader;
+import org.zkoss.poi.xwpf.usermodel.XWPFHeaderFooter;
+import org.zkoss.poi.xwpf.usermodel.XWPFParagraph;
+import org.zkoss.poi.xwpf.usermodel.XWPFRelation;
 
 import schemasMicrosoftComOfficeOffice.CTLock;
 import schemasMicrosoftComOfficeOffice.STConnectType;

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula;
+package org.zkoss.poi.hssf.record.formula;
 
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.SpreadsheetVersion;
 
 
 /**

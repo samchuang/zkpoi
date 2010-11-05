@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 /**
  * This class represents a slide's notes in a PowerPoint Document. It
@@ -35,7 +35,7 @@ public final class Notes extends Sheet
    *
    * @param notes the Notes record to read from
    */
-  public Notes (org.apache.poi.hslf.record.Notes notes) {
+  public Notes (org.zkoss.poi.hslf.record.Notes notes) {
       super(notes, notes.getNotesAtom().getSlideID());
 
 	// Now, build up TextRuns from pairs of TextHeaderAtom and

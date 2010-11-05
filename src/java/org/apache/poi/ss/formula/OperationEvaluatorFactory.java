@@ -15,45 +15,45 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.hssf.record.formula.AbstractFunctionPtg;
-import org.apache.poi.hssf.record.formula.AddPtg;
-import org.apache.poi.hssf.record.formula.ConcatPtg;
-import org.apache.poi.hssf.record.formula.DividePtg;
-import org.apache.poi.hssf.record.formula.EqualPtg;
-import org.apache.poi.hssf.record.formula.GreaterEqualPtg;
-import org.apache.poi.hssf.record.formula.GreaterThanPtg;
-import org.apache.poi.hssf.record.formula.IntersectionPtg;
-import org.apache.poi.hssf.record.formula.LessEqualPtg;
-import org.apache.poi.hssf.record.formula.LessThanPtg;
-import org.apache.poi.hssf.record.formula.MultiplyPtg;
-import org.apache.poi.hssf.record.formula.NotEqualPtg;
-import org.apache.poi.hssf.record.formula.OperationPtg;
-import org.apache.poi.hssf.record.formula.PercentPtg;
-import org.apache.poi.hssf.record.formula.PowerPtg;
-import org.apache.poi.hssf.record.formula.RangePtg;
-import org.apache.poi.hssf.record.formula.SubtractPtg;
-import org.apache.poi.hssf.record.formula.UnaryMinusPtg;
-import org.apache.poi.hssf.record.formula.UnaryPlusPtg;
-import org.apache.poi.hssf.record.formula.eval.ConcatEval;
-import org.apache.poi.hssf.record.formula.eval.FunctionEval;
-import org.apache.poi.hssf.record.formula.eval.IntersectionEval;
-import org.apache.poi.hssf.record.formula.eval.PercentEval;
-import org.apache.poi.hssf.record.formula.eval.RangeEval;
-import org.apache.poi.hssf.record.formula.eval.RelationalOperationEval;
-import org.apache.poi.hssf.record.formula.eval.TwoOperandNumericOperation;
-import org.apache.poi.hssf.record.formula.eval.UnaryMinusEval;
-import org.apache.poi.hssf.record.formula.eval.UnaryPlusEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.hssf.record.formula.function.FunctionMetadataRegistry;
-import org.apache.poi.hssf.record.formula.functions.Function;
-import org.apache.poi.hssf.record.formula.functions.Indirect;
+import org.zkoss.poi.hssf.record.formula.AbstractFunctionPtg;
+import org.zkoss.poi.hssf.record.formula.AddPtg;
+import org.zkoss.poi.hssf.record.formula.ConcatPtg;
+import org.zkoss.poi.hssf.record.formula.DividePtg;
+import org.zkoss.poi.hssf.record.formula.EqualPtg;
+import org.zkoss.poi.hssf.record.formula.GreaterEqualPtg;
+import org.zkoss.poi.hssf.record.formula.GreaterThanPtg;
+import org.zkoss.poi.hssf.record.formula.IntersectionPtg;
+import org.zkoss.poi.hssf.record.formula.LessEqualPtg;
+import org.zkoss.poi.hssf.record.formula.LessThanPtg;
+import org.zkoss.poi.hssf.record.formula.MultiplyPtg;
+import org.zkoss.poi.hssf.record.formula.NotEqualPtg;
+import org.zkoss.poi.hssf.record.formula.OperationPtg;
+import org.zkoss.poi.hssf.record.formula.PercentPtg;
+import org.zkoss.poi.hssf.record.formula.PowerPtg;
+import org.zkoss.poi.hssf.record.formula.RangePtg;
+import org.zkoss.poi.hssf.record.formula.SubtractPtg;
+import org.zkoss.poi.hssf.record.formula.UnaryMinusPtg;
+import org.zkoss.poi.hssf.record.formula.UnaryPlusPtg;
+import org.zkoss.poi.hssf.record.formula.eval.ConcatEval;
+import org.zkoss.poi.hssf.record.formula.eval.FunctionEval;
+import org.zkoss.poi.hssf.record.formula.eval.IntersectionEval;
+import org.zkoss.poi.hssf.record.formula.eval.PercentEval;
+import org.zkoss.poi.hssf.record.formula.eval.RangeEval;
+import org.zkoss.poi.hssf.record.formula.eval.RelationalOperationEval;
+import org.zkoss.poi.hssf.record.formula.eval.TwoOperandNumericOperation;
+import org.zkoss.poi.hssf.record.formula.eval.UnaryMinusEval;
+import org.zkoss.poi.hssf.record.formula.eval.UnaryPlusEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadataRegistry;
+import org.zkoss.poi.hssf.record.formula.functions.Function;
+import org.zkoss.poi.hssf.record.formula.functions.Indirect;
 
 /**
  * This class creates <tt>OperationEval</tt> instances to help evaluate <tt>OperationPtg</tt>

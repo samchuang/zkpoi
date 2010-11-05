@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc;
+package org.zkoss.poi.openxml4j.opc;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
 
 /**
  * A package part collection.

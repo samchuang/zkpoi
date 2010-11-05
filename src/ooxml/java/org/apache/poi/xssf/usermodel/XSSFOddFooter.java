@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.xssf.usermodel.extensions.XSSFHeaderFooter;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTHeaderFooter;
+import org.zkoss.poi.ss.usermodel.Footer;
+import org.zkoss.poi.xssf.usermodel.extensions.XSSFHeaderFooter;
 
 /**
  * Odd page footer value. Corresponds to odd printed pages.

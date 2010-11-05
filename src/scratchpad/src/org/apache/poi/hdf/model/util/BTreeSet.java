@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.model.util;
+package org.zkoss.poi.hdf.model.util;
 
 import java.util.*;
 
-import org.apache.poi.hdf.model.hdftypes.PropertyNode;
+import org.zkoss.poi.hdf.model.hdftypes.PropertyNode;
 
 /*
  * A B-Tree like implementation of the java.util.Set inteface.  This is a modifiable set

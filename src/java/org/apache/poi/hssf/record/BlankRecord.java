@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:        Blank cell record (0x0201) <P>
@@ -79,7 +79,7 @@ public final class BlankRecord extends StandardRecord implements CellValueRecord
      * set the index of the extended format record to style this cell with
      *
      * @param xf - the 0-based index of the extended format
-     * @see org.apache.poi.hssf.record.ExtendedFormatRecord
+     * @see org.zkoss.poi.hssf.record.ExtendedFormatRecord
      */
     public void setXFIndex(short xf)
     {

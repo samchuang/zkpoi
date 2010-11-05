@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.blip;
+package org.zkoss.poi.hslf.blip;
 
-import org.apache.poi.hslf.usermodel.PictureData;
+import org.zkoss.poi.hslf.usermodel.PictureData;
 
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;

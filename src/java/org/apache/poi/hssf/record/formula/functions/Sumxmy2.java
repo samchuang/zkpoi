@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.functions;
+package org.zkoss.poi.hssf.record.formula.functions;
 
 /**
  * Implementation of Excel function SUMXMY2()<p/>

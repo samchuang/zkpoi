@@ -11,9 +11,9 @@ Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 
 */
 
-package org.apache.poi.hssf.record.formula.eval;
+package org.zkoss.poi.hssf.record.formula.eval;
 
-import org.apache.poi.ss.usermodel.Hyperlink;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 
 /**
  * Handle associated hyperlink if this ValueEval is a label of the HYPERLINK function.

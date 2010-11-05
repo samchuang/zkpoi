@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
 import java.lang.reflect.Field;
 import java.util.Hashtable;
 
-import org.apache.poi.ss.usermodel.Color;
+import org.zkoss.poi.ss.usermodel.Color;
 
 
 /**

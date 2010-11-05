@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.model.hdftypes.definitions;
+package org.zkoss.poi.hdf.model.hdftypes.definitions;
 
-import org.apache.poi.hdf.model.hdftypes.HDFType;
+import org.zkoss.poi.hdf.model.hdftypes.HDFType;
 
 /**
  * Table Properties.

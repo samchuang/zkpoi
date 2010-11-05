@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 /**
- * @deprecated Use {@link org.apache.poi.hssf.record.common.UnicodeString} instead
+ * @deprecated Use {@link org.zkoss.poi.hssf.record.common.UnicodeString} instead
  */
-public final class UnicodeString extends org.apache.poi.hssf.record.common.UnicodeString {
+public final class UnicodeString extends org.zkoss.poi.hssf.record.common.UnicodeString {
    /**
-    * @deprecated Use {@link org.apache.poi.hssf.record.common.UnicodeString} instead
+    * @deprecated Use {@link org.zkoss.poi.hssf.record.common.UnicodeString} instead
     */
    public UnicodeString(RecordInputStream in) {
       super(in);
    }
    /**
-    * @deprecated Use {@link org.apache.poi.hssf.record.common.UnicodeString} instead
+    * @deprecated Use {@link org.zkoss.poi.hssf.record.common.UnicodeString} instead
     */
    public UnicodeString(String str) {
       super(str);

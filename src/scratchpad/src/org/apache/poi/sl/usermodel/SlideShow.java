@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.sl.usermodel;
+package org.zkoss.poi.sl.usermodel;
 
 import java.io.IOException;
 

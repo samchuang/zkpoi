@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
+import org.zkoss.poi.ddf.*;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;

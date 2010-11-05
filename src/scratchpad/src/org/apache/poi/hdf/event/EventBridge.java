@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.event;
+package org.zkoss.poi.hdf.event;
 
 
-import org.apache.poi.hdf.model.util.BTreeSet;
-import org.apache.poi.hdf.model.util.NumberFormatter;
-import org.apache.poi.hdf.model.hdftypes.*;
 
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hdf.model.hdftypes.*;
+import org.zkoss.poi.hdf.model.util.BTreeSet;
+import org.zkoss.poi.hdf.model.util.NumberFormatter;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.util.ArrayList;
 

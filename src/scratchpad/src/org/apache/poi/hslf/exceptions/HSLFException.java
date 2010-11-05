@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.exceptions;
+package org.zkoss.poi.hslf.exceptions;
 
 /**
  * A generic exception that can be thrown by HSLF classes

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
-import org.apache.poi.util.HexDump;
+import org.zkoss.poi.util.HexDump;
 
 /**
  *  <p>Represents a class ID (16 bytes). Unlike other little-endian

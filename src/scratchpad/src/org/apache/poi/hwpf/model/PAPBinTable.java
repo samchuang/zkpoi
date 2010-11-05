@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.hwpf.model.io.*;
-import org.apache.poi.hwpf.sprm.SprmBuffer;
 
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hwpf.model.io.*;
+import org.zkoss.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * This class represents the bin table of Word document but it also serves as a

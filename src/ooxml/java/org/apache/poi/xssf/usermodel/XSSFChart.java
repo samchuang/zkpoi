@@ -10,17 +10,10 @@
 Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.io.IOException;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.hssf.usermodel.HSSFChart.HSSFSeries;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.ss.usermodel.Chart;
-import org.apache.poi.ss.usermodel.ChartInfo;
-import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTArea3DChart;
@@ -60,6 +53,13 @@ import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.hssf.usermodel.HSSFChart.HSSFSeries;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.ChartInfo;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
 
 /**
  * XSSFChart information.

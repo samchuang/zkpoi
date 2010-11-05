@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.exceptions;
+package org.zkoss.poi.openxml4j.exceptions;
 
 /**
  * Throw when an invalid operation is done.

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal.unmarshallers;
+package org.zkoss.poi.openxml4j.opc.internal.unmarshallers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,14 +30,14 @@ import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.PackageNamespaces;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageProperties;
-import org.apache.poi.openxml4j.opc.ZipPackage;
-import org.apache.poi.openxml4j.opc.internal.PackagePropertiesPart;
-import org.apache.poi.openxml4j.opc.internal.PartUnmarshaller;
-import org.apache.poi.openxml4j.opc.internal.ZipHelper;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.opc.PackageNamespaces;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageProperties;
+import org.zkoss.poi.openxml4j.opc.ZipPackage;
+import org.zkoss.poi.openxml4j.opc.internal.PackagePropertiesPart;
+import org.zkoss.poi.openxml4j.opc.internal.PartUnmarshaller;
+import org.zkoss.poi.openxml4j.opc.internal.ZipHelper;
 
 /**
  * Package properties unmarshaller.

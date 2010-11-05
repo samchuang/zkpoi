@@ -14,11 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.model;
+package org.zkoss.poi.xwpf.model;
 
-import org.apache.poi.xwpf.usermodel.XWPFComment;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTMarkupRange;
+import org.zkoss.poi.xwpf.usermodel.XWPFComment;
+import org.zkoss.poi.xwpf.usermodel.XWPFParagraph;
 
 /**
  * Decorator class for XWPFParagraph allowing to add comments 

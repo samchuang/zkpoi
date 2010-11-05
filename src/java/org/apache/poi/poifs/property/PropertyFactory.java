@@ -17,14 +17,14 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.property;
+package org.zkoss.poi.poifs.property;
 
 import java.io.IOException;
 
 import java.util.*;
 
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.storage.ListManagedBlock;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.storage.ListManagedBlock;
 
 /**
  * Factory for turning an array of RawDataBlock instances containing

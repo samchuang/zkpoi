@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
-import org.apache.poi.hssf.record.ArrayRecord;
-import org.apache.poi.hssf.record.CellValueRecordInterface;
-import org.apache.poi.hssf.record.FormulaRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordFormatException;
-import org.apache.poi.hssf.record.SharedFormulaRecord;
-import org.apache.poi.hssf.record.StringRecord;
-import org.apache.poi.hssf.record.formula.ExpPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.util.CellRangeAddress8Bit;
-import org.apache.poi.hssf.util.CellReference;
-import org.apache.poi.ss.formula.Formula;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.hssf.record.ArrayRecord;
+import org.zkoss.poi.hssf.record.CellValueRecordInterface;
+import org.zkoss.poi.hssf.record.FormulaRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RecordFormatException;
+import org.zkoss.poi.hssf.record.SharedFormulaRecord;
+import org.zkoss.poi.hssf.record.StringRecord;
+import org.zkoss.poi.hssf.record.formula.ExpPtg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.util.CellRangeAddress8Bit;
+import org.zkoss.poi.hssf.util.CellReference;
+import org.zkoss.poi.ss.formula.Formula;
+import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**
  * The formula record aggregate is used to join together the formula record and it's

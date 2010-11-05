@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,23 +23,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.record.ArrayRecord;
-import org.apache.poi.hssf.record.CellValueRecordInterface;
-import org.apache.poi.hssf.record.ContinueRecord;
-import org.apache.poi.hssf.record.DBCellRecord;
-import org.apache.poi.hssf.record.DimensionsRecord;
-import org.apache.poi.hssf.record.FormulaRecord;
-import org.apache.poi.hssf.record.IndexRecord;
-import org.apache.poi.hssf.record.MergeCellsRecord;
-import org.apache.poi.hssf.record.MulBlankRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RowRecord;
-import org.apache.poi.hssf.record.SharedFormulaRecord;
-import org.apache.poi.hssf.record.TableRecord;
-import org.apache.poi.hssf.record.UnknownRecord;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.hssf.model.RecordStream;
+import org.zkoss.poi.hssf.record.ArrayRecord;
+import org.zkoss.poi.hssf.record.CellValueRecordInterface;
+import org.zkoss.poi.hssf.record.ContinueRecord;
+import org.zkoss.poi.hssf.record.DBCellRecord;
+import org.zkoss.poi.hssf.record.DimensionsRecord;
+import org.zkoss.poi.hssf.record.FormulaRecord;
+import org.zkoss.poi.hssf.record.IndexRecord;
+import org.zkoss.poi.hssf.record.MergeCellsRecord;
+import org.zkoss.poi.hssf.record.MulBlankRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RowRecord;
+import org.zkoss.poi.hssf.record.SharedFormulaRecord;
+import org.zkoss.poi.hssf.record.TableRecord;
+import org.zkoss.poi.hssf.record.UnknownRecord;
+import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.ss.SpreadsheetVersion;
 
 /**
  *
@@ -360,7 +360,7 @@ public final class RowRecordsAggregate extends RecordAggregate {
 	 *
 	 * @param rowNumber row number
 	 * @return RowRecord created for the passed in row number
-	 * @see org.apache.poi.hssf.record.RowRecord
+	 * @see org.zkoss.poi.hssf.record.RowRecord
 	 */
 	public static RowRecord createRow(int rowNumber) {
 		return new RowRecord(rowNumber);

@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.sprm;
+package org.zkoss.poi.hwpf.sprm;
 
-import org.apache.poi.hwpf.usermodel.CharacterProperties;
-import org.apache.poi.hwpf.usermodel.DateAndTime;
-import org.apache.poi.hwpf.usermodel.BorderCode;
-import org.apache.poi.hwpf.usermodel.ShadingDescriptor;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hwpf.usermodel.BorderCode;
+import org.zkoss.poi.hwpf.usermodel.CharacterProperties;
+import org.zkoss.poi.hwpf.usermodel.DateAndTime;
+import org.zkoss.poi.hwpf.usermodel.ShadingDescriptor;
+import org.zkoss.poi.util.LittleEndian;
 
 public final class CharacterSprmUncompressor
 {

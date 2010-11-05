@@ -16,17 +16,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.eventusermodel;
+package org.zkoss.poi.hssf.eventusermodel;
 
-import org.apache.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.Record;
 
 /**
  * Interface for use with the HSSFRequest and HSSFEventFactory.  Users should create
  * a listener supporting this interface and register it with the HSSFRequest (associating
  * it with Record SID's).
  *
- * @see org.apache.poi.hssf.eventusermodel.HSSFEventFactory
- * @see org.apache.poi.hssf.eventusermodel.HSSFRequest
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFEventFactory
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFRequest
  * @author  acoliver@apache.org
  */
 

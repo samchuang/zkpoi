@@ -16,10 +16,10 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.PrintSetupRecord;
-import org.apache.poi.ss.usermodel.PrintSetup;
+import org.zkoss.poi.hssf.record.PrintSetupRecord;
+import org.zkoss.poi.ss.usermodel.PrintSetup;
 
 /**
  * Used to modify the print setup.

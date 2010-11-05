@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.function;
+package org.zkoss.poi.hssf.record.formula.function;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
 
 /**
  * Converts the text meta-data file into a <tt>FunctionMetadataRegistry</tt>

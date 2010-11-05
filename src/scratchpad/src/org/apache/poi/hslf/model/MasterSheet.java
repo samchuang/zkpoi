@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.hslf.record.SheetContainer;
-import org.apache.poi.hslf.model.textproperties.TextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextProp;
+import org.zkoss.poi.hslf.record.SheetContainer;
 
 /**
  * The superclass of all master sheets - Slide masters, Notes masters, etc.

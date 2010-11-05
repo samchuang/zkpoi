@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula;
+package org.zkoss.poi.hssf.record.formula;
 
 /**
  * Addition operator PTG the "+" binomial operator.  If you need more 

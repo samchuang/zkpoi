@@ -14,13 +14,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.model;
+package org.zkoss.poi.xwpf.model;
 
-import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHyperlink;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
+import org.zkoss.poi.xwpf.usermodel.XWPFHyperlinkRun;
+import org.zkoss.poi.xwpf.usermodel.XWPFParagraph;
 
 /**
  * Decorator class for XWPFParagraph allowing to add hyperlinks 

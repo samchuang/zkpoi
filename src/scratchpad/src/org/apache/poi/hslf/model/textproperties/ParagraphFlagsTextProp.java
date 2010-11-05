@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model.textproperties;
+package org.zkoss.poi.hslf.model.textproperties;
 
 /**
  * Definition for the common paragraph text property bitset.

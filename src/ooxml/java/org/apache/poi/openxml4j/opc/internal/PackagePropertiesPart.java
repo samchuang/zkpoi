@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal;
+package org.zkoss.poi.openxml4j.opc.internal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,14 +25,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
-import org.apache.poi.openxml4j.opc.ContentTypes;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageProperties;
-import org.apache.poi.openxml4j.util.Nullable;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.openxml4j.opc.ContentTypes;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageProperties;
+import org.zkoss.poi.openxml4j.util.Nullable;
 
 /**
  * Represents the core properties part of a package.
@@ -181,7 +181,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get the category property.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getCategoryProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getCategoryProperty()
 	 */
 	public Nullable<String> getCategoryProperty() {
 		return category;
@@ -190,7 +190,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get content status.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getContentStatusProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getContentStatusProperty()
 	 */
 	public Nullable<String> getContentStatusProperty() {
 		return contentStatus;
@@ -199,7 +199,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get content type.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getContentTypeProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getContentTypeProperty()
 	 */
 	public Nullable<String> getContentTypeProperty() {
 		return contentType;
@@ -208,7 +208,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get created date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getCreatedProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getCreatedProperty()
 	 */
 	public Nullable<Date> getCreatedProperty() {
 		return created;
@@ -226,7 +226,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get creator.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getCreatorProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getCreatorProperty()
 	 */
 	public Nullable<String> getCreatorProperty() {
 		return creator;
@@ -235,7 +235,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get description.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getDescriptionProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getDescriptionProperty()
 	 */
 	public Nullable<String> getDescriptionProperty() {
 		return description;
@@ -244,7 +244,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get identifier.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getIdentifierProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getIdentifierProperty()
 	 */
 	public Nullable<String> getIdentifierProperty() {
 		return identifier;
@@ -253,7 +253,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get keywords.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getKeywordsProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getKeywordsProperty()
 	 */
 	public Nullable<String> getKeywordsProperty() {
 		return keywords;
@@ -262,7 +262,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get the language.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getLanguageProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getLanguageProperty()
 	 */
 	public Nullable<String> getLanguageProperty() {
 		return language;
@@ -271,7 +271,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get the author of last modifications.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getLastModifiedByProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getLastModifiedByProperty()
 	 */
 	public Nullable<String> getLastModifiedByProperty() {
 		return lastModifiedBy;
@@ -280,7 +280,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get last printed date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getLastPrintedProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getLastPrintedProperty()
 	 */
 	public Nullable<Date> getLastPrintedProperty() {
 		return lastPrinted;
@@ -298,7 +298,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get modified date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getModifiedProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getModifiedProperty()
 	 */
 	public Nullable<Date> getModifiedProperty() {
 		return modified;
@@ -319,7 +319,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get revision.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getRevisionProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getRevisionProperty()
 	 */
 	public Nullable<String> getRevisionProperty() {
 		return revision;
@@ -328,7 +328,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get subject.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getSubjectProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getSubjectProperty()
 	 */
 	public Nullable<String> getSubjectProperty() {
 		return subject;
@@ -337,7 +337,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get title.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getTitleProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getTitleProperty()
 	 */
 	public Nullable<String> getTitleProperty() {
 		return title;
@@ -346,7 +346,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Get version.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#getVersionProperty()
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#getVersionProperty()
 	 */
 	public Nullable<String> getVersionProperty() {
 		return version;
@@ -355,7 +355,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the category.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setCategoryProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setCategoryProperty(java.lang.String)
 	 */
 	public void setCategoryProperty(String category) {
 		this.category = setStringValue(category);
@@ -364,7 +364,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the content status.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setContentStatusProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setContentStatusProperty(java.lang.String)
 	 */
 	public void setContentStatusProperty(String contentStatus) {
 		this.contentStatus = setStringValue(contentStatus);
@@ -373,7 +373,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the content type.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setContentTypeProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setContentTypeProperty(java.lang.String)
 	 */
 	public void setContentTypeProperty(String contentType) {
 		this.contentType = setStringValue(contentType);
@@ -382,7 +382,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the created date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setCreatedProperty(org.apache.poi.openxml4j.util.Nullable)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setCreatedProperty(org.zkoss.poi.openxml4j.util.Nullable)
 	 */
 	public void setCreatedProperty(String created) {
 		try {
@@ -396,7 +396,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the created date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setCreatedProperty(org.apache.poi.openxml4j.util.Nullable)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setCreatedProperty(org.zkoss.poi.openxml4j.util.Nullable)
 	 */
 	public void setCreatedProperty(Nullable<Date> created) {
 		if (created.hasValue())
@@ -406,7 +406,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the creator.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setCreatorProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setCreatorProperty(java.lang.String)
 	 */
 	public void setCreatorProperty(String creator) {
 		this.creator = setStringValue(creator);
@@ -415,7 +415,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set the description.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setDescriptionProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setDescriptionProperty(java.lang.String)
 	 */
 	public void setDescriptionProperty(String description) {
 		this.description = setStringValue(description);
@@ -424,7 +424,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set identifier.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setIdentifierProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setIdentifierProperty(java.lang.String)
 	 */
 	public void setIdentifierProperty(String identifier) {
 		this.identifier = setStringValue(identifier);
@@ -433,7 +433,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set keywords.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setKeywordsProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setKeywordsProperty(java.lang.String)
 	 */
 	public void setKeywordsProperty(String keywords) {
 		this.keywords = setStringValue(keywords);
@@ -442,7 +442,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set language.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setLanguageProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setLanguageProperty(java.lang.String)
 	 */
 	public void setLanguageProperty(String language) {
 		this.language = setStringValue(language);
@@ -451,7 +451,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set last modifications author.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setLastModifiedByProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setLastModifiedByProperty(java.lang.String)
 	 */
 	public void setLastModifiedByProperty(String lastModifiedBy) {
 		this.lastModifiedBy = setStringValue(lastModifiedBy);
@@ -460,7 +460,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set last printed date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setLastPrintedProperty(org.apache.poi.openxml4j.util.Nullable)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setLastPrintedProperty(org.zkoss.poi.openxml4j.util.Nullable)
 	 */
 	public void setLastPrintedProperty(String lastPrinted) {
 		try {
@@ -474,7 +474,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set last printed date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setLastPrintedProperty(org.apache.poi.openxml4j.util.Nullable)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setLastPrintedProperty(org.zkoss.poi.openxml4j.util.Nullable)
 	 */
 	public void setLastPrintedProperty(Nullable<Date> lastPrinted) {
 		if (lastPrinted.hasValue())
@@ -484,7 +484,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set last modification date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setModifiedProperty(org.apache.poi.openxml4j.util.Nullable)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setModifiedProperty(org.zkoss.poi.openxml4j.util.Nullable)
 	 */
 	public void setModifiedProperty(String modified) {
 		try {
@@ -498,7 +498,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set last modification date.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setModifiedProperty(org.apache.poi.openxml4j.util.Nullable)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setModifiedProperty(org.zkoss.poi.openxml4j.util.Nullable)
 	 */
 	public void setModifiedProperty(Nullable<Date> modified) {
 		if (modified.hasValue())
@@ -508,7 +508,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set revision.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setRevisionProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setRevisionProperty(java.lang.String)
 	 */
 	public void setRevisionProperty(String revision) {
 		this.revision = setStringValue(revision);
@@ -517,7 +517,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set subject.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setSubjectProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setSubjectProperty(java.lang.String)
 	 */
 	public void setSubjectProperty(String subject) {
 		this.subject = setStringValue(subject);
@@ -526,7 +526,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set title.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setTitleProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setTitleProperty(java.lang.String)
 	 */
 	public void setTitleProperty(String title) {
 		this.title = setStringValue(title);
@@ -535,7 +535,7 @@ public final class PackagePropertiesPart extends PackagePart implements
 	/**
 	 * Set version.
 	 *
-	 * @see org.apache.poi.openxml4j.opc.PackageProperties#setVersionProperty(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.PackageProperties#setVersionProperty(java.lang.String)
 	 */
 	public void setVersionProperty(String version) {
 		this.version = setStringValue(version);

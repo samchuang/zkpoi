@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal;
+package org.zkoss.poi.openxml4j.opc.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
 
 /**
  * Represents a immutable MIME ContentType value (RFC 2616 &#167;3.7)

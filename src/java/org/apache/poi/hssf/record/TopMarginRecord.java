@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.*;
+import org.zkoss.poi.util.*;
 
 /**
  * Record for the top margin.<p/>

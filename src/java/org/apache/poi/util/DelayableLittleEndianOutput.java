@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 /**
  * Implementors of this interface allow client code to 'delay' writing to a certain section of a
  * data output stream.<br/>

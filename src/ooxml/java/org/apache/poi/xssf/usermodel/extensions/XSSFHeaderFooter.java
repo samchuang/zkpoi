@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel.extensions;
+package org.zkoss.poi.xssf.usermodel.extensions;
 
-import org.apache.poi.ss.usermodel.HeaderFooter;
-import org.apache.poi.xssf.usermodel.helpers.HeaderFooterHelper;
-import org.apache.poi.util.Internal;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTHeaderFooter;
+import org.zkoss.poi.ss.usermodel.HeaderFooter;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.xssf.usermodel.helpers.HeaderFooterHelper;
 
 /**
  * Parent class of all XSSF headers and footers.
@@ -177,7 +177,7 @@ public abstract class XSSFHeaderFooter implements HeaderFooter {
 	 * resultant text should not normally be saved back into the document!
 	 */
 	public static String stripFields(String text) {
-		return org.apache.poi.hssf.usermodel.HeaderFooter.stripFields(text);
+		return org.zkoss.poi.hssf.usermodel.HeaderFooter.stripFields(text);
 	}
 
 	public abstract String getText();

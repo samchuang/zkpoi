@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.io.*;
 import java.util.Map;
 import java.util.HashMap;
 
 
-import org.apache.poi.POIXMLException;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTChartsheet;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.ChartsheetDocument;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 
 import javax.xml.namespace.QName;
 

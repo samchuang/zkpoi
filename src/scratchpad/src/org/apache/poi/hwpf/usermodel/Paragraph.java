@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.model.PAPX;
-import org.apache.poi.hwpf.sprm.SprmBuffer;
-import org.apache.poi.hwpf.sprm.TableSprmCompressor;
+import org.zkoss.poi.hwpf.model.PAPX;
+import org.zkoss.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.hwpf.sprm.TableSprmCompressor;
 
 public class Paragraph extends Range implements Cloneable {
   public final static short SPRM_JC = 0x2403;

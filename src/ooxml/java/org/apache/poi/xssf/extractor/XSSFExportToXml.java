@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.extractor;
+package org.zkoss.poi.xssf.extractor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,14 +40,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.xssf.model.Table;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFMap;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.helpers.XSSFSingleXmlCell;
-import org.apache.poi.xssf.usermodel.helpers.XSSFXmlColumnPr;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STXmlDataType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,6 +47,14 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.xssf.model.Table;
+import org.zkoss.poi.xssf.usermodel.XSSFCell;
+import org.zkoss.poi.xssf.usermodel.XSSFMap;
+import org.zkoss.poi.xssf.usermodel.XSSFRow;
+import org.zkoss.poi.xssf.usermodel.XSSFSheet;
+import org.zkoss.poi.xssf.usermodel.helpers.XSSFSingleXmlCell;
+import org.zkoss.poi.xssf.usermodel.helpers.XSSFXmlColumnPr;
 
 /**
  *

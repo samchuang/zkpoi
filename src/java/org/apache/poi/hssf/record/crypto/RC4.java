@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.crypto;
+package org.zkoss.poi.hssf.record.crypto;
 
-import org.apache.poi.util.HexDump;
+import org.zkoss.poi.util.HexDump;
 
 /**
  * Simple implementation of the alleged RC4 algorithm.

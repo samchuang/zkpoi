@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.model.SEPX;
+import org.zkoss.poi.hwpf.model.SEPX;
 
 public final class Section
   extends Range

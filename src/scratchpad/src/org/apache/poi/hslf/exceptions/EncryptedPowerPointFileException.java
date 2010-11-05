@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.exceptions;
+package org.zkoss.poi.hslf.exceptions;
 
-import org.apache.poi.EncryptedDocumentException;
+import org.zkoss.poi.EncryptedDocumentException;
 
 /**
  * This exception is thrown when we try to open a PowerPoint file, and

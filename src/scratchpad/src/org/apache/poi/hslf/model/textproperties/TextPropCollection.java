@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model.textproperties;
+package org.zkoss.poi.hslf.model.textproperties;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 
-import org.apache.poi.hslf.record.StyleTextPropAtom;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hslf.record.StyleTextPropAtom;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * For a given run of characters, holds the properties (which could

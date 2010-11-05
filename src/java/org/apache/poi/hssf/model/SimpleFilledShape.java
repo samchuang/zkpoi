@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hssf.record.ObjRecord;
-import org.apache.poi.hssf.record.EscherAggregate;
-import org.apache.poi.hssf.record.CommonObjectDataSubRecord;
-import org.apache.poi.hssf.record.EndSubRecord;
-import org.apache.poi.hssf.usermodel.HSSFSimpleShape;
-import org.apache.poi.hssf.usermodel.HSSFShape;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hssf.record.CommonObjectDataSubRecord;
+import org.zkoss.poi.hssf.record.EndSubRecord;
+import org.zkoss.poi.hssf.record.EscherAggregate;
+import org.zkoss.poi.hssf.record.ObjRecord;
+import org.zkoss.poi.hssf.usermodel.HSSFShape;
+import org.zkoss.poi.hssf.usermodel.HSSFSimpleShape;
 
 public class SimpleFilledShape
         extends AbstractShape

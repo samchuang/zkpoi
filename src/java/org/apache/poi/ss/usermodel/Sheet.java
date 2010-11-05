@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
 import java.util.Iterator;
 
-import org.apache.poi.hssf.util.PaneInformation;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.hssf.util.PaneInformation;
+import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**
  * High level representation of a Excel worksheet.

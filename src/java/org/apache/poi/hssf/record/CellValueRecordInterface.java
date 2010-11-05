@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 /**
  * The cell value record interface is implemented by all classes of type Record that
@@ -25,8 +25,8 @@ package org.apache.poi.hssf.record;
  * @author Andrew C. Oliver (acoliver at apache dot org)
  * @author Jason Height (jheight at chariot dot net dot au)
  *
- * @see org.apache.poi.hssf.record.Record
- * @see org.apache.poi.hssf.record.RecordFactory
+ * @see org.zkoss.poi.hssf.record.Record
+ * @see org.zkoss.poi.hssf.record.RecordFactory
  */
 public interface CellValueRecordInterface {
 

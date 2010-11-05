@@ -15,24 +15,24 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import java.util.Iterator;
 
-import org.apache.poi.hslf.HSLFSlideShow;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.ddf.DefaultEscherRecordFactory;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherTextboxRecord;
-import org.apache.poi.hslf.record.EscherTextboxWrapper;
-import org.apache.poi.hslf.record.TextCharsAtom;
-import org.apache.poi.hslf.record.TextBytesAtom;
-import org.apache.poi.hslf.record.StyleTextPropAtom;
+import org.zkoss.poi.ddf.DefaultEscherRecordFactory;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.EscherTextboxRecord;
+import org.zkoss.poi.hslf.HSLFSlideShow;
+import org.zkoss.poi.hslf.record.EscherTextboxWrapper;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.record.StyleTextPropAtom;
+import org.zkoss.poi.hslf.record.TextBytesAtom;
+import org.zkoss.poi.hslf.record.TextCharsAtom;
+import org.zkoss.poi.util.HexDump;
 
 /**
  * This class provides a way to view the contents of a powerpoint file.

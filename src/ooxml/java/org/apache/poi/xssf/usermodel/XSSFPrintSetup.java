@@ -15,20 +15,20 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
-import org.apache.poi.POIXMLException;
-import org.apache.poi.ss.usermodel.PageOrder;
-import org.apache.poi.ss.usermodel.PaperSize;
-import org.apache.poi.ss.usermodel.PrintCellComments;
-import org.apache.poi.ss.usermodel.PrintOrientation;
-import org.apache.poi.ss.usermodel.PrintSetup;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageMargins;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageSetup;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellComments;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STOrientation;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STPageOrder;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.ss.usermodel.PageOrder;
+import org.zkoss.poi.ss.usermodel.PaperSize;
+import org.zkoss.poi.ss.usermodel.PrintCellComments;
+import org.zkoss.poi.ss.usermodel.PrintOrientation;
+import org.zkoss.poi.ss.usermodel.PrintSetup;
 
 
 /**

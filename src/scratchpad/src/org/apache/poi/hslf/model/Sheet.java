@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.record.*;
-import org.apache.poi.hslf.usermodel.SlideShow;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.record.*;
+import org.zkoss.poi.hslf.usermodel.SlideShow;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -386,7 +386,7 @@ public abstract class Sheet {
     /**
      * Return placeholder by text type
      *
-     * @param type  type of text, See {@link org.apache.poi.hslf.record.TextHeaderAtom}
+     * @param type  type of text, See {@link org.zkoss.poi.hslf.record.TextHeaderAtom}
      * @return  <code>TextShape</code> or <code>null</code>
      */
     public TextShape getPlaceholderByTextType(int type){
@@ -406,7 +406,7 @@ public abstract class Sheet {
     /**
      * Search text placeholer by its type
      *
-     * @param type  type of placeholder to search. See {@link org.apache.poi.hslf.record.OEPlaceholderAtom}
+     * @param type  type of placeholder to search. See {@link org.zkoss.poi.hslf.record.OEPlaceholderAtom}
      * @return  <code>TextShape</code> or <code>null</code>
      */
     public TextShape getPlaceholder(int type){

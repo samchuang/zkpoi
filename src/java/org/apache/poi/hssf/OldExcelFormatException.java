@@ -14,9 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf;
+package org.zkoss.poi.hssf;
 
-import org.apache.poi.OldFileFormatException;
+import org.zkoss.poi.OldFileFormatException;
 
 public class OldExcelFormatException extends OldFileFormatException {
 	public OldExcelFormatException(String s) {

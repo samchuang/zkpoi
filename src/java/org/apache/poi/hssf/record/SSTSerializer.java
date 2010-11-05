@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.cont.ContinuableRecordOutput;
-import org.apache.poi.util.IntMapper;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.hssf.record.cont.ContinuableRecordOutput;
+import org.zkoss.poi.util.IntMapper;
 
 /**
  * This class handles serialization of SST records.  It utilizes the record processor

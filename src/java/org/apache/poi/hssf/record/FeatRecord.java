@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.common.FeatFormulaErr2;
-import org.apache.poi.hssf.record.common.FeatProtection;
-import org.apache.poi.hssf.record.common.FeatSmartTag;
-import org.apache.poi.hssf.record.common.FtrHeader;
-import org.apache.poi.hssf.record.common.SharedFeature;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.common.FeatFormulaErr2;
+import org.zkoss.poi.hssf.record.common.FeatProtection;
+import org.zkoss.poi.hssf.record.common.FeatSmartTag;
+import org.zkoss.poi.hssf.record.common.FtrHeader;
+import org.zkoss.poi.hssf.record.common.SharedFeature;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title: Feat (Feature) Record

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
-import org.apache.poi.ddf.EscherDgRecord;
-import org.apache.poi.ddf.EscherDggRecord;
+import org.zkoss.poi.ddf.EscherDgRecord;
+import org.zkoss.poi.ddf.EscherDggRecord;
 
 import java.util.List;
 import java.util.ArrayList;

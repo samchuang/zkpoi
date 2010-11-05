@@ -14,14 +14,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.apache.poi.hssf.record.ExtendedFormatRecord;
-import org.apache.poi.hssf.record.FontRecord;
-import org.apache.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.hssf.record.ExtendedFormatRecord;
+import org.zkoss.poi.hssf.record.FontRecord;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
 
 /**
  * Excel can get cranky if you give it files containing too

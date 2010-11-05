@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.usermodel;
+package org.zkoss.poi.hslf.usermodel;
 
 import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
@@ -26,20 +26,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
-import org.apache.poi.ddf.EscherBSERecord;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.hslf.HSLFSlideShow;
-import org.apache.poi.hslf.exceptions.CorruptPowerPointFileException;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.hslf.model.*;
-import org.apache.poi.hslf.model.Notes;
-import org.apache.poi.hslf.model.Slide;
-import org.apache.poi.hslf.record.*;
-import org.apache.poi.hslf.record.SlideListWithText.SlideAtomsSet;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.EscherBSERecord;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.hslf.HSLFSlideShow;
+import org.zkoss.poi.hslf.exceptions.CorruptPowerPointFileException;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.model.*;
+import org.zkoss.poi.hslf.model.Notes;
+import org.zkoss.poi.hslf.model.Slide;
+import org.zkoss.poi.hslf.record.*;
+import org.zkoss.poi.hslf.record.SlideListWithText.SlideAtomsSet;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This class is a friendly wrapper on top of the more scary HSLFSlideShow.
@@ -296,13 +296,13 @@ public final class SlideShow {
 				Record r = getCoreRecordForSAS(masterSets[i]);
 				SlideAtomsSet sas = masterSets[i];
 				int sheetNo = sas.getSlidePersistAtom().getSlideIdentifier();
-				if (r instanceof org.apache.poi.hslf.record.Slide) {
-					TitleMaster master = new TitleMaster((org.apache.poi.hslf.record.Slide) r,
+				if (r instanceof org.zkoss.poi.hslf.record.Slide) {
+					TitleMaster master = new TitleMaster((org.zkoss.poi.hslf.record.Slide) r,
 							sheetNo);
 					master.setSlideShow(this);
 					tmr.add(master);
-				} else if (r instanceof org.apache.poi.hslf.record.MainMaster) {
-					SlideMaster master = new SlideMaster((org.apache.poi.hslf.record.MainMaster) r,
+				} else if (r instanceof org.zkoss.poi.hslf.record.MainMaster) {
+					SlideMaster master = new SlideMaster((org.zkoss.poi.hslf.record.MainMaster) r,
 							sheetNo);
 					master.setSlideShow(this);
 					mmr.add(master);
@@ -320,24 +320,24 @@ public final class SlideShow {
 
 		// Start by finding the notes records to go with the entries in
 		// notesSLWT
-		org.apache.poi.hslf.record.Notes[] notesRecords;
+		org.zkoss.poi.hslf.record.Notes[] notesRecords;
 		SlideAtomsSet[] notesSets = new SlideAtomsSet[0];
 		Hashtable<Integer,Integer> slideIdToNotes = new Hashtable<Integer,Integer>();
 		if (notesSLWT == null) {
 			// None
-			notesRecords = new org.apache.poi.hslf.record.Notes[0];
+			notesRecords = new org.zkoss.poi.hslf.record.Notes[0];
 		} else {
 			// Match up the records and the SlideAtomSets
 			notesSets = notesSLWT.getSlideAtomsSets();
-			ArrayList<org.apache.poi.hslf.record.Notes> notesRecordsL = 
-			   new ArrayList<org.apache.poi.hslf.record.Notes>();
+			ArrayList<org.zkoss.poi.hslf.record.Notes> notesRecordsL = 
+			   new ArrayList<org.zkoss.poi.hslf.record.Notes>();
 			for (int i = 0; i < notesSets.length; i++) {
 				// Get the right core record
 				Record r = getCoreRecordForSAS(notesSets[i]);
 
 				// Ensure it really is a notes record
-				if (r instanceof org.apache.poi.hslf.record.Notes) {
-					org.apache.poi.hslf.record.Notes notesRecord = (org.apache.poi.hslf.record.Notes) r;
+				if (r instanceof org.zkoss.poi.hslf.record.Notes) {
+					org.zkoss.poi.hslf.record.Notes notesRecord = (org.zkoss.poi.hslf.record.Notes) r;
 					notesRecordsL.add(notesRecord);
 
 					// Record the match between slide id and these notes
@@ -351,27 +351,27 @@ public final class SlideShow {
 							+ ", but that was actually a " + r);
 				}
 			}
-			notesRecords = new org.apache.poi.hslf.record.Notes[notesRecordsL.size()];
+			notesRecords = new org.zkoss.poi.hslf.record.Notes[notesRecordsL.size()];
 			notesRecords = notesRecordsL.toArray(notesRecords);
 		}
 
 		// Now, do the same thing for our slides
-		org.apache.poi.hslf.record.Slide[] slidesRecords;
+		org.zkoss.poi.hslf.record.Slide[] slidesRecords;
 		SlideAtomsSet[] slidesSets = new SlideAtomsSet[0];
 		if (slidesSLWT == null) {
 			// None
-			slidesRecords = new org.apache.poi.hslf.record.Slide[0];
+			slidesRecords = new org.zkoss.poi.hslf.record.Slide[0];
 		} else {
 			// Match up the records and the SlideAtomSets
 			slidesSets = slidesSLWT.getSlideAtomsSets();
-			slidesRecords = new org.apache.poi.hslf.record.Slide[slidesSets.length];
+			slidesRecords = new org.zkoss.poi.hslf.record.Slide[slidesSets.length];
 			for (int i = 0; i < slidesSets.length; i++) {
 				// Get the right core record
 				Record r = getCoreRecordForSAS(slidesSets[i]);
 
 				// Ensure it really is a slide record
-				if (r instanceof org.apache.poi.hslf.record.Slide) {
-					slidesRecords[i] = (org.apache.poi.hslf.record.Slide) r;
+				if (r instanceof org.zkoss.poi.hslf.record.Slide) {
+					slidesRecords[i] = (org.zkoss.poi.hslf.record.Slide) r;
 				} else {
 					logger.log(POILogger.ERROR, "A Slide SlideAtomSet at " + i
 							+ " said its record was at refID "
@@ -722,7 +722,7 @@ public final class SlideShow {
 				+ " and identifier " + sp.getSlideIdentifier());
 
 		// Add the core records for this new Slide to the record tree
-		org.apache.poi.hslf.record.Slide slideRecord = slide.getSlideRecord();
+		org.zkoss.poi.hslf.record.Slide slideRecord = slide.getSlideRecord();
 		int slideRecordPos = _hslfSlideShow.appendRootLevelRecord(slideRecord);
 		_records = _hslfSlideShow.getRecords();
 

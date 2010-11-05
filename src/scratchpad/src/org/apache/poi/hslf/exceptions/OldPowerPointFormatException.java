@@ -15,9 +15,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hslf.exceptions;
+package org.zkoss.poi.hslf.exceptions;
 
-import org.apache.poi.OldFileFormatException;
+import org.zkoss.poi.OldFileFormatException;
 
 /**
  * This exception is thrown when we try to open a PowerPoint file, and

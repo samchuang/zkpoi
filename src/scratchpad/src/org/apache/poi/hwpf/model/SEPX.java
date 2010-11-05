@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
-import org.apache.poi.hwpf.sprm.SectionSprmCompressor;
-import org.apache.poi.hwpf.sprm.SectionSprmUncompressor;
-import org.apache.poi.hwpf.usermodel.SectionProperties;
+import org.zkoss.poi.hwpf.sprm.SectionSprmCompressor;
+import org.zkoss.poi.hwpf.sprm.SectionSprmUncompressor;
+import org.zkoss.poi.hwpf.usermodel.SectionProperties;
 
 /**
  */

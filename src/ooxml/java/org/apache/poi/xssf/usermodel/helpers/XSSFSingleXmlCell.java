@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel.helpers;
+package org.zkoss.poi.xssf.usermodel.helpers;
 
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.model.SingleXmlCells;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSingleXmlCell;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTXmlCellPr;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTXmlPr;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STXmlDataType.Enum;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.xssf.model.SingleXmlCells;
+import org.zkoss.poi.xssf.usermodel.XSSFCell;
+import org.zkoss.poi.xssf.usermodel.XSSFRow;
 
 /**
  * 

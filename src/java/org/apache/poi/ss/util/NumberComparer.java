@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.util;
+package org.zkoss.poi.ss.util;
 
-import static org.apache.poi.ss.util.IEEEDouble.*;
+import static org.zkoss.poi.ss.util.IEEEDouble.*;
 
 /**
  * Excel compares numbers using different rules to those of java, so

@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.StringUtil;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * A CString (type 4026). Holds a unicode string, and the first two bytes

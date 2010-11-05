@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf.wellknown;
+package org.zkoss.poi.hpsf.wellknown;
 
 import java.util.HashMap;
 

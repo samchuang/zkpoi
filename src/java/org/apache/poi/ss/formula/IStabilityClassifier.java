@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.zkoss.poi.hssf.usermodel.HSSFFormulaEvaluator;
 
 /**
  * Used to help optimise cell evaluation result caching by allowing applications to specify which

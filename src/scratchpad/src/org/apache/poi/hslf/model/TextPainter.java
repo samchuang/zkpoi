@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -31,10 +31,10 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hslf.record.TextRulerAtom;
-import org.apache.poi.hslf.usermodel.RichTextRun;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.hslf.record.TextRulerAtom;
+import org.zkoss.poi.hslf.usermodel.RichTextRun;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Paint text into java.awt.Graphics2D

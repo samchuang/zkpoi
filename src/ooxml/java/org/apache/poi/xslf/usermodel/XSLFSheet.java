@@ -14,13 +14,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xslf.usermodel;
+package org.zkoss.poi.xslf.usermodel;
 
-import org.apache.poi.sl.usermodel.Background;
-import org.apache.poi.sl.usermodel.MasterSheet;
-import org.apache.poi.sl.usermodel.Shape;
-import org.apache.poi.sl.usermodel.Sheet;
-import org.apache.poi.sl.usermodel.SlideShow;
+import org.zkoss.poi.sl.usermodel.Background;
+import org.zkoss.poi.sl.usermodel.MasterSheet;
+import org.zkoss.poi.sl.usermodel.Shape;
+import org.zkoss.poi.sl.usermodel.Sheet;
+import org.zkoss.poi.sl.usermodel.SlideShow;
 
 public abstract class XSLFSheet implements Sheet {
 	private SlideShow slideShow;

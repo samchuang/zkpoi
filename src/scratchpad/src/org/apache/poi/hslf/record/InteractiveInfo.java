@@ -14,12 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * This class represents the metadata of a link in a slide/notes/etc.

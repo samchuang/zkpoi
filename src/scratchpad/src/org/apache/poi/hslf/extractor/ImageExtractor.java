@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.extractor;
+package org.zkoss.poi.hslf.extractor;
 
-import org.apache.poi.hslf.usermodel.SlideShow;
-import org.apache.poi.hslf.usermodel.PictureData;
-import org.apache.poi.hslf.HSLFSlideShow;
-import org.apache.poi.hslf.model.Picture;
+import org.zkoss.poi.hslf.HSLFSlideShow;
+import org.zkoss.poi.hslf.model.Picture;
+import org.zkoss.poi.hslf.usermodel.PictureData;
+import org.zkoss.poi.hslf.usermodel.SlideShow;
 
 import java.io.IOException;
 import java.io.FileOutputStream;

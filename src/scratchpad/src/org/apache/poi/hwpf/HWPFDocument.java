@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf;
+package org.zkoss.poi.hwpf;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -26,34 +26,34 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.hwpf.model.CHPBinTable;
-import org.apache.poi.hwpf.model.CPSplitCalculator;
-import org.apache.poi.hwpf.model.ComplexFileTable;
-import org.apache.poi.hwpf.model.DocumentProperties;
-import org.apache.poi.hwpf.model.EscherRecordHolder;
-import org.apache.poi.hwpf.model.FSPATable;
-import org.apache.poi.hwpf.model.FontTable;
-import org.apache.poi.hwpf.model.GenericPropertyNode;
-import org.apache.poi.hwpf.model.ListTables;
-import org.apache.poi.hwpf.model.PAPBinTable;
-import org.apache.poi.hwpf.model.PicturesTable;
-import org.apache.poi.hwpf.model.PlexOfCps;
-import org.apache.poi.hwpf.model.PropertyNode;
-import org.apache.poi.hwpf.model.RevisionMarkAuthorTable;
-import org.apache.poi.hwpf.model.SavedByTable;
-import org.apache.poi.hwpf.model.SectionTable;
-import org.apache.poi.hwpf.model.ShapesTable;
-import org.apache.poi.hwpf.model.StyleSheet;
-import org.apache.poi.hwpf.model.TextPiece;
-import org.apache.poi.hwpf.model.TextPieceTable;
-import org.apache.poi.hwpf.model.io.HWPFFileSystem;
-import org.apache.poi.hwpf.model.io.HWPFOutputStream;
-import org.apache.poi.hwpf.usermodel.HWPFList;
-import org.apache.poi.hwpf.usermodel.Range;
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hwpf.model.CHPBinTable;
+import org.zkoss.poi.hwpf.model.CPSplitCalculator;
+import org.zkoss.poi.hwpf.model.ComplexFileTable;
+import org.zkoss.poi.hwpf.model.DocumentProperties;
+import org.zkoss.poi.hwpf.model.EscherRecordHolder;
+import org.zkoss.poi.hwpf.model.FSPATable;
+import org.zkoss.poi.hwpf.model.FontTable;
+import org.zkoss.poi.hwpf.model.GenericPropertyNode;
+import org.zkoss.poi.hwpf.model.ListTables;
+import org.zkoss.poi.hwpf.model.PAPBinTable;
+import org.zkoss.poi.hwpf.model.PicturesTable;
+import org.zkoss.poi.hwpf.model.PlexOfCps;
+import org.zkoss.poi.hwpf.model.PropertyNode;
+import org.zkoss.poi.hwpf.model.RevisionMarkAuthorTable;
+import org.zkoss.poi.hwpf.model.SavedByTable;
+import org.zkoss.poi.hwpf.model.SectionTable;
+import org.zkoss.poi.hwpf.model.ShapesTable;
+import org.zkoss.poi.hwpf.model.StyleSheet;
+import org.zkoss.poi.hwpf.model.TextPiece;
+import org.zkoss.poi.hwpf.model.TextPieceTable;
+import org.zkoss.poi.hwpf.model.io.HWPFFileSystem;
+import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.hwpf.usermodel.HWPFList;
+import org.zkoss.poi.hwpf.usermodel.Range;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 
 /**

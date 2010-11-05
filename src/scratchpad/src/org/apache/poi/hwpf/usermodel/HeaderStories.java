@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.model.FileInformationBlock;
-import org.apache.poi.hwpf.model.GenericPropertyNode;
-import org.apache.poi.hwpf.model.PlexOfCps;
+import org.zkoss.poi.hwpf.HWPFDocument;
+import org.zkoss.poi.hwpf.model.FileInformationBlock;
+import org.zkoss.poi.hwpf.model.GenericPropertyNode;
+import org.zkoss.poi.hwpf.model.PlexOfCps;
 
 /**
  * A HeaderStory is a Header, a Footer, or footnote/endnote

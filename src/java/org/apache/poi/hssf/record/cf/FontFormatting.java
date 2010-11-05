@@ -16,12 +16,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.cf;
+package org.zkoss.poi.hssf.record.cf;
 
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Font Formatting Block of the Conditional Formatting Rule Record.
@@ -189,7 +189,7 @@ public final class FontFormatting
 	 * set the font to be italics or not
 	 *
 	 * @param italic - whether the font is italics or not
-	 * @see #setFontOption(boolean, org.apache.poi.util.BitField)
+	 * @see #setFontOption(boolean, org.zkoss.poi.util.BitField)
 	 */
 
 	public void setItalic(boolean italic)
@@ -201,7 +201,7 @@ public final class FontFormatting
 	 * get whether the font is to be italics or not
 	 *
 	 * @return italics - whether the font is italics or not
-	 * @see #getFontOption(org.apache.poi.util.BitField)
+	 * @see #getFontOption(org.zkoss.poi.util.BitField)
 	 */
 
 	public boolean isItalic()
@@ -244,7 +244,7 @@ public final class FontFormatting
 	 * get whether the font is to be stricken out or not
 	 *
 	 * @return strike - whether the font is stricken out or not
-	 * @see #getFontOption(org.apache.poi.util.BitField)
+	 * @see #getFontOption(org.zkoss.poi.util.BitField)
 	 */
 
 	public boolean isStruckout()
@@ -304,9 +304,9 @@ public final class FontFormatting
 	 * get the type of super or subscript for the font
 	 *
 	 * @return super or subscript option
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_NONE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUPER
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUB
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#SS_NONE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#SS_SUPER
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#SS_SUB
 	 */
 	public short getEscapementType()
 	{
@@ -317,9 +317,9 @@ public final class FontFormatting
 	 * set the escapement type for the font
 	 *
 	 * @param escapementType  super or subscript option
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_NONE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUPER
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#SS_SUB
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#SS_NONE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#SS_SUPER
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#SS_SUB
 	 */
 	public void setEscapementType( short escapementType)
 	{
@@ -331,11 +331,11 @@ public final class FontFormatting
 	 *
 	 * @return font underlining type
 	 *
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_NONE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE_ACCOUNTING
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE_ACCOUNTING
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_NONE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE_ACCOUNTING
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE_ACCOUNTING
 	 */
 
 	public short getUnderlineType()
@@ -348,11 +348,11 @@ public final class FontFormatting
 	 *
 	 * @param underlineType underline option
 	 *
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_NONE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE_ACCOUNTING
-	 * @see org.apache.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE_ACCOUNTING
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_NONE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_SINGLE_ACCOUNTING
+	 * @see org.zkoss.poi.hssf.usermodel.HSSFFontFormatting#U_DOUBLE_ACCOUNTING
 	 */
 	public void setUnderlineType( short underlineType)
 	{

@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 
 /**
  * Common class for {@link HSSFHeader} and {@link HSSFFooter}.
  */
-public abstract class HeaderFooter implements org.apache.poi.ss.usermodel.HeaderFooter {
+public abstract class HeaderFooter implements org.zkoss.poi.ss.usermodel.HeaderFooter {
 
 	protected HeaderFooter() {
 		//

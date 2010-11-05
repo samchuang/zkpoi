@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.record.*;
-import org.apache.poi.hslf.usermodel.RichTextRun;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.*;
+import org.zkoss.poi.hslf.usermodel.RichTextRun;
+import org.zkoss.poi.util.POILogger;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -560,7 +560,7 @@ public abstract class TextShape extends SimpleShape {
      * @param linkId    id of the hyperlink, @see org.apache.poi.hslf.usermodel.SlideShow#addHyperlink(Hyperlink)
      * @param      beginIndex   the beginning index, inclusive.
      * @param      endIndex     the ending index, exclusive.
-     * @see org.apache.poi.hslf.usermodel.SlideShow#addHyperlink(Hyperlink)
+     * @see org.zkoss.poi.hslf.usermodel.SlideShow#addHyperlink(Hyperlink)
      */
     public void setHyperlink(int linkId, int beginIndex, int endIndex){
         //TODO validate beginIndex and endIndex and throw IllegalArgumentException

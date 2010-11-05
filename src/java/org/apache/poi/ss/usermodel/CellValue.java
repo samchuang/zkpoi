@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.ss.usermodel.Cell;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.usermodel.Cell;
 
 /**
  * Mimics the 'data view' of a cell. This allows formula evaluator

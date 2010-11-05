@@ -17,10 +17,10 @@
 ==================================================================== */
         
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.util.IntMapper;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.util.IntMapper;
 
 /**
  * Handles the task of deserializing a SST string.  The two main entry points are

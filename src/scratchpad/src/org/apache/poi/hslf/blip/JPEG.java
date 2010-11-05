@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.blip;
+package org.zkoss.poi.hslf.blip;
 
-import org.apache.poi.hslf.model.Picture;
+import org.zkoss.poi.hslf.model.Picture;
 
 /**
  * Represents a JPEG picture data in a PPT file
@@ -28,7 +28,7 @@ public final class JPEG extends Bitmap {
 
     /**
      * @return type of  this picture
-     * @see  org.apache.poi.hslf.model.Picture#JPEG
+     * @see  org.zkoss.poi.hslf.model.Picture#JPEG
      */
     public int getType(){
         return Picture.JPEG;

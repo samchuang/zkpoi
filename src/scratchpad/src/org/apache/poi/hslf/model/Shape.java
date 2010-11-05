@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.record.ColorSchemeAtom;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.record.ColorSchemeAtom;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 import java.util.*;
 import java.awt.*;
@@ -126,7 +126,7 @@ public abstract class Shape {
 
     /**
      * @return type of the shape.
-     * @see org.apache.poi.hslf.record.RecordTypes
+     * @see org.zkoss.poi.hslf.record.RecordTypes
      */
     public int getShapeType(){
         EscherSpRecord spRecord = _escherContainer.getChildById(EscherSpRecord.RECORD_ID);
@@ -135,7 +135,7 @@ public abstract class Shape {
 
     /**
      * @param type type of the shape.
-     * @see org.apache.poi.hslf.record.RecordTypes
+     * @see org.zkoss.poi.hslf.record.RecordTypes
      */
     public void setShapeType(int type){
         EscherSpRecord spRecord = _escherContainer.getChildById(EscherSpRecord.RECORD_ID);

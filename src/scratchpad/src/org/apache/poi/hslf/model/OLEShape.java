@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.usermodel.SlideShow;
-import org.apache.poi.hslf.usermodel.ObjectData;
-import org.apache.poi.hslf.record.ExObjList;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.hslf.record.ExEmbed;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.record.ExEmbed;
+import org.zkoss.poi.hslf.record.ExObjList;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.usermodel.ObjectData;
+import org.zkoss.poi.hslf.usermodel.SlideShow;
+import org.zkoss.poi.util.POILogger;
 
 
 /**

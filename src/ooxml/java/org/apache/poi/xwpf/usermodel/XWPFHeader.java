@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.usermodel;
+package org.zkoss.poi.xwpf.usermodel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,9 +25,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -37,6 +34,9 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTNumbering;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.HdrDocument;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 
 /**
  * Sketch of XWPF header class
@@ -143,7 +143,7 @@ public class XWPFHeader extends XWPFHeaderFooter {
 
 	/**
 	 * returns the Part, to which the body belongs, which you need for adding relationship to other parts
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPart()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPart()
 	 */
 	public IBody getPart() {
 		return this;
@@ -151,7 +151,7 @@ public class XWPFHeader extends XWPFHeaderFooter {
 
 	/**
 	 * get the PartType of the body
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPartType()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPartType()
 	 */
 	public BodyType getPartType() {
 		return BodyType.HEADER;

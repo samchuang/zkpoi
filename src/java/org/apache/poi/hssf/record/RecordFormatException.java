@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 /**
  * Title:     Record Format Exception
@@ -25,7 +25,7 @@ package org.apache.poi.hssf.record;
  */
 
 public class RecordFormatException
-    extends org.apache.poi.util.RecordFormatException
+    extends org.zkoss.poi.util.RecordFormatException
 {
     public RecordFormatException(String exception)
     {

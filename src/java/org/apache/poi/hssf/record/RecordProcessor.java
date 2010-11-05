@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 
 /**

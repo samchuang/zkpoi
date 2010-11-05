@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.io.OutputStream;
 import java.io.IOException;
 
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.hwpf.model.io.*;
-import org.apache.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.hwpf.model.io.*;
+import org.zkoss.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * This class holds all of the character formatting properties.

@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.StringUtil;
 
-import org.apache.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * String table containing the history of the last few revisions ("saves") of the document.

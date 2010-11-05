@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title: COLINFO Record (0x007D)<p/>
@@ -105,7 +105,7 @@ public final class ColumnInfoRecord extends StandardRecord {
     /**
      * set the columns' default format info
      * @param xfi - the extended format index
-     * @see org.apache.poi.hssf.record.ExtendedFormatRecord
+     * @see org.zkoss.poi.hssf.record.ExtendedFormatRecord
      */
     public void setXFIndex(int xfi) {
         _xfIndex = xfi;
@@ -161,7 +161,7 @@ public final class ColumnInfoRecord extends StandardRecord {
     /**
      * get the columns' default format info
      * @return the extended format index
-     * @see org.apache.poi.hssf.record.ExtendedFormatRecord
+     * @see org.zkoss.poi.hssf.record.ExtendedFormatRecord
      */
     public int getXFIndex() {
         return _xfIndex;

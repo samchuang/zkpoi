@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.streams;
+package org.zkoss.poi.hdgf.streams;
 
-import org.apache.poi.hdgf.chunks.ChunkFactory;
-import org.apache.poi.hdgf.pointers.Pointer;
+import org.zkoss.poi.hdgf.chunks.ChunkFactory;
+import org.zkoss.poi.hdgf.pointers.Pointer;
 
 /**
  * A Stream which holds Strings. This is just another kind

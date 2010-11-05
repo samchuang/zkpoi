@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.exceptions;
+package org.zkoss.poi.hdgf.exceptions;
 
 /**
  * The superclass of all HDGF exceptions

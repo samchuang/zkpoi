@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 
-import org.apache.poi.hslf.model.textproperties.AlignmentTextProp;
-import org.apache.poi.hslf.model.textproperties.CharFlagsTextProp;
-import org.apache.poi.hslf.model.textproperties.ParagraphFlagsTextProp;
-import org.apache.poi.hslf.model.textproperties.TextProp;
-import org.apache.poi.hslf.model.textproperties.TextPropCollection;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.hslf.model.textproperties.AlignmentTextProp;
+import org.zkoss.poi.hslf.model.textproperties.CharFlagsTextProp;
+import org.zkoss.poi.hslf.model.textproperties.ParagraphFlagsTextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextPropCollection;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * A StyleTextPropAtom (type 4001). Holds basic character properties

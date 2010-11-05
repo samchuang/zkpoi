@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.hssf.record.SelectionRecord;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.hssf.record.SelectionRecord;
 
 /**
  * See OOO documentation: excelfileformat.pdf sec 2.5.14 - 'Cell Range Address'<p/>
  *
  * Note - {@link SelectionRecord} uses the BIFF5 version of this structure
- * @deprecated use {@link org.apache.poi.ss.util.CellRangeAddress}
+ * @deprecated use {@link org.zkoss.poi.ss.util.CellRangeAddress}
  * @author Dragos Buleandra (dragos.buleandra@trade2b.ro)
  */
-public class CellRangeAddress extends org.apache.poi.ss.util.CellRangeAddress {
+public class CellRangeAddress extends org.zkoss.poi.ss.util.CellRangeAddress {
 
 	public CellRangeAddress(int firstRow, int lastRow, int firstCol, int lastCol) {
 		super(firstRow, lastRow, firstCol, lastCol);

@@ -15,10 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi;
+package org.zkoss.poi;
 
-import org.apache.poi.openxml4j.opc.internal.PackagePropertiesPart;
 import org.openxmlformats.schemas.officeDocument.x2006.customProperties.CTProperty;
+import org.zkoss.poi.POITextExtractor;
+import org.zkoss.poi.openxml4j.opc.internal.PackagePropertiesPart;
 
 import java.util.Date;
 import java.util.List;

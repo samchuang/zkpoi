@@ -17,23 +17,23 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.eventfilesystem;
+package org.zkoss.poi.poifs.eventfilesystem;
 
 import java.io.*;
 
 import java.util.*;
 
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
-import org.apache.poi.poifs.filesystem.POIFSDocument;
-import org.apache.poi.poifs.filesystem.POIFSDocumentPath;
-import org.apache.poi.poifs.property.DirectoryProperty;
-import org.apache.poi.poifs.property.Property;
-import org.apache.poi.poifs.property.PropertyTable;
-import org.apache.poi.poifs.storage.BlockAllocationTableReader;
-import org.apache.poi.poifs.storage.BlockList;
-import org.apache.poi.poifs.storage.HeaderBlockReader;
-import org.apache.poi.poifs.storage.RawDataBlockList;
-import org.apache.poi.poifs.storage.SmallBlockTableReader;
+import org.zkoss.poi.poifs.filesystem.DocumentInputStream;
+import org.zkoss.poi.poifs.filesystem.POIFSDocument;
+import org.zkoss.poi.poifs.filesystem.POIFSDocumentPath;
+import org.zkoss.poi.poifs.property.DirectoryProperty;
+import org.zkoss.poi.poifs.property.Property;
+import org.zkoss.poi.poifs.property.PropertyTable;
+import org.zkoss.poi.poifs.storage.BlockAllocationTableReader;
+import org.zkoss.poi.poifs.storage.BlockList;
+import org.zkoss.poi.poifs.storage.HeaderBlockReader;
+import org.zkoss.poi.poifs.storage.RawDataBlockList;
+import org.zkoss.poi.poifs.storage.SmallBlockTableReader;
 
 /**
  * An event-driven reader for POIFS file systems. Users of this class

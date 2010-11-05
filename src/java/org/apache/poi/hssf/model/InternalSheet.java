@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,62 +23,62 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.hssf.record.BOFRecord;
-import org.apache.poi.hssf.record.CFHeaderRecord;
-import org.apache.poi.hssf.record.CalcCountRecord;
-import org.apache.poi.hssf.record.CalcModeRecord;
-import org.apache.poi.hssf.record.CellValueRecordInterface;
-import org.apache.poi.hssf.record.ColumnInfoRecord;
-import org.apache.poi.hssf.record.DVALRecord;
-import org.apache.poi.hssf.record.DefaultColWidthRecord;
-import org.apache.poi.hssf.record.DefaultRowHeightRecord;
-import org.apache.poi.hssf.record.DeltaRecord;
-import org.apache.poi.hssf.record.DimensionsRecord;
-import org.apache.poi.hssf.record.DrawingRecord;
-import org.apache.poi.hssf.record.EOFRecord;
-import org.apache.poi.hssf.record.EscherAggregate;
-import org.apache.poi.hssf.record.FeatHdrRecord;
-import org.apache.poi.hssf.record.FeatRecord;
-import org.apache.poi.hssf.record.GridsetRecord;
-import org.apache.poi.hssf.record.GutsRecord;
-import org.apache.poi.hssf.record.IndexRecord;
-import org.apache.poi.hssf.record.IterationRecord;
-import org.apache.poi.hssf.record.MergeCellsRecord;
-import org.apache.poi.hssf.record.NoteRecord;
-import org.apache.poi.hssf.record.ObjRecord;
-import org.apache.poi.hssf.record.PaneRecord;
-import org.apache.poi.hssf.record.PrintGridlinesRecord;
-import org.apache.poi.hssf.record.PrintHeadersRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordBase;
-import org.apache.poi.hssf.record.RefModeRecord;
-import org.apache.poi.hssf.record.RowRecord;
-import org.apache.poi.hssf.record.SCLRecord;
-import org.apache.poi.hssf.record.SaveRecalcRecord;
-import org.apache.poi.hssf.record.SelectionRecord;
-import org.apache.poi.hssf.record.UncalcedRecord;
-import org.apache.poi.hssf.record.WSBoolRecord;
-import org.apache.poi.hssf.record.WindowTwoRecord;
-import org.apache.poi.hssf.record.aggregates.ChartSubstreamRecordAggregate;
-import org.apache.poi.hssf.record.aggregates.ColumnInfoRecordsAggregate;
-import org.apache.poi.hssf.record.aggregates.ConditionalFormattingTable;
-import org.apache.poi.hssf.record.aggregates.CustomViewSettingsRecordAggregate;
-import org.apache.poi.hssf.record.aggregates.DataValidityTable;
-import org.apache.poi.hssf.record.aggregates.MergedCellsTable;
-import org.apache.poi.hssf.record.aggregates.PageSettingsBlock;
-import org.apache.poi.hssf.record.aggregates.RecordAggregate;
-import org.apache.poi.hssf.record.aggregates.RowRecordsAggregate;
-import org.apache.poi.hssf.record.aggregates.WorksheetProtectionBlock;
-import org.apache.poi.hssf.record.aggregates.RecordAggregate.PositionTrackingVisitor;
-import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.hssf.util.PaneInformation;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
 import org.zkoss.lang.Classes;
 import org.zkoss.lang.Library;
+import org.zkoss.poi.hssf.record.BOFRecord;
+import org.zkoss.poi.hssf.record.CFHeaderRecord;
+import org.zkoss.poi.hssf.record.CalcCountRecord;
+import org.zkoss.poi.hssf.record.CalcModeRecord;
+import org.zkoss.poi.hssf.record.CellValueRecordInterface;
+import org.zkoss.poi.hssf.record.ColumnInfoRecord;
+import org.zkoss.poi.hssf.record.DVALRecord;
+import org.zkoss.poi.hssf.record.DefaultColWidthRecord;
+import org.zkoss.poi.hssf.record.DefaultRowHeightRecord;
+import org.zkoss.poi.hssf.record.DeltaRecord;
+import org.zkoss.poi.hssf.record.DimensionsRecord;
+import org.zkoss.poi.hssf.record.DrawingRecord;
+import org.zkoss.poi.hssf.record.EOFRecord;
+import org.zkoss.poi.hssf.record.EscherAggregate;
+import org.zkoss.poi.hssf.record.FeatHdrRecord;
+import org.zkoss.poi.hssf.record.FeatRecord;
+import org.zkoss.poi.hssf.record.GridsetRecord;
+import org.zkoss.poi.hssf.record.GutsRecord;
+import org.zkoss.poi.hssf.record.IndexRecord;
+import org.zkoss.poi.hssf.record.IterationRecord;
+import org.zkoss.poi.hssf.record.MergeCellsRecord;
+import org.zkoss.poi.hssf.record.NoteRecord;
+import org.zkoss.poi.hssf.record.ObjRecord;
+import org.zkoss.poi.hssf.record.PaneRecord;
+import org.zkoss.poi.hssf.record.PrintGridlinesRecord;
+import org.zkoss.poi.hssf.record.PrintHeadersRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RecordBase;
+import org.zkoss.poi.hssf.record.RefModeRecord;
+import org.zkoss.poi.hssf.record.RowRecord;
+import org.zkoss.poi.hssf.record.SCLRecord;
+import org.zkoss.poi.hssf.record.SaveRecalcRecord;
+import org.zkoss.poi.hssf.record.SelectionRecord;
+import org.zkoss.poi.hssf.record.UncalcedRecord;
+import org.zkoss.poi.hssf.record.WSBoolRecord;
+import org.zkoss.poi.hssf.record.WindowTwoRecord;
+import org.zkoss.poi.hssf.record.aggregates.ChartSubstreamRecordAggregate;
+import org.zkoss.poi.hssf.record.aggregates.ColumnInfoRecordsAggregate;
+import org.zkoss.poi.hssf.record.aggregates.ConditionalFormattingTable;
+import org.zkoss.poi.hssf.record.aggregates.CustomViewSettingsRecordAggregate;
+import org.zkoss.poi.hssf.record.aggregates.DataValidityTable;
+import org.zkoss.poi.hssf.record.aggregates.MergedCellsTable;
+import org.zkoss.poi.hssf.record.aggregates.PageSettingsBlock;
+import org.zkoss.poi.hssf.record.aggregates.RecordAggregate;
+import org.zkoss.poi.hssf.record.aggregates.RowRecordsAggregate;
+import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
+import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.PositionTrackingVisitor;
+import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
+import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.hssf.util.PaneInformation;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Low level model implementation of a Sheet (one workbook contains many sheets)
@@ -98,8 +98,8 @@ import org.zkoss.lang.Library;
  * @author  Brian Sanders (kestrel at burdell dot org) Active Cell support
  * @author  Jean-Pierre Paris (jean-pierre.paris at m4x dot org) (Just a little)
  *
- * @see org.apache.poi.hssf.model.InternalWorkbook
- * @see org.apache.poi.hssf.usermodel.HSSFSheet
+ * @see org.zkoss.poi.hssf.model.InternalWorkbook
+ * @see org.zkoss.poi.hssf.usermodel.HSSFSheet
  */
 @Internal
 public final class InternalSheet {
@@ -159,8 +159,8 @@ public final class InternalSheet {
      *
      * @return Sheet object with all values set to those read from the file
      *
-     * @see org.apache.poi.hssf.model.InternalWorkbook
-     * @see org.apache.poi.hssf.record.Record
+     * @see org.zkoss.poi.hssf.model.InternalWorkbook
+     * @see org.zkoss.poi.hssf.record.Record
      */
     public static InternalSheet createSheet(RecordStream rs) {
         return new InternalSheet(rs);
@@ -537,7 +537,7 @@ public final class InternalSheet {
      * sets the values in the sheet's DimensionsRecord object to be correct.  Excel doesn't
      * really care, but we want to play nice with other libraries.
      *
-     * @see org.apache.poi.hssf.record.DimensionsRecord
+     * @see org.zkoss.poi.hssf.record.DimensionsRecord
      */
     public void setDimensions(int firstrow, short firstcol, int lastrow,
                               short lastcol)
@@ -655,7 +655,7 @@ public final class InternalSheet {
      *
      * @param row - the row of the value record you wish to remove
      * @param col - a record supporting the CellValueRecordInterface.
-     * @see org.apache.poi.hssf.record.CellValueRecordInterface
+     * @see org.zkoss.poi.hssf.record.CellValueRecordInterface
      */
     public void removeValueRecord(int row, CellValueRecordInterface col) {
 
@@ -1005,8 +1005,8 @@ public final class InternalSheet {
     /**
      * get the width of a given column in units of 1/256th of a character width
      * @param columnIndex index
-     * @see org.apache.poi.hssf.record.DefaultColWidthRecord
-     * @see org.apache.poi.hssf.record.ColumnInfoRecord
+     * @see org.zkoss.poi.hssf.record.DefaultColWidthRecord
+     * @see org.zkoss.poi.hssf.record.ColumnInfoRecord
      * @see #setColumnWidth(int, int)
      * @return column width in units of 1/256th of a character width
      */
@@ -1060,8 +1060,8 @@ public final class InternalSheet {
     /**
      * Get the hidden property for a given column.
      * @param columnIndex column index
-     * @see org.apache.poi.hssf.record.DefaultColWidthRecord
-     * @see org.apache.poi.hssf.record.ColumnInfoRecord
+     * @see org.zkoss.poi.hssf.record.DefaultColWidthRecord
+     * @see org.zkoss.poi.hssf.record.ColumnInfoRecord
      * @see #setColumnHidden(int, boolean)
      * @return whether the column is hidden or not.
      */
@@ -1183,7 +1183,7 @@ public final class InternalSheet {
     /**
      * Returns the active row
      *
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see org.zkoss.poi.hssf.record.SelectionRecord
      * @return row the active row index
      */
     public int getActiveCellRow() {
@@ -1197,7 +1197,7 @@ public final class InternalSheet {
      * Sets the active row
      *
      * @param row the row index
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see org.zkoss.poi.hssf.record.SelectionRecord
      */
     public void setActiveCellRow(int row) {
         //shouldn't have a sheet w/o a SelectionRecord, but best to guard anyway
@@ -1207,7 +1207,7 @@ public final class InternalSheet {
     }
 
     /**
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see org.zkoss.poi.hssf.record.SelectionRecord
      * @return column of the active cell
      */
     public short getActiveCellCol() {
@@ -1221,7 +1221,7 @@ public final class InternalSheet {
      * Sets the active column
      *
      * @param col the column index
-     * @see org.apache.poi.hssf.record.SelectionRecord
+     * @see org.zkoss.poi.hssf.record.SelectionRecord
      */
     public void setActiveCellCol(short col) {
         //shouldn't have a sheet w/o a SelectionRecord, but best to guard anyway

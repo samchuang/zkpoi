@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.record.OEPlaceholderAtom;
-import org.apache.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.OEPlaceholderAtom;
 
 import java.io.ByteArrayOutputStream;
 

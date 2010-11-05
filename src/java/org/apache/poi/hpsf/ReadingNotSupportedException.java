@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 /**
  * <p>This exception is thrown when HPSF tries to read a (yet) unsupported

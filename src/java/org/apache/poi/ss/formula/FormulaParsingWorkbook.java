@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.ss.SpreadsheetVersion;
 
 /**
  * Abstracts a workbook for the purpose of formula parsing.<br/>

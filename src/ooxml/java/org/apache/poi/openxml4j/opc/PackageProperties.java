@@ -15,18 +15,18 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc;
+package org.zkoss.poi.openxml4j.opc;
 
 import java.util.Date;
 
-import org.apache.poi.openxml4j.util.Nullable;
+import org.zkoss.poi.openxml4j.util.Nullable;
 
 /**
  * Represents the core properties of an OPC package.
  * 
  * @author Julien Chable
  * @version 1.0
- * @see org.apache.poi.openxml4j.opc.OPCPackage
+ * @see org.zkoss.poi.openxml4j.opc.OPCPackage
  */
 public interface PackageProperties {
 	

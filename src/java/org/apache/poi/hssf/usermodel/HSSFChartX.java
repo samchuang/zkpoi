@@ -10,12 +10,13 @@
 Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.ss.usermodel.Chart;
-import org.apache.poi.ss.usermodel.ChartInfo;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.util.CellRangeAddressBase;
+import org.zkoss.poi.hssf.usermodel.HSSFChart;
+import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.ChartInfo;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.ss.util.CellRangeAddressBase;
 
 /**
  * Represents a escher chart.

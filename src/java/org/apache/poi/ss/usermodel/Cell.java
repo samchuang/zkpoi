@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.poi.ss.formula.FormulaParseException;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.formula.FormulaParseException;
+import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**
  * High level representation of a cell in a row of a spreadsheet.
@@ -323,7 +323,7 @@ public interface Cell {
      *
      * @param style  reference contained in the workbook.
      * If the value is null then the style information is removed causing the cell to used the default workbook style.
-     * @see org.apache.poi.ss.usermodel.Workbook#createCellStyle()
+     * @see org.zkoss.poi.ss.usermodel.Workbook#createCellStyle()
      */
     void setCellStyle(CellStyle style);
 

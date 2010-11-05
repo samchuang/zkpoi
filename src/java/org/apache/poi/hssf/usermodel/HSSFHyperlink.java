@@ -14,10 +14,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.HyperlinkRecord;
-import org.apache.poi.ss.usermodel.Hyperlink;
+import org.zkoss.poi.hssf.record.HyperlinkRecord;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 
 /**
  * Represents an Excel hyperlink.

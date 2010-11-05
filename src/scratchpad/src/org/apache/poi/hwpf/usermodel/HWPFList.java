@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.model.ListLevel;
-import org.apache.poi.hwpf.model.ListData;
-import org.apache.poi.hwpf.model.ListFormatOverride;
-import org.apache.poi.hwpf.model.StyleSheet;
 
-import org.apache.poi.hwpf.sprm.CharacterSprmCompressor;
-import org.apache.poi.hwpf.sprm.ParagraphSprmCompressor;
+import org.zkoss.poi.hwpf.model.ListData;
+import org.zkoss.poi.hwpf.model.ListFormatOverride;
+import org.zkoss.poi.hwpf.model.ListLevel;
+import org.zkoss.poi.hwpf.model.StyleSheet;
+import org.zkoss.poi.hwpf.sprm.CharacterSprmCompressor;
+import org.zkoss.poi.hwpf.sprm.ParagraphSprmCompressor;
 
 /**
  * This class is used to create a list in a Word document. It is used in
  * conjunction with {@link
- * org.apache.poi.hwpf.HWPFDocument#registerList(HWPFList) registerList} in
- * {@link org.apache.poi.hwpf.HWPFDocument HWPFDocument}.
+ * org.zkoss.poi.hwpf.HWPFDocument#registerList(HWPFList) registerList} in
+ * {@link org.zkoss.poi.hwpf.HWPFDocument HWPFDocument}.
  *
  * In Word, lists are not ranged entities, meaning you can't actually add one
  * to the document. Lists only act as properties for list entries. Once you

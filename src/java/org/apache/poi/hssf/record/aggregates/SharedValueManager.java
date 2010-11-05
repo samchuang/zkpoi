@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,14 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.record.ArrayRecord;
-import org.apache.poi.hssf.record.FormulaRecord;
-import org.apache.poi.hssf.record.SharedFormulaRecord;
-import org.apache.poi.hssf.record.SharedValueRecordBase;
-import org.apache.poi.hssf.record.TableRecord;
-import org.apache.poi.hssf.record.formula.ExpPtg;
-import org.apache.poi.hssf.util.CellRangeAddress8Bit;
-import org.apache.poi.ss.util.CellReference;
+import org.zkoss.poi.hssf.record.ArrayRecord;
+import org.zkoss.poi.hssf.record.FormulaRecord;
+import org.zkoss.poi.hssf.record.SharedFormulaRecord;
+import org.zkoss.poi.hssf.record.SharedValueRecordBase;
+import org.zkoss.poi.hssf.record.TableRecord;
+import org.zkoss.poi.hssf.record.formula.ExpPtg;
+import org.zkoss.poi.hssf.util.CellRangeAddress8Bit;
+import org.zkoss.poi.ss.util.CellReference;
 
 /**
  * Manages various auxiliary records while constructing a

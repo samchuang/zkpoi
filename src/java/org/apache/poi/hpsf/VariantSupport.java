@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.LittleEndianConsts;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.LittleEndianConsts;
 
 /**
  * <p>Supports reading and writing of variant data.</p>

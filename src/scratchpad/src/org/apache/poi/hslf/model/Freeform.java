@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -26,13 +26,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.poi.ddf.EscherArrayProperty;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
-import org.apache.poi.ddf.EscherSimpleProperty;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.EscherArrayProperty;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.ddf.EscherSimpleProperty;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * A "Freeform" shape.

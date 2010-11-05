@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.blip;
+package org.zkoss.poi.hslf.blip;
 
-import org.apache.poi.hslf.model.Picture;
-import org.apache.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.model.Picture;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -54,7 +54,7 @@ public final class PNG extends Bitmap {
 
     /**
      * @return type of  this picture
-     * @see  org.apache.poi.hslf.model.Picture#PNG
+     * @see  org.zkoss.poi.hslf.model.Picture#PNG
      */
     public int getType(){
         return Picture.PNG;

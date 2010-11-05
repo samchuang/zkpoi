@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
 /**
- * Should be implemented by any {@link org.apache.poi.hssf.record.formula.Ptg} subclass that needs has an extern sheet index <br/>
+ * Should be implemented by any {@link org.zkoss.poi.hssf.record.formula.Ptg} subclass that needs has an extern sheet index <br/>
  *
  * For POI internal use only
  *

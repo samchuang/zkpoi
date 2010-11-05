@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.common;
+package org.zkoss.poi.hssf.record.common;
 
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title: FtrHeader (Future Record Header) common record part

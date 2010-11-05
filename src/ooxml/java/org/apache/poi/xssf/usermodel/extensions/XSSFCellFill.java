@@ -14,14 +14,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.usermodel.extensions;
+package org.zkoss.poi.xssf.usermodel.extensions;
 
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFill;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPatternFill;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STPatternType;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.util.Internal;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.xssf.usermodel.XSSFColor;
 
 /**
  * This element specifies fill formatting.

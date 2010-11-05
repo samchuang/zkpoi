@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.Record;
 
 public final class WorkbookRecordList implements Iterable<Record> {
     private List<Record> records = new ArrayList<Record>();

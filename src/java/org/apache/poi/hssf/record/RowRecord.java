@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:        Row Record (0x0208)<P/>
@@ -176,7 +176,7 @@ public final class RowRecord extends StandardRecord {
 
     /**
      * if the row is formatted then this is the index to the extended format record
-     * @see org.apache.poi.hssf.record.ExtendedFormatRecord
+     * @see org.zkoss.poi.hssf.record.ExtendedFormatRecord
      * @param index to the XF record
      */
     public void setXFIndex(short index) {
@@ -283,7 +283,7 @@ public final class RowRecord extends StandardRecord {
 
     /**
      * if the row is formatted then this is the index to the extended format record
-     * @see org.apache.poi.hssf.record.ExtendedFormatRecord
+     * @see org.zkoss.poi.hssf.record.ExtendedFormatRecord
      * @return index to the XF record or bogus value (undefined) if isn't formatted
      */
     public short getXFIndex() {

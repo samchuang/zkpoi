@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -29,49 +29,49 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.poi.POIDocument;
-import org.apache.poi.ddf.EscherBSERecord;
-import org.apache.poi.ddf.EscherBitmapBlip;
-import org.apache.poi.ddf.EscherBlipRecord;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.hssf.OldExcelFormatException;
-import org.apache.poi.hssf.model.HSSFFormulaParser;
-import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.model.InternalSheet;
-import org.apache.poi.hssf.model.InternalWorkbook;
-import org.apache.poi.hssf.record.AbstractEscherHolderRecord;
-import org.apache.poi.hssf.record.BackupRecord;
-import org.apache.poi.hssf.record.DrawingGroupRecord;
-import org.apache.poi.hssf.record.EmbeddedObjectRefSubRecord;
-import org.apache.poi.hssf.record.ExtendedFormatRecord;
-import org.apache.poi.hssf.record.FontRecord;
-import org.apache.poi.hssf.record.LabelRecord;
-import org.apache.poi.hssf.record.LabelSSTRecord;
-import org.apache.poi.hssf.record.NameRecord;
-import org.apache.poi.hssf.record.ObjRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordFactory;
-import org.apache.poi.hssf.record.SSTRecord;
-import org.apache.poi.hssf.record.UnknownRecord;
-import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
-import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.record.formula.MemFuncPtg;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.hssf.record.formula.OperandPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.record.formula.Ref3DPtg;
-import org.apache.poi.hssf.record.formula.SheetNameFormatter;
-import org.apache.poi.hssf.record.formula.UnionPtg;
-import org.apache.poi.hssf.util.CellReference;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
-import org.apache.poi.ss.formula.FormulaType;
-import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.POIDocument;
+import org.zkoss.poi.ddf.EscherBSERecord;
+import org.zkoss.poi.ddf.EscherBitmapBlip;
+import org.zkoss.poi.ddf.EscherBlipRecord;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.hssf.OldExcelFormatException;
+import org.zkoss.poi.hssf.model.HSSFFormulaParser;
+import org.zkoss.poi.hssf.model.InternalSheet;
+import org.zkoss.poi.hssf.model.InternalWorkbook;
+import org.zkoss.poi.hssf.model.RecordStream;
+import org.zkoss.poi.hssf.record.AbstractEscherHolderRecord;
+import org.zkoss.poi.hssf.record.BackupRecord;
+import org.zkoss.poi.hssf.record.DrawingGroupRecord;
+import org.zkoss.poi.hssf.record.EmbeddedObjectRefSubRecord;
+import org.zkoss.poi.hssf.record.ExtendedFormatRecord;
+import org.zkoss.poi.hssf.record.FontRecord;
+import org.zkoss.poi.hssf.record.LabelRecord;
+import org.zkoss.poi.hssf.record.LabelSSTRecord;
+import org.zkoss.poi.hssf.record.NameRecord;
+import org.zkoss.poi.hssf.record.ObjRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RecordFactory;
+import org.zkoss.poi.hssf.record.SSTRecord;
+import org.zkoss.poi.hssf.record.UnknownRecord;
+import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.hssf.record.formula.Area3DPtg;
+import org.zkoss.poi.hssf.record.formula.MemFuncPtg;
+import org.zkoss.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.hssf.record.formula.OperandPtg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.record.formula.Ref3DPtg;
+import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
+import org.zkoss.poi.hssf.record.formula.UnionPtg;
+import org.zkoss.poi.hssf.util.CellReference;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.ss.usermodel.CreationHelper;
+import org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy;
+import org.zkoss.poi.ss.util.WorkbookUtil;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 
 /**
@@ -79,14 +79,14 @@ import org.apache.poi.util.POILogger;
  * will construct whether they are reading or writing a workbook.  It is also the
  * top level object for creating new sheets/etc.
  *
- * @see org.apache.poi.hssf.model.InternalWorkbook
- * @see org.apache.poi.hssf.usermodel.HSSFSheet
+ * @see org.zkoss.poi.hssf.model.InternalWorkbook
+ * @see org.zkoss.poi.hssf.usermodel.HSSFSheet
  * @author  Andrew C. Oliver (acoliver at apache dot org)
  * @author  Glen Stampoultzis (glens at apache.org)
  * @author  Shawn Laubach (slaubach at apache dot org)
  * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
-public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.usermodel.Workbook {
+public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermodel.Workbook {
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
     private static final int MAX_ROW = 0xFFFF;
     private static final short MAX_COLUMN = (short)0x00FF;
@@ -180,7 +180,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      *        macros.  This takes more memory, so only say yes if you
      *        need to. If set, will store all of the POIFSFileSystem
      *        in memory
-     * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
+     * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem
      * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(POIFSFileSystem fs, boolean preserveNodes)
@@ -236,7 +236,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      *        macros.  This takes more memory, so only say yes if you
      *        need to. If set, will store all of the POIFSFileSystem
      *        in memory
-     * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
+     * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem
      * @exception IOException if the stream cannot be read
      */
     public HSSFWorkbook(DirectoryNode directory, POIFSFileSystem fs, boolean preserveNodes)
@@ -297,7 +297,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      * @param preserveNodes whether to preseve other nodes, such as
      *        macros.  This takes more memory, so only say yes if you
      *        need to.
-     * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
+     * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem
      * @see #HSSFWorkbook(POIFSFileSystem)
      * @exception IOException if the stream cannot be read
      */
@@ -331,9 +331,9 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
       *
       * @param records a collection of sheet's records.
       * @param offset the offset to search at 
-      * @see org.apache.poi.hssf.record.LabelRecord
-      * @see org.apache.poi.hssf.record.LabelSSTRecord
-      * @see org.apache.poi.hssf.record.SSTRecord
+      * @see org.zkoss.poi.hssf.record.LabelRecord
+      * @see org.zkoss.poi.hssf.record.LabelSSTRecord
+      * @see org.zkoss.poi.hssf.record.SSTRecord
       */
 
      private void convertLabelRecords(List records, int offset)
@@ -467,7 +467,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      * This may be different from the "selected sheet" since excel seems to
      * allow you to show the data of one sheet when another is seen "selected"
      * in the tabs (at the bottom).
-     * @see org.apache.poi.hssf.usermodel.HSSFSheet#setSelected(boolean)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFSheet#setSelected(boolean)
      */
     public int getActiveSheetIndex() {
         return workbook.getWindowOne().getActiveSheetIndex();
@@ -578,7 +578,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      * @param sheet the sheet to look up
      * @return index of the sheet (0 based). <tt>-1</tt> if not found
      */
-    public int getSheetIndex(org.apache.poi.ss.usermodel.Sheet sheet) {
+    public int getSheetIndex(org.zkoss.poi.ss.usermodel.Sheet sheet) {
         for(int i=0; i<_sheets.size(); i++) {
             if(_sheets.get(i) == sheet) {
                 return i;
@@ -733,7 +733,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      *
      * @param sheetname the name for the new sheet. Note - certain length limits
      * apply. See {@link #setSheetName(int, String)}.
-     * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
+     * @see org.zkoss.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      *  for a safe way to create valid names
      * @return HSSFSheet representing the new sheet.
      * @throws IllegalArgumentException
@@ -1147,7 +1147,7 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
      * @param stream - the java OutputStream you wish to write the XLS to
      *
      * @exception IOException if anything can't be written.
-     * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
+     * @see org.zkoss.poi.poifs.filesystem.POIFSFileSystem
      */
 
     public void write(OutputStream stream)
@@ -1437,8 +1437,8 @@ public class HSSFWorkbook extends POIDocument implements org.apache.poi.ss.userm
     /**
      * Returns the instance of HSSFDataFormat for this workbook.
      * @return the HSSFDataFormat object
-     * @see org.apache.poi.hssf.record.FormatRecord
-     * @see org.apache.poi.hssf.record.Record
+     * @see org.zkoss.poi.hssf.record.FormatRecord
+     * @see org.zkoss.poi.hssf.record.Record
      */
     public HSSFDataFormat createDataFormat() {
     if (formatter == null)

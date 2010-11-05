@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.poi.hpsf.wellknown.PropertyIDMap;
-import org.apache.poi.hpsf.wellknown.SectionIDMap;
+import org.zkoss.poi.hpsf.wellknown.PropertyIDMap;
+import org.zkoss.poi.hpsf.wellknown.SectionIDMap;
 
 /**
  * <p>Convenience class representing a DocumentSummary Information stream in a

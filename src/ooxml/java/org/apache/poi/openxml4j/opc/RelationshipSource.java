@@ -14,11 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.openxml4j.opc;
+package org.zkoss.poi.openxml4j.opc;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
 
 public interface RelationshipSource {
 
@@ -76,7 +76,7 @@ public interface RelationshipSource {
 	 * @param target External target of the relationship
 	 * @param relationshipType Type of relationship.
 	 * @return The newly created and added relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String, java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String, java.lang.String)
 	 */
 	public PackageRelationship addExternalRelationship(String target, String relationshipType);
 
@@ -93,7 +93,7 @@ public interface RelationshipSource {
 	 * @param relationshipType Type of relationship.
 	 * @param id Relationship unique id.
 	 * @return The newly created and added relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String, java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String, java.lang.String)
 	 */
 	public PackageRelationship addExternalRelationship(String target, String relationshipType, String id);
 

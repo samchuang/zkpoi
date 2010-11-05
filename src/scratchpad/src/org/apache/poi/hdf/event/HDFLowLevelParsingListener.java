@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.event;
+package org.zkoss.poi.hdf.event;
 
-import org.apache.poi.hdf.model.hdftypes.ChpxNode;
-import org.apache.poi.hdf.model.hdftypes.PapxNode;
-import org.apache.poi.hdf.model.hdftypes.SepxNode;
-import org.apache.poi.hdf.model.hdftypes.TextPiece;
-import org.apache.poi.hdf.model.hdftypes.DocumentProperties;
-import org.apache.poi.hdf.model.hdftypes.FontTable;
-import org.apache.poi.hdf.model.hdftypes.ListTables;
-import org.apache.poi.hdf.model.hdftypes.StyleSheet;
+import org.zkoss.poi.hdf.model.hdftypes.ChpxNode;
+import org.zkoss.poi.hdf.model.hdftypes.DocumentProperties;
+import org.zkoss.poi.hdf.model.hdftypes.FontTable;
+import org.zkoss.poi.hdf.model.hdftypes.ListTables;
+import org.zkoss.poi.hdf.model.hdftypes.PapxNode;
+import org.zkoss.poi.hdf.model.hdftypes.SepxNode;
+import org.zkoss.poi.hdf.model.hdftypes.StyleSheet;
+import org.zkoss.poi.hdf.model.hdftypes.TextPiece;
 
 public interface HDFLowLevelParsingListener
 {

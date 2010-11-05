@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.eval;
+package org.zkoss.poi.hssf.record.formula.eval;
 
-import org.apache.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.hssf.record.formula.NameXPtg;
 
 /**
  * @author Josh Micich

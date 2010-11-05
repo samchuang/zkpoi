@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
 /**
  * Utility class for helping convert RK numbers.
@@ -24,8 +24,8 @@ package org.apache.poi.hssf.util;
  * @author Glen Stampoultzis (glens at apache.org)
  * @author Rolf-J\u00f6rgen Moll
  *
- * @see org.apache.poi.hssf.record.MulRKRecord
- * @see org.apache.poi.hssf.record.RKRecord
+ * @see org.zkoss.poi.hssf.record.MulRKRecord
+ * @see org.zkoss.poi.hssf.record.RKRecord
  */
 public final class RKUtil {
     private RKUtil() {

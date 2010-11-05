@@ -15,25 +15,25 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.record.CRNCountRecord;
-import org.apache.poi.hssf.record.CRNRecord;
-import org.apache.poi.hssf.record.CountryRecord;
-import org.apache.poi.hssf.record.ExternSheetRecord;
-import org.apache.poi.hssf.record.ExternalNameRecord;
-import org.apache.poi.hssf.record.NameCommentRecord;
-import org.apache.poi.hssf.record.NameRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.SupBookRecord;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.hssf.record.formula.Ref3DPtg;
+import org.zkoss.poi.hssf.record.CRNCountRecord;
+import org.zkoss.poi.hssf.record.CRNRecord;
+import org.zkoss.poi.hssf.record.CountryRecord;
+import org.zkoss.poi.hssf.record.ExternSheetRecord;
+import org.zkoss.poi.hssf.record.ExternalNameRecord;
+import org.zkoss.poi.hssf.record.NameCommentRecord;
+import org.zkoss.poi.hssf.record.NameRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.SupBookRecord;
+import org.zkoss.poi.hssf.record.formula.Area3DPtg;
+import org.zkoss.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.hssf.record.formula.Ref3DPtg;
 
 /**
  * Link Table (OOO pdf reference: 4.10.3 ) <p/>

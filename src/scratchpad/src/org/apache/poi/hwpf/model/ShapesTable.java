@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hwpf.usermodel.Shape;
+import org.zkoss.poi.hwpf.usermodel.Shape;
 
 public final class ShapesTable {
         private List _shapes;

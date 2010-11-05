@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.eval;
+package org.zkoss.poi.hssf.record.formula.eval;
 
-import org.apache.poi.hssf.record.formula.functions.Fixed2ArgFunction;
-import org.apache.poi.hssf.record.formula.functions.Function;
+import org.zkoss.poi.hssf.record.formula.functions.Fixed2ArgFunction;
+import org.zkoss.poi.hssf.record.formula.functions.Function;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;

@@ -16,7 +16,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ddf;
+package org.zkoss.poi.ddf;
 
 /**
  * Represents a boolean property.  The actual utility of this property is in doubt because many

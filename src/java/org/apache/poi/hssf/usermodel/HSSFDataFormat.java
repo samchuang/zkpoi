@@ -21,7 +21,7 @@
  *
  * Created on December 18, 2001, 12:42 PM
  */
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import org.apache.poi.hssf.model.InternalWorkbook;
-import org.apache.poi.hssf.record.FormatRecord;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
-import org.apache.poi.ss.usermodel.DataFormat;
+import org.zkoss.poi.hssf.model.InternalWorkbook;
+import org.zkoss.poi.hssf.record.FormatRecord;
+import org.zkoss.poi.ss.usermodel.BuiltinFormats;
+import org.zkoss.poi.ss.usermodel.DataFormat;
 
 /**
  * Identifies both built-in and user defined formats within a workbook.<p/>

@@ -15,8 +15,8 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
-import org.apache.poi.ss.usermodel.AutoFilter;
+package org.zkoss.poi.hssf.usermodel;
+import org.zkoss.poi.ss.usermodel.AutoFilter;
 
 /**
  * Represents autofiltering for the specified worksheet.

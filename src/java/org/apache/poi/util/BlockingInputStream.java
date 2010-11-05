@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
 import java.io.InputStream;
 import java.io.IOException;

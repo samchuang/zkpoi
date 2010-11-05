@@ -14,13 +14,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.ss.util;
+package org.zkoss.poi.ss.util;
 
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
+import org.zkoss.poi.ss.usermodel.Workbook;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 import javax.imageio.ImageReader;
 import javax.imageio.ImageIO;
@@ -43,8 +43,8 @@ public class ImageUtils {
      * Return the dimension of this image
      *
      * @param is the stream containing the image data
-     * @param type type of the picture: {@link org.apache.poi.ss.usermodel.Workbook#PICTURE_TYPE_JPEG},
-     * {@link org.apache.poi.ss.usermodel.Workbook#PICTURE_TYPE_PNG} or {@link org.apache.poi.ss.usermodel.Workbook#PICTURE_TYPE_DIB}
+     * @param type type of the picture: {@link org.zkoss.poi.ss.usermodel.Workbook#PICTURE_TYPE_JPEG},
+     * {@link org.zkoss.poi.ss.usermodel.Workbook#PICTURE_TYPE_PNG} or {@link org.zkoss.poi.ss.usermodel.Workbook#PICTURE_TYPE_DIB}
      *
      * @return image dimension in pixels
      */

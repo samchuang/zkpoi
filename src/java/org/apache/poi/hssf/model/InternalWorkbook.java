@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.security.AccessControlException;
 import java.util.ArrayList;
@@ -26,70 +26,70 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.poi.ddf.EscherBSERecord;
-import org.apache.poi.ddf.EscherBoolProperty;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherDgRecord;
-import org.apache.poi.ddf.EscherDggRecord;
-import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
-import org.apache.poi.ddf.EscherRGBProperty;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherSpRecord;
-import org.apache.poi.ddf.EscherSplitMenuColorsRecord;
-import org.apache.poi.hssf.record.BOFRecord;
-import org.apache.poi.hssf.record.BackupRecord;
-import org.apache.poi.hssf.record.BookBoolRecord;
-import org.apache.poi.hssf.record.BoundSheetRecord;
-import org.apache.poi.hssf.record.CodepageRecord;
-import org.apache.poi.hssf.record.CountryRecord;
-import org.apache.poi.hssf.record.DSFRecord;
-import org.apache.poi.hssf.record.DateWindow1904Record;
-import org.apache.poi.hssf.record.DrawingGroupRecord;
-import org.apache.poi.hssf.record.EOFRecord;
-import org.apache.poi.hssf.record.EscherAggregate;
-import org.apache.poi.hssf.record.ExtSSTRecord;
-import org.apache.poi.hssf.record.ExtendedFormatRecord;
-import org.apache.poi.hssf.record.ExternSheetRecord;
-import org.apache.poi.hssf.record.FileSharingRecord;
-import org.apache.poi.hssf.record.FnGroupCountRecord;
-import org.apache.poi.hssf.record.FontRecord;
-import org.apache.poi.hssf.record.FormatRecord;
-import org.apache.poi.hssf.record.HideObjRecord;
-import org.apache.poi.hssf.record.HyperlinkRecord;
-import org.apache.poi.hssf.record.InterfaceEndRecord;
-import org.apache.poi.hssf.record.InterfaceHdrRecord;
-import org.apache.poi.hssf.record.MMSRecord;
-import org.apache.poi.hssf.record.NameCommentRecord;
-import org.apache.poi.hssf.record.NameRecord;
-import org.apache.poi.hssf.record.PaletteRecord;
-import org.apache.poi.hssf.record.PasswordRecord;
-import org.apache.poi.hssf.record.PasswordRev4Record;
-import org.apache.poi.hssf.record.PrecisionRecord;
-import org.apache.poi.hssf.record.ProtectRecord;
-import org.apache.poi.hssf.record.ProtectionRev4Record;
-import org.apache.poi.hssf.record.RecalcIdRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RefreshAllRecord;
-import org.apache.poi.hssf.record.SSTRecord;
-import org.apache.poi.hssf.record.StyleRecord;
-import org.apache.poi.hssf.record.SupBookRecord;
-import org.apache.poi.hssf.record.TabIdRecord;
-import org.apache.poi.hssf.record.UseSelFSRecord;
-import org.apache.poi.hssf.record.WindowOneRecord;
-import org.apache.poi.hssf.record.WindowProtectRecord;
-import org.apache.poi.hssf.record.WriteAccessRecord;
-import org.apache.poi.hssf.record.WriteProtectRecord;
-import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalName;
-import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
-import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.EscherBSERecord;
+import org.zkoss.poi.ddf.EscherBoolProperty;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherDgRecord;
+import org.zkoss.poi.ddf.EscherDggRecord;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.ddf.EscherRGBProperty;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.EscherSpRecord;
+import org.zkoss.poi.ddf.EscherSplitMenuColorsRecord;
+import org.zkoss.poi.hssf.record.BOFRecord;
+import org.zkoss.poi.hssf.record.BackupRecord;
+import org.zkoss.poi.hssf.record.BookBoolRecord;
+import org.zkoss.poi.hssf.record.BoundSheetRecord;
+import org.zkoss.poi.hssf.record.CodepageRecord;
+import org.zkoss.poi.hssf.record.CountryRecord;
+import org.zkoss.poi.hssf.record.DSFRecord;
+import org.zkoss.poi.hssf.record.DateWindow1904Record;
+import org.zkoss.poi.hssf.record.DrawingGroupRecord;
+import org.zkoss.poi.hssf.record.EOFRecord;
+import org.zkoss.poi.hssf.record.EscherAggregate;
+import org.zkoss.poi.hssf.record.ExtSSTRecord;
+import org.zkoss.poi.hssf.record.ExtendedFormatRecord;
+import org.zkoss.poi.hssf.record.ExternSheetRecord;
+import org.zkoss.poi.hssf.record.FileSharingRecord;
+import org.zkoss.poi.hssf.record.FnGroupCountRecord;
+import org.zkoss.poi.hssf.record.FontRecord;
+import org.zkoss.poi.hssf.record.FormatRecord;
+import org.zkoss.poi.hssf.record.HideObjRecord;
+import org.zkoss.poi.hssf.record.HyperlinkRecord;
+import org.zkoss.poi.hssf.record.InterfaceEndRecord;
+import org.zkoss.poi.hssf.record.InterfaceHdrRecord;
+import org.zkoss.poi.hssf.record.MMSRecord;
+import org.zkoss.poi.hssf.record.NameCommentRecord;
+import org.zkoss.poi.hssf.record.NameRecord;
+import org.zkoss.poi.hssf.record.PaletteRecord;
+import org.zkoss.poi.hssf.record.PasswordRecord;
+import org.zkoss.poi.hssf.record.PasswordRev4Record;
+import org.zkoss.poi.hssf.record.PrecisionRecord;
+import org.zkoss.poi.hssf.record.ProtectRecord;
+import org.zkoss.poi.hssf.record.ProtectionRev4Record;
+import org.zkoss.poi.hssf.record.RecalcIdRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RefreshAllRecord;
+import org.zkoss.poi.hssf.record.SSTRecord;
+import org.zkoss.poi.hssf.record.StyleRecord;
+import org.zkoss.poi.hssf.record.SupBookRecord;
+import org.zkoss.poi.hssf.record.TabIdRecord;
+import org.zkoss.poi.hssf.record.UseSelFSRecord;
+import org.zkoss.poi.hssf.record.WindowOneRecord;
+import org.zkoss.poi.hssf.record.WindowProtectRecord;
+import org.zkoss.poi.hssf.record.WriteAccessRecord;
+import org.zkoss.poi.hssf.record.WriteProtectRecord;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.util.HSSFColor;
+import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalName;
+import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Low level model implementation of a Workbook.  Provides creational methods
@@ -113,7 +113,7 @@ import org.apache.poi.util.POILogger;
  * @author  Dan Sherman (dsherman at isisph.com)
  * @author  Glen Stampoultzis (glens at apache.org)
  * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
- * @see org.apache.poi.hssf.usermodel.HSSFWorkbook
+ * @see org.zkoss.poi.hssf.usermodel.HSSFWorkbook
  */
 @Internal
 public final class InternalWorkbook {
@@ -952,7 +952,7 @@ public final class InternalWorkbook {
      * use this function to add a Shared String Table to an existing sheet (say
      * generated by a different java api) without an sst....
      * @see #createExtendedSST()
-     * @see org.apache.poi.hssf.record.SSTRecord
+     * @see org.zkoss.poi.hssf.record.SSTRecord
      */
 
     public void insertSST() {
@@ -1716,8 +1716,8 @@ public final class InternalWorkbook {
      * Always sets the sheet's bof to 0.  You'll need to set that yourself.
      * @param id either sheet 0,1 or 2.
      * @return record containing a BoundSheetRecord
-     * @see org.apache.poi.hssf.record.BoundSheetRecord
-     * @see org.apache.poi.hssf.record.Record
+     * @see org.zkoss.poi.hssf.record.BoundSheetRecord
+     * @see org.zkoss.poi.hssf.record.Record
      */
     private static BoundSheetRecord createBoundSheet(int id) {
         return new BoundSheetRecord("Sheet" + (id+1));
@@ -1957,8 +1957,8 @@ public final class InternalWorkbook {
      * Creates a FormatRecord, inserts it, and returns the index code.
      * @param formatString the format string
      * @return the index code of the format record.
-     * @see org.apache.poi.hssf.record.FormatRecord
-     * @see org.apache.poi.hssf.record.Record
+     * @see org.zkoss.poi.hssf.record.FormatRecord
+     * @see org.zkoss.poi.hssf.record.Record
      */
     public int createFormat(String formatString) {
 

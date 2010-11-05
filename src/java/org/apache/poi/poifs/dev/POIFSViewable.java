@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.dev;
+package org.zkoss.poi.poifs.dev;
 
 import java.util.Iterator;
 

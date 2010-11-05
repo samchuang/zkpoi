@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.util.CellReference;
+import org.zkoss.poi.hssf.util.CellReference;
 
 /**
  * Optimisation - compacts many blank cell references used by a single formula.

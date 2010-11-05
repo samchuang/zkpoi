@@ -15,20 +15,20 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.record.CFHeaderRecord;
-import org.apache.poi.hssf.record.CFRuleRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.formula.AreaErrPtg;
-import org.apache.poi.hssf.record.formula.AreaPtg;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.hssf.model.RecordStream;
+import org.zkoss.poi.hssf.record.CFHeaderRecord;
+import org.zkoss.poi.hssf.record.CFRuleRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.formula.AreaErrPtg;
+import org.zkoss.poi.hssf.record.formula.AreaPtg;
+import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**
  * CFRecordsAggregate - aggregates Conditional Formatting records CFHeaderRecord 

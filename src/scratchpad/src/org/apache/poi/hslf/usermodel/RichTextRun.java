@@ -15,22 +15,22 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.usermodel;
+package org.zkoss.poi.hslf.usermodel;
 
 import java.awt.Color;
 
-import org.apache.poi.hslf.model.MasterSheet;
-import org.apache.poi.hslf.model.Shape;
-import org.apache.poi.hslf.model.Sheet;
-import org.apache.poi.hslf.model.TextRun;
-import org.apache.poi.hslf.model.textproperties.BitMaskTextProp;
-import org.apache.poi.hslf.model.textproperties.CharFlagsTextProp;
-import org.apache.poi.hslf.model.textproperties.ParagraphFlagsTextProp;
-import org.apache.poi.hslf.model.textproperties.TextProp;
-import org.apache.poi.hslf.model.textproperties.TextPropCollection;
-import org.apache.poi.hslf.record.ColorSchemeAtom;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
+import org.zkoss.poi.hslf.model.MasterSheet;
+import org.zkoss.poi.hslf.model.Shape;
+import org.zkoss.poi.hslf.model.Sheet;
+import org.zkoss.poi.hslf.model.TextRun;
+import org.zkoss.poi.hslf.model.textproperties.BitMaskTextProp;
+import org.zkoss.poi.hslf.model.textproperties.CharFlagsTextProp;
+import org.zkoss.poi.hslf.model.textproperties.ParagraphFlagsTextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextProp;
+import org.zkoss.poi.hslf.model.textproperties.TextPropCollection;
+import org.zkoss.poi.hslf.record.ColorSchemeAtom;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 
 /**

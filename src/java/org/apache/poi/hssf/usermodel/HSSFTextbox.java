@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.ss.usermodel.RichTextString;
+import org.zkoss.poi.ss.usermodel.RichTextString;
 
 /**
  * A textbox is a shape that may hold a rich text string.

@@ -14,27 +14,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.extractor;
+package org.zkoss.poi.xwpf.extractor;
 
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.POIXMLException;
-import org.apache.poi.POIXMLTextExtractor;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.xwpf.model.XWPFCommentsDecorator;
-import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFHyperlink;
-import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRelation;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
+import org.zkoss.poi.POIXMLDocument;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.POIXMLTextExtractor;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.xwpf.model.XWPFCommentsDecorator;
+import org.zkoss.poi.xwpf.model.XWPFHeaderFooterPolicy;
+import org.zkoss.poi.xwpf.usermodel.XWPFDocument;
+import org.zkoss.poi.xwpf.usermodel.XWPFHyperlink;
+import org.zkoss.poi.xwpf.usermodel.XWPFHyperlinkRun;
+import org.zkoss.poi.xwpf.usermodel.XWPFParagraph;
+import org.zkoss.poi.xwpf.usermodel.XWPFRelation;
+import org.zkoss.poi.xwpf.usermodel.XWPFRun;
+import org.zkoss.poi.xwpf.usermodel.XWPFTable;
 
 /**
  * Helper class to extract text from an OOXML Word file

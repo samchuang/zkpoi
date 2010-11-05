@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.model.util;
+package org.zkoss.poi.hdf.model.util;
 
-import org.apache.poi.hdf.model.hdftypes.FormattedDiskPage;
+import org.zkoss.poi.hdf.model.hdftypes.FormattedDiskPage;
 
 public final class ParsingState
 {

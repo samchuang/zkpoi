@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.extractor;
+package org.zkoss.poi.hpbf.extractor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.poi.POIOLE2TextExtractor;
-import org.apache.poi.hpbf.HPBFDocument;
-import org.apache.poi.hpbf.model.qcbits.QCBit;
-import org.apache.poi.hpbf.model.qcbits.QCTextBit;
-import org.apache.poi.hpbf.model.qcbits.QCPLCBit.Type12;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.POIOLE2TextExtractor;
+import org.zkoss.poi.hpbf.HPBFDocument;
+import org.zkoss.poi.hpbf.model.qcbits.QCBit;
+import org.zkoss.poi.hpbf.model.qcbits.QCTextBit;
+import org.zkoss.poi.hpbf.model.qcbits.QCPLCBit.Type12;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * Extract text from HPBF Publisher files

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.function;
+package org.zkoss.poi.hssf.record.formula.function;
 
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.SpreadsheetVersion;
 
 /**
  * Holds information about Excel built-in functions.
@@ -31,7 +31,7 @@ public final class FunctionMetadata {
 	 * from the SpreadsheetVersion enum.
 	 * Perhaps a value like 'M' should be used instead of '30' in functionMetadata.txt
 	 * to make that file more version neutral.
-	 * @see org.apache.poi.ss.formula.FormulaParser#validateNumArgs(int, FunctionMetadata)
+	 * @see org.zkoss.poi.ss.formula.FormulaParser#validateNumArgs(int, FunctionMetadata)
 	 */
 	private static final short FUNCTION_MAX_PARAMS = 30;
 

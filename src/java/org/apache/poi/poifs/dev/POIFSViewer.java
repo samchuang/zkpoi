@@ -17,13 +17,13 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.dev;
+package org.zkoss.poi.poifs.dev;
 
 import java.io.*;
 
 import java.util.*;
 
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * A simple viewer for POIFS files

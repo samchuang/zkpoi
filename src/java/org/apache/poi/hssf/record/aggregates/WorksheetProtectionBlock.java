@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
-import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.record.ObjectProtectRecord;
-import org.apache.poi.hssf.record.PasswordRecord;
-import org.apache.poi.hssf.record.ProtectRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordFormatException;
-import org.apache.poi.hssf.record.ScenarioProtectRecord;
+import org.zkoss.poi.hssf.model.RecordStream;
+import org.zkoss.poi.hssf.record.ObjectProtectRecord;
+import org.zkoss.poi.hssf.record.PasswordRecord;
+import org.zkoss.poi.hssf.record.ProtectRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RecordFormatException;
+import org.zkoss.poi.hssf.record.ScenarioProtectRecord;
 
 /**
  * Groups the sheet protection records for a worksheet.

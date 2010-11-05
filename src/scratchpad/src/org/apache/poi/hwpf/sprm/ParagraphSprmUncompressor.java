@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.sprm;
+package org.zkoss.poi.hwpf.sprm;
 
-import org.apache.poi.hwpf.usermodel.ParagraphProperties;
-import org.apache.poi.hwpf.usermodel.BorderCode;
-import org.apache.poi.hwpf.usermodel.DateAndTime;
-import org.apache.poi.hwpf.usermodel.LineSpacingDescriptor;
-import org.apache.poi.hwpf.usermodel.ShadingDescriptor;
-import org.apache.poi.hwpf.usermodel.DropCapSpecifier;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hwpf.usermodel.BorderCode;
+import org.zkoss.poi.hwpf.usermodel.DateAndTime;
+import org.zkoss.poi.hwpf.usermodel.DropCapSpecifier;
+import org.zkoss.poi.hwpf.usermodel.LineSpacingDescriptor;
+import org.zkoss.poi.hwpf.usermodel.ParagraphProperties;
+import org.zkoss.poi.hwpf.usermodel.ShadingDescriptor;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.PaletteRecord;
-import org.apache.poi.hssf.util.HSSFColor;
+import org.zkoss.poi.hssf.record.PaletteRecord;
+import org.zkoss.poi.hssf.util.HSSFColor;
 
 /**
  * Represents a workbook color palette.

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.usermodel;
+package org.zkoss.poi.hslf.usermodel;
 
-import org.apache.poi.hslf.record.*;
+import org.zkoss.poi.hslf.record.*;
 
 import java.util.ArrayList;
 

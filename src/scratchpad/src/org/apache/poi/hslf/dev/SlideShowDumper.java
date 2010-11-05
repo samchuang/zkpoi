@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
 import java.io.*;
 
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.record.RecordTypes;
 
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.record.RecordTypes;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * This class provides a way to "peek" inside a powerpoint file. It

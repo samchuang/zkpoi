@@ -15,26 +15,26 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.util.LittleEndian;
 
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.HWPFDocumentCore;
 
-import org.apache.poi.hwpf.model.CPSplitCalculator;
-import org.apache.poi.hwpf.model.FileInformationBlock;
-import org.apache.poi.hwpf.model.PropertyNode;
-import org.apache.poi.hwpf.model.StyleSheet;
-import org.apache.poi.hwpf.model.CHPX;
-import org.apache.poi.hwpf.model.PAPX;
-import org.apache.poi.hwpf.model.SEPX;
-import org.apache.poi.hwpf.model.TextPiece;
-import org.apache.poi.hwpf.model.ListTables;
 
-import org.apache.poi.hwpf.sprm.CharacterSprmCompressor;
-import org.apache.poi.hwpf.sprm.ParagraphSprmCompressor;
-import org.apache.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.hwpf.HWPFDocument;
+import org.zkoss.poi.hwpf.HWPFDocumentCore;
+import org.zkoss.poi.hwpf.model.CHPX;
+import org.zkoss.poi.hwpf.model.CPSplitCalculator;
+import org.zkoss.poi.hwpf.model.FileInformationBlock;
+import org.zkoss.poi.hwpf.model.ListTables;
+import org.zkoss.poi.hwpf.model.PAPX;
+import org.zkoss.poi.hwpf.model.PropertyNode;
+import org.zkoss.poi.hwpf.model.SEPX;
+import org.zkoss.poi.hwpf.model.StyleSheet;
+import org.zkoss.poi.hwpf.model.TextPiece;
+import org.zkoss.poi.hwpf.sprm.CharacterSprmCompressor;
+import org.zkoss.poi.hwpf.sprm.ParagraphSprmCompressor;
+import org.zkoss.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.util.List;
 import java.util.NoSuchElementException;

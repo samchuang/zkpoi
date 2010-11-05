@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.model.HSSFFormulaParser;
-import org.apache.poi.hssf.record.cf.BorderFormatting;
-import org.apache.poi.hssf.record.cf.FontFormatting;
-import org.apache.poi.hssf.record.cf.PatternFormatting;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.ss.formula.Formula;
-import org.apache.poi.ss.formula.FormulaType;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.model.HSSFFormulaParser;
+import org.zkoss.poi.hssf.record.cf.BorderFormatting;
+import org.zkoss.poi.hssf.record.cf.FontFormatting;
+import org.zkoss.poi.hssf.record.cf.PatternFormatting;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.usermodel.HSSFSheet;
+import org.zkoss.poi.ss.formula.Formula;
+import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Conditional Formatting Rule Record (0x01B1).<br/>

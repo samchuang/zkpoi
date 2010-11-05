@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.ss.extractor;
+package org.zkoss.poi.ss.extractor;
 
 /**
  * Common interface for Excel text extractors, covering

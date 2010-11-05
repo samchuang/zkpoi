@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.sl.usermodel;
+package org.zkoss.poi.sl.usermodel;
 
 public interface Picture extends SimpleShape {
 	public PictureData getPictureData();

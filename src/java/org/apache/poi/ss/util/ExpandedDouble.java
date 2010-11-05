@@ -15,10 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.util;
+package org.zkoss.poi.ss.util;
 
 import java.math.BigInteger;
-import static org.apache.poi.ss.util.IEEEDouble.*;
+
+import static org.zkoss.poi.ss.util.IEEEDouble.*;
 
 /**
  * Represents a 64 bit IEEE double quantity expressed with both decimal and binary exponents

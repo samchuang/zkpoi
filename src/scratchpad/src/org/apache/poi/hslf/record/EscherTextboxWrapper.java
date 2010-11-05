@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
-import org.apache.poi.ddf.*;
+import org.zkoss.poi.ddf.*;
 
 import java.io.IOException;
 import java.io.OutputStream;

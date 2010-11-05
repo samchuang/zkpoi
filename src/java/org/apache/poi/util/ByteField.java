@@ -17,9 +17,9 @@
 ==================================================================== */
         
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
-import org.apache.poi.util.LittleEndian.BufferUnderrunException;
+import org.zkoss.poi.util.LittleEndian.BufferUnderrunException;
 
 import java.io.*;
 import java.nio.BufferUnderflowException;

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.CFRuleRecord;
-import org.apache.poi.hssf.record.cf.PatternFormatting;
+import org.zkoss.poi.hssf.record.CFRuleRecord;
+import org.zkoss.poi.hssf.record.cf.PatternFormatting;
 
 /**
  * High level representation for Conditional Formatting settings
@@ -82,7 +82,7 @@ public class HSSFPatternFormatting
 	}
 
 	/**
-	 * @see org.apache.poi.hssf.record.cf.PatternFormatting#getFillBackgroundColor()
+	 * @see org.zkoss.poi.hssf.record.cf.PatternFormatting#getFillBackgroundColor()
 	 */
 	public short getFillBackgroundColor()
 	{
@@ -90,7 +90,7 @@ public class HSSFPatternFormatting
 	}
 
 	/**
-	 * @see org.apache.poi.hssf.record.cf.PatternFormatting#getFillForegroundColor()
+	 * @see org.zkoss.poi.hssf.record.cf.PatternFormatting#getFillForegroundColor()
 	 */
 	public short getFillForegroundColor()
 	{
@@ -98,7 +98,7 @@ public class HSSFPatternFormatting
 	}
 
 	/**
-	 * @see org.apache.poi.hssf.record.cf.PatternFormatting#getFillPattern()
+	 * @see org.zkoss.poi.hssf.record.cf.PatternFormatting#getFillPattern()
 	 */
 	public short getFillPattern()
 	{
@@ -107,7 +107,7 @@ public class HSSFPatternFormatting
 
 	/**
 	 * @param bg
-	 * @see org.apache.poi.hssf.record.cf.PatternFormatting#setFillBackgroundColor(int)
+	 * @see org.zkoss.poi.hssf.record.cf.PatternFormatting#setFillBackgroundColor(int)
 	 */
 	public void setFillBackgroundColor(short bg)
 	{
@@ -120,7 +120,7 @@ public class HSSFPatternFormatting
 
 	/**
 	 * @param fg
-	 * @see org.apache.poi.hssf.record.cf.PatternFormatting#setFillForegroundColor(int)
+	 * @see org.zkoss.poi.hssf.record.cf.PatternFormatting#setFillForegroundColor(int)
 	 */
 	public void setFillForegroundColor(short fg)
 	{
@@ -133,7 +133,7 @@ public class HSSFPatternFormatting
 
 	/**
 	 * @param fp
-	 * @see org.apache.poi.hssf.record.cf.PatternFormatting#setFillPattern(int)
+	 * @see org.zkoss.poi.hssf.record.cf.PatternFormatting#setFillPattern(int)
 	 */
 	public void setFillPattern(short fp)
 	{

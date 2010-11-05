@@ -14,14 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
-import org.apache.poi.ss.usermodel.Comment;
-import org.apache.poi.ss.usermodel.RichTextString;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.model.CommentsTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTComment;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst;
+import org.zkoss.poi.ss.usermodel.Comment;
+import org.zkoss.poi.ss.usermodel.RichTextString;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.xssf.model.CommentsTable;
+
 import schemasMicrosoftComVml.CTShape;
 
 import java.math.BigInteger;

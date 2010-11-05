@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.sl.usermodel;
+package org.zkoss.poi.sl.usermodel;
 
-public interface LineStyle extends org.apache.poi.common.usermodel.LineStyle {
+public interface LineStyle extends org.zkoss.poi.common.usermodel.LineStyle {
 }

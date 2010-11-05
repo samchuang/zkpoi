@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.util;
+package org.zkoss.poi.xssf.util;
 
 import java.io.IOException;
 import java.io.InputStream;

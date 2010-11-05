@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal.marshallers;
+package org.zkoss.poi.openxml4j.opc.internal.marshallers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,19 +29,19 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.PackageNamespaces;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
-import org.apache.poi.openxml4j.opc.PackagingURIHelper;
-import org.apache.poi.openxml4j.opc.StreamHelper;
-import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.openxml4j.opc.internal.PartMarshaller;
-import org.apache.poi.openxml4j.opc.internal.ZipHelper;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.PackageNamespaces;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
+import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
+import org.zkoss.poi.openxml4j.opc.StreamHelper;
+import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.openxml4j.opc.internal.PartMarshaller;
+import org.zkoss.poi.openxml4j.opc.internal.ZipHelper;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Zip part marshaller. This marshaller is use to save any part in a zip stream.

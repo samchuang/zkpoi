@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
-import org.apache.poi.hwpf.HWPFDocument;
+import org.zkoss.poi.hwpf.HWPFDocument;
 
 /**
  * Helper class for {@link HWPFDocument}, which figures out

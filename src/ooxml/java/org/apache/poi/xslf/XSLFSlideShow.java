@@ -14,21 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xslf;
+package org.zkoss.poi.xslf;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.util.Internal;
-import org.apache.poi.xslf.usermodel.XSLFRelation;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTCommentList;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTNotesSlide;
@@ -44,6 +35,15 @@ import org.openxmlformats.schemas.presentationml.x2006.main.NotesDocument;
 import org.openxmlformats.schemas.presentationml.x2006.main.PresentationDocument;
 import org.openxmlformats.schemas.presentationml.x2006.main.SldDocument;
 import org.openxmlformats.schemas.presentationml.x2006.main.SldMasterDocument;
+import org.zkoss.poi.POIXMLDocument;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.xslf.usermodel.XSLFRelation;
 
 /**
  * Experimental class to do low level processing

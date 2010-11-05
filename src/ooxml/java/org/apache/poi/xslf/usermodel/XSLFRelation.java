@@ -14,15 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xslf.usermodel;
+package org.zkoss.poi.xslf.usermodel;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLRelation;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLRelation;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 public class XSLFRelation extends POIXMLRelation {
 

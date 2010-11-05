@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.model;
+package org.zkoss.poi.xssf.model;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,16 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.xssf.usermodel.XSSFMap;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTMap;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTMapInfo;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSchema;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.MapInfoDocument;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.xssf.usermodel.XSSFMap;
+import org.zkoss.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * 

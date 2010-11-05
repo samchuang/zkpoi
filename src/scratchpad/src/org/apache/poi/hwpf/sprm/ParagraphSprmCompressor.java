@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.sprm;
+package org.zkoss.poi.hwpf.sprm;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.poi.util.LittleEndian;
 
-import org.apache.poi.hwpf.usermodel.ParagraphProperties;
+import org.zkoss.poi.hwpf.usermodel.ParagraphProperties;
+import org.zkoss.poi.util.LittleEndian;
 
 public final class ParagraphSprmCompressor
 {

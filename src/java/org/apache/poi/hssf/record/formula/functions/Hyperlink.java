@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.functions;
+package org.zkoss.poi.hssf.record.formula.functions;
 
-import org.apache.poi.hssf.record.formula.eval.BlankEval;
-import org.apache.poi.hssf.record.formula.eval.BoolEval;
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.hssf.record.formula.eval.EvaluationException;
-import org.apache.poi.hssf.record.formula.eval.HyperlinkEval;
-import org.apache.poi.hssf.record.formula.eval.NumberEval;
-import org.apache.poi.hssf.record.formula.eval.OperandResolver;
-import org.apache.poi.hssf.record.formula.eval.StringEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.eval.BlankEval;
+import org.zkoss.poi.hssf.record.formula.eval.BoolEval;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.hssf.record.formula.eval.EvaluationException;
+import org.zkoss.poi.hssf.record.formula.eval.HyperlinkEval;
+import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
+import org.zkoss.poi.hssf.record.formula.eval.OperandResolver;
+import org.zkoss.poi.hssf.record.formula.eval.StringEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
 
 /**
  * Implementation of Excel HYPERLINK function.<p/>
@@ -64,7 +64,7 @@ public final class Hyperlink extends Var1or2ArgFunction {
 		return arg1;
 	}
 	
-	private static class EvalHyperlink implements org.apache.poi.ss.usermodel.Hyperlink {
+	private static class EvalHyperlink implements org.zkoss.poi.ss.usermodel.Hyperlink {
 		private int _row;
 		private int _col;
 		private String _address;
@@ -75,13 +75,13 @@ public final class Hyperlink extends Var1or2ArgFunction {
 			_label = (String) evaluateToString(labelEval, row, col);
 			final String addr = _address.toLowerCase(); 
 			if (addr.startsWith("http://") || addr.startsWith("https://")) {
-				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_URL;
+				_type = org.zkoss.poi.ss.usermodel.Hyperlink.LINK_URL;
 			} else if (addr.startsWith("mailto://")) {
-				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_EMAIL;
+				_type = org.zkoss.poi.ss.usermodel.Hyperlink.LINK_EMAIL;
 			} else if (addr.indexOf('!') > 0) {
-				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_DOCUMENT;
+				_type = org.zkoss.poi.ss.usermodel.Hyperlink.LINK_DOCUMENT;
 			} else {
-				_type = org.apache.poi.ss.usermodel.Hyperlink.LINK_FILE;
+				_type = org.zkoss.poi.ss.usermodel.Hyperlink.LINK_FILE;
 			}
 			_row = row;
 			_col = col;

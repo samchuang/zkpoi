@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.extractor;
+package org.zkoss.poi.extractor;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,38 +26,38 @@ import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.poi.POIOLE2TextExtractor;
-import org.apache.poi.POITextExtractor;
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.POIXMLTextExtractor;
-import org.apache.poi.hdgf.extractor.VisioTextExtractor;
-import org.apache.poi.hpbf.extractor.PublisherTextExtractor;
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
-import org.apache.poi.hsmf.MAPIMessage;
-import org.apache.poi.hsmf.datatypes.AttachmentChunks;
-import org.apache.poi.hsmf.extractor.OutlookTextExtactor;
-import org.apache.poi.hssf.extractor.EventBasedExcelExtractor;
-import org.apache.poi.hssf.extractor.ExcelExtractor;
-import org.apache.poi.hwpf.OldWordFileFormatException;
-import org.apache.poi.hwpf.extractor.Word6Extractor;
-import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.Entry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
-import org.apache.poi.xslf.usermodel.XSLFRelation;
-import org.apache.poi.xssf.extractor.XSSFEventBasedExcelExtractor;
-import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
-import org.apache.poi.xssf.usermodel.XSSFRelation;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFRelation;
 import org.apache.xmlbeans.XmlException;
+import org.zkoss.poi.POIOLE2TextExtractor;
+import org.zkoss.poi.POITextExtractor;
+import org.zkoss.poi.POIXMLDocument;
+import org.zkoss.poi.POIXMLTextExtractor;
+import org.zkoss.poi.hdgf.extractor.VisioTextExtractor;
+import org.zkoss.poi.hpbf.extractor.PublisherTextExtractor;
+import org.zkoss.poi.hslf.extractor.PowerPointExtractor;
+import org.zkoss.poi.hsmf.MAPIMessage;
+import org.zkoss.poi.hsmf.datatypes.AttachmentChunks;
+import org.zkoss.poi.hsmf.extractor.OutlookTextExtactor;
+import org.zkoss.poi.hssf.extractor.EventBasedExcelExtractor;
+import org.zkoss.poi.hssf.extractor.ExcelExtractor;
+import org.zkoss.poi.hwpf.OldWordFileFormatException;
+import org.zkoss.poi.hwpf.extractor.Word6Extractor;
+import org.zkoss.poi.hwpf.extractor.WordExtractor;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
+import org.zkoss.poi.poifs.filesystem.DirectoryEntry;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.Entry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.xslf.extractor.XSLFPowerPointExtractor;
+import org.zkoss.poi.xslf.usermodel.XSLFRelation;
+import org.zkoss.poi.xssf.extractor.XSSFEventBasedExcelExtractor;
+import org.zkoss.poi.xssf.extractor.XSSFExcelExtractor;
+import org.zkoss.poi.xssf.usermodel.XSSFRelation;
+import org.zkoss.poi.xwpf.extractor.XWPFWordExtractor;
+import org.zkoss.poi.xwpf.usermodel.XWPFRelation;
 
 /**
  * Figures out the correct POITextExtractor for your supplied

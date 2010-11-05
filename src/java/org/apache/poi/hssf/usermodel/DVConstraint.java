@@ -15,18 +15,18 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.poi.hssf.model.HSSFFormulaParser;
-import org.apache.poi.hssf.record.formula.NumberPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.record.formula.StringPtg;
-import org.apache.poi.ss.formula.FormulaType;
-import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.zkoss.poi.hssf.model.HSSFFormulaParser;
+import org.zkoss.poi.hssf.record.formula.NumberPtg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.record.formula.StringPtg;
+import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.ss.usermodel.DataValidationConstraint;
 
 /**
  * 
@@ -90,11 +90,11 @@ public class DVConstraint implements DataValidationConstraint {
 	 * can be either standard Excel formulas or formatted number values. If the expression starts 
 	 * with '=' it is parsed as a formula, otherwise it is parsed as a formatted number. 
 	 * 
-	 * @param validationType one of {@link org.apache.poi.ss.usermodel.DataValidationConstraint.ValidationType#ANY},
-     * {@link org.apache.poi.ss.usermodel.DataValidationConstraint.ValidationType#DECIMAL},
-     * {@link org.apache.poi.ss.usermodel.DataValidationConstraint.ValidationType#INTEGER},
-     * {@link org.apache.poi.ss.usermodel.DataValidationConstraint.ValidationType#TEXT_LENGTH}
-	 * @param comparisonOperator any constant from {@link org.apache.poi.ss.usermodel.DataValidationConstraint.OperatorType} enum
+	 * @param validationType one of {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.ValidationType#ANY},
+     * {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.ValidationType#DECIMAL},
+     * {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.ValidationType#INTEGER},
+     * {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.ValidationType#TEXT_LENGTH}
+	 * @param comparisonOperator any constant from {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.OperatorType} enum
 	 * @param expr1 date formula (when first char is '=') or formatted number value
 	 * @param expr2 date formula (when first char is '=') or formatted number value
 	 */
@@ -142,7 +142,7 @@ public class DVConstraint implements DataValidationConstraint {
 	 * formatted times, two formats are supported:  "HH:MM" or "HH:MM:SS".  This is contrary to 
 	 * Excel which uses the default time format from the OS.
 	 * 
-	 * @param comparisonOperator constant from {@link org.apache.poi.ss.usermodel.DataValidationConstraint.OperatorType} enum
+	 * @param comparisonOperator constant from {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.OperatorType} enum
 	 * @param expr1 date formula (when first char is '=') or formatted time value
 	 * @param expr2 date formula (when first char is '=') or formatted time value
 	 */
@@ -168,7 +168,7 @@ public class DVConstraint implements DataValidationConstraint {
 	 * the same convention).  To parse formatted dates, a date format needs to be specified.  This
 	 * is contrary to Excel which uses the default short date format from the OS.
 	 * 
-	 * @param comparisonOperator constant from {@link org.apache.poi.ss.usermodel.DataValidationConstraint.OperatorType} enum
+	 * @param comparisonOperator constant from {@link org.zkoss.poi.ss.usermodel.DataValidationConstraint.OperatorType} enum
 	 * @param expr1 date formula (when first char is '=') or formatted date value
 	 * @param expr2 date formula (when first char is '=') or formatted date value
 	 * @param dateFormat ignored if both expr1 and expr2 are formulas.  Default value is "YYYY/MM/DD"

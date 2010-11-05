@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.model.GenericPropertyNode;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hwpf.model.GenericPropertyNode;
+import org.zkoss.poi.util.LittleEndian;
 
 public final class Shape {
         int _id, _left, _right, _top, _bottom;

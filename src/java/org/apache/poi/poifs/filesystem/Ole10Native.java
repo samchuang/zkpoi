@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
-import org.apache.poi.util.*;
+import org.zkoss.poi.util.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;

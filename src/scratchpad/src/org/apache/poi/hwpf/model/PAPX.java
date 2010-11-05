@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 
-import org.apache.poi.util.LittleEndian;
 
-import org.apache.poi.hwpf.usermodel.ParagraphProperties;
-import org.apache.poi.hwpf.sprm.ParagraphSprmUncompressor;
-import org.apache.poi.hwpf.sprm.SprmBuffer;
-import org.apache.poi.hwpf.sprm.SprmOperation;
+import org.zkoss.poi.hwpf.sprm.ParagraphSprmUncompressor;
+import org.zkoss.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.hwpf.sprm.SprmOperation;
+import org.zkoss.poi.hwpf.usermodel.ParagraphProperties;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * DANGER - works in bytes!

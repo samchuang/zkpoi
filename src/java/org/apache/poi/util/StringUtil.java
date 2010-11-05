@@ -15,18 +15,18 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
 import java.io.UnsupportedEncodingException;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Iterator;
 
-import org.apache.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.hssf.record.RecordInputStream;
 /**
  *  Title: String Utility Description: Collection of string handling utilities<p/>
  *
- * Note - none of the methods in this class deals with {@link org.apache.poi.hssf.record.ContinueRecord}s.  For such
+ * Note - none of the methods in this class deals with {@link org.zkoss.poi.hssf.record.ContinueRecord}s.  For such
  * functionality, consider using {@link RecordInputStream
 } *
  *

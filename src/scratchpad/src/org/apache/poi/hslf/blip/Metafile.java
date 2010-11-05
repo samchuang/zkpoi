@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.blip;
+package org.zkoss.poi.hslf.blip;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.hslf.usermodel.PictureData;
+import org.zkoss.poi.hslf.usermodel.PictureData;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.awt.*;
 import java.io.*;

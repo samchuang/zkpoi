@@ -14,19 +14,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hsmf.extractor;
+package org.zkoss.poi.hsmf.extractor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
-import org.apache.poi.POIOLE2TextExtractor;
-import org.apache.poi.hsmf.MAPIMessage;
-import org.apache.poi.hsmf.datatypes.AttachmentChunks;
-import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.StringUtil.StringsIterator;
+import org.zkoss.poi.POIOLE2TextExtractor;
+import org.zkoss.poi.hsmf.MAPIMessage;
+import org.zkoss.poi.hsmf.datatypes.AttachmentChunks;
+import org.zkoss.poi.hsmf.exceptions.ChunkNotFoundException;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.StringUtil.StringsIterator;
 
 /**
  * A text extractor for HSMF (Outlook) .msg files.

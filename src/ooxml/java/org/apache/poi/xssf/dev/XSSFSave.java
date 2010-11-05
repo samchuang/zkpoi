@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.dev;
+package org.zkoss.poi.xssf.dev;
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.zkoss.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 

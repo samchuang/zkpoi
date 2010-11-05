@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.chunks;
+package org.zkoss.poi.hdgf.chunks;
 
 /**
  * A trailer that follows a chunk

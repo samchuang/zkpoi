@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hsmf.exceptions;
+package org.zkoss.poi.hsmf.exceptions;
 
 /**
  * Exception for when a directory chunk is not found but is expected.

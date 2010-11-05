@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -24,14 +24,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-import org.apache.poi.hssf.record.chart.*;
-import org.apache.poi.hssf.record.pivottable.*;
+import org.zkoss.poi.hssf.record.chart.*;
+import org.zkoss.poi.hssf.record.pivottable.*;
 
 /**
  * Title:  Record Factory<P>
  * Description:  Takes a stream and outputs an array of Record objects.<P>
  *
- * @see org.apache.poi.hssf.eventmodel.EventRecordFactory
+ * @see org.zkoss.poi.hssf.eventmodel.EventRecordFactory
  * @author Andrew C. Oliver (acoliver at apache dot org)
  * @author Marc Johnson (mjohnson at apache dot org)
  * @author Glen Stampoultzis (glens at apache.org)

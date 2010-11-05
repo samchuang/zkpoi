@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss;
+package org.zkoss.poi.ss;
 
-import org.apache.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.util.CellReference;
 
 /**
  * This enum allows spreadsheets from multiple Excel versions to be handled by the common code.

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.ddf.EscherChildAnchorRecord;
-import org.apache.poi.ddf.EscherClientAnchorRecord;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherSpRecord;
-import org.apache.poi.ddf.EscherSpgrRecord;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.EscherChildAnchorRecord;
+import org.zkoss.poi.ddf.EscherClientAnchorRecord;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.EscherSpRecord;
+import org.zkoss.poi.ddf.EscherSpgrRecord;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogger;
 
 /**
  *  Represents a group of shapes.
@@ -261,7 +261,7 @@ public class ShapeGroup extends Shape{
 
     /**
      * Return type of the shape.
-     * In most cases shape group type is {@link org.apache.poi.hslf.model.ShapeTypes#NotPrimitive}
+     * In most cases shape group type is {@link org.zkoss.poi.hslf.model.ShapeTypes#NotPrimitive}
      *
      * @return type of the shape.
      */

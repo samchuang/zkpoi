@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.constant.ConstantValueParser;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.constant.ConstantValueParser;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:       CRN(0x005A) <p/>

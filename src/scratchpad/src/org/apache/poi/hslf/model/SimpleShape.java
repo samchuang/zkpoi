@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -23,14 +23,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.ddf.EscherSpRecord;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.hslf.record.ColorSchemeAtom;
-import org.apache.poi.hslf.record.InteractiveInfo;
-import org.apache.poi.hslf.record.InteractiveInfoAtom;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.ColorSchemeAtom;
+import org.zkoss.poi.hslf.record.InteractiveInfo;
+import org.zkoss.poi.hslf.record.InteractiveInfoAtom;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  *  An abstract simple (non-group) shape.

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.pointers;
+package org.zkoss.poi.hdgf.pointers;
 
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Factor class to create the appropriate pointers, based on the version

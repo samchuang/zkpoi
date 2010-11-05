@@ -17,9 +17,9 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * The AutoFilterInfo record specifies the number of columns that have AutoFilter enabled

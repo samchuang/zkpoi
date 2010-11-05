@@ -15,26 +15,26 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf;
+package org.zkoss.poi.hwpf;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.POIDocument;
-import org.apache.poi.hwpf.model.CHPBinTable;
-import org.apache.poi.hwpf.model.FileInformationBlock;
-import org.apache.poi.hwpf.model.FontTable;
-import org.apache.poi.hwpf.model.ListTables;
-import org.apache.poi.hwpf.model.PAPBinTable;
-import org.apache.poi.hwpf.model.SectionTable;
-import org.apache.poi.hwpf.model.StyleSheet;
-import org.apache.poi.hwpf.model.TextPieceTable;
-import org.apache.poi.hwpf.usermodel.Range;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.EncryptedDocumentException;
+import org.zkoss.poi.POIDocument;
+import org.zkoss.poi.hwpf.model.CHPBinTable;
+import org.zkoss.poi.hwpf.model.FileInformationBlock;
+import org.zkoss.poi.hwpf.model.FontTable;
+import org.zkoss.poi.hwpf.model.ListTables;
+import org.zkoss.poi.hwpf.model.PAPBinTable;
+import org.zkoss.poi.hwpf.model.SectionTable;
+import org.zkoss.poi.hwpf.model.StyleSheet;
+import org.zkoss.poi.hwpf.model.TextPieceTable;
+import org.zkoss.poi.hwpf.usermodel.Range;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 
 /**

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model.textproperties;
+package org.zkoss.poi.hslf.model.textproperties;
 
 /** 
  * Definition of a special kind of property of some text, or its 

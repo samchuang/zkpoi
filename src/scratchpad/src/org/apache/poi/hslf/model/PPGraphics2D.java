@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 
 import java.awt.*;
@@ -28,10 +28,11 @@ import java.awt.image.renderable.RenderableImage;
 import java.awt.geom.*;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
-import org.apache.poi.hslf.usermodel.RichTextRun;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
+
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.usermodel.RichTextRun;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Translates Graphics2D calls into PowerPoint.

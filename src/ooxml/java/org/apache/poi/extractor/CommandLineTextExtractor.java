@@ -14,11 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.extractor;
+package org.zkoss.poi.extractor;
 
 import java.io.File;
 
-import org.apache.poi.POITextExtractor;
+import org.zkoss.poi.POITextExtractor;
 
 /**
  * A command line wrapper around {@link ExtractorFactory}, useful

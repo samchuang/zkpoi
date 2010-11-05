@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextAttribute;
@@ -30,32 +30,32 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.hssf.model.HSSFFormulaParser;
-import org.apache.poi.hssf.model.InternalSheet;
-import org.apache.poi.hssf.model.InternalWorkbook;
-import org.apache.poi.hssf.record.*;
-import org.apache.poi.hssf.record.aggregates.DataValidityTable;
-import org.apache.poi.hssf.record.aggregates.FormulaRecordAggregate;
-import org.apache.poi.hssf.record.aggregates.WorksheetProtectionBlock;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.util.PaneInformation;
-import org.apache.poi.hssf.util.Region;
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.formula.FormulaType;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellRange;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataValidation;
-import org.apache.poi.ss.usermodel.DataValidationHelper;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.SSCellRange;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.hssf.model.HSSFFormulaParser;
+import org.zkoss.poi.hssf.model.InternalSheet;
+import org.zkoss.poi.hssf.model.InternalWorkbook;
+import org.zkoss.poi.hssf.record.*;
+import org.zkoss.poi.hssf.record.aggregates.DataValidityTable;
+import org.zkoss.poi.hssf.record.aggregates.FormulaRecordAggregate;
+import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
+import org.zkoss.poi.hssf.record.formula.Area3DPtg;
+import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.util.PaneInformation;
+import org.zkoss.poi.hssf.util.Region;
+import org.zkoss.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.CellRange;
+import org.zkoss.poi.ss.usermodel.CellStyle;
+import org.zkoss.poi.ss.usermodel.DataValidation;
+import org.zkoss.poi.ss.usermodel.DataValidationHelper;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.util.SSCellRange;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * High level representation of a worksheet.
@@ -69,7 +69,7 @@ import org.apache.poi.util.POILogger;
  * @author  Petr Udalau(Petr.Udalau at exigenservices.com) - set/remove array formulas
  * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference; enhance HYPERLINK shift
  */
-public class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
+public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
     private static final POILogger log = POILogFactory.getLogger(HSSFSheet.class);
     private static final int DEBUG = POILogger.DEBUG;
 
@@ -97,7 +97,7 @@ public class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * scratch.  You should not be calling this from application code (its protected anyhow).
      *
      * @param workbook - The HSSF Workbook object associated with the sheet.
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#createSheet()
+     * @see org.zkoss.poi.hssf.usermodel.HSSFWorkbook#createSheet()
      */
     protected HSSFSheet(HSSFWorkbook workbook) {
         _sheet = InternalSheet.createSheet();
@@ -112,7 +112,7 @@ public class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      *
      * @param workbook - The HSSF Workbook object associated with the sheet.
      * @param sheet - lowlevel Sheet object this sheet will represent
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#createSheet()
+     * @see org.zkoss.poi.hssf.usermodel.HSSFWorkbook#createSheet()
      */
     protected HSSFSheet(HSSFWorkbook workbook, InternalSheet sheet) {
         this._sheet = sheet;
@@ -200,8 +200,8 @@ public class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      *
      * @param rownum  row number
      * @return High level HSSFRow object representing a row in the sheet
-     * @see org.apache.poi.hssf.usermodel.HSSFRow
-     * @see #removeRow(org.apache.poi.ss.usermodel.Row)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFRow
+     * @see #removeRow(org.zkoss.poi.ss.usermodel.Row)
      */
     public HSSFRow createRow(int rownum)
     {
@@ -561,7 +561,7 @@ public class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     /**
      * @deprecated (Aug-2008) use <tt>CellRangeAddress</tt> instead of <tt>Region</tt>
      */
-    public int addMergedRegion(org.apache.poi.ss.util.Region region)
+    public int addMergedRegion(org.zkoss.poi.ss.util.Region region)
     {
         return _sheet.addMergedRegion( region.getRowFrom(),
                 region.getColumnFrom(),

@@ -14,12 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi;
+package org.zkoss.poi;
 
-import org.apache.poi.hpsf.DocumentSummaryInformation;
-import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.hpsf.extractor.HPSFPropertiesExtractor;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hpsf.DocumentSummaryInformation;
+import org.zkoss.poi.hpsf.SummaryInformation;
+import org.zkoss.poi.hpsf.extractor.HPSFPropertiesExtractor;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * Common Parent for OLE2 based Text Extractors
@@ -27,10 +27,10 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
  * You will typically find the implementation of
  *  a given format's text extractor under
  *  org.apache.poi.[format].extractor .
- * @see org.apache.poi.hssf.extractor.ExcelExtractor
- * @see org.apache.poi.hslf.extractor.PowerPointExtractor
- * @see org.apache.poi.hdgf.extractor.VisioTextExtractor
- * @see org.apache.poi.hwpf.extractor.WordExtractor
+ * @see org.zkoss.poi.hssf.extractor.ExcelExtractor
+ * @see org.zkoss.poi.hslf.extractor.PowerPointExtractor
+ * @see org.zkoss.poi.hdgf.extractor.VisioTextExtractor
+ * @see org.zkoss.poi.hwpf.extractor.WordExtractor
  */
 public abstract class POIOLE2TextExtractor extends POITextExtractor {
 	/**

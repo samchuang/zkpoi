@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.hslf.model.textproperties.TextProp;
-import org.apache.poi.hslf.record.*;
+import org.zkoss.poi.hslf.model.textproperties.TextProp;
+import org.zkoss.poi.hslf.record.*;
 
 /**
  * Title masters define the design template for slides with a Title Slide layout.
@@ -32,7 +32,7 @@ public final class TitleMaster extends MasterSheet {
      * Constructs a TitleMaster
      *
      */
-    public TitleMaster(org.apache.poi.hslf.record.Slide record, int sheetNo) {
+    public TitleMaster(org.zkoss.poi.hslf.record.Slide record, int sheetNo) {
         super(record, sheetNo);
 
         _runs = findTextRuns(getPPDrawing());
@@ -59,7 +59,7 @@ public final class TitleMaster extends MasterSheet {
      */
     public MasterSheet getMasterSheet(){
         SlideMaster[] master = getSlideShow().getSlidesMasters();
-        SlideAtom sa = ((org.apache.poi.hslf.record.Slide)getSheetContainer()).getSlideAtom();
+        SlideAtom sa = ((org.zkoss.poi.hslf.record.Slide)getSheetContainer()).getSlideAtom();
         int masterId = sa.getMasterID();
         for (int i = 0; i < master.length; i++) {
             if (masterId == master[i]._getSheetNumber()) return master[i];

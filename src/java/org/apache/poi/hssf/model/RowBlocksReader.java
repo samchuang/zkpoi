@@ -15,20 +15,20 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.record.ArrayRecord;
-import org.apache.poi.hssf.record.FormulaRecord;
-import org.apache.poi.hssf.record.MergeCellsRecord;
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.SharedFormulaRecord;
-import org.apache.poi.hssf.record.TableRecord;
-import org.apache.poi.hssf.record.aggregates.MergedCellsTable;
-import org.apache.poi.hssf.record.aggregates.SharedValueManager;
-import org.apache.poi.ss.util.CellReference;
+import org.zkoss.poi.hssf.record.ArrayRecord;
+import org.zkoss.poi.hssf.record.FormulaRecord;
+import org.zkoss.poi.hssf.record.MergeCellsRecord;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.SharedFormulaRecord;
+import org.zkoss.poi.hssf.record.TableRecord;
+import org.zkoss.poi.hssf.record.aggregates.MergedCellsTable;
+import org.zkoss.poi.hssf.record.aggregates.SharedValueManager;
+import org.zkoss.poi.ss.util.CellReference;
 
 /**
  * Segregates the 'Row Blocks' section of a single sheet into plain row/cell records and

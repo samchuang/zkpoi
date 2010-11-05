@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.dev;
+package org.zkoss.poi.hwpf.dev;
 
 import java.io.FileInputStream;
 
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.model.FileInformationBlock;
+import org.zkoss.poi.hwpf.HWPFDocument;
+import org.zkoss.poi.hwpf.model.FileInformationBlock;
 
 /**
  * Used by developers to list out key information on a

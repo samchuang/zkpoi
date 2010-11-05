@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +23,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hpsf.wellknown.SectionIDMap;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hpsf.wellknown.SectionIDMap;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * <p>Represents a property set in the Horrible Property Set Format

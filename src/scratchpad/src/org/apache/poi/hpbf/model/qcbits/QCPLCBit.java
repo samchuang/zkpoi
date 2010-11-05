@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.model.qcbits;
+package org.zkoss.poi.hpbf.model.qcbits;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.StringUtil;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.StringUtil;
 
 
 /**

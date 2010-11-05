@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.function;
+package org.zkoss.poi.hssf.record.formula.function;
 
 import java.util.HashMap;
 import java.util.HashSet;

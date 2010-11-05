@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi;
+package org.zkoss.poi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,19 +24,19 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.hpsf.DocumentSummaryInformation;
-import org.apache.poi.hpsf.MutablePropertySet;
-import org.apache.poi.hpsf.PropertySet;
-import org.apache.poi.hpsf.PropertySetFactory;
-import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
-import org.apache.poi.poifs.filesystem.Entry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.hpsf.DocumentSummaryInformation;
+import org.zkoss.poi.hpsf.MutablePropertySet;
+import org.zkoss.poi.hpsf.PropertySet;
+import org.zkoss.poi.hpsf.PropertySetFactory;
+import org.zkoss.poi.hpsf.SummaryInformation;
+import org.zkoss.poi.poifs.filesystem.DirectoryEntry;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.DocumentInputStream;
+import org.zkoss.poi.poifs.filesystem.Entry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This holds the common functionality for all POI
@@ -159,7 +159,7 @@ public abstract class POIDocument {
 		} catch(IOException ie) {
 			// Must be corrupt or something like that
 			logger.log(POILogger.WARN, "Error creating property set with name " + setName + "\n" + ie);
-		} catch(org.apache.poi.hpsf.HPSFException he) {
+		} catch(org.zkoss.poi.hpsf.HPSFException he) {
 			// Oh well, doesn't exist
 			logger.log(POILogger.WARN, "Error creating property set with name " + setName + "\n" + he);
 		}
@@ -212,7 +212,7 @@ public abstract class POIDocument {
 			outFS.createDocument(bIn,name);
 
 			logger.log(POILogger.INFO, "Wrote property set " + name + " of size " + data.length);
-		} catch(org.apache.poi.hpsf.WritingNotSupportedException wnse) {
+		} catch(org.zkoss.poi.hpsf.WritingNotSupportedException wnse) {
 			System.err.println("Couldn't write property set with name " + name + " as not supported by HPSF yet");
 		}
 	}

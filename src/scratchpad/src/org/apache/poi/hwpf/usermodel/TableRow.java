@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.sprm.TableSprmUncompressor;
+import org.zkoss.poi.hwpf.sprm.TableSprmUncompressor;
 
 public final class TableRow
   extends Paragraph

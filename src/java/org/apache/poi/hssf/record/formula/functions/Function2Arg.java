@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.functions;
+package org.zkoss.poi.hssf.record.formula.functions;
 
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
 
 /**
  * Implemented by all functions that can be called with two arguments

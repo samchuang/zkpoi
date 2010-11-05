@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hsmf.exceptions;
+package org.zkoss.poi.hsmf.exceptions;
 
 public final class ChunkNotFoundException extends Exception {
 	private static final long serialVersionUID = 1L;

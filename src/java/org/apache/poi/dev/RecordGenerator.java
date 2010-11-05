@@ -16,7 +16,7 @@
    limitations under the License.
 ==================================================================== */
         
-package org.apache.poi.dev;
+package org.zkoss.poi.dev;
 
 import java.io.File;
 import java.io.FileNotFoundException;

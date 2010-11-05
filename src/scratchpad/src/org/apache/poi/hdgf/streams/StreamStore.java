@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.streams;
+package org.zkoss.poi.hdgf.streams;
 
 /**
  * Holds the representation of the stream on-disk, and

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
-import org.apache.poi.hwpf.model.io.HWPFOutputStream;
-import org.apache.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.poifs.common.POIFSConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;

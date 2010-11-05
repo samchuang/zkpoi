@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.sl.usermodel;
+package org.zkoss.poi.sl.usermodel;
 
-public interface Fill extends org.apache.poi.common.usermodel.Fill {
+public interface Fill extends org.zkoss.poi.common.usermodel.Fill {
 }

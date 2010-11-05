@@ -15,11 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+
+import org.zkoss.poi.hssf.usermodel.HSSFChart;
 
 /**
  * A shape group may contain other shapes.  It was no actual form on the

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.util;
+package org.zkoss.poi.ss.util;
 
-import org.apache.poi.ss.usermodel.Workbook;
+import org.zkoss.poi.ss.usermodel.Workbook;
 
 
 /**
@@ -28,7 +28,7 @@ public class WorkbookUtil {
 	/**
 	 * Creates a valid sheet name, which is conform to the rules.
 	 * In any case, the result safely can be used for 
-	 * {@link org.apache.poi.hssf.usermodel.HSSFWorkbook#setSheetName(int, String)}.
+	 * {@link org.zkoss.poi.hssf.usermodel.HSSFWorkbook#setSheetName(int, String)}.
 	 * <br>
 	 * Rules:
 	 * <ul>

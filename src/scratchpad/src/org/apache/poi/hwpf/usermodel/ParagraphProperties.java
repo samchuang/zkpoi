@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.model.types.PAPAbstractType;
+import org.zkoss.poi.hwpf.model.types.PAPAbstractType;
 
 public final class ParagraphProperties extends PAPAbstractType implements Cloneable {
 

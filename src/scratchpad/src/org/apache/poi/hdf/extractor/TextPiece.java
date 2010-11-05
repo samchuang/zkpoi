@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.extractor;
+package org.zkoss.poi.hdf.extractor;
 
-import org.apache.poi.hdf.extractor.util.*;
+import org.zkoss.poi.hdf.extractor.util.*;
 
 /**
  * Comment me

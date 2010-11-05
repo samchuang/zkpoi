@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.eventmodel;
+package org.zkoss.poi.hssf.eventmodel;
 
-import org.apache.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.Record;
 
 /**
  * An ERFListener is registered with the EventRecordFactory.

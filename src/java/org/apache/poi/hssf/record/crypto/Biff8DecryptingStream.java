@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.crypto;
+package org.zkoss.poi.hssf.record.crypto;
 
 import java.io.InputStream;
 
-import org.apache.poi.hssf.record.BiffHeaderInput;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianInputStream;
+import org.zkoss.poi.hssf.record.BiffHeaderInput;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianInputStream;
 
 /**
  *

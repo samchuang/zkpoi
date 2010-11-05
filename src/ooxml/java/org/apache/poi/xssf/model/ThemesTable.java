@@ -14,12 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.model;
+package org.zkoss.poi.xssf.model;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTColorScheme;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTSRgbColor;
@@ -27,6 +23,10 @@ import org.openxmlformats.schemas.drawingml.x2006.main.CTScRgbColor;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTSystemColor;
 import org.openxmlformats.schemas.drawingml.x2006.main.ThemeDocument;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTColor;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.xssf.usermodel.XSSFColor;
 
 /**
  * Class that represents theme of XLSX document. The theme includes specific

@@ -17,9 +17,9 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.property;
+package org.zkoss.poi.poifs.property;
 
-import org.apache.poi.poifs.filesystem.POIFSDocument;
+import org.zkoss.poi.poifs.filesystem.POIFSDocument;
 
 /**
  * Trivial extension of Property for POIFSDocuments

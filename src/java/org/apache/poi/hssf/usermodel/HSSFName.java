@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.model.HSSFFormulaParser;
-import org.apache.poi.hssf.model.InternalWorkbook;
-import org.apache.poi.hssf.record.NameCommentRecord;
-import org.apache.poi.hssf.record.NameRecord;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.ss.formula.FormulaType;
-import org.apache.poi.ss.usermodel.Name;
+import org.zkoss.poi.hssf.model.HSSFFormulaParser;
+import org.zkoss.poi.hssf.model.InternalWorkbook;
+import org.zkoss.poi.hssf.record.NameCommentRecord;
+import org.zkoss.poi.hssf.record.NameRecord;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.ss.usermodel.Name;
 
 /**
  * High Level Representation of a 'defined name' which could be a 'built-in' name,
@@ -40,7 +40,7 @@ public final class HSSFName implements Name {
      * Creates new HSSFName   - called by HSSFWorkbook to create a name from
      * scratch.
      *
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#createName()
+     * @see org.zkoss.poi.hssf.usermodel.HSSFWorkbook#createName()
      * @param name the Name Record
      * @param book workbook object associated with the sheet.
      */
@@ -51,7 +51,7 @@ public final class HSSFName implements Name {
      * Creates new HSSFName   - called by HSSFWorkbook to create a name from
      * scratch.
      *
-     * @see org.apache.poi.hssf.usermodel.HSSFWorkbook#createName()
+     * @see org.zkoss.poi.hssf.usermodel.HSSFWorkbook#createName()
      * @param name the Name Record
      * @param comment the Name Comment Record, optional.
      * @param book workbook object associated with the sheet.

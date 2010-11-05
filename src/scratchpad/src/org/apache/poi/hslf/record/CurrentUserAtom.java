@@ -18,15 +18,16 @@
         
 
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.*;
-import org.apache.poi.poifs.filesystem.*;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.StringUtil;
-import org.apache.poi.hslf.exceptions.CorruptPowerPointFileException;
-import org.apache.poi.hslf.exceptions.EncryptedPowerPointFileException;
-import org.apache.poi.hslf.exceptions.OldPowerPointFormatException;
+
+import org.zkoss.poi.hslf.exceptions.CorruptPowerPointFileException;
+import org.zkoss.poi.hslf.exceptions.EncryptedPowerPointFileException;
+import org.zkoss.poi.hslf.exceptions.OldPowerPointFormatException;
+import org.zkoss.poi.poifs.filesystem.*;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.StringUtil;
 
 
 /**

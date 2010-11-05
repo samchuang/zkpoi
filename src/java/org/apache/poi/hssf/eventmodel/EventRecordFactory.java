@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.eventmodel;
+package org.zkoss.poi.hssf.eventmodel;
 
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.poi.hssf.record.*;
+import org.zkoss.poi.hssf.record.*;
 
 /**
  * Event-based record factory.  As opposed to RecordFactory

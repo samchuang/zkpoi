@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.usermodel.HSSFDataValidation;
-import org.apache.poi.ss.formula.Formula;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.LittleEndianOutput;
-import org.apache.poi.util.StringUtil;
+import org.zkoss.poi.hssf.record.common.UnicodeString;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.usermodel.HSSFDataValidation;
+import org.zkoss.poi.ss.formula.Formula;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.util.CellRangeAddressList;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * Title:        DATAVALIDATION Record (0x01BE)<p/>
@@ -133,7 +133,7 @@ public final class DVRecord extends StandardRecord {
 	// --> start option flags
 	/**
 	 * @return the condition data type
-	 * @see org.apache.poi.ss.usermodel.DataValidationConstraint.ValidationType
+	 * @see org.zkoss.poi.ss.usermodel.DataValidationConstraint.ValidationType
 	 */
 	public int getDataType() {
 	   return opt_data_type.getValue(_option_flags);
@@ -141,7 +141,7 @@ public final class DVRecord extends StandardRecord {
 
 	/**
 	 * @return the condition error style
-	 * @see org.apache.poi.ss.usermodel.DataValidation.ErrorStyle
+	 * @see org.zkoss.poi.ss.usermodel.DataValidation.ErrorStyle
 	 */
 	public int getErrorStyle() {
 	   return opt_error_style.getValue(_option_flags);

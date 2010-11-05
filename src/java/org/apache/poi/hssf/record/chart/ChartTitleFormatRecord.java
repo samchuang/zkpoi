@@ -18,11 +18,11 @@
 /*
  * HSSF Chart Title Format Record Type
  */
-package org.apache.poi.hssf.record.chart;
+package org.zkoss.poi.hssf.record.chart;
 
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.hssf.record.StandardRecord;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * CHARTTITLEFORMAT (0x1050)<p/>

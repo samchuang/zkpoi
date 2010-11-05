@@ -14,14 +14,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.usermodel;
+package org.zkoss.poi.xwpf.usermodel;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder;
@@ -49,6 +48,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STJc;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STLineSpacingRule;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTextAlignment;
+import org.zkoss.poi.util.Internal;
 
 
 /**
@@ -1228,7 +1228,7 @@ public class XWPFParagraph implements IBodyElement{
 
 	/**
 	 * returns the type of the BodyElement Paragraph
-	 * @see org.apache.poi.xwpf.usermodel.IBodyElement#getElementType()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBodyElement#getElementType()
 	 */
 	public BodyElementType getElementType() {
 		return BodyElementType.PARAGRAPH;
@@ -1236,7 +1236,7 @@ public class XWPFParagraph implements IBodyElement{
 
 	/**
 	 * returns the part of the bodyElement
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPart()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPart()
 	 */
 	public IBody getPart() {
 		if(part != null){
@@ -1247,7 +1247,7 @@ public class XWPFParagraph implements IBodyElement{
 
 	/**
 	 * returns the partType of the bodyPart which owns the bodyElement
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPartType()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPartType()
 	 */
 	public BodyType getPartType() {
 		return part.getPartType();

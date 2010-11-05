@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.format;
+package org.zkoss.poi.ss.format;
 
 /**
  * The different kinds of formats that the formatter understands.

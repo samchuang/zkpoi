@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
-import org.apache.poi.util.LittleEndian;
 
 import java.io.OutputStream;
 import java.io.IOException;
 
-import org.apache.poi.hslf.model.textproperties.*;
+import org.zkoss.poi.hslf.model.textproperties.*;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * TxMasterStyleAtom atom (4003).

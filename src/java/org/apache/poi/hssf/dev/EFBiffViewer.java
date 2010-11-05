@@ -15,18 +15,18 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.dev;
+package org.zkoss.poi.hssf.dev;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.hssf.record.Record;
 
-import org.apache.poi.hssf.eventusermodel.HSSFRequest;
-import org.apache.poi.hssf.eventusermodel.HSSFListener;
-import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
+import org.zkoss.poi.hssf.eventusermodel.HSSFEventFactory;
+import org.zkoss.poi.hssf.eventusermodel.HSSFListener;
+import org.zkoss.poi.hssf.eventusermodel.HSSFRequest;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  *

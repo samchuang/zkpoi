@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.usermodel;
+package org.zkoss.poi.hslf.usermodel;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.hslf.model.Picture;
-import org.apache.poi.hslf.blip.*;
-import org.apache.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.blip.*;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.model.Picture;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 import java.io.OutputStream;
 import java.io.IOException;

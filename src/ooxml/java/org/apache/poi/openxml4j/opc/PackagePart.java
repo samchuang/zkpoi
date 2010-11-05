@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc;
+package org.zkoss.poi.openxml4j.opc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +23,10 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.internal.ContentType;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.internal.ContentType;
 
 /**
  * Provides a base class for parts stored in a Package.
@@ -140,7 +140,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 * @param relationshipType
 	 *            Type of relationship.
 	 * @return The newly created and added relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String,
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String,
 	 *      java.lang.String)
 	 */
 	public PackageRelationship addExternalRelationship(String target,
@@ -162,7 +162,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 * @param id
 	 *            Relationship unique id.
 	 * @return The newly created and added relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String,
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addExternalRelationship(java.lang.String,
 	 *      java.lang.String)
 	 */
 	public PackageRelationship addExternalRelationship(String target,
@@ -200,8 +200,8 @@ public abstract class PackagePart implements RelationshipSource {
 	 * @param relationshipType
 	 *            Type of relationship.
 	 * @return The newly created and added relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addRelationship(org.apache.poi.openxml4j.opc.PackagePartName,
-	 *      org.apache.poi.openxml4j.opc.TargetMode, java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addRelationship(org.zkoss.poi.openxml4j.opc.PackagePartName,
+	 *      org.zkoss.poi.openxml4j.opc.TargetMode, java.lang.String)
 	 */
 	public PackageRelationship addRelationship(PackagePartName targetPartName,
 			TargetMode targetMode, String relationshipType) {
@@ -230,8 +230,8 @@ public abstract class PackagePart implements RelationshipSource {
 	 *
 	 * @throws InvalidFormatException
 	 *             If the URI point to a relationship part URI.
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addRelationship(org.apache.poi.openxml4j.opc.PackagePartName,
-	 *      org.apache.poi.openxml4j.opc.TargetMode, java.lang.String, java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addRelationship(org.zkoss.poi.openxml4j.opc.PackagePartName,
+	 *      org.zkoss.poi.openxml4j.opc.TargetMode, java.lang.String, java.lang.String)
 	 */
 	public PackageRelationship addRelationship(PackagePartName targetPartName,
 			TargetMode targetMode, String relationshipType, String id) {
@@ -271,8 +271,8 @@ public abstract class PackagePart implements RelationshipSource {
 	 * @param relationshipType
 	 *            Type of relationship.
 	 * @return The newly created and added relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addRelationship(org.apache.poi.openxml4j.opc.PackagePartName,
-	 *      org.apache.poi.openxml4j.opc.TargetMode, java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addRelationship(org.zkoss.poi.openxml4j.opc.PackagePartName,
+	 *      org.zkoss.poi.openxml4j.opc.TargetMode, java.lang.String)
 	 */
 	public PackageRelationship addRelationship(URI targetURI,
 			TargetMode targetMode, String relationshipType) {
@@ -300,8 +300,8 @@ public abstract class PackagePart implements RelationshipSource {
 	 *
 	 * @throws InvalidFormatException
 	 *             If the URI point to a relationship part URI.
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#addRelationship(org.apache.poi.openxml4j.opc.PackagePartName,
-	 *      org.apache.poi.openxml4j.opc.TargetMode, java.lang.String, java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#addRelationship(org.zkoss.poi.openxml4j.opc.PackagePartName,
+	 *      org.zkoss.poi.openxml4j.opc.TargetMode, java.lang.String, java.lang.String)
 	 */
 	public PackageRelationship addRelationship(URI targetURI,
 			TargetMode targetMode, String relationshipType, String id) {
@@ -334,7 +334,7 @@ public abstract class PackagePart implements RelationshipSource {
 	}
 
 	/**
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#clearRelationships()
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#clearRelationships()
 	 */
 	public void clearRelationships() {
 		if (_relationships != null) {
@@ -347,7 +347,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 *
 	 * @param id
 	 *            The ID identified the part to delete.
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#removeRelationship(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#removeRelationship(java.lang.String)
 	 */
 	public void removeRelationship(String id) {
 		this._container.throwExceptionIfReadOnly();
@@ -360,7 +360,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 *
 	 * @return This part's relationships.
 	 * @throws OpenXML4JException
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#getRelationships()
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#getRelationships()
 	 */
 	public PackageRelationshipCollection getRelationships()
 			throws InvalidFormatException {
@@ -373,7 +373,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 * @param id
 	 *            ID of the package relationship to retrieve.
 	 * @return The package relationship
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#getRelationship(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#getRelationship(java.lang.String)
 	 */
 	public PackageRelationship getRelationship(String id) {
 		return this._relationships.getRelationshipByID(id);
@@ -390,7 +390,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 *             If an error occurs while parsing the part.
 	 * @throws InvalidOperationException
 	 *             If the package is open in write only mode.
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#getRelationshipsByType(java.lang.String)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#getRelationshipsByType(java.lang.String)
 	 */
 	public PackageRelationshipCollection getRelationshipsByType(
 			String relationshipType) throws InvalidFormatException {
@@ -428,7 +428,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 *
 	 * @return <b>true</b> if the part have at least one relationship else
 	 *         <b>false</b>.
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#hasRelationships()
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#hasRelationships()
 	 */
 	public boolean hasRelationships() {
 		return (!this._isRelationshipPart && (_relationships != null && _relationships
@@ -442,7 +442,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 *            The relationship to check.
 	 * @return <b>true</b> if the specified relationship exists in this part,
 	 *         else returns <b>false</b>
-	 * @see org.apache.poi.openxml4j.opc.RelationshipSource#isRelationshipExists(org.apache.poi.openxml4j.opc.PackageRelationship)
+	 * @see org.zkoss.poi.openxml4j.opc.RelationshipSource#isRelationshipExists(org.zkoss.poi.openxml4j.opc.PackageRelationship)
 	 */
 	public boolean isRelationshipExists(PackageRelationship rel) {
         try {
@@ -477,7 +477,7 @@ public abstract class PackagePart implements RelationshipSource {
 	 * order to write inside (the standard Java API doesn't allow to write in
 	 * the file)
 	 *
-	 * @see org.apache.poi.openxml4j.opc.internal.MemoryPackagePart
+	 * @see org.zkoss.poi.openxml4j.opc.internal.MemoryPackagePart
 	 */
 	public OutputStream getOutputStream() {
 		OutputStream outStream;

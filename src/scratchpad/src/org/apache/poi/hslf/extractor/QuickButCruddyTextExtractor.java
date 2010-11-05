@@ -15,23 +15,23 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.extractor;
+package org.zkoss.poi.hslf.extractor;
 
 import java.io.*;
 import java.util.Vector;
 
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.util.LittleEndian;
 
-import org.apache.poi.hslf.record.CString;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.hslf.record.RecordTypes;
-import org.apache.poi.hslf.record.StyleTextPropAtom;
-import org.apache.poi.hslf.record.TextHeaderAtom;
-import org.apache.poi.hslf.record.TextBytesAtom;
-import org.apache.poi.hslf.record.TextCharsAtom;
-import org.apache.poi.hslf.model.TextRun;
+import org.zkoss.poi.hslf.model.TextRun;
+import org.zkoss.poi.hslf.record.CString;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.record.RecordTypes;
+import org.zkoss.poi.hslf.record.StyleTextPropAtom;
+import org.zkoss.poi.hslf.record.TextBytesAtom;
+import org.zkoss.poi.hslf.record.TextCharsAtom;
+import org.zkoss.poi.hslf.record.TextHeaderAtom;
+import org.zkoss.poi.poifs.filesystem.DocumentEntry;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * This class will get all the text from a Powerpoint Document, including

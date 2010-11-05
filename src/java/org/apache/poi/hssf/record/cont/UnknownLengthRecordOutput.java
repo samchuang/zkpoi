@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.cont;
+package org.zkoss.poi.hssf.record.cont;
 
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.util.DelayableLittleEndianOutput;
-import org.apache.poi.util.LittleEndianByteArrayOutputStream;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.util.DelayableLittleEndianOutput;
+import org.zkoss.poi.util.LittleEndianByteArrayOutputStream;
+import org.zkoss.poi.util.LittleEndianOutput;
 /**
  * Allows the writing of BIFF records when the 'ushort size' header field is not known in advance.
  * When the client is finished writing data, it calls {@link #terminate()}, at which point this

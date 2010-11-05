@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

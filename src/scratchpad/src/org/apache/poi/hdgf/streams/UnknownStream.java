@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.streams;
+package org.zkoss.poi.hdgf.streams;
 
-import org.apache.poi.hdgf.pointers.Pointer;
+import org.zkoss.poi.hdgf.pointers.Pointer;
 
 /**
  * A placeholder for a stream where we don't known anything

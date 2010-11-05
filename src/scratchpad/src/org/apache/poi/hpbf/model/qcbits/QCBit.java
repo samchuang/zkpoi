@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.model.qcbits;
+package org.zkoss.poi.hpbf.model.qcbits;
 
 /**
  * Parent of all Quill CONTENTS bits

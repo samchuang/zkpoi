@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xwpf.usermodel;
+package org.zkoss.poi.xwpf.usermodel;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLRelation;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLRelation;
 
 /**
  * @author Yegor Kozlov

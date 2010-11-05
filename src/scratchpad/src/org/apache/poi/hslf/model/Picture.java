@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.usermodel.PictureData;
-import org.apache.poi.hslf.usermodel.SlideShow;
-import org.apache.poi.hslf.record.Document;
-import org.apache.poi.hslf.blip.Bitmap;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.blip.Bitmap;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.Document;
+import org.zkoss.poi.hslf.usermodel.PictureData;
+import org.zkoss.poi.hslf.usermodel.SlideShow;
+import org.zkoss.poi.util.POILogger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.hslf.record.Comment2000;
+import org.zkoss.poi.hslf.record.Comment2000;
 
 /**
  *

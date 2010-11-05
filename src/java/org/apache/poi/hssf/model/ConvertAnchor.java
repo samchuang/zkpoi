@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherClientAnchorRecord;
-import org.apache.poi.ddf.EscherChildAnchorRecord;
-import org.apache.poi.hssf.usermodel.HSSFAnchor;
-import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
-import org.apache.poi.hssf.usermodel.HSSFChildAnchor;
+import org.zkoss.poi.ddf.EscherChildAnchorRecord;
+import org.zkoss.poi.ddf.EscherClientAnchorRecord;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.hssf.usermodel.HSSFAnchor;
+import org.zkoss.poi.hssf.usermodel.HSSFChildAnchor;
+import org.zkoss.poi.hssf.usermodel.HSSFClientAnchor;
 
 /**
  *

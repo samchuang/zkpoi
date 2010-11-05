@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.crypto;
+package org.zkoss.poi.hssf.record.crypto;
 
-import org.apache.poi.hssf.record.BOFRecord;
-import org.apache.poi.hssf.record.FilePassRecord;
-import org.apache.poi.hssf.record.InterfaceHdrRecord;
+import org.zkoss.poi.hssf.record.BOFRecord;
+import org.zkoss.poi.hssf.record.FilePassRecord;
+import org.zkoss.poi.hssf.record.InterfaceHdrRecord;
 
 /**
  * Used for both encrypting and decrypting BIFF8 streams. The internal

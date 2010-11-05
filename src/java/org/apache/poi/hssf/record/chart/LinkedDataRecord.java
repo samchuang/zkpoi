@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.chart;
+package org.zkoss.poi.hssf.record.chart;
 
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.hssf.record.StandardRecord;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.ss.formula.Formula;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.hssf.record.StandardRecord;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.Formula;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Describes a linked data record.  This record refers to the series data or text.<p/>

@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal.marshallers;
+package org.zkoss.poi.openxml4j.opc.internal.marshallers;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.StreamHelper;
-import org.apache.poi.openxml4j.opc.internal.ZipHelper;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.StreamHelper;
+import org.zkoss.poi.openxml4j.opc.internal.ZipHelper;
 
 /**
  * Package core properties marshaller specialized for zipped package.

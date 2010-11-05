@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.eventfilesystem;
+package org.zkoss.poi.poifs.eventfilesystem;
 
 /**
  * Interface POIFSReaderListener

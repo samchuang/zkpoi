@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.poi.hssf.model.InternalSheet;
-import org.apache.poi.hssf.record.CellValueRecordInterface;
-import org.apache.poi.hssf.record.ExtendedFormatRecord;
-import org.apache.poi.hssf.record.NoteRecord;
-import org.apache.poi.hssf.record.RowRecord;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.hssf.model.InternalSheet;
+import org.zkoss.poi.hssf.record.CellValueRecordInterface;
+import org.zkoss.poi.hssf.record.ExtendedFormatRecord;
+import org.zkoss.poi.hssf.record.NoteRecord;
+import org.zkoss.poi.hssf.record.RowRecord;
+import org.zkoss.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.Row;
 
 /**
  * High level representation of a row of a spreadsheet.
@@ -66,7 +66,7 @@ public final class HSSFRow implements Row {
      * @param book low-level Workbook object containing the sheet that contains this row
      * @param sheet low-level Sheet object that contains this Row
      * @param rowNum the row number of this row (0 based)
-     * @see org.apache.poi.hssf.usermodel.HSSFSheet#createRow(int)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFSheet#createRow(int)
      */
     HSSFRow(HSSFWorkbook book, HSSFSheet sheet, int rowNum) {
         this(book, sheet, new RowRecord(rowNum));
@@ -79,7 +79,7 @@ public final class HSSFRow implements Row {
      * @param book low-level Workbook object containing the sheet that contains this row
      * @param sheet low-level Sheet object that contains this Row
      * @param record the low level api object this row should represent
-     * @see org.apache.poi.hssf.usermodel.HSSFSheet#createRow(int)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFSheet#createRow(int)
      */
     HSSFRow(HSSFWorkbook book, HSSFSheet sheet, RowRecord record) {
         this.book = book;
@@ -349,7 +349,7 @@ public final class HSSFRow implements Row {
      * Get the hssfcell representing a given column (logical cell)
      *  0-based.  If you ask for a cell that is not defined then
      *  you get a null, unless you have set a different
-     *  {@link org.apache.poi.ss.usermodel.Row.MissingCellPolicy} on the base workbook.
+     *  {@link org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy} on the base workbook.
      *
      * @param cellnum  0 based column number
      * @return HSSFCell representing that column or null if undefined.
@@ -595,7 +595,7 @@ public final class HSSFRow implements Row {
      *  will not return un-defined (null) cells.
      * Call getCellNum() on the returned cells to know which cell they are.
      * As this only ever works on physically defined cells,
-     *  the {@link org.apache.poi.ss.usermodel.Row.MissingCellPolicy} has no effect.
+     *  the {@link org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy} has no effect.
      */
     public Iterator<Cell> cellIterator()
     {

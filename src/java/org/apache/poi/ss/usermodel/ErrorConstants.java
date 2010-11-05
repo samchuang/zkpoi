@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
 /**
  * Contains raw Excel error codes (as defined in OOO's excelfileformat.pdf (2.5.6)

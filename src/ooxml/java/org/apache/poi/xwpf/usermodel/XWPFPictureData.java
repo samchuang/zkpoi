@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xwpf.usermodel;
+package org.zkoss.poi.xwpf.usermodel;
 
 import java.io.IOException;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLRelation;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.util.IOUtils;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLRelation;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.util.IOUtils;
 
 /**
  * Raw picture data, normally attached to a WordprocessingML Drawing.
@@ -117,12 +117,12 @@ public class XWPFPictureData extends POIXMLDocumentPart {
      * Return an integer constant that specifies type of this picture
      *
      * @return an integer constant that specifies type of this picture 
-     * @see org.apache.poi.xwpf.usermodel.Document#PICTURE_TYPE_EMF
-     * @see org.apache.poi.xwpf.usermodel.Document#PICTURE_TYPE_WMF
-     * @see org.apache.poi.xwpf.usermodel.Document#PICTURE_TYPE_PICT
-     * @see org.apache.poi.xwpf.usermodel.Document#PICTURE_TYPE_JPEG
-     * @see org.apache.poi.xwpf.usermodel.Document#PICTURE_TYPE_PNG
-     * @see org.apache.poi.xwpf.usermodel.Document#PICTURE_TYPE_DIB
+     * @see org.zkoss.poi.xwpf.usermodel.Document#PICTURE_TYPE_EMF
+     * @see org.zkoss.poi.xwpf.usermodel.Document#PICTURE_TYPE_WMF
+     * @see org.zkoss.poi.xwpf.usermodel.Document#PICTURE_TYPE_PICT
+     * @see org.zkoss.poi.xwpf.usermodel.Document#PICTURE_TYPE_JPEG
+     * @see org.zkoss.poi.xwpf.usermodel.Document#PICTURE_TYPE_PNG
+     * @see org.zkoss.poi.xwpf.usermodel.Document#PICTURE_TYPE_DIB
      */
     public int getPictureType(){
         String contentType = getPackagePart().getContentType();

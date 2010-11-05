@@ -14,16 +14,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf.record.crypto;
+package org.zkoss.poi.hssf.record.crypto;
 
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutputStream;
+import org.zkoss.poi.hssf.usermodel.HSSFWorkbook;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutputStream;
 
 public final class Biff8EncryptionKey {
 	// these two constants coincidentally have the same value

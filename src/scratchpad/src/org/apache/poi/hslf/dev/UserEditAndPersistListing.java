@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Hashtable;
 
-import org.apache.poi.hslf.HSLFSlideShow;
-import org.apache.poi.hslf.record.*;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hslf.HSLFSlideShow;
+import org.zkoss.poi.hslf.record.*;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Uses record level code to locate UserEditAtom records, and other

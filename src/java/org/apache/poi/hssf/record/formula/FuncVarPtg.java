@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula;
-import org.apache.poi.hssf.record.formula.function.FunctionMetadata;
-import org.apache.poi.hssf.record.formula.function.FunctionMetadataRegistry;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+package org.zkoss.poi.hssf.record.formula;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadata;
+import org.zkoss.poi.hssf.record.formula.function.FunctionMetadataRegistry;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * @author Jason Height (jheight at chariot dot net dot au)

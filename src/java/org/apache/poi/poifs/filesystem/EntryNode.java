@@ -17,9 +17,9 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
-import org.apache.poi.poifs.property.Property;
+import org.zkoss.poi.poifs.property.Property;
 
 /**
  * Abstract implementation of Entry

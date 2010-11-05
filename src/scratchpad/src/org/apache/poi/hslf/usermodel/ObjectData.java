@@ -14,12 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hslf.usermodel;
+package org.zkoss.poi.hslf.usermodel;
 
 import java.io.InputStream;
 import java.io.IOException;
 
-import org.apache.poi.hslf.record.ExOleObjStg;
+import org.zkoss.poi.hslf.record.ExOleObjStg;
 
 /**
  * A class that represents object data embedded in a slide show.

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
 
-public final class AreaReference extends org.apache.poi.ss.util.AreaReference {
+public final class AreaReference extends org.zkoss.poi.ss.util.AreaReference {
     /**
      * Create an area ref from a string representation.  Sheet names containing special characters should be
      * delimited and escaped as per normal syntax rules for formulas.<br/> 

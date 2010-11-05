@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
-import org.apache.poi.hwpf.sprm.SprmBuffer;
+import org.zkoss.poi.hwpf.sprm.SprmBuffer;
 
 import java.lang.ref.SoftReference;
 

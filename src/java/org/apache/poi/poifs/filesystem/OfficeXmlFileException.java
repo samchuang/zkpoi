@@ -18,7 +18,7 @@
         
 
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 /**
  * This exception is thrown when we try to open a file that's actually

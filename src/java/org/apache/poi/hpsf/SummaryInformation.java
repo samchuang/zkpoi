@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.util.Date;
 
-import org.apache.poi.hpsf.wellknown.PropertyIDMap;
+import org.zkoss.poi.hpsf.wellknown.PropertyIDMap;
 
 /**
  * <p>Convenience class representing a Summary Information stream in a

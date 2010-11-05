@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula;
+package org.zkoss.poi.hssf.record.formula;
 
-import org.apache.poi.hssf.record.constant.ConstantValueParser;
-import org.apache.poi.hssf.record.constant.ErrorConstant;
-import org.apache.poi.ss.util.NumberToTextConverter;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.constant.ConstantValueParser;
+import org.zkoss.poi.hssf.record.constant.ErrorConstant;
+import org.zkoss.poi.ss.util.NumberToTextConverter;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * ArrayPtg - handles arrays

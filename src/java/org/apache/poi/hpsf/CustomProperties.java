@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.poi.hpsf.wellknown.PropertyIDMap;
+import org.zkoss.poi.hpsf.wellknown.PropertyIDMap;
 
 /**
  * <p>Maintains the instances of {@link CustomProperty} that belong to a

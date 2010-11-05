@@ -15,29 +15,29 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.storage;
+package org.zkoss.poi.poifs.storage;
 
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._bat_array_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._bat_count_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._max_bats_in_header;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._property_start_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._sbat_start_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._sbat_block_count_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._signature;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._signature_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._xbat_count_offset;
-import static org.apache.poi.poifs.storage.HeaderBlockConstants._xbat_start_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._bat_array_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._bat_count_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._max_bats_in_header;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._property_start_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._sbat_block_count_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._sbat_start_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._signature;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._signature_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._xbat_count_offset;
+import static org.zkoss.poi.poifs.storage.HeaderBlockConstants._xbat_start_offset;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.poi.poifs.common.POIFSBigBlockSize;
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.LittleEndianConsts;
+import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.filesystem.OfficeXmlFileException;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.IOUtils;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.LittleEndianConsts;
 
 /**
  * The block containing the archive header

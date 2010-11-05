@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.udf;
+package org.zkoss.poi.hssf.record.formula.udf;
 
-import org.apache.poi.hssf.record.formula.atp.AnalysisToolPak;
-import org.apache.poi.hssf.record.formula.functions.FreeRefFunction;
+import org.zkoss.poi.hssf.record.formula.atp.AnalysisToolPak;
+import org.zkoss.poi.hssf.record.formula.functions.FreeRefFunction;
 
 /**
  * Common interface for "Add-in" libraries and user defined function libraries.

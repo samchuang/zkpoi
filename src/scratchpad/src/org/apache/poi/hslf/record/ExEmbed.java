@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.OutputStream;
 import java.io.IOException;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This data represents an embedded object in the document.

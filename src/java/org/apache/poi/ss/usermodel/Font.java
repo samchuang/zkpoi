@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
 
 public interface Font {
@@ -196,7 +196,7 @@ public interface Font {
      * @return color to use
      * @see #COLOR_NORMAL
      * @see #COLOR_RED
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      */
     short getColor();
 

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.storage;
+package org.zkoss.poi.poifs.storage;
 
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.util.LittleEndianConsts;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.util.LittleEndianConsts;
 
 /**
  * Constants used in reading/writing the Header block

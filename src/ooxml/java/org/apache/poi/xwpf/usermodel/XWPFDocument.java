@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xwpf.usermodel;
+package org.zkoss.poi.xwpf.usermodel;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,23 +32,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLException;
-import org.apache.poi.POIXMLProperties;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
-import org.apache.poi.openxml4j.opc.PackagingURIHelper;
-import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.Internal;
-import org.apache.poi.util.PackageHelper;
-import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -68,6 +51,23 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.EndnotesDocument;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.FootnotesDocument;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STDocProtect;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.StylesDocument;
+import org.zkoss.poi.POIXMLDocument;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.POIXMLProperties;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipTypes;
+import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
+import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.util.IOUtils;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.PackageHelper;
+import org.zkoss.poi.xwpf.model.XWPFHeaderFooterPolicy;
 
 /**
  * Experimental class to do low level processing
@@ -273,28 +273,28 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     
     /**
      * returns an Iterator with paragraphs and tables
-     * @see org.apache.poi.xwpf.usermodel.IBody#getBodyElements()
+     * @see org.zkoss.poi.xwpf.usermodel.IBody#getBodyElements()
      */
     public List<IBodyElement> getBodyElements(){
     	return Collections.unmodifiableList(bodyElements);
     }
     
     /**
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getParagraphs()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getParagraphs()
      */
   	public List<XWPFParagraph> getParagraphs(){
     	return Collections.unmodifiableList(paragraphs);
     }
     
  	/**
- 	 * @see org.apache.poi.xwpf.usermodel.IBody#getTables()
+ 	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getTables()
  	 */
  	public List<XWPFTable> getTables(){
  		return Collections.unmodifiableList(tables);
  	}
  	
 	/**
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getTableArray(int)
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getTableArray(int)
 	 */
 	public XWPFTable getTableArray(int pos) {
 		if(pos > 0 && pos < tables.size()){
@@ -1031,7 +1031,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	/**
 	 * get a table by its CTTbl-Object
 	 * @param ctTbl
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getTable(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl)
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getTable(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl)
 	 * @return a table by its CTTbl-Object or null
 	 */
     public XWPFTable getTable(CTTbl ctTbl) {
@@ -1052,7 +1052,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
 	/**
 	 * Returns the paragraph that of position pos
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getParagraphArray(int)
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getParagraphArray(int)
 	 */
 	public XWPFParagraph getParagraphArray(int pos) {
 		if(pos >= 0 && pos < paragraphs.size()){		
@@ -1067,7 +1067,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	 * returns the Part, to which the body belongs, which you need for adding relationship to other parts
 	 * Actually it is needed of the class XWPFTableCell. Because you have to know to which part the tableCell
 	 * belongs.
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPart()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPart()
 	 */
 	public IBody getPart() {
 		return this;
@@ -1077,7 +1077,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 	 * get the PartType of the body, for example
 	 * DOCUMENT, HEADER, FOOTER,	FOOTNOTE,
      *
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPartType()
+	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPartType()
 	 */
 	public BodyType getPartType() {
 		return BodyType.DOCUMENT;

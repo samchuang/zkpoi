@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal.signature;
+package org.zkoss.poi.openxml4j.opc.internal.signature;
 
 /**
  * Represents a digital signature origin part.

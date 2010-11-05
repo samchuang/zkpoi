@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.cf;
+package org.zkoss.poi.hssf.record.cf;
 
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Border Formatting Block of the Conditional Formatting Rule Record.
@@ -320,7 +320,7 @@ public final class BorderFormatting {
 
     /**
      * get the color to use for the left border
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return  The index of the color definition
      */
     public int getLeftBorderColor() {
@@ -337,7 +337,7 @@ public final class BorderFormatting {
 
     /**
      * get the color to use for the right border
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return The index of the color definition
      */
     public int getRightBorderColor() {
@@ -354,7 +354,7 @@ public final class BorderFormatting {
 
     /**
      * get the color to use for the top border
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return The index of the color definition
      */
     public int getTopBorderColor() {
@@ -372,7 +372,7 @@ public final class BorderFormatting {
 
     /**
      * get the color to use for the bottom border
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return The index of the color definition
      */
     public int getBottomBorderColor() {
@@ -389,7 +389,7 @@ public final class BorderFormatting {
 
     /**
      * get the color to use for the diagonal border
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return The index of the color definition
      */
     public int getDiagonalBorderColor() {

@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.internal.unmarshallers;
+package org.zkoss.poi.openxml4j.opc.internal.unmarshallers;
 
 import java.util.zip.ZipEntry;
 
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
 
 /**
  * Context needed for the unmarshall process of a part. This class is immutable.

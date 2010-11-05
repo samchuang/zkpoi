@@ -17,12 +17,12 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 import java.util.*;
 
-import org.apache.poi.poifs.dev.POIFSViewable;
-import org.apache.poi.poifs.property.DocumentProperty;
+import org.zkoss.poi.poifs.dev.POIFSViewable;
+import org.zkoss.poi.poifs.property.DocumentProperty;
 
 /**
  * Simple implementation of DocumentEntry

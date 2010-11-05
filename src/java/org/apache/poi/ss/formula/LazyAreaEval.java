@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.AreaI;
-import org.apache.poi.hssf.record.formula.AreaI.OffsetArea;
-import org.apache.poi.hssf.record.formula.eval.AreaEval;
-import org.apache.poi.hssf.record.formula.eval.AreaEvalBase;
-import org.apache.poi.hssf.record.formula.eval.HyperlinkEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.hssf.util.CellReference;
-import org.apache.poi.ss.usermodel.Hyperlink;
+import org.zkoss.poi.hssf.record.formula.AreaI;
+import org.zkoss.poi.hssf.record.formula.AreaI.OffsetArea;
+import org.zkoss.poi.hssf.record.formula.eval.AreaEval;
+import org.zkoss.poi.hssf.record.formula.eval.AreaEvalBase;
+import org.zkoss.poi.hssf.record.formula.eval.HyperlinkEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.util.CellReference;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 
 /**
  *

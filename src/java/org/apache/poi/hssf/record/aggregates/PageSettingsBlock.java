@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,9 +23,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Arrays;
 
-import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.model.InternalSheet;
-import org.apache.poi.hssf.record.*;
+import org.zkoss.poi.hssf.model.InternalSheet;
+import org.zkoss.poi.hssf.model.RecordStream;
+import org.zkoss.poi.hssf.record.*;
 
 /**
  * Groups the page settings records for a worksheet.<p/>
@@ -92,7 +92,7 @@ public final class PageSettingsBlock extends RecordAggregate {
     /**
      * HeaderFooterRecord records belonging to preceding CustomViewSettingsRecordAggregates.
      * The indicator of such records is a non-zero GUID,
-     *  see {@link  org.apache.poi.hssf.record.HeaderFooterRecord#getGuid()}
+     *  see {@link  org.zkoss.poi.hssf.record.HeaderFooterRecord#getGuid()}
      */
     private List<HeaderFooterRecord> _sviewHeaderFooters = new ArrayList<HeaderFooterRecord>();
     private Record _printSize;
@@ -326,8 +326,8 @@ public final class PageSettingsBlock extends RecordAggregate {
 
 	/**
 	 * creates the PrintSetup Record and sets it to defaults and marks it invalid
-	 * @see org.apache.poi.hssf.record.PrintSetupRecord
-	 * @see org.apache.poi.hssf.record.Record
+	 * @see org.zkoss.poi.hssf.record.PrintSetupRecord
+	 * @see org.zkoss.poi.hssf.record.Record
 	 * @return record containing a PrintSetupRecord
 	 */
 	private static PrintSetupRecord createPrintSetup() {

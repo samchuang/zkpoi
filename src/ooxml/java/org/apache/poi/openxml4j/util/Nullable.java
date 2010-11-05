@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.util;
+package org.zkoss.poi.openxml4j.util;
 
 /**
  * An immutable object that could be defined as null.

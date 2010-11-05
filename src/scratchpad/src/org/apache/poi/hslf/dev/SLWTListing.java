@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
-import org.apache.poi.hslf.HSLFSlideShow;
-import org.apache.poi.hslf.record.Document;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.hslf.record.RecordTypes;
-import org.apache.poi.hslf.record.SlideListWithText;
+import org.zkoss.poi.hslf.HSLFSlideShow;
+import org.zkoss.poi.hslf.record.Document;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.record.RecordTypes;
+import org.zkoss.poi.hslf.record.SlideListWithText;
 
 /**
  * Uses record level code to Documents.

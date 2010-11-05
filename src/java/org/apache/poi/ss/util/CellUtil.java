@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.util;
+package org.zkoss.poi.ss.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.CellStyle;
+import org.zkoss.poi.ss.usermodel.Font;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.ss.usermodel.Workbook;
 
 /**
  * Various utility functions that make working with a cells and rows easier. The various methods
@@ -213,7 +213,7 @@ public final class CellUtil {
 	 *
 	 * @param style cell style
 	 * @return map of format properties (String -> Object)
-	 * @see #setFormatProperties(org.apache.poi.ss.usermodel.CellStyle, org.apache.poi.ss.usermodel.Workbook, java.util.Map)
+	 * @see #setFormatProperties(org.zkoss.poi.ss.usermodel.CellStyle, org.zkoss.poi.ss.usermodel.Workbook, java.util.Map)
 	 */
 	private static Map<String, Object> getFormatProperties(CellStyle style) {
 		Map<String, Object> properties = new HashMap<String, Object>();

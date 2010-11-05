@@ -10,7 +10,7 @@
 Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 */
 
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
 /**
  * Information regarding chart.

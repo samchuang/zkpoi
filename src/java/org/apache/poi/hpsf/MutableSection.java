@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.apache.poi.hpsf.wellknown.PropertyIDMap;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hpsf.wellknown.PropertyIDMap;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * <p>Adds writing capability to the {@link Section} class.</p>

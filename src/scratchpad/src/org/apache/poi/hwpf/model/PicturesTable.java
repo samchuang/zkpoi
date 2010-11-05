@@ -15,21 +15,22 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.usermodel.CharacterRun;
-import org.apache.poi.hwpf.usermodel.Picture;
-import org.apache.poi.hwpf.usermodel.Range;
 
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.poi.ddf.DefaultEscherRecordFactory;
-import org.apache.poi.ddf.EscherBSERecord;
-import org.apache.poi.ddf.EscherBlipRecord;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherRecordFactory;
+
+import org.zkoss.poi.ddf.DefaultEscherRecordFactory;
+import org.zkoss.poi.ddf.EscherBSERecord;
+import org.zkoss.poi.ddf.EscherBlipRecord;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.EscherRecordFactory;
+import org.zkoss.poi.hwpf.HWPFDocument;
+import org.zkoss.poi.hwpf.usermodel.CharacterRun;
+import org.zkoss.poi.hwpf.usermodel.Picture;
+import org.zkoss.poi.hwpf.usermodel.Range;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Holds information about all pictures embedded in Word Document either via "Insert -> Picture -> From File" or via
@@ -133,7 +134,7 @@ public final class PicturesTable
    * to have that byte array in memory but only write picture's contents to stream, pass false and then use Picture.writeImageContent
    * @see Picture#writeImageContent(java.io.OutputStream)
    * @return a Picture object if picture exists for specified CharacterRun, null otherwise. PicturesTable.hasPicture is used to determine this.
-   * @see #hasPicture(org.apache.poi.hwpf.usermodel.CharacterRun)
+   * @see #hasPicture(org.zkoss.poi.hwpf.usermodel.CharacterRun)
    */
   public Picture extractPicture(CharacterRun run, boolean fillBytes) {
     if (hasPicture(run)) {

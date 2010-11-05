@@ -15,11 +15,11 @@
   limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.format;
+package org.zkoss.poi.ss.format;
 
-import org.apache.poi.hssf.record.constant.ErrorConstant;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.ErrorConstants;
+import org.zkoss.poi.hssf.record.constant.ErrorConstant;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.ErrorConstants;
 
 import javax.swing.*;
 import java.util.ArrayList;

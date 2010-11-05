@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.extractor;
+package org.zkoss.poi.hslf.extractor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,12 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.apache.poi.POIOLE2TextExtractor;
-import org.apache.poi.hslf.HSLFSlideShow;
-import org.apache.poi.hslf.model.*;
-import org.apache.poi.hslf.usermodel.SlideShow;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.POIOLE2TextExtractor;
+import org.zkoss.poi.hslf.HSLFSlideShow;
+import org.zkoss.poi.hslf.model.*;
+import org.zkoss.poi.hslf.usermodel.SlideShow;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * This class can be used to extract text from a PowerPoint file. Can optionally

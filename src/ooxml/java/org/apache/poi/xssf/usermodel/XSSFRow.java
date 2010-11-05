@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.xssf.usermodel;
+package org.zkoss.poi.xssf.usermodel;
 
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.util.Internal;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.xssf.model.CalculationChain;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRow;
+import org.zkoss.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.xssf.model.CalculationChain;
 
 /**
  * High level representation of a row of a spreadsheet.
@@ -180,7 +180,7 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
 
     /**
      * Returns the cell at the given (0 based) index,
-     *  with the {@link org.apache.poi.ss.usermodel.Row.MissingCellPolicy} from the parent Workbook.
+     *  with the {@link org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy} from the parent Workbook.
      *
      * @return the cell at the given (0 based) index
      */
@@ -189,7 +189,7 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
     }
 
     /**
-     * Returns the cell at the given (0 based) index, with the specified {@link org.apache.poi.ss.usermodel.Row.MissingCellPolicy}
+     * Returns the cell at the given (0 based) index, with the specified {@link org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy}
      *
      * @return the cell at the given (0 based) index
      * @throws IllegalArgumentException if cellnum < 0 or the specified MissingCellPolicy is invalid
@@ -255,7 +255,7 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
 
     /**
      * Get the row's height measured in twips (1/20th of a point). If the height is not set, the default worksheet value is returned,
-     * See {@link org.apache.poi.xssf.usermodel.XSSFSheet#getDefaultRowHeightInPoints()}
+     * See {@link org.zkoss.poi.xssf.usermodel.XSSFSheet#getDefaultRowHeightInPoints()}
      *
      * @return row height measured in twips (1/20th of a point)
      */
@@ -265,10 +265,10 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
 
     /**
      * Returns row height measured in point size. If the height is not set, the default worksheet value is returned,
-     * See {@link org.apache.poi.xssf.usermodel.XSSFSheet#getDefaultRowHeightInPoints()}
+     * See {@link org.zkoss.poi.xssf.usermodel.XSSFSheet#getDefaultRowHeightInPoints()}
      *
      * @return row height measured in point size
-     * @see org.apache.poi.xssf.usermodel.XSSFSheet#getDefaultRowHeightInPoints()
+     * @see org.zkoss.poi.xssf.usermodel.XSSFSheet#getDefaultRowHeightInPoints()
      */
     public float getHeightInPoints() {
         if (this._row.isSetHt()) {
@@ -388,7 +388,7 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
     /**
      * Fired when the document is written to an output stream.
      *
-     * @see org.apache.poi.xssf.usermodel.XSSFSheet#write(java.io.OutputStream) ()
+     * @see org.zkoss.poi.xssf.usermodel.XSSFSheet#write(java.io.OutputStream) ()
      */
     protected void onDocumentWrite(){
         // check if cells in the CTRow are ordered

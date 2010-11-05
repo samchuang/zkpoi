@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.io.IOException;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.hwpf.model.io.*;
+import org.zkoss.poi.hwpf.model.io.*;
+import org.zkoss.poi.util.LittleEndian;
 
 public final class ComplexFileTable
 {

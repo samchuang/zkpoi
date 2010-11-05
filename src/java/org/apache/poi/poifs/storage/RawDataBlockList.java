@@ -17,13 +17,13 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.storage;
+package org.zkoss.poi.poifs.storage;
 
 import java.io.*;
 
 import java.util.*;
 
-import org.apache.poi.poifs.common.POIFSBigBlockSize;
+import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
 
 /**
  * A list of RawDataBlocks instances, and methods to manage the list

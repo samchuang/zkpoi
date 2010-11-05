@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.blip;
+package org.zkoss.poi.hslf.blip;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.InflaterInputStream;
 
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.hslf.model.Picture;
-import org.apache.poi.hslf.model.Shape;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.model.Picture;
+import org.zkoss.poi.hslf.model.Shape;
 
 /**
  * Represents Macintosh PICT picture data.
@@ -102,7 +102,7 @@ public final class PICT extends Metafile {
     }
 
     /**
-     * @see org.apache.poi.hslf.model.Picture#PICT
+     * @see org.zkoss.poi.hslf.model.Picture#PICT
      */
     public int getType(){
         return Picture.PICT;

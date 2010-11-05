@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc;
+package org.zkoss.poi.openxml4j.opc;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,22 +27,22 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.internal.ContentTypeManager;
-import org.apache.poi.openxml4j.opc.internal.FileHelper;
-import org.apache.poi.openxml4j.opc.internal.MemoryPackagePart;
-import org.apache.poi.openxml4j.opc.internal.PartMarshaller;
-import org.apache.poi.openxml4j.opc.internal.ZipContentTypeManager;
-import org.apache.poi.openxml4j.opc.internal.ZipHelper;
-import org.apache.poi.openxml4j.opc.internal.marshallers.ZipPackagePropertiesMarshaller;
-import org.apache.poi.openxml4j.opc.internal.marshallers.ZipPartMarshaller;
-import org.apache.poi.openxml4j.util.ZipEntrySource;
-import org.apache.poi.openxml4j.util.ZipFileZipEntrySource;
-import org.apache.poi.openxml4j.util.ZipInputStreamZipEntrySource;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.POILogFactory;
+import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
+import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.internal.ContentTypeManager;
+import org.zkoss.poi.openxml4j.opc.internal.FileHelper;
+import org.zkoss.poi.openxml4j.opc.internal.MemoryPackagePart;
+import org.zkoss.poi.openxml4j.opc.internal.PartMarshaller;
+import org.zkoss.poi.openxml4j.opc.internal.ZipContentTypeManager;
+import org.zkoss.poi.openxml4j.opc.internal.ZipHelper;
+import org.zkoss.poi.openxml4j.opc.internal.marshallers.ZipPackagePropertiesMarshaller;
+import org.zkoss.poi.openxml4j.opc.internal.marshallers.ZipPartMarshaller;
+import org.zkoss.poi.openxml4j.util.ZipEntrySource;
+import org.zkoss.poi.openxml4j.util.ZipFileZipEntrySource;
+import org.zkoss.poi.openxml4j.util.ZipInputStreamZipEntrySource;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Physical zip package.

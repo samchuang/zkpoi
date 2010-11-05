@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.aggregates;
+package org.zkoss.poi.hssf.record.aggregates;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.model.RecordStream;
-import org.apache.poi.hssf.record.DVALRecord;
-import org.apache.poi.hssf.record.DVRecord;
-import org.apache.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.model.RecordStream;
+import org.zkoss.poi.hssf.record.DVALRecord;
+import org.zkoss.poi.hssf.record.DVRecord;
+import org.zkoss.poi.hssf.record.Record;
 
 /**
  * Manages the DVALRecord and DVRecords for a single sheet<br/>

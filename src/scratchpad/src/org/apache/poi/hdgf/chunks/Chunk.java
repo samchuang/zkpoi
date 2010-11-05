@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.chunks;
+package org.zkoss.poi.hdgf.chunks;
 
 import java.util.ArrayList;
 
-import org.apache.poi.hdgf.chunks.ChunkFactory.CommandDefinition;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
-import org.apache.poi.util.StringUtil;
+import org.zkoss.poi.hdgf.chunks.ChunkFactory.CommandDefinition;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * Base of all chunks, which hold data, flags etc

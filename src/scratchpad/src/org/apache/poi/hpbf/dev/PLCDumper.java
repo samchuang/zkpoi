@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.dev;
+package org.zkoss.poi.hpbf.dev;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.poi.hpbf.HPBFDocument;
-import org.apache.poi.hpbf.model.QuillContents;
-import org.apache.poi.hpbf.model.qcbits.QCBit;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.HexDump;
+import org.zkoss.poi.hpbf.HPBFDocument;
+import org.zkoss.poi.hpbf.model.QuillContents;
+import org.zkoss.poi.hpbf.model.qcbits.QCBit;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.HexDump;
 
 /**
  * For dumping out the PLC contents of QC Bits of a

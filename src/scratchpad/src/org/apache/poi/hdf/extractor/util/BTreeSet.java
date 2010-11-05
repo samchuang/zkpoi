@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.extractor.util;
+package org.zkoss.poi.hdf.extractor.util;
 
 import java.util.*;
 

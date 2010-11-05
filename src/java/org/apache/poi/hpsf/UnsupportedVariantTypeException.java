@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
-import org.apache.poi.util.HexDump;
+import org.zkoss.poi.util.HexDump;
 
 /**
  * <p>This exception is thrown if HPSF encounters a variant type that isn't

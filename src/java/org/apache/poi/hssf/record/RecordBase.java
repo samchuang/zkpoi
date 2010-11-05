@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 /**
- * Common base class of {@link Record} and {@link org.apache.poi.hssf.record.aggregates.RecordAggregate}
+ * Common base class of {@link Record} and {@link org.zkoss.poi.hssf.record.aggregates.RecordAggregate}
  * 
  * @author Josh Micich
  */

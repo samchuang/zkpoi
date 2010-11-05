@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.ss.util.NumberToTextConverter;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.ss.util.NumberToTextConverter;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * NUMBER (0x0203) Contains a numeric cell value. <P>

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,18 +26,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.poifs.common.POIFSBigBlockSize;
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.dev.POIFSViewable;
-import org.apache.poi.poifs.property.DocumentProperty;
-import org.apache.poi.poifs.property.Property;
-import org.apache.poi.poifs.storage.BlockWritable;
-import org.apache.poi.poifs.storage.DataInputBlock;
-import org.apache.poi.poifs.storage.DocumentBlock;
-import org.apache.poi.poifs.storage.ListManagedBlock;
-import org.apache.poi.poifs.storage.RawDataBlock;
-import org.apache.poi.poifs.storage.SmallDocumentBlock;
-import org.apache.poi.util.HexDump;
+import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.dev.POIFSViewable;
+import org.zkoss.poi.poifs.property.DocumentProperty;
+import org.zkoss.poi.poifs.property.Property;
+import org.zkoss.poi.poifs.storage.BlockWritable;
+import org.zkoss.poi.poifs.storage.DataInputBlock;
+import org.zkoss.poi.poifs.storage.DocumentBlock;
+import org.zkoss.poi.poifs.storage.ListManagedBlock;
+import org.zkoss.poi.poifs.storage.RawDataBlock;
+import org.zkoss.poi.poifs.storage.SmallDocumentBlock;
+import org.zkoss.poi.util.HexDump;
 
 /**
  * This class manages a document in the POIFS filesystem.

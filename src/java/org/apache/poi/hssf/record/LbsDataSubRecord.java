@@ -14,10 +14,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.hssf.record.formula.*;
-import org.apache.poi.util.*;
+import org.zkoss.poi.hssf.record.formula.*;
+import org.zkoss.poi.util.*;
 
 /**
  * This structure specifies the properties of a list or drop-down list embedded object in a sheet.
@@ -157,7 +157,7 @@ public class LbsDataSubRecord extends SubRecord {
     /**
      *
      * @return a new instance of LbsDataSubRecord to construct auto-filters
-     * @see org.apache.poi.hssf.model.ComboboxShape#createObjRecord(org.apache.poi.hssf.usermodel.HSSFSimpleShape, int)
+     * @see org.zkoss.poi.hssf.model.ComboboxShape#createObjRecord(org.apache.poi.hssf.usermodel.HSSFSimpleShape, int)
      */
     public static LbsDataSubRecord newAutoFilterInstance(){
         LbsDataSubRecord lbs = new LbsDataSubRecord();

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.openxml4j.opc.signature;
+package org.zkoss.poi.openxml4j.opc.signature;
 
 public final class PackageDigitalSignatureManager {
 

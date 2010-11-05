@@ -16,7 +16,7 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.eventusermodel;
+package org.zkoss.poi.hssf.eventusermodel;
 
 /**
  * <p>This exception is provided as a way for API users to throw 

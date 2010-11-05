@@ -14,9 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.ss.format;
+package org.zkoss.poi.ss.format;
 
-import org.apache.poi.ss.format.CellFormatPart.PartHandler;
+import org.zkoss.poi.ss.format.CellFormatPart.PartHandler;
 
 import java.util.regex.Matcher;
 

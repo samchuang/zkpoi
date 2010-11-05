@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.pointers;
+package org.zkoss.poi.hdgf.pointers;
 
 /**
  * Base class of pointers, which hold metadata and offsets about

@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hwpf.usermodel;
+package org.zkoss.poi.hwpf.usermodel;
 
-import org.apache.poi.hwpf.HWPFDocument;
+import org.zkoss.poi.hwpf.HWPFDocument;
 
 public final class DocumentPosition
   extends Range

@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.hslf.usermodel.PictureData;
-import org.apache.poi.hslf.blip.Bitmap;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.hslf.blip.Bitmap;
+import org.zkoss.poi.hslf.usermodel.PictureData;
+import org.zkoss.poi.util.POILogger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,37 +24,37 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ddf.DefaultEscherRecordFactory;
-import org.apache.poi.ddf.EscherBoolProperty;
-import org.apache.poi.ddf.EscherClientAnchorRecord;
-import org.apache.poi.ddf.EscherClientDataRecord;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherDgRecord;
-import org.apache.poi.ddf.EscherDggRecord;
-import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperties;
-import org.apache.poi.ddf.EscherProperty;
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.EscherRecordFactory;
-import org.apache.poi.ddf.EscherSerializationListener;
-import org.apache.poi.ddf.EscherSimpleProperty;
-import org.apache.poi.ddf.EscherSpRecord;
-import org.apache.poi.ddf.EscherSpgrRecord;
-import org.apache.poi.ddf.EscherTextboxRecord;
-import org.apache.poi.hssf.model.AbstractShape;
-import org.apache.poi.hssf.model.CommentShape;
-import org.apache.poi.hssf.model.ConvertAnchor;
-import org.apache.poi.hssf.model.DrawingManager2;
-import org.apache.poi.hssf.model.TextboxShape;
-import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
-import org.apache.poi.hssf.usermodel.HSSFPatriarch;
-import org.apache.poi.hssf.usermodel.HSSFPicture;
-import org.apache.poi.hssf.usermodel.HSSFShape;
-import org.apache.poi.hssf.usermodel.HSSFShapeContainer;
-import org.apache.poi.hssf.usermodel.HSSFShapeGroup;
-import org.apache.poi.hssf.usermodel.HSSFTextbox;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.ddf.DefaultEscherRecordFactory;
+import org.zkoss.poi.ddf.EscherBoolProperty;
+import org.zkoss.poi.ddf.EscherClientAnchorRecord;
+import org.zkoss.poi.ddf.EscherClientDataRecord;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherDgRecord;
+import org.zkoss.poi.ddf.EscherDggRecord;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.ddf.EscherProperty;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.EscherRecordFactory;
+import org.zkoss.poi.ddf.EscherSerializationListener;
+import org.zkoss.poi.ddf.EscherSimpleProperty;
+import org.zkoss.poi.ddf.EscherSpRecord;
+import org.zkoss.poi.ddf.EscherSpgrRecord;
+import org.zkoss.poi.ddf.EscherTextboxRecord;
+import org.zkoss.poi.hssf.model.AbstractShape;
+import org.zkoss.poi.hssf.model.CommentShape;
+import org.zkoss.poi.hssf.model.ConvertAnchor;
+import org.zkoss.poi.hssf.model.DrawingManager2;
+import org.zkoss.poi.hssf.model.TextboxShape;
+import org.zkoss.poi.hssf.usermodel.HSSFClientAnchor;
+import org.zkoss.poi.hssf.usermodel.HSSFPatriarch;
+import org.zkoss.poi.hssf.usermodel.HSSFPicture;
+import org.zkoss.poi.hssf.usermodel.HSSFShape;
+import org.zkoss.poi.hssf.usermodel.HSSFShapeContainer;
+import org.zkoss.poi.hssf.usermodel.HSSFShapeGroup;
+import org.zkoss.poi.hssf.usermodel.HSSFTextbox;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This class is used to aggregate the MSODRAWING and OBJ record

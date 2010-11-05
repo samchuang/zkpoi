@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.common;
+package org.zkoss.poi.hssf.record.common;
 
-import org.apache.poi.hssf.record.FeatRecord;
 //import org.apache.poi.hssf.record.Feat11Record;
 //import org.apache.poi.hssf.record.Feat12Record;
-import org.apache.poi.hssf.record.RecordInputStream;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.hssf.record.FeatRecord;
+import org.zkoss.poi.hssf.record.RecordInputStream;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title: FeatFormulaErr2 (Formula Evaluation Shared Feature) common record part

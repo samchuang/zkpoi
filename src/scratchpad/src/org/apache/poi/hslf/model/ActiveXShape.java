@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hslf.record.*;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.*;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -95,7 +95,7 @@ public final class ActiveXShape extends Picture {
     /**
      * Assign a control to this shape
      *
-     * @see org.apache.poi.hslf.usermodel.SlideShow#addMovie(String, int)
+     * @see org.zkoss.poi.hslf.usermodel.SlideShow#addMovie(String, int)
      * @param idx  the index of the movie
      */
     public void setActiveXIndex(int idx){

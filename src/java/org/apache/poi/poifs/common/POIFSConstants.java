@@ -17,7 +17,7 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.common;
+package org.zkoss.poi.poifs.common;
 
 /**
  * <p>A repository for constants shared by POI classes.</p>

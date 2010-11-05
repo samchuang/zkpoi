@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf.model;
+package org.zkoss.poi.hpbf.model;
 
 import java.io.IOException;
 
-import org.apache.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
 /**
  *
  */

@@ -10,14 +10,14 @@
 Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.AreaI;
-import org.apache.poi.hssf.record.formula.ArrayPtg;
-import org.apache.poi.hssf.record.formula.eval.AreaEval;
-import org.apache.poi.hssf.record.formula.eval.NumberEval;
-import org.apache.poi.hssf.record.formula.eval.StringEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.hssf.record.formula.AreaI;
+import org.zkoss.poi.hssf.record.formula.ArrayPtg;
+import org.zkoss.poi.hssf.record.formula.eval.AreaEval;
+import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
+import org.zkoss.poi.hssf.record.formula.eval.StringEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
 
 import com.sun.org.apache.xml.internal.utils.UnImplNode;
 

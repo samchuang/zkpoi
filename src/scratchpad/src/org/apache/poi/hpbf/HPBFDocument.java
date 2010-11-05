@@ -15,19 +15,19 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpbf;
+package org.zkoss.poi.hpbf;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.poi.POIDocument;
-import org.apache.poi.hpbf.model.EscherDelayStm;
-import org.apache.poi.hpbf.model.EscherStm;
-import org.apache.poi.hpbf.model.MainContents;
-import org.apache.poi.hpbf.model.QuillContents;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.POIDocument;
+import org.zkoss.poi.hpbf.model.EscherDelayStm;
+import org.zkoss.poi.hpbf.model.EscherStm;
+import org.zkoss.poi.hpbf.model.MainContents;
+import org.zkoss.poi.hpbf.model.QuillContents;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * This class provides the basic functionality

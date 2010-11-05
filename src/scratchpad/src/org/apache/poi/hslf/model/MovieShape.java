@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 import java.io.ByteArrayOutputStream;
 
-import org.apache.poi.ddf.EscherClientDataRecord;
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherProperties;
-import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.hslf.record.*;
-import org.apache.poi.hslf.usermodel.SlideShow;
+import org.zkoss.poi.ddf.EscherClientDataRecord;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.*;
+import org.zkoss.poi.hslf.usermodel.SlideShow;
 
 /**
  * Represents a movie in a PowerPoint document.
@@ -112,7 +112,7 @@ public final class MovieShape extends Picture {
     /**
      * Assign a movie to this shape
      *
-     * @see org.apache.poi.hslf.usermodel.SlideShow#addMovie(String, int)
+     * @see org.zkoss.poi.hslf.usermodel.SlideShow#addMovie(String, int)
      * @param idx  the index of the movie
      */
     public void setMovieIndex(int idx){

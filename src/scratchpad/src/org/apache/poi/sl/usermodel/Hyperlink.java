@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.sl.usermodel;
+package org.zkoss.poi.sl.usermodel;
 
 /**
  * A PowerPoint hyperlink
  */
-public interface Hyperlink extends org.apache.poi.common.usermodel.Hyperlink {
+public interface Hyperlink extends org.zkoss.poi.common.usermodel.Hyperlink {
 }

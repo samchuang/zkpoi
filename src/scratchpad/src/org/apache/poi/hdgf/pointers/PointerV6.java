@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.pointers;
+package org.zkoss.poi.hdgf.pointers;
 
 /**
  * A Pointer from v6+

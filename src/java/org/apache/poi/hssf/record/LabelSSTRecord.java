@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:        Label SST Record<P>
@@ -45,7 +45,7 @@ public final class LabelSSTRecord extends CellRecord {
      * set the index to the string in the SSTRecord
      *
      * @param index - of string in the SST Table
-     * @see org.apache.poi.hssf.record.SSTRecord
+     * @see org.zkoss.poi.hssf.record.SSTRecord
      */
     public void setSSTIndex(int index) {
         field_4_sst_index = index;
@@ -56,7 +56,7 @@ public final class LabelSSTRecord extends CellRecord {
      * get the index to the string in the SSTRecord
      *
      * @return index of string in the SST Table
-     * @see org.apache.poi.hssf.record.SSTRecord
+     * @see org.zkoss.poi.hssf.record.SSTRecord
      */
     public int getSSTIndex() {
         return field_4_sst_index;

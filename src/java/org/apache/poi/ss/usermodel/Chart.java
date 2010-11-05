@@ -14,9 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel;
 
-import org.apache.poi.ss.util.CellRangeAddressBase;
+import org.zkoss.poi.ss.util.CellRangeAddressBase;
 
 /**
  * Represents a chart in a SpreadsheetML document

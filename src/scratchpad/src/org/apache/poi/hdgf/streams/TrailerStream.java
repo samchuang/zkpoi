@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.streams;
+package org.zkoss.poi.hdgf.streams;
 
-import org.apache.poi.hdgf.chunks.ChunkFactory;
-import org.apache.poi.hdgf.pointers.Pointer;
-import org.apache.poi.hdgf.pointers.PointerFactory;
+import org.zkoss.poi.hdgf.chunks.ChunkFactory;
+import org.zkoss.poi.hdgf.pointers.Pointer;
+import org.zkoss.poi.hdgf.pointers.PointerFactory;
 
 /**
  * The TrailerStream is a special kind of Stream containing pointers,

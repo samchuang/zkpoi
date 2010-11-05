@@ -11,21 +11,21 @@ Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 
 */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.hssf.record.formula.Area2DPtgBase;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.record.formula.AreaErrPtg;
-import org.apache.poi.hssf.record.formula.AreaPtg;
-import org.apache.poi.hssf.record.formula.AreaPtgBase;
-import org.apache.poi.hssf.record.formula.DeletedArea3DPtg;
-import org.apache.poi.hssf.record.formula.DeletedRef3DPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.record.formula.Ref3DPtg;
-import org.apache.poi.hssf.record.formula.RefErrorPtg;
-import org.apache.poi.hssf.record.formula.RefPtg;
-import org.apache.poi.hssf.record.formula.RefPtgBase;
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.hssf.record.formula.Area2DPtgBase;
+import org.zkoss.poi.hssf.record.formula.Area3DPtg;
+import org.zkoss.poi.hssf.record.formula.AreaErrPtg;
+import org.zkoss.poi.hssf.record.formula.AreaPtg;
+import org.zkoss.poi.hssf.record.formula.AreaPtgBase;
+import org.zkoss.poi.hssf.record.formula.DeletedArea3DPtg;
+import org.zkoss.poi.hssf.record.formula.DeletedRef3DPtg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.record.formula.Ref3DPtg;
+import org.zkoss.poi.hssf.record.formula.RefErrorPtg;
+import org.zkoss.poi.hssf.record.formula.RefPtg;
+import org.zkoss.poi.hssf.record.formula.RefPtgBase;
+import org.zkoss.poi.ss.SpreadsheetVersion;
 
 /**
  * @author henrichen

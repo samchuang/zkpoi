@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf;
+package org.zkoss.poi.hslf;
 
 import java.io.FileNotFoundException;
 
-import org.apache.poi.hslf.exceptions.CorruptPowerPointFileException;
-import org.apache.poi.hslf.record.CurrentUserAtom;
-import org.apache.poi.hslf.record.DocumentEncryptionAtom;
-import org.apache.poi.hslf.record.PersistPtrHolder;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.hslf.record.UserEditAtom;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hslf.exceptions.CorruptPowerPointFileException;
+import org.zkoss.poi.hslf.record.CurrentUserAtom;
+import org.zkoss.poi.hslf.record.DocumentEncryptionAtom;
+import org.zkoss.poi.hslf.record.PersistPtrHolder;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.record.UserEditAtom;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * This class provides helper functions for determining if a

@@ -14,29 +14,29 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.extractor;
+package org.zkoss.poi.xssf.extractor;
 
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.poi.POIXMLTextExtractor;
-import org.apache.poi.hssf.extractor.ExcelExtractor;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Comment;
-import org.apache.poi.ss.usermodel.HeaderFooter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRelation;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xmlbeans.XmlException;
+import org.zkoss.poi.POIXMLTextExtractor;
+import org.zkoss.poi.hssf.extractor.ExcelExtractor;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.Comment;
+import org.zkoss.poi.ss.usermodel.HeaderFooter;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.xssf.usermodel.XSSFCell;
+import org.zkoss.poi.xssf.usermodel.XSSFRelation;
+import org.zkoss.poi.xssf.usermodel.XSSFSheet;
+import org.zkoss.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Helper class to extract text from an OOXML Excel file
  */
-public class XSSFExcelExtractor extends POIXMLTextExtractor implements org.apache.poi.ss.extractor.ExcelExtractor {
+public class XSSFExcelExtractor extends POIXMLTextExtractor implements org.zkoss.poi.ss.extractor.ExcelExtractor {
    public static final XSSFRelation[] SUPPORTED_TYPES = new XSSFRelation[] {
       XSSFRelation.WORKBOOK, XSSFRelation.MACRO_TEMPLATE_WORKBOOK,
       XSSFRelation.MACRO_ADDIN_WORKBOOK, XSSFRelation.TEMPLATE_WORKBOOK,

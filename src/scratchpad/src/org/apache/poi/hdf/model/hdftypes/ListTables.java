@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdf.model.hdftypes;
+package org.zkoss.poi.hdf.model.hdftypes;
 
 import java.util.*;
 
-import org.apache.poi.hdf.extractor.*;
+import org.zkoss.poi.hdf.extractor.*;
 
 
 /**

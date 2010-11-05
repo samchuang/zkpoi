@@ -15,11 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.dev;
+package org.zkoss.poi.hslf.dev;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.hslf.record.RecordTypes;
-import org.apache.poi.poifs.filesystem.*;
+import org.zkoss.poi.hslf.record.RecordTypes;
+import org.zkoss.poi.poifs.filesystem.*;
+import org.zkoss.poi.util.LittleEndian;
+
 import java.io.*;
 
 /**

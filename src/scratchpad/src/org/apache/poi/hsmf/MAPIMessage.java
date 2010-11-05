@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hsmf;
+package org.zkoss.poi.hsmf;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,20 +28,20 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.poi.POIDocument;
-import org.apache.poi.hsmf.datatypes.AttachmentChunks;
-import org.apache.poi.hsmf.datatypes.AttachmentChunks.AttachmentChunksSorter;
-import org.apache.poi.hsmf.datatypes.Chunk;
-import org.apache.poi.hsmf.datatypes.ChunkGroup;
-import org.apache.poi.hsmf.datatypes.Chunks;
-import org.apache.poi.hsmf.datatypes.NameIdChunks;
-import org.apache.poi.hsmf.datatypes.RecipientChunks;
-import org.apache.poi.hsmf.datatypes.RecipientChunks.RecipientChunksSorter;
-import org.apache.poi.hsmf.datatypes.StringChunk;
-import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
-import org.apache.poi.hsmf.parsers.POIFSChunkParser;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.POIDocument;
+import org.zkoss.poi.hsmf.datatypes.AttachmentChunks;
+import org.zkoss.poi.hsmf.datatypes.Chunk;
+import org.zkoss.poi.hsmf.datatypes.ChunkGroup;
+import org.zkoss.poi.hsmf.datatypes.Chunks;
+import org.zkoss.poi.hsmf.datatypes.NameIdChunks;
+import org.zkoss.poi.hsmf.datatypes.RecipientChunks;
+import org.zkoss.poi.hsmf.datatypes.StringChunk;
+import org.zkoss.poi.hsmf.datatypes.AttachmentChunks.AttachmentChunksSorter;
+import org.zkoss.poi.hsmf.datatypes.RecipientChunks.RecipientChunksSorter;
+import org.zkoss.poi.hsmf.exceptions.ChunkNotFoundException;
+import org.zkoss.poi.hsmf.parsers.POIFSChunkParser;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * Reads an Outlook MSG File in and provides hooks into its data structure.

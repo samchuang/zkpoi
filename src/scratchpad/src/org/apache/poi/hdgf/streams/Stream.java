@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf.streams;
+package org.zkoss.poi.hdgf.streams;
 
 import java.io.IOException;
 
-import org.apache.poi.hdgf.chunks.ChunkFactory;
-import org.apache.poi.hdgf.pointers.Pointer;
-import org.apache.poi.hdgf.pointers.PointerFactory;
-import org.apache.poi.hdgf.exceptions.HDGFException;
+import org.zkoss.poi.hdgf.chunks.ChunkFactory;
+import org.zkoss.poi.hdgf.exceptions.HDGFException;
+import org.zkoss.poi.hdgf.pointers.Pointer;
+import org.zkoss.poi.hdgf.pointers.PointerFactory;
 
 /**
  * Base of all Streams within a HDGF document.

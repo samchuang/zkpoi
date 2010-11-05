@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.ddf.EscherRecord;
-import org.apache.poi.ddf.NullEscherSerializationListener;
-import org.apache.poi.util.ArrayUtil;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.NullEscherSerializationListener;
+import org.zkoss.poi.util.ArrayUtil;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.util.Iterator;
 import java.util.List;

@@ -14,13 +14,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.poi.hslf.record;
+package org.zkoss.poi.hslf.record;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This class represents the data of a link in the document. 

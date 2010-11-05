@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hssf.record.ObjRecord;
-import org.apache.poi.hssf.usermodel.*;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hssf.record.ObjRecord;
+import org.zkoss.poi.hssf.usermodel.*;
 
 /**
  * An abstract shape is the lowlevel model for a shape.

@@ -15,24 +15,24 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
 import java.awt.Graphics2D;
 import java.util.Vector;
 
-import org.apache.poi.ddf.EscherContainerRecord;
-import org.apache.poi.ddf.EscherDgRecord;
-import org.apache.poi.ddf.EscherDggRecord;
-import org.apache.poi.ddf.EscherSpRecord;
-import org.apache.poi.hslf.record.ColorSchemeAtom;
-import org.apache.poi.hslf.record.Comment2000;
-import org.apache.poi.hslf.record.HeadersFootersContainer;
-import org.apache.poi.hslf.record.Record;
-import org.apache.poi.hslf.record.RecordContainer;
-import org.apache.poi.hslf.record.RecordTypes;
-import org.apache.poi.hslf.record.SlideAtom;
-import org.apache.poi.hslf.record.TextHeaderAtom;
-import org.apache.poi.hslf.record.SlideListWithText.SlideAtomsSet;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherDgRecord;
+import org.zkoss.poi.ddf.EscherDggRecord;
+import org.zkoss.poi.ddf.EscherSpRecord;
+import org.zkoss.poi.hslf.record.ColorSchemeAtom;
+import org.zkoss.poi.hslf.record.Comment2000;
+import org.zkoss.poi.hslf.record.HeadersFootersContainer;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.record.RecordContainer;
+import org.zkoss.poi.hslf.record.RecordTypes;
+import org.zkoss.poi.hslf.record.SlideAtom;
+import org.zkoss.poi.hslf.record.TextHeaderAtom;
+import org.zkoss.poi.hslf.record.SlideListWithText.SlideAtomsSet;
 
 /**
  * This class represents a slide in a PowerPoint Document. It allows
@@ -59,7 +59,7 @@ public final class Slide extends Sheet
 	 * @param notes the Notes sheet attached to us
 	 * @param atomSet the SlideAtomsSet to get the text from
 	 */
-	public Slide(org.apache.poi.hslf.record.Slide slide, Notes notes, SlideAtomsSet atomSet, int slideIdentifier, int slideNumber) {
+	public Slide(org.zkoss.poi.hslf.record.Slide slide, Notes notes, SlideAtomsSet atomSet, int slideIdentifier, int slideNumber) {
         super(slide, slideIdentifier);
 
 		_notes = notes;
@@ -100,7 +100,7 @@ public final class Slide extends Sheet
 	* @param slideNumber The user facing number of the sheet
 	*/
 	public Slide(int sheetNumber, int sheetRefId, int slideNumber){
-		super(new org.apache.poi.hslf.record.Slide(), sheetNumber);
+		super(new org.zkoss.poi.hslf.record.Slide(), sheetNumber);
 		_slideNo = slideNumber;
         getSheetContainer().setSheetId(sheetRefId);
 	}
@@ -126,7 +126,7 @@ public final class Slide extends Sheet
 
 	/**
 	* Changes the Slide's (external facing) page number.
-	* @see org.apache.poi.hslf.usermodel.SlideShow#reorderSlide(int, int)
+	* @see org.zkoss.poi.hslf.usermodel.SlideShow#reorderSlide(int, int)
 	*/
 	public void setSlideNumber(int newSlideNumber) {
 		_slideNo = newSlideNumber;
@@ -225,8 +225,8 @@ public final class Slide extends Sheet
 	/**
 	 * Returns the underlying slide record
 	 */
-	public org.apache.poi.hslf.record.Slide getSlideRecord() {
-        return (org.apache.poi.hslf.record.Slide)getSheetContainer();
+	public org.zkoss.poi.hslf.record.Slide getSlideRecord() {
+        return (org.zkoss.poi.hslf.record.Slide)getSheetContainer();
     }
 
 	/**

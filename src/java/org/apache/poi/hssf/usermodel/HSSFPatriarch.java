@@ -15,19 +15,20 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.ddf.EscherComplexProperty;
-import org.apache.poi.ddf.EscherOptRecord;
-import org.apache.poi.ddf.EscherProperty;
-import org.apache.poi.hssf.record.EscherAggregate;
-import org.apache.poi.util.StringUtil;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.ddf.EscherComplexProperty;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperty;
+import org.zkoss.poi.hssf.record.EscherAggregate;
+import org.zkoss.poi.hssf.usermodel.HSSFChart;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.ss.usermodel.Drawing;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * The patriarch is the toplevel container for shapes in a sheet.  It does
@@ -160,7 +161,7 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing {
     /**
      * YK: used to create autofilters
      *
-     * @see org.apache.poi.hssf.usermodel.HSSFSheet#setAutoFilter(int, int, int, int)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFSheet#setAutoFilter(int, int, int, int)
      */
      HSSFSimpleShape createComboBox(HSSFAnchor anchor)
      {

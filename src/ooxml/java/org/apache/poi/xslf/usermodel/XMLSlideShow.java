@@ -14,19 +14,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xslf.usermodel;
+package org.zkoss.poi.xslf.usermodel;
 
 import java.io.IOException;
 
-import org.apache.poi.sl.usermodel.MasterSheet;
-import org.apache.poi.sl.usermodel.Resources;
-import org.apache.poi.sl.usermodel.Slide;
-import org.apache.poi.sl.usermodel.SlideShow;
-import org.apache.poi.xslf.XSLFSlideShow;
 import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlide;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdList;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdListEntry;
+import org.zkoss.poi.sl.usermodel.MasterSheet;
+import org.zkoss.poi.sl.usermodel.Resources;
+import org.zkoss.poi.sl.usermodel.Slide;
+import org.zkoss.poi.sl.usermodel.SlideShow;
+import org.zkoss.poi.xslf.XSLFSlideShow;
 
 /**
  * High level representation of a ooxml slideshow.

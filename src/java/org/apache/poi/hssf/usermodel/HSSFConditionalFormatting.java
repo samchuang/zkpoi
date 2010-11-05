@@ -14,12 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.CFRuleRecord;
-import org.apache.poi.hssf.record.aggregates.CFRecordsAggregate;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.Region;
+import org.zkoss.poi.hssf.record.CFRuleRecord;
+import org.zkoss.poi.hssf.record.aggregates.CFRecordsAggregate;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.ss.util.Region;
 
 /**
  * HSSFConditionalFormatting class encapsulates all settings of Conditional Formatting. 
@@ -43,7 +43,7 @@ import org.apache.poi.ss.util.Region;
  *  </LI>
  *  </UL>
  * 
- * Use {@link org.apache.poi.hssf.usermodel.HSSFSheet#getSheetConditionalFormatting()} to get access to an instance of this class.
+ * Use {@link org.zkoss.poi.hssf.usermodel.HSSFSheet#getSheetConditionalFormatting()} to get access to an instance of this class.
  * <P>
  * To create a new Conditional Formatting set use the following approach:
  * 

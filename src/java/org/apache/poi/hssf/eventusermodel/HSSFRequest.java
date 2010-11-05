@@ -15,23 +15,23 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.eventusermodel;
+package org.zkoss.poi.hssf.eventusermodel;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.poi.hssf.record.Record;
-import org.apache.poi.hssf.record.RecordFactory;
+import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.hssf.record.RecordFactory;
 
 /**
  * An HSSFRequest object should be constructed registering an instance or multiple
  * instances of HSSFListener with each Record.sid you wish to listen for.
  *
- * @see org.apache.poi.hssf.eventusermodel.HSSFEventFactory
- * @see org.apache.poi.hssf.eventusermodel.HSSFListener
- * @see org.apache.poi.hssf.eventusermodel.HSSFUserException
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFEventFactory
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFListener
+ * @see org.zkoss.poi.hssf.eventusermodel.HSSFUserException
  * @author  Andrew C. Oliver (acoliver at apache dot org)
  * @author Carey Sublette (careysub@earthling.net)
  */

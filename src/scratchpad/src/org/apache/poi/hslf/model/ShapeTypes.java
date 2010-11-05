@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.model;
+package org.zkoss.poi.hslf.model;
 
-import org.apache.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
 
 import java.util.HashMap;
 import java.lang.reflect.Field;
@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
  *
  * @author Yegor Kozlov
  */
-public final class ShapeTypes implements org.apache.poi.sl.usermodel.ShapeTypes {
+public final class ShapeTypes implements org.zkoss.poi.sl.usermodel.ShapeTypes {
     /**
      * Return name of the shape by id
      * @param type  - the id of the shape, one of the static constants defined in this class
@@ -42,7 +42,7 @@ public final class ShapeTypes implements org.apache.poi.sl.usermodel.ShapeTypes 
     static {
         types = new HashMap();
         try {
-            Field[] f = org.apache.poi.sl.usermodel.ShapeTypes.class.getFields();
+            Field[] f = org.zkoss.poi.sl.usermodel.ShapeTypes.class.getFields();
             for (int i = 0; i < f.length; i++){
                 Object val = f[i].get(null);
                 if (val instanceof Integer) {

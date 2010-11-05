@@ -15,10 +15,10 @@
 * limitations under the License.
 */
 
-package org.apache.poi.hssf.record.formula.eval;
+package org.zkoss.poi.hssf.record.formula.eval;
 
-import org.apache.poi.hssf.usermodel.HSSFErrorConstants;
-import org.apache.poi.ss.usermodel.Hyperlink;
+import org.zkoss.poi.hssf.usermodel.HSSFErrorConstants;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;

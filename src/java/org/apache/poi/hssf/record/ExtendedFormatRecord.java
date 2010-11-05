@@ -17,11 +17,11 @@
 ==================================================================== */
         
 
-package org.apache.poi.hssf.record;
+package org.zkoss.poi.hssf.record;
 
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Title:        Extended Format Record
@@ -213,7 +213,7 @@ public final class ExtendedFormatRecord
      *
      *
      * @param index to the font
-     * @see org.apache.poi.hssf.record.FontRecord
+     * @see org.zkoss.poi.hssf.record.FontRecord
      */
 
     public void setFontIndex(short index)
@@ -226,7 +226,7 @@ public final class ExtendedFormatRecord
      *
      *
      * @param index to the format record
-     * @see org.apache.poi.hssf.record.FormatRecord
+     * @see org.zkoss.poi.hssf.record.FormatRecord
      */
 
     public void setFormatIndex(short index)
@@ -958,7 +958,7 @@ public final class ExtendedFormatRecord
      *
      *
      * @return index to the font
-     * @see org.apache.poi.hssf.record.FontRecord
+     * @see org.zkoss.poi.hssf.record.FontRecord
      */
 
     public short getFontIndex()
@@ -971,7 +971,7 @@ public final class ExtendedFormatRecord
      *
      *
      * @return index to the format record
-     * @see org.apache.poi.hssf.record.FormatRecord
+     * @see org.zkoss.poi.hssf.record.FormatRecord
      */
 
     public short getFormatIndex()

@@ -16,7 +16,7 @@
 ==================================================================== */
 
 
-package org.apache.poi.hssf.util;
+package org.zkoss.poi.hssf.util;
 
 /**
  * Represents a from/to row/col square.  This is a object primitive
@@ -26,7 +26,7 @@ package org.apache.poi.hssf.util;
  * @author  Andrew C. Oliver acoliver at apache dot org
  */
 
-public class Region extends org.apache.poi.ss.util.Region
+public class Region extends org.zkoss.poi.ss.util.Region
 {
     /**
      * Creates a new instance of Region (0,0 - 0,0)

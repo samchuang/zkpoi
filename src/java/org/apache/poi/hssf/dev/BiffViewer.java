@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.dev;
+package org.zkoss.poi.hssf.dev;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -30,13 +30,13 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.record.*;
-import org.apache.poi.hssf.record.RecordInputStream.LeftoverDataException;
-import org.apache.poi.hssf.record.chart.*;
-import org.apache.poi.hssf.record.pivottable.*;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hssf.record.*;
+import org.zkoss.poi.hssf.record.RecordInputStream.LeftoverDataException;
+import org.zkoss.poi.hssf.record.chart.*;
+import org.zkoss.poi.hssf.record.pivottable.*;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  *  Utillity for reading in BIFF8 records and displaying data from them.

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hslf.blip;
+package org.zkoss.poi.hslf.blip;
 
-import org.apache.poi.hslf.model.Picture;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hslf.model.Picture;
+import org.zkoss.poi.util.LittleEndian;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public final class DIB extends Bitmap {
 
     /**
      * @return type of  this picture
-     * @see  org.apache.poi.hslf.model.Picture#DIB
+     * @see  org.zkoss.poi.hslf.model.Picture#DIB
      */
     public int getType(){
         return Picture.DIB;

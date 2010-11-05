@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.cf;
+package org.zkoss.poi.hssf.record.cf;
 
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Pattern Formatting Block of the Conditional Formatting Rule Record.
@@ -131,7 +131,7 @@ public final class PatternFormatting implements Cloneable {
     }
 
     /**
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return get the background fill color
      */
     public int getFillBackgroundColor() {
@@ -146,7 +146,7 @@ public final class PatternFormatting implements Cloneable {
     }
 
     /**
-     * @see org.apache.poi.hssf.usermodel.HSSFPalette#getColor(short)
+     * @see org.zkoss.poi.hssf.usermodel.HSSFPalette#getColor(short)
      * @return get the foreground fill color
      */
     public int getFillForegroundColor() {

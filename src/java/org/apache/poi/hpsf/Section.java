@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hpsf;
+package org.zkoss.poi.hpsf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -24,9 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hpsf.wellknown.PropertyIDMap;
-import org.apache.poi.hpsf.wellknown.SectionIDMap;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hpsf.wellknown.PropertyIDMap;
+import org.zkoss.poi.hpsf.wellknown.SectionIDMap;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * <p>Represents a section in a {@link PropertySet}.</p>

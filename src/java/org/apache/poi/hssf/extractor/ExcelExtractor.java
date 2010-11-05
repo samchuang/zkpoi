@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.extractor;
+package org.zkoss.poi.hssf.extractor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,19 +23,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.apache.poi.POIOLE2TextExtractor;
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFComment;
-import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.HeaderFooter;
+import org.zkoss.poi.POIOLE2TextExtractor;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.hssf.usermodel.HSSFCell;
+import org.zkoss.poi.hssf.usermodel.HSSFCellStyle;
+import org.zkoss.poi.hssf.usermodel.HSSFComment;
+import org.zkoss.poi.hssf.usermodel.HSSFDataFormatter;
+import org.zkoss.poi.hssf.usermodel.HSSFRichTextString;
+import org.zkoss.poi.hssf.usermodel.HSSFRow;
+import org.zkoss.poi.hssf.usermodel.HSSFSheet;
+import org.zkoss.poi.hssf.usermodel.HSSFWorkbook;
+import org.zkoss.poi.poifs.filesystem.DirectoryNode;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.ss.usermodel.HeaderFooter;
 
 /**
  * A text extractor for Excel files.
@@ -51,7 +51,7 @@ import org.apache.poi.ss.usermodel.HeaderFooter;
  * <link href="http://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java">
  * http://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java</link>
  */
-public class ExcelExtractor extends POIOLE2TextExtractor implements org.apache.poi.ss.extractor.ExcelExtractor {
+public class ExcelExtractor extends POIOLE2TextExtractor implements org.zkoss.poi.ss.extractor.ExcelExtractor {
 	private HSSFWorkbook _wb;
 	private HSSFDataFormatter _formatter;
 	private boolean _includeSheetNames = true;

@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.usermodel;
+package org.zkoss.poi.hssf.usermodel;
 
-import org.apache.poi.hssf.record.FooterRecord;
-import org.apache.poi.hssf.record.aggregates.PageSettingsBlock;
-import org.apache.poi.ss.usermodel.Footer;
+import org.zkoss.poi.hssf.record.FooterRecord;
+import org.zkoss.poi.hssf.record.aggregates.PageSettingsBlock;
+import org.zkoss.poi.ss.usermodel.Footer;
 
 /**
  * Class to read and manipulate the footer.

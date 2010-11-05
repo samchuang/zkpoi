@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.record.formula.functions;
+package org.zkoss.poi.hssf.record.formula.functions;
 
-import org.apache.poi.hssf.record.formula.eval.RefEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.ss.formula.TwoDEval;
+import org.zkoss.poi.hssf.record.formula.eval.RefEval;
+import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.TwoDEval;
 
 /**
  * Common logic for COUNT, COUNTA and COUNTIF

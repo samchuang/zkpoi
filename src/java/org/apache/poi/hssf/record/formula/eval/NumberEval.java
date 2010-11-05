@@ -18,13 +18,13 @@
  * Created on May 8, 2005
  *
  */
-package org.apache.poi.hssf.record.formula.eval;
+package org.zkoss.poi.hssf.record.formula.eval;
 
-import org.apache.poi.hssf.record.formula.IntPtg;
-import org.apache.poi.hssf.record.formula.NumberPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.ss.usermodel.Hyperlink;
-import org.apache.poi.ss.util.NumberToTextConverter;
+import org.zkoss.poi.hssf.record.formula.IntPtg;
+import org.zkoss.poi.hssf.record.formula.NumberPtg;
+import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
+import org.zkoss.poi.ss.util.NumberToTextConverter;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;

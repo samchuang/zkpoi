@@ -16,11 +16,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hssf.model;
+package org.zkoss.poi.hssf.model;
 
-import org.apache.poi.ddf.*;
-import org.apache.poi.hssf.record.*;
-import org.apache.poi.hssf.usermodel.*;
+import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.hssf.record.*;
+import org.zkoss.poi.hssf.usermodel.*;
 
 /**
  * Represents a picture shape and creates all specific low level records.

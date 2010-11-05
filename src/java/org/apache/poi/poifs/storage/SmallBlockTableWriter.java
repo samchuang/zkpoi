@@ -17,13 +17,13 @@
 ==================================================================== */
         
 
-package org.apache.poi.poifs.storage;
+package org.zkoss.poi.poifs.storage;
 
-import org.apache.poi.poifs.common.POIFSBigBlockSize;
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.filesystem.BATManaged;
-import org.apache.poi.poifs.filesystem.POIFSDocument;
-import org.apache.poi.poifs.property.RootProperty;
+import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.filesystem.BATManaged;
+import org.zkoss.poi.poifs.filesystem.POIFSDocument;
+import org.zkoss.poi.poifs.property.RootProperty;
 
 import java.util.*;
 
