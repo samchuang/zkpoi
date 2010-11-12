@@ -551,10 +551,6 @@ public final class WorkbookEvaluator {
 		if (ptg instanceof NamePtg) {
 			// named ranges, macro functions
 			NamePtg namePtg = (NamePtg) ptg;
-			//20101112, henrichen@zkoss.org: NamePtg without an associated EvaluationName
-			if (namePtg.getIndex() < 0) {
-				return new NameEval(namePtg.getNameText());
-			}
 			EvaluationName nameRecord = _workbook.getName(namePtg);
 			if (nameRecord.isFunctionName()) {
 				return new NameEval(nameRecord.getNameText());

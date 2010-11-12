@@ -102,10 +102,8 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public NameXPtg getNameXPtg(String name) {
-		//20101112, henrichen@zkoss.org
-		return null;
 		// may require to return null to make tests pass
-		//throw new RuntimeException("Not implemented yet");
+		throw new RuntimeException("Not implemented yet");
 	}
 
 	public EvaluationSheet getSheet(int sheetIndex) {
@@ -203,5 +201,23 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	@Override
 	public String getBookNameFromExternalLinkIndex(String externalLinkIndex) {
 		return _uBook.getBookNameFromExternalLinkIndex(externalLinkIndex);
+	}
+	
+	//20101112, henrichen@zkoss.org: handle parsing of user defined function
+	@Override
+	public EvaluationName getOrCreateName(String name, int sheetIndex) {
+		for (int i = 0; i < _uBook.getNumberOfNames(); i++) {
+			XSSFName nm = _uBook.getNameAt(i);
+			String nameText = nm.getNameName();
+			if (name.equalsIgnoreCase(nameText) && nm.getSheetIndex() == sheetIndex) {
+				return new Name(_uBook.getNameAt(i), i, this);
+			}
+		}
+		if (sheetIndex == -1) {
+			XSSFName nm = _uBook.createName();
+			nm.setNameName(name);
+			return new Name(nm, _uBook.getNumberOfNames() - 1, this);
+		}
+		return getOrCreateName(name, -1); //recursive
 	}
 }

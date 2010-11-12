@@ -192,4 +192,28 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 		//TODO Excel 97-2003, external link index?
 		return externalLinkIndex;
 	}
+	
+	//20101112, henrichen@zkoss.org: handle parsing user defined function name
+	/**
+	 * Lookup a named range by its name.
+	 *
+	 * @param name the name to search
+	 * @param sheetIndex  the 0-based index of the sheet this formula belongs to.
+	 * The sheet index is required to resolve sheet-level names. <code>-1</code> means workbook-global names
+	 */
+	@Override
+	public EvaluationName getOrCreateName(String name, int sheetIndex) {
+		for(int i=0; i < _iBook.getNumNames(); i++) {
+			NameRecord nr = _iBook.getNameRecord(i);
+			if (nr.getSheetNumber() == sheetIndex+1 && name.equalsIgnoreCase(nr.getNameText())) {
+				return new Name(nr, i);
+			}
+		}
+		if (sheetIndex == -1) {
+			NameRecord nr = _iBook.createName();
+			nr.setNameText(name);
+			return new Name(nr, _iBook.getNumNames() - 1);
+		}
+		return getOrCreateName(name, -1); //recursive
+	}
 }

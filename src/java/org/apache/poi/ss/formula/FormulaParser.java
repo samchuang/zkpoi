@@ -927,22 +927,23 @@ public final class FormulaParser {
 				// Only test cases omit the book (expecting it not to be needed)
 				throw new IllegalStateException("Need book to evaluate name '" + name + "'");
 			}
-			EvaluationName hName = _book.getName(name, _sheetIndex);
+			//20101112, henrichen@zkoss.org: shall provide a temporary defined named record
+			//EvaluationName hName = _book.getName(name, _sheetIndex);
+			EvaluationName hName = _book.getOrCreateName(name, _sheetIndex);
 			if (hName == null) {
 
 				nameToken = _book.getNameXPtg(name);
 				if (nameToken == null) {
-					//20101112, henrichen@zkoss.org: a NamePtg without associated Name record in workbook 
-					nameToken = new NamePtg(name);
-//					throw new FormulaParseException("Name '" + name
-//							+ "' is completely unknown in the current workbook");
+					throw new FormulaParseException("Name '" + name
+							+ "' is completely unknown in the current workbook");
 				}
 			} else {
-				if (!hName.isFunctionName()) {
+				//20101112, henrichen@zkoss.org: unnecessary check
+/*				if (!hName.isFunctionName()) {
 					throw new FormulaParseException("Attempt to use name '" + name
 							+ "' as a function, but defined name in workbook does not refer to a function");
 				}
-
+*/
 				// calls to user-defined functions within the workbook
 				// get a Name token which points to a defined name record
 				nameToken = hName.createPtg();

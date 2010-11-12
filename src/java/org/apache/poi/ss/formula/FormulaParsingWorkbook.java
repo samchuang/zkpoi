@@ -59,4 +59,10 @@ public interface FormulaParsingWorkbook {
 	 * @return the associated book name of the specified ExternalLink index.
 	 */
 	String getBookNameFromExternalLinkIndex(String externalLinkIndex);
+
+	//20101112, henrichen@zkoss.org: handle user defined name parsing
+	/**
+	 *  named range name matching is case insensitive
+	 */
+	EvaluationName getOrCreateName(String name, int sheetIndex);
 }
