@@ -102,8 +102,10 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public NameXPtg getNameXPtg(String name) {
+		//20101112, henrichen@zkoss.org
+		return null;
 		// may require to return null to make tests pass
-		throw new RuntimeException("Not implemented yet");
+		//throw new RuntimeException("Not implemented yet");
 	}
 
 	public EvaluationSheet getSheet(int sheetIndex) {

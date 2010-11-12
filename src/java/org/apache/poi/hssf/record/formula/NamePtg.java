@@ -76,4 +76,13 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
 	}
+	
+	//20101112, henrichen@zkoss.org
+	private String _name;
+	public NamePtg(String name) { //Possible that name in NamePtg does not have any associated XSSF Name
+		_name = name;
+	}
+	public String getNameText() {
+		return _name;
+	}
 }

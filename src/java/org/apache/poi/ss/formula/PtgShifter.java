@@ -50,7 +50,7 @@ public class PtgShifter {
 			throw new IllegalArgumentException("firstRow("+firstRow+") and lastRow("+lastRow+") out of order");
 		}
 		if (firstCol > lastCol) {
-			throw new IllegalArgumentException("firstCol, lastCol out of order");
+			throw new IllegalArgumentException("firstCol("+firstCol+") and lastCol("+lastCol+") out of order");
 		}
 		_externSheetIndex = externSheetIndex;
 		_firstRow = firstRow;

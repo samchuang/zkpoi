@@ -512,8 +512,10 @@ public final class FormulaParser {
 
 			if (part1.isRowOrColumn() || part2.isRowOrColumn()) {
 				if (dotCount != 2) {
-					throw new FormulaParseException("Dotted range (full row or column) expression '" + part1And2
-							+ "' must have exactly 2 dots.");
+					//henrichen@zkoss.org: shall return #NAME?
+					//throw new FormulaParseException("Dotted range (full row or column) expression '" + part1And2
+					//		+ "' must have exactly 2 dots.");
+					return parseNonRange(savePointer);
 				}
 			}
 			return createAreaRefParseNode(sheetIden, part1, part2);
@@ -930,8 +932,10 @@ public final class FormulaParser {
 
 				nameToken = _book.getNameXPtg(name);
 				if (nameToken == null) {
-					throw new FormulaParseException("Name '" + name
-							+ "' is completely unknown in the current workbook");
+					//20101112, henrichen@zkoss.org: a NamePtg without associated Name record in workbook 
+					nameToken = new NamePtg(name);
+//					throw new FormulaParseException("Name '" + name
+//							+ "' is completely unknown in the current workbook");
 				}
 			} else {
 				if (!hName.isFunctionName()) {
