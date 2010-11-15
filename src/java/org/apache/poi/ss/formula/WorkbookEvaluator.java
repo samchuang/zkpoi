@@ -462,6 +462,9 @@ public final class WorkbookEvaluator {
 				// storing the ops in reverse order since they are popping
 				for (int j = numops - 1; j >= 0; j--) {
 					ValueEval p = stack.pop();
+					//20101115, henrichen@zkoss.org: add dependency before operation
+					//FuncVarPtg, the NamePtg(functionname) should be as is
+					p = addDependency(ec, p, !(optg instanceof FuncVarPtg) || j > 0); 
 					ops[j] = p;
 				}
 //				logDebug("invoke " + operation + " (nAgs=" + numops + ")");
@@ -469,7 +472,7 @@ public final class WorkbookEvaluator {
 				opResult = addDependency(ec, opResult, true);
 			} else {
 				opResult = getEvalForPtg(ptg, ec);
-				opResult = addDependency(ec, opResult, false);
+//				opResult = addDependency(ec, opResult, false);
 			}
 			if (opResult == null) {
 				throw new RuntimeException("Evaluation result must not be null");
@@ -482,6 +485,7 @@ public final class WorkbookEvaluator {
 		if (!stack.isEmpty()) {
 			throw new IllegalStateException("evaluation stack not empty");
 		}
+		value = addDependency(ec, value, true); //20101115, henrichen@zkoss.org: might be simple one operand formula
 		return dereferenceResult(value, ec.getRowIndex(), ec.getColumnIndex());
 	}
 	

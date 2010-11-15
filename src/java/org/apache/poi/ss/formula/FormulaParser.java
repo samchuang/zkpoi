@@ -578,17 +578,23 @@ public final class FormulaParser {
 			// Only test cases omit the book (expecting it not to be needed)
 			throw new IllegalStateException("Need book to evaluate name '" + name + "'");
 		}
-		EvaluationName evalName = _book.getName(name, _sheetIndex);
+		//20101115, henrichen@zkoss.org: shall provide a temporary defined named record
+		//EvaluationName evalName = _book.getName(name, _sheetIndex);
+		EvaluationName evalName = _book.getOrCreateName(name, _sheetIndex);
 		if (evalName == null) {
-			throw new FormulaParseException("Specified named range '"
-					+ name + "' does not exist in the current workbook.");
+			//20101112, henrichen@zkoss.org: shall return #NAME? error
+			//throw new FormulaParseException("Specified named range '"
+			//		+ name + "' does not exist in the current workbook.");
+			return new ParseNode(ErrPtg.NAME_INVALID);
 		}
-		if (evalName.isRange()) {
-			return new ParseNode(evalName.createPtg());
-		}
+		//20101115, henrichen@zkoss.org: unnecessary check
+		//if (evalName.isRange()) {
+		//	return new ParseNode(evalName.createPtg());
+		//}
 		// TODO - what about NameX ?
-		throw new FormulaParseException("Specified name '"
-				+ name + "' is not a range as expected.");
+		//throw new FormulaParseException("Specified name '"
+		//		+ name + "' is not a range as expected.");
+		return new ParseNode(evalName.createPtg());
 	}
 
 	/**
