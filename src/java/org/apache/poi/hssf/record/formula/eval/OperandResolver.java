@@ -326,4 +326,28 @@ public final class OperandResolver {
 		}
 		throw new RuntimeException("Unexpected eval (" + ve.getClass().getName() + ")");
 	}
+
+	//20101113, henrichen@zkoss.org: to long
+	/**
+	 * Applies some conversion rules if the supplied value is not already a long integer.<br/>
+	 * Value is first coerced to a <tt>double</tt> ( See <tt>coerceValueToDouble()</tt> ).
+	 * Note - <tt>BlankEval</tt> is converted to <code>0</code>.<p/>
+	 *
+	 * Excel typically converts doubles to integers by truncating toward negative infinity.<br/>
+	 * The equivalent java code is:<br/>
+	 * &nbsp;&nbsp;<code>return (long)Math.floor(d);</code><br/>
+	 * <b>not</b>:<br/>
+	 * &nbsp;&nbsp;<code>return (long)d; // wrong - rounds toward zero</code>
+	 *
+	 */
+	public static long coerceValueToLong(ValueEval ev) throws EvaluationException {
+		if (ev == BlankEval.instance) {
+			return 0;
+		}
+		double d = coerceValueToDouble(ev);
+		// Note - the standard java type conversion from double to int truncates toward zero.
+		// but Math.floor() truncates toward negative infinity
+		return (long)Math.floor(d);
+	}
+
 }

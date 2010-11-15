@@ -66,7 +66,10 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	}
 
 	public String toFormulaString(FormulaRenderingWorkbook book) {
-		return book.getNameText(this);
+		//20101114, henrichen@zkoss.org: filter out _xlfn. if any
+		//return book.getNameText(this);
+		final String name = book.getNameText(this);
+		return (name != null && name.startsWith("_xlfn.")) ? name.substring(6) : name;
 	}
 
 	public String toFormulaString() {
