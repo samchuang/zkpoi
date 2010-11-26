@@ -48,6 +48,12 @@ public class ThemesTable extends POIXMLDocumentPart {
 
     public XSSFColor getThemeColor(int idx) {
         CTColorScheme colorScheme = theme.getTheme().getThemeElements().getClrScheme();
+        //20101123, henrichen@zkoss.org: shall handle System Color case
+        if (idx == 0) {
+        	return new XSSFColor(colorScheme.getLt1().getSysClr().getLastClr());
+        } else if (idx == 1) {
+        	return new XSSFColor(colorScheme.getDk1().getSysClr().getLastClr());
+        }
         CTColor ctColor = null;
         int cnt = 0;
         for (XmlObject obj : colorScheme.selectPath("./*")) {
