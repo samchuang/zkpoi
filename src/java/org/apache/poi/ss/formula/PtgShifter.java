@@ -321,14 +321,14 @@ public class PtgShifter {
 			//return aptg;
 			return aptgSetFirstRow(aptg, destLastRowIndex+1);
 		}
-		if (destFirstRowIndex < aLastRow && aLastRow <= destLastRowIndex) {
+		if (destFirstRowIndex <= aLastRow && aLastRow < destLastRowIndex) { //20101201, henrichen@zkoss.org: correct the logic
 			// dest rows overlap bottom of area
 			// - truncate the bottom
 			//aptg.setLastRow(destFirstRowIndex-1);
 			return aptgSetLastRow(aptg, destFirstRowIndex-1);
 		}
 		throw new IllegalStateException("Situation not covered: (" + _firstRow + ", " +
-					_lastRow + ", " + _rowAmount + ", " + aFirstRow + ", " + aLastRow + ")");
+					_lastRow + ", " + _rowAmount + ", " + aFirstRow + ", " + aLastRow + ", "+ destFirstRowIndex + ", " + destLastRowIndex + ")");
 	}
 
 	private Ptg bothMoveRefPtg(RefPtgBase rptg) {
@@ -503,13 +503,13 @@ public class PtgShifter {
 		if (aFirstCol < _firstCol && _lastCol < aLastCol) {
 			// Cols moved were originally *completely* within the area ref
 
-			// If the destination of the cols overlaps either the top
-			// or bottom of the area ref there will be a change
+			// If the destination of the cols overlaps either the left
+			// or right of the area ref there will be a change
 			if (destFirstColIndex < aFirstCol && aFirstCol <= destLastColIndex) {
-				// truncate the top of the area by the moved cols
+				// truncate the left of the area by the moved cols
 				return aptgSetFirstCol(aptg, destLastColIndex+1);
 			} else if (destFirstColIndex <= aLastCol && aLastCol < destLastColIndex) {
-				// truncate the bottom of the area by the moved cols
+				// truncate the right of the area by the moved cols
 				return aptgSetLastCol(aptg, destFirstColIndex-1);
 			}
 			// else - cols have moved completely outside the area ref,
@@ -520,7 +520,7 @@ public class PtgShifter {
 			// Cols moved include the first col of the area ref, but not the last col
 			// btw: (aLastCol > _lastMovedIndex)
 			if (_colAmount < 0) {
-				// simple case - expand area by shifting top upward
+				// simple case - expand area by shifting left leftward
 				return aptgSetFirstCol(aptg, aFirstCol + _colAmount);
 			}
 			if (destFirstColIndex > aLastCol) {
@@ -530,13 +530,13 @@ public class PtgShifter {
 			int newFirstColIx = aFirstCol + _colAmount;
 			if (destLastColIndex < aLastCol) {
 				// end of area is preserved (will remain exact same col)
-				// the top area col is moved simply
+				// the left area col is moved simply
 				return aptgSetFirstCol(aptg, newFirstColIx);
 			}
-			// else - bottom area col has been replaced - both area top and bottom may move now
+			// else - right area col has been replaced - both area left and right may move now
 			int areaRemainingTopColIx = _lastCol + 1;
 			if (destFirstColIndex > areaRemainingTopColIx) {
-				// old top col of area has moved deep within the area, and exposed a new top col
+				// old left col of area has moved deep within the area, and exposed a new left col
 				newFirstColIx = areaRemainingTopColIx;
 			}
 			return aptgSetFirstLastCol(aptg, newFirstColIx, Math.max(aLastCol, destLastColIndex));
@@ -545,7 +545,7 @@ public class PtgShifter {
 			// Cols moved include the last col of the area ref, but not the first
 			// btw: (aFirstCol < _firstMovedIndex)
 			if (_colAmount > 0) {
-				// simple case - expand area by shifting bottom downward
+				// simple case - expand area by shifting right rightward
 				return aptgSetLastCol(aptg, aLastCol + _colAmount);
 			}
 			if (destLastColIndex < aFirstCol) {
@@ -554,14 +554,14 @@ public class PtgShifter {
 			}
 			int newLastColIx = aLastCol + _colAmount;
 			if (destFirstColIndex > aFirstCol) {
-				// top of area is preserved (will remain exact same col)
-				// the bottom area col is moved simply
+				// left of area is preserved (will remain exact same col)
+				// the right area col is moved simply
 				return aptgSetLastCol(aptg, newLastColIx);
 			}
 			// else - top area col has been replaced - both area top and bottom may move now
 			int areaRemainingBottomColIx = _firstCol - 1;
 			if (destLastColIndex < areaRemainingBottomColIx) {
-				// old bottom col of area has moved up deep within the area, and exposed a new bottom col
+				// old right col of area has moved left deep within the area, and exposed a new right col
 				newLastColIx = areaRemainingBottomColIx;
 			}
 			return aptgSetFirstLastCol(aptg, Math.min(aFirstCol, destFirstColIndex), newLastColIx);
@@ -580,22 +580,22 @@ public class PtgShifter {
 		}
 
 		if (aFirstCol <= destFirstColIndex && destLastColIndex <= aLastCol) {
-			// destination cols are within area ref (possibly exact on top or bottom, but not both)
+			// destination cols are within area ref (possibly exact on left or right, but not both)
 			return null; // - no change to area
 		}
 
 		if (destFirstColIndex < aFirstCol && aFirstCol <= destLastColIndex) {
-			// dest cols overlap top of area
-			// - truncate the top
+			// dest cols overlap left of area
+			// - truncate the left
 			return aptgSetFirstCol(aptg, destLastColIndex+1);
 		}
-		if (destFirstColIndex < aLastCol && aLastCol <= destLastColIndex) {
-			// dest cols overlap bottom of area
-			// - truncate the bottom
+		if (destFirstColIndex <= aLastCol && aLastCol < destLastColIndex) { //20101202, henrichen@zkoss.org: correct the logic
+			// dest cols overlap right of area
+			// - truncate the right
 			return aptgSetLastCol(aptg, destFirstColIndex-1);
 		}
 		throw new IllegalStateException("Situation not covered: (" + _firstCol + ", " +
-					_lastRow + ", " + _colAmount + ", " + aFirstCol + ", " + aLastCol + ")");
+					_lastRow + ", " + _colAmount + ", " + aFirstCol + ", " + aLastCol + ", " + destFirstColIndex + ", " + destLastColIndex+ ")");
 	}
 	private Ptg rptgSetRow(RefPtgBase rptg, int rowNum) {
 		if (rowNum > _ver.getLastRowIndex() || rowNum < 0) {
