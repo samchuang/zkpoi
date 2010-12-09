@@ -1646,14 +1646,13 @@ public final class InternalSheet {
     //20101013, henrichen@zkoss.org: merge drawing records into a fake EscherAggregate record if possible 
     @SuppressWarnings("unchecked")
 	private boolean mergeRecordsIntoEscherAggregate(List<RecordBase> records, int loc, DrawingManager2 drawingManager) {
-	    final String clsName = Library.getProperty("org.zkoss.zss.model.EscherAggregate.class", "org.zkoss.zssex.model.impl.ZKEscherAggregate");
+	    final String clsName = Library.getProperty("org.zkoss.zss.model.EscherAggregate.class");
 	    if (clsName != null) {
 	    	try {
 	    		final Class cls = Classes.forNameByThread(clsName);
 				final Object r = cls.getConstructor(DrawingManager2.class).newInstance(drawingManager);
 				final Method m = Classes.getMethodInPublic(cls, "mergeRecordsIntoEscherAggregate", new Class[] {List.class, int.class, DrawingManager2.class});
-				m.invoke(r, records, new Integer(loc), drawingManager);
-	        	return true;
+				return ((Boolean)m.invoke(r, records, new Integer(loc), drawingManager)).booleanValue();
 	    	} catch (InvocationTargetException e) {
 	    		throw new RuntimeException(e.getCause());
 			} catch (Exception ex) {
