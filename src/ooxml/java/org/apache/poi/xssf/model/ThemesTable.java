@@ -49,26 +49,32 @@ public class ThemesTable extends POIXMLDocumentPart {
     public XSSFColor getThemeColor(int idx) {
         CTColorScheme colorScheme = theme.getTheme().getThemeElements().getClrScheme();
         //20101123, henrichen@zkoss.org: shall handle System Color case
-        if (idx == 0) {
-        	return new XSSFColor(colorScheme.getLt1().getSysClr().getLastClr());
-        } else if (idx == 1) {
-        	return new XSSFColor(colorScheme.getDk1().getSysClr().getLastClr());
-        }
-        CTColor ctColor = null;
-        int cnt = 0;
-        for (XmlObject obj : colorScheme.selectPath("./*")) {
-            if (obj instanceof org.openxmlformats.schemas.drawingml.x2006.main.CTColor) {
-                if (cnt == idx) {
-                    ctColor = (org.openxmlformats.schemas.drawingml.x2006.main.CTColor) obj;
-                    CTSRgbColor srgbClr = ctColor.getSrgbClr();
-                    if (srgbClr != null)
-                    	return new XSSFColor(srgbClr.getVal());
-                    else
-                    	break;
-                }
-                cnt++;
-            }
-        }
-        return null;
+    	switch(idx) {
+    	case 0: //lt1
+    		return new XSSFColor(colorScheme.getLt1().getSysClr().getLastClr());
+    	case 1: //dk1
+    		return new XSSFColor(colorScheme.getDk1().getSysClr().getLastClr());
+    	case 2: //lt2
+    		return new XSSFColor(colorScheme.getLt2().getSrgbClr().getVal());
+    	case 3: //dk2
+    		return new XSSFColor(colorScheme.getDk2().getSrgbClr().getVal());
+    	default:
+	        CTColor ctColor = null;
+	        int cnt = 0;
+	        for (XmlObject obj : colorScheme.selectPath("./*")) {
+	            if (obj instanceof org.openxmlformats.schemas.drawingml.x2006.main.CTColor) {
+	                if (cnt == idx) {
+	                    ctColor = (org.openxmlformats.schemas.drawingml.x2006.main.CTColor) obj;
+	                    CTSRgbColor srgbClr = ctColor.getSrgbClr();
+	                    if (srgbClr != null)
+	                    	return new XSSFColor(srgbClr.getVal());
+	                    else
+	                    	break;
+	                }
+	                cnt++;
+	            }
+	        }
+	        return null;
+    	}
     }
 }

@@ -33,6 +33,10 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegendPos;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLine3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineSer;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumData;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumDataSource;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumRef;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumVal;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTOfPieChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPie3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPieChart;
@@ -40,8 +44,11 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTPieSer;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTRadarChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTScatterChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTSerTx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTStockChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrData;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrRef;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrVal;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurface3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurfaceChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
@@ -304,68 +311,295 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
     
     //Bar
     private XSSFSeries[] prepareBarSer(CTBarSer[] bsers) {
-   			final XSSFSeries[] sers = new XSSFSeries[bsers.length];
-   			for (int j = 0; j < bsers.length; ++j) {
-   				final CTBarSer ser = bsers[j];
-   				final int idx = (int) ser.getIdx().getVal();
-   				sers[idx] = new XSSFSeries(ser, getTitleRef(ser), getCategoryRef(ser), getValueRef(ser));
-   			}
-   			return sers;
+		final XSSFSeries[] sers = new XSSFSeries[bsers.length];
+		for (int j = 0; j < bsers.length; ++j) {
+			final CTBarSer ser = bsers[j];
+			final int idx = (int) ser.getIdx().getVal();
+			final TitleInfo ti = getTitleInfo(ser);
+			final CategoryInfo ci = getCategoryInfo(ser);
+			final ValueInfo vi = getValueInfo(ser);
+			final String tiref = ti == null ? null : ti.ref;
+			final String tilit = ti == null ? null : ti.lit;
+			final String ciref = ci == null ? null : ci.ref;
+			final String[] cilits = ci == null ? null : ci.lits;
+			final String viref = vi == null ? null : vi.ref;
+			final String[] vilits = vi == null ? null : vi.lits;
+			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, viref, vilits);
+		}
+		return sers;
     }
-	private String getTitleRef(CTBarSer ser) {
-		return ser.getTx().getStrRef().getF();
+	private TitleInfo getTitleInfo(CTBarSer ser) {
+		if (ser != null) {
+			final CTSerTx tx = ser.getTx();
+			if (tx != null) {
+				final CTStrRef strRef = tx.getStrRef();
+				return new TitleInfo((strRef != null ? strRef.getF() : null), tx.getV());
+			}
+		}
+		return null;
 	}
-	private String getCategoryRef(CTBarSer ser) {
-		final CTAxDataSource cat = ser.getCat();
-		final CTStrRef strRef = cat.getStrRef(); 
-		return strRef != null ? strRef.getF() : cat.getNumRef().getF(); //could be string or number 
+	private CategoryInfo getCategoryInfo(CTBarSer ser) {
+		if (ser != null) {
+			final CTAxDataSource cat = ser.getCat();
+			if (cat != null) {
+				final CTStrRef strRef = cat.getStrRef();
+				if (strRef != null) {
+					final CTStrData strData = strRef.getStrCache();
+					final String[] lits = getStrLits(strData);
+					return new CategoryInfo(strRef.getF(), lits);
+				}
+				
+				final CTNumRef numRef = cat.getNumRef();
+				if (numRef != null) {
+					final CTNumData numData = numRef.getNumCache();
+					final String[] lits = getNumLits(numData);
+					return new CategoryInfo(numRef.getF(), lits);
+				}
+				
+				final CTStrData strData = cat.getStrLit();
+				if (strData != null) {
+					final String[] lits = getStrLits(strData);
+					return new CategoryInfo(null, lits);
+				}
+				
+				final CTNumData numData = cat.getNumLit();
+				if (numData != null) {
+					final String[] lits = getNumLits(numData);
+					return new CategoryInfo(null, lits);
+				}
+			}
+		}
+		return null;
 	}
-	private String getValueRef(CTBarSer ser) {
-		return ser.getVal().getNumRef().getF();
+	private ValueInfo getValueInfo(CTBarSer ser) {
+		if (ser != null) {
+			final CTNumDataSource numDS = ser.getVal();
+			if (numDS != null) {
+				final CTNumRef numRef = numDS.getNumRef();
+				if (numRef != null) {
+					final CTNumData numData = numRef.getNumCache();
+					final String[] lits = getNumLits(numData);
+					return new ValueInfo(numRef.getF(), lits);
+				}
+				final CTNumData numData = numDS.getNumLit();
+				if (numData != null) {
+					final String[] lits = getNumLits(numData);
+					return new ValueInfo(null, lits);
+				}
+			}
+		}
+		return null;
 	}
     
     //Pie
     private XSSFSeries[] preparePieSer(CTPieSer[] bsers) {
-			final XSSFSeries[] sers = new XSSFSeries[bsers.length];
-			for (int j = 0; j < bsers.length; ++j) {
-				final CTPieSer ser = bsers[j];
-				final int idx = (int) ser.getIdx().getVal();
-				sers[idx] = new XSSFSeries(ser, getTitleRef(ser), getCategoryRef(ser), getValueRef(ser));
-			}
-			return sers;
+		final XSSFSeries[] sers = new XSSFSeries[bsers.length];
+		for (int j = 0; j < bsers.length; ++j) {
+			final CTPieSer ser = bsers[j];
+			final int idx = (int) ser.getIdx().getVal();
+			final TitleInfo ti = getTitleInfo(ser);
+			final CategoryInfo ci = getCategoryInfo(ser);
+			final ValueInfo vi = getValueInfo(ser);
+			final String tiref = ti == null ? null : ti.ref;
+			final String tilit = ti == null ? null : ti.lit;
+			final String ciref = ci == null ? null : ci.ref;
+			final String[] cilits = ci == null ? null : ci.lits;
+			final String viref = vi == null ? null : vi.ref;
+			final String[] vilits = vi == null ? null : vi.lits;
+			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, viref, vilits);
+		}
+		return sers;
     }
-	private String getTitleRef(CTPieSer ser) {
-		return ser.getTx().getStrRef().getF();
+	private TitleInfo getTitleInfo(CTPieSer ser) {
+		if (ser != null) {
+			final CTSerTx tx = ser.getTx();
+			if (tx != null) {
+				final CTStrRef strRef = tx.getStrRef();
+				return new TitleInfo((strRef != null ? strRef.getF() : null), tx.getV());
+			}
+		}
+		return null;
 	}
-	private String getCategoryRef(CTPieSer ser) {
-		final CTAxDataSource cat = ser.getCat();
-		final CTStrRef strRef = cat.getStrRef(); 
-		return strRef != null ? strRef.getF() : cat.getNumRef().getF(); //could be string or number 
+	private CategoryInfo getCategoryInfo(CTPieSer ser) {
+		if (ser != null) {
+			final CTAxDataSource cat = ser.getCat();
+			if (cat != null) {
+				final CTStrRef strRef = cat.getStrRef();
+				if (strRef != null) {
+					final CTStrData strData = strRef.getStrCache();
+					final String[] lits = getStrLits(strData);
+					return new CategoryInfo(strRef.getF(), lits);
+				}
+				
+				final CTNumRef numRef = cat.getNumRef();
+				if (numRef != null) {
+					final CTNumData numData = numRef.getNumCache();
+					final String[] lits = getNumLits(numData);
+					return new CategoryInfo(numRef.getF(), lits);
+				}
+				
+				final CTStrData strData = cat.getStrLit();
+				if (strData != null) {
+					final String[] lits = getStrLits(strData);
+					return new CategoryInfo(null, lits);
+				}
+				
+				final CTNumData numData = cat.getNumLit();
+				if (numData != null) {
+					final String[] lits = getNumLits(numData);
+					return new CategoryInfo(null, lits);
+				}
+			}
+		}
+		return null;
 	}
-	private String getValueRef(CTPieSer ser) {
-		return ser.getVal().getNumRef().getF();
+	private ValueInfo getValueInfo(CTPieSer ser) {
+		if (ser != null) {
+			final CTNumDataSource numDS = ser.getVal();
+			if (numDS != null) {
+				final CTNumRef numRef = numDS.getNumRef();
+				if (numRef != null) {
+					final CTNumData numData = numRef.getNumCache();
+					final String[] lits = getNumLits(numData);
+					return new ValueInfo(numRef.getF(), lits);
+				}
+				final CTNumData numData = numDS.getNumLit();
+				if (numData != null) {
+					final String[] lits = getNumLits(numData);
+					return new ValueInfo(null, lits);
+				}
+			}
+		}
+		return null;
 	}
 
     //Line
     private XSSFSeries[] prepareLineSer(CTLineSer[] lsers) {
-   			final XSSFSeries[] sers = new XSSFSeries[lsers.length];
-   			for (int j = 0; j < lsers.length; ++j) {
-   				final CTLineSer ser = lsers[j];
-   				final int idx = (int) ser.getIdx().getVal();
-   				sers[idx] = new XSSFSeries(ser, getTitleRef(ser), getCategoryRef(ser), getValueRef(ser));
-   			}
-   			return sers;
+		final XSSFSeries[] sers = new XSSFSeries[lsers.length];
+		for (int j = 0; j < lsers.length; ++j) {
+			final CTLineSer ser = lsers[j];
+			final int idx = (int) ser.getIdx().getVal();
+			final TitleInfo ti = getTitleInfo(ser);
+			final CategoryInfo ci = getCategoryInfo(ser);
+			final ValueInfo vi = getValueInfo(ser);
+			final String tiref = ti == null ? null : ti.ref;
+			final String tilit = ti == null ? null : ti.lit;
+			final String ciref = ci == null ? null : ci.ref;
+			final String[] cilits = ci == null ? null : ci.lits;
+			final String viref = vi == null ? null : vi.ref;
+			final String[] vilits = vi == null ? null : vi.lits;
+			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, viref, vilits);
+		}
+		return sers;
     }
-	private String getTitleRef(CTLineSer ser) {
-		return ser.getTx().getStrRef().getF();
+	private TitleInfo getTitleInfo(CTLineSer ser) {
+		if (ser != null) {
+			final CTSerTx tx = ser.getTx();
+			if (tx != null) {
+				final CTStrRef strRef = tx.getStrRef();
+				return new TitleInfo((strRef != null ? strRef.getF() : null), tx.getV());
+			}
+		}
+		return null;
 	}
-	private String getCategoryRef(CTLineSer ser) {
-		final CTAxDataSource cat = ser.getCat();
-		final CTStrRef strRef = cat.getStrRef(); 
-		return strRef != null ? strRef.getF() : cat.getNumRef().getF(); //could be string or number 
+	private CategoryInfo getCategoryInfo(CTLineSer ser) {
+		if (ser != null) {
+			final CTAxDataSource cat = ser.getCat();
+			if (cat != null) {
+				final CTStrRef strRef = cat.getStrRef();
+				if (strRef != null) {
+					final CTStrData strData = strRef.getStrCache();
+					final String[] lits = getStrLits(strData);
+					return new CategoryInfo(strRef.getF(), lits);
+				}
+				
+				final CTNumRef numRef = cat.getNumRef();
+				if (numRef != null) {
+					final CTNumData numData = numRef.getNumCache();
+					final String[] lits = getNumLits(numData);
+					return new CategoryInfo(numRef.getF(), lits);
+				}
+				
+				final CTStrData strData = cat.getStrLit();
+				if (strData != null) {
+					final String[] lits = getStrLits(strData);
+					return new CategoryInfo(null, lits);
+				}
+				
+				final CTNumData numData = cat.getNumLit();
+				if (numData != null) {
+					final String[] lits = getNumLits(numData);
+					return new CategoryInfo(null, lits);
+				}
+			}
+		}
+		return null;
 	}
-	private String getValueRef(CTLineSer ser) {
-		return ser.getVal().getNumRef().getF();
+	private ValueInfo getValueInfo(CTLineSer ser) {
+		if (ser != null) {
+			final CTNumDataSource numDS = ser.getVal();
+			if (numDS != null) {
+				final CTNumRef numRef = numDS.getNumRef();
+				if (numRef != null) {
+					final CTNumData numData = numRef.getNumCache();
+					final String[] lits = getNumLits(numData);
+					return new ValueInfo(numRef.getF(), lits);
+				}
+				final CTNumData numData = numDS.getNumLit();
+				if (numData != null) {
+					final String[] lits = getNumLits(numData);
+					return new ValueInfo(null, lits);
+				}
+			}
+		}
+		return null;
+	}
+    
+	private String[] getStrLits(CTStrData strData) {
+		String[] lits = null;
+		if (strData != null) {
+			final CTStrVal[] strVals = strData.getPtArray();
+			lits = new String[strVals.length];
+			for(int j = 0; j < strVals.length; ++j) {
+				lits[j] = strVals[j].getV();
+			}
+		}
+		return lits;
+	}
+	private String[] getNumLits(CTNumData numData) {
+		String[] lits = null;
+		if (numData != null) {
+			final CTNumVal[] numVals = numData.getPtArray();
+			lits = new String[numVals.length];
+			for(int j= 0; j < numVals.length; ++j) {
+				lits[j] = numVals[j].getV();
+			}
+		}
+		return lits;
+	}
+    private static class TitleInfo {
+    	private final String ref;
+    	private final String lit;
+    	private TitleInfo(String ref, String lit) {
+    		this.ref = ref;
+    		this.lit = lit;
+    	}
+    }
+	private static class CategoryInfo {
+		private final String ref;
+		private final String[] lits;
+		private CategoryInfo(String ref, String[] lits) {
+			this.ref = ref;
+			this.lits = lits;
+		}
+	}
+	private static class ValueInfo {
+		private final String ref;
+		private final String[] lits;
+		private ValueInfo(String ref, String[] lits) {
+			this.ref = ref;
+			this.lits = lits;
+		}
 	}
     
 	/**
@@ -377,12 +611,41 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		private final String _titleRef; //title reference formula(e.g. B1:B1)
 		private final String _catRef; //category reference formula(e.g. A2:A4)
 		private final String _valRef; //value reference formula(e.g. B2:B4)
+		private final String[] _labels; //literal labels(categories)
+		private final String _title; //literal title
+		private final Number[] _values; //literal values
 		
-		public XSSFSeries(XmlObject ser, String titleRef, String catRef, String valRef) {
+		public XSSFSeries(XmlObject ser, String titleRef, String title, String catRef, String[] labels, String valRef, String[] values) {
 			_ser = ser;
 			_titleRef = titleRef;
+			if (catRef != null) {
+				if (catRef.startsWith("(") && catRef.endsWith(")")) {
+					catRef = catRef.substring(1, catRef.length() - 1);
+				}
+			}
 			_catRef = catRef;
+			if (valRef != null) {
+				if (valRef.startsWith("(") && valRef.endsWith(")")) {
+					valRef = valRef.substring(1, valRef.length() - 1);
+				}
+			}
 			_valRef = valRef;
+			_title = title;
+			_labels = labels;
+			Double[] vals = null;
+			if (values != null) {
+				vals = new Double[values.length];
+				for(int j = 0; j < values.length; ++j) {
+					Double db = new Double(0.0);
+					try {
+						db = new Double(values[j]);
+					} catch(NumberFormatException ex) {
+						//ignore
+					}
+					vals[j++] = db; 
+				}
+			}
+			_values = vals;
 		}
 		public String getTitleRef() {
 			return _titleRef;
@@ -394,6 +657,18 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		
 		public String getValueRef() {
 			return _valRef;
+		}
+		
+		public String getTitle() {
+			return _title;
+		}
+		
+		public String[] getLabels() {
+			return _labels;
+		}
+		
+		public Number[] getValues() {
+			return _values;
 		}
 	}
 

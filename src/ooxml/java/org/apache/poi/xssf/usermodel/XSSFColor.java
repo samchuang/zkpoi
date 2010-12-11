@@ -196,6 +196,10 @@ public class XSSFColor implements Color {
      * @return the tint value
      */
     public double getTint() {
+    	//20101211, henrichen@zkoss.org: Java's double precision is less than Excel's
+    	//e.g. value of 0.59999389629810485, 17 digits as stored in style.xml, Java interpret it
+    	//as 0.5999938962981048, 16 digits, the last digit is missing. This could cause 1
+    	//difference in RGB color.
 		return ctColor.getTint();
 	}
 	
