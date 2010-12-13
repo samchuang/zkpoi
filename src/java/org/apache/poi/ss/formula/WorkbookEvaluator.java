@@ -643,6 +643,9 @@ public final class WorkbookEvaluator {
 	 */
 	/* package */ ValueEval evaluateReference(String sheetname1, String sheetname2, int rowIndex,
 			int columnIndex, EvaluationTracker tracker) {
+		if ("#REF".equals(sheetname1)) { //20101213, henrichen@zkoss.org: handle reference to deleted sheet
+			return ErrorEval.REF_INVALID;
+		}
 		final int i1 = getSheetIndex(sheetname1);
 		final int i2 = getSheetIndex(sheetname2);
 		final int sheetIndex1 = Math.min(i1, i2);

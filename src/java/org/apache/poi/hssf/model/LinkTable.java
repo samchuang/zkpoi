@@ -484,4 +484,22 @@ final class LinkTable {
 	private int findRefIndexFromExtBookIndex(int extBookIndex) {
 		return _externSheetRecord.findRefIndexFromExtBookIndex(extBookIndex);
 	}
+	
+	//20101213, henrichen@zkoss.org: handle externSheetRecord when remove a sheet
+	/*package*/ void removeSheet(int sheetIdx) {
+		if (_externSheetRecord != null) {
+			int thisWbIndex = -1; // this is probably always zero
+			for (int i=0; i<_externalBookBlocks.length; i++) {
+				SupBookRecord ebr = _externalBookBlocks[i].getExternalBookRecord();
+				if (ebr.isInternalReferences()) {
+					thisWbIndex = i;
+					break;
+				}
+			}
+			if (thisWbIndex < 0) {
+				throw new RuntimeException("Could not find 'internal references' EXTERNALBOOK");
+			}
+			_externSheetRecord.removeSheet(sheetIdx, thisWbIndex);
+		}
+	}
 }

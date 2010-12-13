@@ -773,6 +773,9 @@ public final class InternalWorkbook {
                 nr.setSheetNumber(nr.getSheetNumber()-1);
             }
         }
+        
+        //20101213, henrichen@zkoss.org: has to hanlde externSheetRecords
+        getOrCreateLinkTable().removeSheet(sheetIndex);
     }
 
     /**

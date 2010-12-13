@@ -137,8 +137,9 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public String getSheetNameByExternSheet(int externSheetIndex) {
-		String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);		
-		return names == null ? "" : names[1].equals(names[2]) ? names[1] : names[1]+':'+names[2];  
+		String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);
+		//20101213, henrichen@zkoss.org: sheet could have been deleted
+		return names == null || _uBook.getSheet(names[1]) == null ? "" : names[1].equals(names[2]) ? names[1] : names[1]+':'+names[2];  
 	}
 
 	public String getNameText(NamePtg namePtg) {

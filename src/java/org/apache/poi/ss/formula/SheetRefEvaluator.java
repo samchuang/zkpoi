@@ -32,24 +32,25 @@ final class SheetRefEvaluator {
 	private final int _lastSheetIndex;
 
 	public SheetRefEvaluator(WorkbookEvaluator bookEvaluator, EvaluationTracker tracker, int sheetIndex, int lastSheetIndex) {
-		if (sheetIndex < 0) {
+//20101213, henrichen@zkoss.org: handle deleted sheet		
+/*		if (sheetIndex < 0) {
 			throw new IllegalArgumentException("Invalid sheetIndex: " + sheetIndex + ".");
 		}
 		if (lastSheetIndex < 0) {
 			throw new IllegalArgumentException("Invalid sheetIndex2: " + lastSheetIndex + ".");
 		}
-		_bookEvaluator = bookEvaluator;
+*/		_bookEvaluator = bookEvaluator;
 		_tracker = tracker;
 		_sheetIndex = sheetIndex;
 		_lastSheetIndex = lastSheetIndex;
 	}
 
 	public String getSheetName() {
-		return _bookEvaluator.getSheetName(_sheetIndex);
+		return _sheetIndex < 0 ? "#REF" : _bookEvaluator.getSheetName(_sheetIndex);
 	}
 	
 	public String getLastSheetName() {
-		return _bookEvaluator.getSheetName(_lastSheetIndex);
+		return _lastSheetIndex < 0 ? "#REF" : _bookEvaluator.getSheetName(_lastSheetIndex);
 	}
 
 	public ValueEval getEvalForCell(int rowIndex, int columnIndex) {

@@ -65,6 +65,13 @@ public class ExternSheetRecord extends StandardRecord {
 		public int getLastSheetIndex(){
 			return _lastSheetIndex;
 		}
+		//20101213,henrichen@zkoss.org: handle sheet index update
+		public void setFirstSheetIndex(int sheetIdx) {
+			_firstSheetIndex = sheetIdx;
+		}
+		public void setLastSheetIndex(int sheetIdx){
+			_lastSheetIndex = sheetIdx;
+		}
 		
 		public String toString() {
 			StringBuffer buffer = new StringBuffer();
@@ -220,5 +227,26 @@ public class ExternSheetRecord extends StandardRecord {
 			}
 		}
 		return result;
+	}
+	
+	//20101213, henrichen@zkoss.org: update externSheet record when remove a sheet
+	public void removeSheet(int sheetIndex, int internalBookIndex) {
+		for (RefSubRecord ref : _list) {
+			if (ref.getExtBookIndex() != internalBookIndex) {
+				continue;
+			}
+			final int diff = ref.getFirstSheetIndex() - sheetIndex;
+			if (diff > 0) {
+				ref.setFirstSheetIndex(ref.getFirstSheetIndex() - 1);
+			} else if (diff == 0) {
+				ref.setFirstSheetIndex(-1);
+			}
+			final int diff2 = ref.getLastSheetIndex() - sheetIndex; 
+			if (diff > 0) {
+				ref.setLastSheetIndex(ref.getLastSheetIndex() - 1);
+			} else if (diff == 0) {
+				ref.setLastSheetIndex(-1);
+			}
+		}
 	}
 }
