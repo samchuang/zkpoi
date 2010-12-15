@@ -217,7 +217,7 @@ public final class FormulaParser {
 	}
 
 	/** Report What Was Expected */
-	private RuntimeException expected(String s) {
+/*	private RuntimeException expected(String s) {
 		String msg;
 
 		if (look == '=' && _formulaString.substring(0, _pointer-1).trim().length() < 1) {
@@ -230,7 +230,7 @@ public final class FormulaParser {
 		}
 		return new FormulaParseException(msg);
 	}
-
+*/
 	/** Recognize an Alpha Character */
 	private static boolean IsAlpha(char c) {
 		return Character.isLetter(c) || c == '$' || c=='_';
@@ -1145,7 +1145,7 @@ public final class FormulaParser {
 		if (look == '.') {
 			return new ParseNode(parseNumber());
 		}
-		throw expected("cell ref or constant literal");
+		throw expected("cell reference or constant literal");
 	}
 
 
@@ -1316,7 +1316,7 @@ public final class FormulaParser {
 		Match('#');
 		String part1 = parseUnquotedIdentifier().toUpperCase();
 		if (part1 == null) {
-			throw expected("remainder of error constant literal");
+			throw expected("valid error constant literal");
 		}
 
 		switch(part1.charAt(0)) {
@@ -1603,5 +1603,19 @@ end;
 		// RVA is for 'operand class': 'reference', 'value', 'array'
 		oct.transformFormula(_rootNode);
 		return ParseNode.toTokenArray(_rootNode);
+	}
+	
+	//20101214, henrichen@zkoss.org: make parse error more end user readable
+	private RuntimeException expected(String s) {
+		String msg;
+	
+		if (look == '=' && _formulaString.substring(0, _pointer-1).trim().length() < 1) {
+			msg = "The specified formula '" + _formulaString
+				+ "' cannot starts with two equals signs.";
+		} else {
+			msg = "The specified formula '" + _formulaString
+				+ "' contains an error. Expects " + s + ".";
+		}
+		return new FormulaParseException(msg);
 	}
 }
