@@ -18,6 +18,7 @@
 package org.zkoss.poi.ss.format;
 
 import org.zkoss.poi.hssf.record.constant.ErrorConstant;
+import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.usermodel.Cell;
 import org.zkoss.poi.ss.usermodel.ErrorConstants;
 
@@ -93,7 +94,7 @@ public class CellFormat {
             if (value == null) {
                 text = "";
             } else if (value instanceof Byte){ //20100616, Henri Chen
-            	text = ErrorConstants.getText(((Byte)value).intValue());
+            	text = ErrorEval.getText(((Byte)value).intValue());
             } else if (value instanceof Number) {
                 text = CellNumberFormatter.SIMPLE_NUMBER.format(value);
             } else if (value instanceof Boolean) { //20100616, Henri Chen
@@ -193,7 +194,7 @@ public class CellFormat {
      */
     public CellFormatResult apply(Object value) {
     	if (value instanceof Byte){ //20100616, Henri Chen
-    		return new CellFormatResult(false, ErrorConstants.getText(((Byte)value).intValue()), null);
+    		return new CellFormatResult(false, ErrorEval.getText(((Byte)value).intValue()), null);
     	} else if (value instanceof Number) {
             Number num = (Number) value;
             double val = num.doubleValue();
