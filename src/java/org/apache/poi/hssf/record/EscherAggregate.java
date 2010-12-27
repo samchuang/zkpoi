@@ -19,6 +19,7 @@ package org.zkoss.poi.hssf.record;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -984,4 +985,13 @@ public class EscherAggregate extends AbstractEscherHolderRecord {
 		return null;
 	}
 
+	//20101227, henrichen: eschor records, to be overridden
+	public List<? extends Record> getAggregateRecords() {
+		return Collections.emptyList();
+	}
+	
+	//20101227, henrichen: eschor records factory, to be overridden
+	public EscherRecordFactory getRecordFactory() {
+		return null;
+	}
 }
