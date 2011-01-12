@@ -61,6 +61,7 @@ import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
 import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
 import org.zkoss.poi.hssf.usermodel.HSSFChart.HSSFSeries;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
@@ -322,9 +323,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 			final String tilit = ti == null ? null : ti.lit;
 			final String ciref = ci == null ? null : ci.ref;
 			final String[] cilits = ci == null ? null : ci.lits;
-			final String viref = vi == null ? null : vi.ref;
-			final String[] vilits = vi == null ? null : vi.lits;
-			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, viref, vilits);
+			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, vi);
 		}
 		return sers;
     }
@@ -375,17 +374,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		if (ser != null) {
 			final CTNumDataSource numDS = ser.getVal();
 			if (numDS != null) {
-				final CTNumRef numRef = numDS.getNumRef();
-				if (numRef != null) {
-					final CTNumData numData = numRef.getNumCache();
-					final String[] lits = getNumLits(numData);
-					return new ValueInfo(numRef.getF(), lits);
-				}
-				final CTNumData numData = numDS.getNumLit();
-				if (numData != null) {
-					final String[] lits = getNumLits(numData);
-					return new ValueInfo(null, lits);
-				}
+				return new ValueInfo(numDS);
 			}
 		}
 		return null;
@@ -404,9 +393,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 			final String tilit = ti == null ? null : ti.lit;
 			final String ciref = ci == null ? null : ci.ref;
 			final String[] cilits = ci == null ? null : ci.lits;
-			final String viref = vi == null ? null : vi.ref;
-			final String[] vilits = vi == null ? null : vi.lits;
-			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, viref, vilits);
+			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, vi);
 		}
 		return sers;
     }
@@ -456,19 +443,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 	private ValueInfo getValueInfo(CTPieSer ser) {
 		if (ser != null) {
 			final CTNumDataSource numDS = ser.getVal();
-			if (numDS != null) {
-				final CTNumRef numRef = numDS.getNumRef();
-				if (numRef != null) {
-					final CTNumData numData = numRef.getNumCache();
-					final String[] lits = getNumLits(numData);
-					return new ValueInfo(numRef.getF(), lits);
-				}
-				final CTNumData numData = numDS.getNumLit();
-				if (numData != null) {
-					final String[] lits = getNumLits(numData);
-					return new ValueInfo(null, lits);
-				}
-			}
+			return new ValueInfo(numDS);
 		}
 		return null;
 	}
@@ -486,9 +461,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 			final String tilit = ti == null ? null : ti.lit;
 			final String ciref = ci == null ? null : ci.ref;
 			final String[] cilits = ci == null ? null : ci.lits;
-			final String viref = vi == null ? null : vi.ref;
-			final String[] vilits = vi == null ? null : vi.lits;
-			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, viref, vilits);
+			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, vi);
 		}
 		return sers;
     }
@@ -539,23 +512,45 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		if (ser != null) {
 			final CTNumDataSource numDS = ser.getVal();
 			if (numDS != null) {
-				final CTNumRef numRef = numDS.getNumRef();
-				if (numRef != null) {
-					final CTNumData numData = numRef.getNumCache();
-					final String[] lits = getNumLits(numData);
-					return new ValueInfo(numRef.getF(), lits);
-				}
-				final CTNumData numData = numDS.getNumLit();
-				if (numData != null) {
-					final String[] lits = getNumLits(numData);
-					return new ValueInfo(null, lits);
-				}
+				return new ValueInfo(numDS);
 			}
 		}
 		return null;
 	}
-    
-	private String[] getStrLits(CTStrData strData) {
+	private static void setCTNumDataSource(CTNumDataSource numDS, String ref, String[] lits) {
+		if (numDS != null) {
+			CTNumRef numRef = numDS.getNumRef();
+			if (ref != null && numRef == null) {
+				numRef = numDS.addNewNumRef();
+			} else if (ref == null && numRef != null) {
+				numDS.unsetNumRef();
+				numRef = null;
+			}
+			if (numRef != null) {
+				setCTNumRef(numRef, ref, lits);
+			} else {
+				CTNumData numData = numDS.getNumLit();
+				
+				if (lits != null && numData == null) {
+					numData = numDS.addNewNumLit();
+				} else if (lits == null && numData != null) {
+					numDS.unsetNumLit();
+					numData = null;
+				}
+				if (numData != null) {
+					setNumLits(numData, lits);
+				}
+			}
+		}
+	}
+    private static void setCTNumRef(CTNumRef numRef, String ref, String[] lits) {
+		if (numRef != null) {
+			numRef.setF(ref);
+			final CTNumData numData = numRef.getNumCache();
+			setNumLits(numData, lits);
+		}
+    }
+	private static String[] getStrLits(CTStrData strData) {
 		String[] lits = null;
 		if (strData != null) {
 			final CTStrVal[] strVals = strData.getPtArray();
@@ -566,7 +561,16 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		}
 		return lits;
 	}
-	private String[] getNumLits(CTNumData numData) {
+	private static void setStrLits(CTStrData strData, String[] lits) {
+		if (strData != null) {
+			final CTStrVal[] strVals = strData.getPtArray();
+			lits = new String[strVals.length];
+			for(int j = 0; j < strVals.length; ++j) {
+				strVals[j].setV(lits[j]); 
+			}
+		}
+	}
+	private static String[] getNumLits(CTNumData numData) {
 		String[] lits = null;
 		if (numData != null) {
 			final CTNumVal[] numVals = numData.getPtArray();
@@ -576,6 +580,25 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 			}
 		}
 		return lits;
+	}
+	private static void setNumLits(CTNumData numData, String[] lits) {
+		if (numData != null) {
+			final CTNumVal[] numVals = numData.getPtArray();
+			
+			if (numVals.length > lits.length) {
+				for(int len = numVals.length - lits.length; len-- > 0;) {
+					numData.removePt(len);
+				}
+			} else {
+				for(int len = lits.length - numVals.length; len-- > 0;) {
+					numData.addNewPt();
+				}
+			}
+			final CTNumVal[] numVals0 = numData.getPtArray();
+			for(int j= 0; j < lits.length; ++j) {
+				numVals0[j].setV(lits[j]); 
+			}
+		}
 	}
     private static class TitleInfo {
     	private final String ref;
@@ -594,11 +617,44 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		}
 	}
 	private static class ValueInfo {
-		private final String ref;
-		private final String[] lits;
-		private ValueInfo(String ref, String[] lits) {
-			this.ref = ref;
-			this.lits = lits;
+		private final CTNumDataSource numDS;
+		private String ref;
+		private String[] lits;
+		private ValueInfo(CTNumDataSource numDS) {
+			this.numDS = numDS;
+			if (numDS == null) {
+				throw new NullPointerException("CTNumDataSource numDS");
+			}
+			init();
+		}
+		private void init() {
+			final CTNumRef numRef = numDS.getNumRef();
+			if (numRef != null) {
+				final CTNumData numData = numRef.getNumCache();
+				final String[] lits = getNumLits(numData);
+				this.ref = numRef.getF();
+				this.lits = lits;
+			} else {
+				final CTNumData numData = numDS.getNumLit();
+				if (numData != null) {
+					this.ref = null;
+					this.lits = getNumLits(numData);
+				} else {
+					this.ref = null;
+					this.lits = null;
+				}
+			}
+		}
+		public void renameSheet(String oldname, String newname) {
+			if (this.ref != null) {
+				final String o = SheetNameFormatter.format(oldname);
+				final String n = SheetNameFormatter.format(newname);
+				final String newref = this.ref.replaceAll(o+"!", n+"!");
+				if (!newref.equals(this.ref)) {
+					setCTNumDataSource(numDS, newref, this.lits);
+					init();
+				}
+			}
 		}
 	}
     
@@ -614,8 +670,10 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		private final String[] _labels; //literal labels(categories)
 		private final String _title; //literal title
 		private final Number[] _values; //literal values
+		private final ValueInfo _vi;
 		
-		public XSSFSeries(XmlObject ser, String titleRef, String title, String catRef, String[] labels, String valRef, String[] values) {
+		public XSSFSeries(XmlObject ser, String titleRef, String title, String catRef, String[] labels, ValueInfo vi) {
+			_vi = vi;
 			_ser = ser;
 			_titleRef = titleRef;
 			if (catRef != null) {
@@ -624,6 +682,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 				}
 			}
 			_catRef = catRef;
+			String valRef = vi == null ? null : vi.ref;
 			if (valRef != null) {
 				if (valRef.startsWith("(") && valRef.endsWith(")")) {
 					valRef = valRef.substring(1, valRef.length() - 1);
@@ -632,6 +691,7 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 			_valRef = valRef;
 			_title = title;
 			_labels = labels;
+			String[] values = vi == null ? null : vi.lits;
 			Double[] vals = null;
 			if (values != null) {
 				vals = new Double[values.length];
@@ -669,6 +729,10 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
 		
 		public Number[] getValues() {
 			return _values;
+		}
+		
+		public void renameSheet(String oldname, String newname) {
+			_vi.renameSheet(oldname, newname);
 		}
 	}
 

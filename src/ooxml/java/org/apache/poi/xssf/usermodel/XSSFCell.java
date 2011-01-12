@@ -28,6 +28,7 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellFormulaType;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
 import org.zkoss.poi.hssf.record.SharedFormulaRecord;
 import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
 import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.formula.FormulaParser;
@@ -1062,5 +1063,24 @@ public final class XSSFCell implements Cell {
     }
     public Hyperlink getEvalHyperlink() {
     	return _hyperlink;
+    }
+    //20110107, henrichen@zkoss.org: handle extern reference rename
+    public void whenRenameSheet(String oldname, String newname) {
+    	final int cellType = getCellType();
+    	if (cellType != CELL_TYPE_FORMULA) {
+    		return;
+    	}
+    	final CTCellFormula cf = _cell.getF();
+    	if (cf != null) {
+    		final String fml = cf.getStringValue();
+    		if (fml != null) {
+				final String o = SheetNameFormatter.format(oldname);
+				final String n = SheetNameFormatter.format(newname);
+				final String newfml = fml.replaceAll(o+"!", n+"!");
+				if (!newfml.equals(fml)) {
+					cf.setStringValue(newfml);
+				}
+    		}
+    	}
     }
 }

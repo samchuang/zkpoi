@@ -28,6 +28,7 @@ import org.zkoss.poi.hssf.record.EOFRecord;
 import org.zkoss.poi.hssf.record.FooterRecord;
 import org.zkoss.poi.hssf.record.HCenterRecord;
 import org.zkoss.poi.hssf.record.HeaderRecord;
+import org.zkoss.poi.hssf.record.LabelSSTRecord;
 import org.zkoss.poi.hssf.record.PrintSetupRecord;
 import org.zkoss.poi.hssf.record.ProtectRecord;
 import org.zkoss.poi.hssf.record.Record;
@@ -1148,6 +1149,17 @@ public final class HSSFChart implements ChartInfo {
 			
 			series.setNumCategories((short)(int)count);
 		}
+
+		//20110111, henrichen@zkoss.org: handle category literal
+		private LabelSSTRecord[] catLiterals;
+		/* package */ void setDataCategoryLabelLiterals(List<LabelSSTRecord> cats) {
+			this.catLiterals = cats.toArray(new LabelSSTRecord[cats.size()]);
+		}
+		
+		//20110111, henrichen@zkoss.org: handle category literal
+		public LabelSSTRecord[] getDataCategoryLabelLiterals(){
+			return this.catLiterals;
+		}
 	}
 	
 	public HSSFSeries createSeries() throws Exception {
@@ -1382,6 +1394,10 @@ public final class HSSFChart implements ChartInfo {
 				for(LinkedDataRecord data : dataList) {
 					ser.insertData(data);
 				}
+			}
+			//literal category text record (LabelSSTRecord)
+			if (seriesObj[3] != null) { 
+				ser.setDataCategoryLabelLiterals((List<LabelSSTRecord>) seriesObj[3]);
 			}
 		}
 		for(ValueRangeRecord r : valueRanges) {

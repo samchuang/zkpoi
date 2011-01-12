@@ -26,6 +26,7 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.ChartInfo;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.xssf.usermodel.XSSFChart.XSSFSeries;
 
 /**
  * 
@@ -33,14 +34,14 @@ import org.zkoss.poi.ss.usermodel.ClientAnchor;
  *
  */
 public class XSSFChartX implements Chart {
-	private String _chartId;
 	private XSSFDrawing _patriarch;
 	private XSSFClientAnchor _anchor;
 	private String _name;
+	private XSSFChart _chart;
 
 	public XSSFChartX(XSSFDrawing patriarch, XSSFClientAnchor anchor, String name, String chartId) {
 		_patriarch = patriarch;
-		_chartId = chartId;
+		_chart = getXSSFChart0(chartId);
 		_anchor = anchor;
 		_name = name;
 	}
@@ -49,14 +50,16 @@ public class XSSFChartX implements Chart {
 	public ClientAnchor getPreferredSize() {
 		return _anchor;
 	}
-	
-	public ChartInfo getChartInfo() {
+	private XSSFChart getXSSFChart0(String chartId) {
         for(POIXMLDocumentPart part : _patriarch.getRelations()){
-	        if(part instanceof XSSFChart && part.getPackageRelationship().getId().equals(_chartId)){
+	        if(part instanceof XSSFChart && part.getPackageRelationship().getId().equals(chartId)){
 	            return (XSSFChart)part;
 	        }
         }
         return null;
+	}
+	public ChartInfo getChartInfo() {
+        return _chart;
 	}
 	
 	public String getName() {
@@ -65,5 +68,11 @@ public class XSSFChartX implements Chart {
 
 	public void setName(String name) {
 		this._name = name;
+	}
+	
+	public void renameSheet(String oldname, String newname) {
+		for(XSSFSeries ser : _chart.getSeries()) {
+			ser.renameSheet(oldname, newname);
+		}
 	}
 }

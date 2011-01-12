@@ -1165,6 +1165,21 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         WorkbookUtil.validateSheetName(name);
         if (containsSheet(name, sheet ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
+        //20110106, henrichen: handle the externsheet reference
+        final Sheet wsheet = getSheetAt(sheet);
+        if (wsheet != null) {
+	        final String oldname = wsheet.getSheetName();
+	        for(String[] names : _externalSheetRefs) {
+	        	final String sheetname1 = names[1];
+	        	final String sheetname2 = names[2];
+	        	if (oldname.equals(sheetname1)) {
+	        		names[1] = name;
+	        	}
+	        	if (oldname.equals(sheetname2)) {
+	        		names[2] = name;
+	        	}
+	        }
+        }
         workbook.getSheets().getSheetArray(sheet).setName(name);
     }
 
