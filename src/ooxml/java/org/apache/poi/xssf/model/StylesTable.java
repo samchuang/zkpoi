@@ -59,14 +59,14 @@ import org.zkoss.poi.xssf.usermodel.extensions.XSSFCellFill;
  * @author ugo
  */
 public class StylesTable extends POIXMLDocumentPart {
-	private final Map<Integer, String> numberFormats = new LinkedHashMap<Integer,String>();
-	private final List<XSSFFont> fonts = new ArrayList<XSSFFont>();
-	private final List<XSSFCellFill> fills = new ArrayList<XSSFCellFill>();
-	private final List<XSSFCellBorder> borders = new ArrayList<XSSFCellBorder>();
-	private final List<CTXf> styleXfs = new ArrayList<CTXf>();
-	private final List<CTXf> xfs = new ArrayList<CTXf>();
+	private Map<Integer, String> numberFormats = new LinkedHashMap<Integer,String>();
+	private List<XSSFFont> fonts = new ArrayList<XSSFFont>();
+	private List<XSSFCellFill> fills = new ArrayList<XSSFCellFill>();
+	private List<XSSFCellBorder> borders = new ArrayList<XSSFCellBorder>();
+	private List<CTXf> styleXfs = new ArrayList<CTXf>();
+	private List<CTXf> xfs = new ArrayList<CTXf>();
 
-	private final List<CTDxf> dxfs = new ArrayList<CTDxf>();
+	private List<CTDxf> dxfs = new ArrayList<CTDxf>();
 
 	/**
 	 * The first style id available for use as a custom style
@@ -106,56 +106,69 @@ public class StylesTable extends POIXMLDocumentPart {
 	 * @param is The input stream containing the XML document.
 	 * @throws IOException if an error occurs while reading.
 	 */
-    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
 	protected void readFrom(InputStream is) throws IOException {
 		try {
 			doc = StyleSheetDocument.Factory.parse(is);
 
             CTStylesheet styleSheet = doc.getStyleSheet();
-
-            // Grab all the different bits we care about
-			CTNumFmts ctfmts = styleSheet.getNumFmts();
-            if( ctfmts != null){
-                for (CTNumFmt nfmt : ctfmts.getNumFmtArray()) {
-                    numberFormats.put((int)nfmt.getNumFmtId(), nfmt.getFormatCode());
-                }
-            }
-
-            CTFonts ctfonts = styleSheet.getFonts();
-            if(ctfonts != null){
-				int idx = 0;
-				for (CTFont font : ctfonts.getFontArray()) {
-					XSSFFont f = new XSSFFont(font, idx);
-					fonts.add(f);
-					idx++;
-				}
-			}
-            CTFills ctfills = styleSheet.getFills();
-            if(ctfills != null){
-                for (CTFill fill : ctfills.getFillArray()) {
-                    fills.add(new XSSFCellFill(fill));
-                }
-            }
-
-            CTBorders ctborders = styleSheet.getBorders();
-            if(ctborders != null) {
-                for (CTBorder border : ctborders.getBorderArray()) {
-                    borders.add(new XSSFCellBorder(border));
-                }
-            }
-
-            CTCellXfs cellXfs = styleSheet.getCellXfs();
-            if(cellXfs != null) xfs.addAll(Arrays.asList(cellXfs.getXfArray()));
-
-            CTCellStyleXfs cellStyleXfs = styleSheet.getCellStyleXfs();
-            if(cellStyleXfs != null) styleXfs.addAll(Arrays.asList(cellStyleXfs.getXfArray()));
-
-            CTDxfs styleDxfs = styleSheet.getDxfs();
-			if(styleDxfs != null) dxfs.addAll(Arrays.asList(styleDxfs.getDxfArray()));
-
+            
+            init(styleSheet); //20110114, henrichen@zkoss.org: setArray(xyz[]) does not guarantee getArray() equals to xyz[]
 		} catch (XmlException e) {
 			throw new IOException(e.getLocalizedMessage());
 		}
+	}
+    
+    //20110114, henrichen@zkoss: setArray(xyz[]) does not guarantee getArray() equals to xyz[]
+    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
+    private void init(CTStylesheet styleSheet) {
+    	numberFormats = new LinkedHashMap<Integer,String>();
+    	fonts = new ArrayList<XSSFFont>();
+    	fills = new ArrayList<XSSFCellFill>();
+    	borders = new ArrayList<XSSFCellBorder>();
+    	styleXfs = new ArrayList<CTXf>();
+    	xfs = new ArrayList<CTXf>();
+    	dxfs = new ArrayList<CTDxf>();
+    	
+        // Grab all the different bits we care about
+		CTNumFmts ctfmts = styleSheet.getNumFmts();
+        if( ctfmts != null){
+            for (CTNumFmt nfmt : ctfmts.getNumFmtArray()) {
+                numberFormats.put((int)nfmt.getNumFmtId(), nfmt.getFormatCode());
+            }
+        }
+
+        CTFonts ctfonts = styleSheet.getFonts();
+        if(ctfonts != null){
+			int idx = 0;
+			for (CTFont font : ctfonts.getFontArray()) {
+				XSSFFont f = new XSSFFont(font, idx);
+				fonts.add(f);
+				idx++;
+			}
+		}
+        CTFills ctfills = styleSheet.getFills();
+        if(ctfills != null){
+            for (CTFill fill : ctfills.getFillArray()) {
+                fills.add(new XSSFCellFill(fill));
+            }
+        }
+
+        CTBorders ctborders = styleSheet.getBorders();
+        if(ctborders != null) {
+            for (CTBorder border : ctborders.getBorderArray()) {
+                borders.add(new XSSFCellBorder(border));
+            }
+        }
+
+        CTCellXfs cellXfs = styleSheet.getCellXfs();
+        if(cellXfs != null) xfs.addAll(Arrays.asList(cellXfs.getXfArray()));
+
+        CTCellStyleXfs cellStyleXfs = styleSheet.getCellStyleXfs();
+        if(cellStyleXfs != null) styleXfs.addAll(Arrays.asList(cellStyleXfs.getXfArray()));
+
+        CTDxfs styleDxfs = styleSheet.getDxfs();
+		if(styleDxfs != null) dxfs.addAll(Arrays.asList(styleDxfs.getDxfArray()));
+
 	}
 
 	// ===========================================================
@@ -413,6 +426,9 @@ public class StylesTable extends POIXMLDocumentPart {
 
 		// Save
 		doc.save(out, options);
+	
+		//20110114, henrichen@zkoss.org: setArray(xyz[]) does not guarantee getArray() equals to xyz[]
+		init(styleSheet);
 	}
 
 	@Override
