@@ -13,12 +13,15 @@ Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 package org.zkoss.poi.xssf.usermodel;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTArea3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTAreaChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTAreaSer;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBar3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarChart;
@@ -55,19 +58,14 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTView3D;
 import org.openxmlformats.schemas.drawingml.x2006.chart.ChartSpaceDocument;
-import org.openxmlformats.schemas.drawingml.x2006.chart.STLegendPos;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
+import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
-import org.zkoss.poi.hssf.usermodel.HSSFChart.HSSFSeries;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
-import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.ChartInfo;
-import org.zkoss.poi.ss.usermodel.ClientAnchor;
 
 /**
  * XSSFChart information.
@@ -90,6 +88,29 @@ public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
         super(part, rel);
         _ctChartSpace = ChartSpaceDocument.Factory.parse(part.getInputStream()).getChartSpace();
         _ctChart = _ctChartSpace.getChart();
+    }
+    
+    @Override
+    protected void commit() throws IOException {
+        XmlOptions xmlOptions = new XmlOptions(DEFAULT_XML_OPTIONS);
+
+        /*
+            Saved drawings must have the following namespaces set:
+			<c:chartSpace 
+				xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" 
+				xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
+				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">        
+		*/
+//        if(isNew) xmlOptions.setSaveSyntheticDocumentElement(new QName(CTChartSpace.type.getName().getNamespaceURI(), "chartSpace", "c"));
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("http://schemas.openxmlformats.org/drawingml/2006/main", "a");
+        map.put(STRelationshipId.type.getName().getNamespaceURI(), "r");
+        xmlOptions.setSaveSuggestedPrefixes(map);
+
+        PackagePart part = getPackagePart();
+        OutputStream out = part.getOutputStream();
+        _ctChartSpace.save(out, xmlOptions);
+        out.close();
     }
     
     public String getChartTitle() {

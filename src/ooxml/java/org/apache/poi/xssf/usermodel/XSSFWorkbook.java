@@ -1165,7 +1165,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         WorkbookUtil.validateSheetName(name);
         if (containsSheet(name, sheet ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
-        //20110106, henrichen: handle the externsheet reference
+        //20110106, henrichen@zkoss.org: handle the externsheet reference
         final Sheet wsheet = getSheetAt(sheet);
         if (wsheet != null) {
 	        final String oldname = wsheet.getSheetName();
@@ -1178,6 +1178,19 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 	        	if (oldname.equals(sheetname2)) {
 	        		names[2] = name;
 	        	}
+	        }
+	        //20110112, henrichen@zkoss.org: adjust sheet name of the named range
+			final String o = SheetNameFormatter.format(oldname);
+			final String n = SheetNameFormatter.format(name);
+	        for (XSSFName nm : namedRanges) {
+	            final CTDefinedName ct = nm.getCTName();
+	            if(ct.isSetLocalSheetId()) {
+		            if (ct.getLocalSheetId() == sheet) {
+		            	final String ref = ct.getStringValue();
+		            	final String newref = ref.replaceAll(o+"!", n+"!");
+		            	ct.setStringValue(newref);
+		            }
+	            }
 	        }
         }
         workbook.getSheets().getSheetArray(sheet).setName(name);
