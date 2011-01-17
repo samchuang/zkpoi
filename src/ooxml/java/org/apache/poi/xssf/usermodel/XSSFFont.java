@@ -362,12 +362,18 @@ public class XSSFFont implements Font {
     public void setColor(XSSFColor color) {
         if(color == null) _ctFont.setColorArray(null);
         else {
+        	CTColor srcctColor = color.getCTColor();
             CTColor ctColor = _ctFont.sizeOfColorArray() == 0 ? _ctFont.addNewColor() : _ctFont.getColorArray(0);
-            if (color.getCTColor().isSetIndexed()) { //20110105, henrichen@zkoss.org: handle indexed color
+            if (srcctColor.isSetIndexed()) { //20110105, henrichen@zkoss.org: handle indexed color
             	ctColor.setIndexed(color.getCTColor().getIndexed());
+            } else if (srcctColor.isSetTheme()) { //20110114, henrichen@zkoss.org: handle theme color
+            	ctColor.setTheme(srcctColor.getTheme());
             } else {
             	ctColor.setRgb(color.getRgb());
             }
+        	if (srcctColor.isSetTint()) {
+        		ctColor.setTint(srcctColor.getTint());
+        	}
         }
     }
 
