@@ -253,6 +253,9 @@ public final class RecordFactory {
 		WriteAccessRecord.class,
 		WriteProtectRecord.class,
 		WSBoolRecord.class,
+		
+		XFCrcRecord.class, //20110117, henrichen@zkoss.org
+		XFExtRecord.class, //20110118, henrichen@zkoss.org, see ExtendedFormatRecord
 
 		// chart records
 		BeginRecord.class,

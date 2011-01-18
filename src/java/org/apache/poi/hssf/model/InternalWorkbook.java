@@ -80,6 +80,7 @@ import org.zkoss.poi.hssf.record.WindowOneRecord;
 import org.zkoss.poi.hssf.record.WindowProtectRecord;
 import org.zkoss.poi.hssf.record.WriteAccessRecord;
 import org.zkoss.poi.hssf.record.WriteProtectRecord;
+import org.zkoss.poi.hssf.record.XFExtRecord;
 import org.zkoss.poi.hssf.record.common.UnicodeString;
 import org.zkoss.poi.hssf.record.formula.FormulaShifter;
 import org.zkoss.poi.hssf.record.formula.NameXPtg;
@@ -187,6 +188,9 @@ public final class InternalWorkbook {
 		uses1904datewindowing = false;
 		escherBSERecords = new ArrayList<EscherBSERecord>();
 		commentRecords = new LinkedHashMap<String, NameCommentRecord>();
+		
+		//20110118,henrichen@zkoss.org: handle XFExt record
+		numxfexts = 0;
     }
 
     /**
@@ -248,6 +252,14 @@ public final class InternalWorkbook {
                     retval.numxfs++;
                     break;
 
+                //20110118, henrichen@zkoss.org: handle XFExt record
+                case XFExtRecord.sid :
+                    if (log.check( POILogger.DEBUG ))
+                        log.log(DEBUG, "found XFExt record at " + k);
+                    retval.records.setXfextpos( k );
+                    retval.numxfexts++;
+                    break;
+                    
                 case TabIdRecord.sid :
                     if (log.check( POILogger.DEBUG ))
                         log.log(DEBUG, "found tabid record at " + k);
@@ -404,6 +416,16 @@ public final class InternalWorkbook {
             retval.numxfs++;
         }
         retval.records.setXfpos( records.size() - 1 );
+        
+        //TODO 20110118, henrichen@zkoss: create default XFExt here?
+        /*
+        for (int k = 0; k < ?; k++) {
+            records.add(retval.createXFExt(k));
+            retval.numxfexts++;
+        }
+        retval.records.setXfextpos( records.size() - 1 );
+        */
+        
         for (int k = 0; k < 6; k++) {
             records.add(retval.createStyle(k));
         }
@@ -2399,4 +2421,89 @@ public final class InternalWorkbook {
 			}
 		}
 	}
+	
+	//20110118, henrichen@zkoss.org
+    /** the number of XFExt records */
+	private int numxfexts;
+
+    /**
+     * get the number of XFExtRecords contained in this workbook.
+     *
+     * @return int count of XFExt records
+     */
+    public int getNumXfexts() {
+        if (log.check( POILogger.DEBUG ))
+            log.log(DEBUG, "getXFExt=", Integer.valueOf(numxfexts));
+        return numxfexts;
+    }
+
+	//20110118, henrichen@zkoss.org
+    /**
+     * gets the XFExtRecord at the given 0-based index
+     *
+     * @param index of the XFExt record (0-based)
+     * @return XFExtRecord at the given index
+     */
+    public XFExtRecord getXFExtAt(int index) {
+        int xfptr = records.getXfextpos() - (numxfexts - 1);
+
+        xfptr += index;
+        XFExtRecord retval =
+        ( XFExtRecord ) records.get(xfptr);
+
+        return retval;
+    }
+
+    /**
+     * Removes the given ExtendedFormatRecord record from the
+     *  file's list. This will make all
+     *  subsequent font indicies drop by one,
+     *  so you'll need to update those yourself!
+     */
+    public void removeXFExtRecord(XFExtRecord rec) {
+        records.remove(rec); // this updates XfextPos for us
+        numxfexts--;
+    }
+
+    /**
+     * creates a new Cell-type XFExtRecord and adds it to the end of
+     *  XFExtRecords collection
+     *
+     * @return XFExtRecord that was created
+     */
+
+    public XFExtRecord createCellXFExt() {
+        XFExtRecord xf = createXFExt();
+
+        records.add(records.getXfextpos()+1, xf);
+        records.setXfextpos( records.getXfextpos() + 1 );
+        numxfexts++;
+        return xf;
+    }
+
+    /**
+     * creates an default cell XFExtRecord object.
+     * @return XFExtRecord with intial defaults (cell-type)
+     */
+    private static XFExtRecord createXFExt() {
+        XFExtRecord retval = new XFExtRecord();
+
+        //TODO initial XFExtRecord
+        /*
+        retval.setFontIndex(( short ) 0);
+        retval.setFormatIndex(( short ) 0x0);
+        retval.setCellOptions(( short ) 0x1);
+        retval.setAlignmentOptions(( short ) 0x20);
+        retval.setIndentionOptions(( short ) 0);
+        retval.setBorderOptions(( short ) 0);
+        retval.setPaletteOptions(( short ) 0);
+        retval.setAdtlPaletteOptions(( short ) 0);
+        retval.setFillPaletteOptions(( short ) 0x20c0);
+        retval.setTopBorderPaletteIdx(HSSFColor.BLACK.index);
+        retval.setBottomBorderPaletteIdx(HSSFColor.BLACK.index);
+        retval.setLeftBorderPaletteIdx(HSSFColor.BLACK.index);
+        retval.setRightBorderPaletteIdx(HSSFColor.BLACK.index);
+        */
+        return retval;
+    }
 }

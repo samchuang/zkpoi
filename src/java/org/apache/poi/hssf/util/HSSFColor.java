@@ -1685,4 +1685,9 @@ public class HSSFColor implements Color {
           return instance;
         }
     }
+    
+    //20110118, henrichen@zkoss.org: handle XFExt FullColorExt
+    public boolean isIndex() {
+    	return true;
+    }
 }

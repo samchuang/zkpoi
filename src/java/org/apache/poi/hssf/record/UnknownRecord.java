@@ -177,8 +177,8 @@ public final class UnknownRecord extends StandardRecord {
 			case 0x0874: return "DROPDOWNOBJIDS";
 			case 0x0876: return "DCONN";
 			case 0x087B: return "CFEX";
-			case 0x087C: return "XFCRC";
-			case 0x087D: return "XFEXT";
+//			case 0x087C: return "XFCRC";
+//			case 0x087D: return "XFEXT";
 			case 0x087F: return "CONTINUEFRT12";
 			case 0x088B: return "PLV";
 			case 0x088C: return "COMPAT12";

@@ -266,6 +266,8 @@ public final class BiffViewer {
 			case WriteAccessRecord.sid:    return new WriteAccessRecord(in);
 			case WriteProtectRecord.sid:   return new WriteProtectRecord(in);
 
+			case XFCrcRecord.sid:          return new XFCrcRecord(in); //20110117, henrichen@zkoss.org
+			case XFExtRecord.sid:          return new XFExtRecord(in); //20110118, henrichen@zkoss.org
 			// chart
 			case CatLabRecord.sid:         return new CatLabRecord(in);
 			case Chart3DBarShapeRecord.sid:      return new Chart3DBarShapeRecord(in);

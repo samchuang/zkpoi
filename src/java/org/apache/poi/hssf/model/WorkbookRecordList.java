@@ -57,6 +57,7 @@ public final class WorkbookRecordList implements Iterable<Record> {
 		if (getTabpos() >= pos) setTabpos( tabpos + 1 );
 		if (getFontpos() >= pos) setFontpos( fontpos + 1 );
 		if (getXfpos() >= pos) setXfpos( xfpos + 1 );
+		if (getXfextpos() >= pos) setXfextpos( xfextpos + 1 ); //20110118, henrichen@zkoss.org: handle XFExt records
 		if (getBackuppos() >= pos) setBackuppos( backuppos + 1 );
 		if (getNamepos() >= pos) setNamepos(namepos+1);
 		if (getSupbookpos() >= pos) setSupbookpos(supbookpos+1);
@@ -85,6 +86,7 @@ public final class WorkbookRecordList implements Iterable<Record> {
 		if (getTabpos() >= pos) setTabpos( tabpos - 1 );
 		if (getFontpos() >= pos) setFontpos( fontpos - 1 );
 		if (getXfpos() >= pos) setXfpos( xfpos - 1 );
+		if (getXfextpos() >= pos) setXfextpos( xfextpos - 1); //20110118, henrichen@zkoss.org: handle XFExt Records
 		if (getBackuppos() >= pos) setBackuppos( backuppos - 1 );
 		if (getNamepos() >= pos) setNamepos(getNamepos()-1);
 		if (getSupbookpos() >= pos) setSupbookpos(getSupbookpos()-1);
@@ -196,4 +198,17 @@ public final class WorkbookRecordList implements Iterable<Record> {
 	public void setExternsheetPos(int externsheetPos) {
 		this.externsheetPos = externsheetPos;
 	}
+	
+	//20110118, henrichen@zkoss.org: handle XFExt record
+	private int  xfextpos	   = 0;   // hold the position of the last XFExt record
+	public int getXfextpos() {
+		return xfextpos;
+	}
+
+	//20110118, henrichen@zkoss.org: handle XFExt record
+	public void setXfextpos(int xfextpos) {
+		this.xfextpos = xfextpos;
+	}
+
+
 }
