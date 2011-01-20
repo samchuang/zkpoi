@@ -707,4 +707,5 @@ public interface CellStyle {
     public Color getBottomBorderColorColor();
     public Color getRightBorderColorColor();
     public Color getLeftBorderColorColor();
+    public void setFontColorColor(Color fontColor);
 }

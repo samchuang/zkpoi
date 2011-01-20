@@ -717,7 +717,8 @@ public final class HSSFCellStyle implements CellStyle {
     }
     
     public HSSFColor getFillBackgroundColorColor() {
-    	final FullColorExt colorExt = getXFExt().getFillBackroundColor();
+    	final XFExtRecord xfExt = getXFExt(); //20110119, henrichen@zkoss.org: handle XFExt record
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getFillBackgroundColor();
     	if (colorExt == null || colorExt.isIndex()) {
     		HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
     		return pallette.getColor(getFillBackgroundColor());
@@ -750,7 +751,8 @@ public final class HSSFCellStyle implements CellStyle {
     }
 
     public HSSFColor getFillForegroundColorColor() {
-    	final FullColorExt colorExt = getXFExt().getFillForgroundColor();
+    	final XFExtRecord xfExt = getXFExt(); //20110119, henrichen@zkoss.org: handle XFExt record
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getFillForegroundColor();
     	if (colorExt == null || colorExt.isIndex()) {
 		    HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
 		    return pallette.getColor(getFillForegroundColor());
@@ -829,7 +831,9 @@ public final class HSSFCellStyle implements CellStyle {
     	// First we need to clone the extended format
     	//  record
     	_format.cloneStyleFrom(source._format);
-
+    	//20110119, henrichen@zkoss.org: then clone XFExt record
+    	_workbook.getXFExtAt(_index).cloneXFExtFrom(source._workbook.getXFExtAt(source._index));
+    	
     	// Handle matching things if we cross workbooks
     	if(_workbook != source._workbook) {
 			// Then we need to clone the format string,
@@ -882,7 +886,8 @@ public final class HSSFCellStyle implements CellStyle {
 	//20100921, henrichen@zkoss.org: fetch border color object
     public HSSFColor getLeftBorderColorColor()
     {
-    	final FullColorExt colorExt = getXFExt().getLeftBorderColor();
+    	final XFExtRecord xfExt = getXFExt(); //20110119, henrichen@zkoss.org: handle XFExt record
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getLeftBorderColor();
     	if (colorExt == null || colorExt.isIndex()) {
 	        HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
 	        return pallette.getColor(getLeftBorderColor());
@@ -894,7 +899,8 @@ public final class HSSFCellStyle implements CellStyle {
 	//20100921, henrichen@zkoss.org: fetch border color object
     public HSSFColor getRightBorderColorColor()
     {
-    	final FullColorExt colorExt = getXFExt().getRightBorderColor();
+    	final XFExtRecord xfExt = getXFExt(); //20110119, henrichen@zkoss.org: handle XFExt record
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getRightBorderColor();
     	if (colorExt == null || colorExt.isIndex()) {
 	        HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
 	        return pallette.getColor(getRightBorderColor());
@@ -905,7 +911,8 @@ public final class HSSFCellStyle implements CellStyle {
 	//20100921, henrichen@zkoss.org: fetch border color object
     public HSSFColor getTopBorderColorColor()
     {
-    	final FullColorExt colorExt = getXFExt().getTopBorderColor();
+    	final XFExtRecord xfExt = getXFExt(); //20110119, henrichen@zkoss.org: handle XFExt record
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getTopBorderColor();
     	if (colorExt == null || colorExt.isIndex()) {
 	        HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
 	        return pallette.getColor(getTopBorderColor());
@@ -916,7 +923,8 @@ public final class HSSFCellStyle implements CellStyle {
 	//20100921, henrichen@zkoss.org: fetch border color object
     public HSSFColor getBottomBorderColorColor()
     {
-    	final FullColorExt colorExt = getXFExt().getBottomBorderColor();
+    	final XFExtRecord xfExt = getXFExt(); //20110119, henrichen@zkoss.org: handle XFExt record
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getBottomBorderColor();
     	if (colorExt == null || colorExt.isIndex()) {
 	        HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
 	        return pallette.getColor(getBottomBorderColor());
@@ -927,17 +935,28 @@ public final class HSSFCellStyle implements CellStyle {
     
     //20100923, henrichen@zkoss.org: handle Color
     public void setFillForegroundColor(HSSFColor color) {
-    	setFillForegroundColor(color.getIndex());
+    	if (color instanceof HSSFColorExt) { //20110119, henrichen@zkoss.org: handle XFExt record
+    		getOrCreateXFExt().setFillForegroundColor(((HSSFColorExt) color).getFullColorExt());
+    		color = ((HSSFColorExt)color).getSimilarColor(new HSSFPalette(_workbook.getCustomPalette()));
+    	}
+        setFillForegroundColor(color.getIndex());
     }
     //20100923, henrichen@zkoss.org: handle Color
     public void setFillBackgroundColor(HSSFColor color) {
-    	setFillBackgroundColor(color.getIndex());
+    	if (color instanceof HSSFColorExt) { //20110119, henrichen@zkoss.org: handle XFExt record
+    		getOrCreateXFExt().setFillBackgroundColor(((HSSFColorExt) color).getFullColorExt());
+    		color = ((HSSFColorExt)color).getSimilarColor(new HSSFPalette(_workbook.getCustomPalette()));
+    	}
+		setFillBackgroundColor(color.getIndex());
     }
 
     //20110118, henrichen@zkoss.org: handle XFExtRecord text color
-    public HSSFColor getFontColorColor(short fontColor) {
-    	final FullColorExt colorExt = getXFExt().getTextColor();
+    public HSSFColor getFontColorColor() {
+    	final XFExtRecord xfExt = getXFExt();
+    	final FullColorExt colorExt = xfExt == null ? null : xfExt.getTextColor();
     	if (colorExt == null || colorExt.isIndex()) {
+    	    final FontRecord frec = _workbook.getFontRecordAt(getFontIndex());
+    	    final short fontColor = frec.getColorPaletteIndex();
 	        HSSFPalette pallette = new HSSFPalette(_workbook.getCustomPalette());
 	        return pallette.getColor(fontColor);
 		} else {
@@ -945,11 +964,33 @@ public final class HSSFCellStyle implements CellStyle {
     	}
     }
     
+    //20110119, henrichen@zkoss.org: handle seting XFExtRecord text color
+    public void setFontColorColor(Color color) {
+    	setFontColorColor((HSSFColor)color);
+    }
+    //20110119, henrichen@zkoss.org: handle seting XFExtRecord text color
+    private void setFontColorColor(HSSFColor color) {
+    	if (color instanceof HSSFColorExt) {
+    		getOrCreateXFExt().setTextColor(((HSSFColorExt)color).getFullColorExt());
+    		color = ((HSSFColorExt)color).getSimilarColor(new HSSFPalette(_workbook.getCustomPalette()));
+    	}
+    	final FontRecord frec = _workbook.getFontRecordAt(getFontIndex());
+    	frec.setColorPaletteIndex(color.getIndex());
+    }
+    
     //20110118, henrichen@zkoss.org: handle XFExtRecord
     private XFExtRecord _xfext;
     private XFExtRecord getXFExt() {
     	if (_xfext == null) {
     		_xfext = _workbook.getXFExtAt(_index);
+    	}
+    	return _xfext;
+    }
+  //20110119, henrichen@zkoss.org: handle XFExt record
+    private XFExtRecord getOrCreateXFExt() {
+    	XFExtRecord xfExt = getXFExt();
+    	if (xfExt == null) {
+    		_xfext = _workbook.createCellXFExt(_index);
     	}
     	return _xfext;
     }

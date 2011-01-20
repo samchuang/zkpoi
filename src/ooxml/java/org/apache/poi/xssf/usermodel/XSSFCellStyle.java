@@ -1476,4 +1476,12 @@ public class XSSFCellStyle implements CellStyle {
     public XSSFColor getBottomBorderColorColor() {
         return getBottomBorderXSSFColor();
     }
+    //20110119, henrichen@zkoss.org: handle font color
+    public void setFontColorColor(Color color) {
+    	setFontColorColor((XSSFColor)color);
+    }
+    //20110119, henrichen@zkoss.org: handle font color
+    private void setFontColorColor(XSSFColor color) {
+    	_font.setColor(color);
+    }
 }

@@ -1,19 +1,14 @@
-/* ====================================================================
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
+/* FullColorExt.java
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	Purpose:
+		
+	Description:
+		
+	History:
+		Jan 17, 2011 10:09:12 AM     2011, Created by henrichen
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-==================================================================== */
+Copyright (C) 2011 Potix Corporation. All Rights Reserved.
+*/
 
 package org.zkoss.poi.hssf.record;
 
@@ -41,6 +36,9 @@ public final class XFExtRecord extends StandardRecord  {
 	public XFExtRecord() {
 		futureHeader = new FtrHeader();
 		futureHeader.setRecordType(sid);
+		cexts = 0;
+		reserved1 = reserved2 = 0;
+		rgexts = new HashMap<Short, ExtProp>();
 	}
 
 	public short getSid() {
@@ -89,6 +87,11 @@ public final class XFExtRecord extends StandardRecord  {
 		}
 	}
 
+	public void cloneXFExtFrom(XFExtRecord source) {
+		cexts = source.cexts;
+		rgexts.putAll(source.rgexts);
+	}
+	
 	protected int getDataSize() {
 		int result = 12 + 2+2+2+2;
 		for(ExtProp extProp : rgexts.values()) {
@@ -115,41 +118,99 @@ public final class XFExtRecord extends StandardRecord  {
         return cloneViaReserialise();
     }
     
-    public FullColorExt getFillForgroundColor() {
+    public FullColorExt getFillForegroundColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x0004));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
     }
-    public FullColorExt getFillBackroundColor() {
+    
+    public void setFillForegroundColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x0004))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x0004, color));
+    }
+    private void addExtProp(ExtProp extProp) {
+    	rgexts.put(extProp.getExtType(), extProp);
+    }
+    public FullColorExt getFillBackgroundColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x0005));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
+    }
+    public void setFillBackgroundColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x0005))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x0005, color));
     }
     public XFExtGradient getGradientFill() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x0006));
     	return extProp != null ? (XFExtGradient) extProp.getExtPropData() : null;
     }
+    public void setFillGradientFill(XFExtGradient color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x0006))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x0006, color));
+    }
     public FullColorExt getTopBorderColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x0007));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
+    }
+    public void setTopBorderColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x0007))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x0007, color));
     }
     public FullColorExt getBottomBorderColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x0008));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
     }
+    public void setBottomBorderColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x0008))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x0008, color));
+    }
     public FullColorExt getLeftBorderColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x0009));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
+    }
+    public void setLeftBorderColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x0009))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x0009, color));
     }
     public FullColorExt getRightBorderColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x000A));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
     }
+    public void setRightBorderColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x000A))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x000A, color));
+    }
     public FullColorExt getDiagonalBorderColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x000B));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
     }
+    public void setDiagonalBorderColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x000B))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x000B, color));
+    }
     public FullColorExt getTextColor() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x000D));
     	return getFullColorExt(extProp != null ? (FullColorExt) extProp.getExtPropData() : null);
+    }
+    public void setTextColor(FullColorExt color) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x000D))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x000D, color));
     }
     private FullColorExt getFullColorExt(FullColorExt ext) {
     	if (ext == null) {
@@ -164,15 +225,41 @@ public final class XFExtRecord extends StandardRecord  {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x000E));
     	return extProp != null ? (Byte)extProp.getExtPropData() : null;
     }
+    public void setFontScheme(Byte scheme) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x000E))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x000E, scheme));
+    }
     public Byte getIndentLevel() {
     	final ExtProp extProp = rgexts.get(Short.valueOf((short)0x000F));
     	return extProp != null ? (Byte)extProp.getExtPropData() : null;
+    }
+    public void setIndentLevel(Byte indent) {
+    	if (!rgexts.containsKey(Short.valueOf((short)0x000F))) {
+        	++cexts;
+    	}
+    	addExtProp(new ExtProp((short)0x000F, indent));
     }
     private static class ExtProp {
     	private short extType;
     	private int cb;
     	private Object extPropData;
     	
+    	private ExtProp(short extType, Object extPropData) {
+    		this.extType = extType;
+    		this.extPropData = extPropData;
+    		cb = 4;
+    		if (extPropData instanceof FullColorExt) {
+    			cb += ((FullColorExt)extPropData).getDataSize();
+    		} else if (extPropData instanceof XFExtGradient) {
+    			cb += ((XFExtGradient)extPropData).getDataSize();
+    		} else if (extPropData instanceof Byte) {
+    			cb += 1;
+    		} else {
+    			throw new RuntimeException("Unknown extPropData. extType:"+extType+", extPropData:"+extPropData);
+    		}
+    	}
     	public void appendString(StringBuffer sb, String prefix) {
     		sb.append(prefix).append(".extType=").append(HexDump.shortToHex(extType)).append("\n");
     		sb.append(prefix).append(".cb     =").append(cb).append("\n");
@@ -255,6 +342,9 @@ public final class XFExtRecord extends StandardRecord  {
     			rgGradStops[j] = new GradStop(in);
     		}
     	}
+    	public int getDataSize() {
+    		return gradient.getDataSize() + 4 + cGradStops * GradStop.DATA_SIZE;
+    	}
     	public void appendString(StringBuffer sb, String prefix) {
     		sb.append(prefix).append(".gradient\n");
     		gradient.toString(sb, prefix+"  ");
@@ -276,6 +366,7 @@ public final class XFExtRecord extends StandardRecord  {
     
     //TODO not complete yet
     private static class XFPropGradient {
+    	private static final int DATA_SIZE = 4 + 8 + 8 + 8 + 8 + 8; 
     	private int type;
     	private double numDegree;
     	private double numFillToLeft;
@@ -290,6 +381,9 @@ public final class XFExtRecord extends StandardRecord  {
     		numFillToRight = in.readDouble();
     		numFillToTop = in.readDouble();
     		numFillToBottom = in.readDouble();
+    	}
+    	public int getDataSize() {
+    		return DATA_SIZE;
     	}
     	public void toString(StringBuffer sb, String prefix) {
     		sb.append(prefix).append(".type          =").append(type).append("\n");
@@ -309,8 +403,10 @@ public final class XFExtRecord extends StandardRecord  {
     	}
     }
     
+    //2.5.156 GradStop [MS-XLS].pdf, page 731
     //TODO not complete yet
     private static class GradStop {
+    	private static final int DATA_SIZE = 2 + 4 + 8 + 8; 
     	private short xclrType;
     	private int xclrValue;
     	private double numPosition;
@@ -333,6 +429,9 @@ public final class XFExtRecord extends StandardRecord  {
     		out.writeInt(xclrValue);
     		out.writeDouble(numPosition);
     		out.writeDouble(numTint);
+    	}
+    	public int getDataSize() {
+    		return DATA_SIZE;
     	}
     }
 }

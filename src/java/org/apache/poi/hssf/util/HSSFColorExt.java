@@ -1,22 +1,18 @@
-/* ====================================================================
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
+/* HSSFColorExt.java
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	Purpose:
+		
+	Description:
+		
+	History:
+		Jan 18, 2011 11:09:40 AM     2011, Created by henrichen
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-==================================================================== */
+Copyright (C) 2011 Potix Corporation. All Rights Reserved.
+*/
 package org.zkoss.poi.hssf.util;
 
 import org.zkoss.poi.hssf.record.FullColorExt;
+import org.zkoss.poi.hssf.usermodel.HSSFPalette;
 import org.zkoss.poi.util.HexDump;
 /**
  * HSSFColor that wrap FullColorExt.
@@ -29,20 +25,48 @@ public final class HSSFColorExt extends HSSFColor
 	public HSSFColorExt(FullColorExt colorExt) {
 		_colorExt = colorExt;
 	}
+	public FullColorExt getFullColorExt() {
+		return _colorExt;
+	}
 	
     public short getIndex()
     {
         return _colorExt.isIndex() ? (short)_colorExt.getXclrValue() : AUTOMATIC.getInstance().getIndex();
+    }
+    
+    public HSSFColor getSimilarColor(HSSFPalette palette) {
+		final short[] rgb = getTriplet();
+		final short red = rgb[0];
+		final short green = rgb[1];
+		final short blue = rgb[2];
+		//return similar color
+		return palette.findSimilarColor(red, green, blue);
     }
 
     public boolean isIndex() {
     	return _colorExt.isIndex();
     }
     
+    public boolean isTheme() {
+    	return _colorExt.isTheme();
+    }
+    
+    public boolean isRgb() {
+    	return _colorExt.isRGB();
+    }
+
+    public boolean isTint() {
+    	return _colorExt.isTint();
+    }
+    
+    public double getTint() {
+    	return _colorExt.getTint();
+    }
+    
     public short [] getTriplet()
     {
-    	if (_colorExt.isRGB()) {
-    		final int color = _colorExt.getXclrValue();
+    	if (_colorExt.isRGB() || _colorExt.isTheme()) {
+    		final int color = _colorExt.getRGB();
     		final short[] rgb = new short[3];
     		rgb[0] = (short) ((color >> 16) & 0xff); //r
     		rgb[1] = (short) ((color >> 8) & 0xff); //g

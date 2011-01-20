@@ -1,19 +1,14 @@
-/* ====================================================================
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
+/* FullColorExt.java
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	Purpose:
+		
+	Description:
+		
+	History:
+		Jan 17, 2011 09:12:40 AM     2011, Created by henrichen
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-==================================================================== */
+Copyright (C) 2011 Potix Corporation. All Rights Reserved.
+*/
 package org.zkoss.poi.hssf.record;
 
 import org.zkoss.poi.util.HexDump;
@@ -35,6 +30,19 @@ public class FullColorExt {
 		nTintShade = in.readShort();
 		xclrValue = in.readInt();
 		in.read(unused, 0, unused.length);
+	}
+	
+	public FullColorExt(short r, short g, short b) {
+		xclrType = 2;
+		nTintShade = 0;
+		xclrValue = 0xff000000 //alpha 
+					| (((int)r) << 16 ) & 0xff0000 //red 
+					| (((int)g) << 8 ) & 0x00ff00 //green
+					| (((int)b) & 0x0000ff); //blue
+	}
+	
+	public int getDataSize() {
+		return 2 + 2 + 4 + 8;
 	}
 	public boolean isTheme() {
 		return xclrType == 3;
@@ -80,4 +88,40 @@ public class FullColorExt {
 	public void setXclrValue(int xclrValue) {
 		this.xclrValue = xclrValue;
 	}
+	
+	public int getRGB() {
+		if (isRGB()) {
+			return getXclrValue();
+		} else if (isTheme()) {
+			return DEFAULT_THEME[getXclrValue()];
+		} else if (isIndex()) {
+			throw new RuntimeException("XFExt with color table is not supported yet:"+ getXclrValue());
+		} else {
+			return -1;
+		}
+	}
+	
+	public boolean isTint() {
+		return nTintShade != 0;
+	}
+	public double getTint() {
+		return ((double) nTintShade) / Short.MAX_VALUE;
+	}
+	
+	//MS document incorrect lt and dk should reverse their order to make lt before dk; 
+	//i.e., [0]:lt1, [1]:dk1, [2]:lt2, [3]:dk2
+	private static final int[] DEFAULT_THEME = new int[] {
+		0xFFFFFF, //lt1
+		0x000000, //dk1
+		0xEEECE1, //lt2
+		0x1F497D, //dk2
+		0x4F81BD, //accent1
+		0xC0504D, //accent2
+		0x9BBB59, //accent3
+		0x8064A2, //accent4
+		0x4BACC6, //accent5
+		0xF79646, //accent6
+		0x0000FF, //hlink
+		0x800080, //folHlink
+	};
 }

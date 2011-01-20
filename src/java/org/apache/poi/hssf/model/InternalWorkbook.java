@@ -19,6 +19,7 @@ package org.zkoss.poi.hssf.model;
 
 import java.security.AccessControlException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -188,9 +189,6 @@ public final class InternalWorkbook {
 		uses1904datewindowing = false;
 		escherBSERecords = new ArrayList<EscherBSERecord>();
 		commentRecords = new LinkedHashMap<String, NameCommentRecord>();
-		
-		//20110118,henrichen@zkoss.org: handle XFExt record
-		numxfexts = 0;
     }
 
     /**
@@ -257,7 +255,7 @@ public final class InternalWorkbook {
                     if (log.check( POILogger.DEBUG ))
                         log.log(DEBUG, "found XFExt record at " + k);
                     retval.records.setXfextpos( k );
-                    retval.numxfexts++;
+                    retval.addXFExtRecord((XFExtRecord)rec);
                     break;
                     
                 case TabIdRecord.sid :
@@ -2423,9 +2421,6 @@ public final class InternalWorkbook {
 	}
 	
 	//20110118, henrichen@zkoss.org
-    /** the number of XFExt records */
-	private int numxfexts;
-
     /**
      * get the number of XFExtRecords contained in this workbook.
      *
@@ -2433,8 +2428,8 @@ public final class InternalWorkbook {
      */
     public int getNumXfexts() {
         if (log.check( POILogger.DEBUG ))
-            log.log(DEBUG, "getXFExt=", Integer.valueOf(numxfexts));
-        return numxfexts;
+            log.log(DEBUG, "getXFExt=", Integer.valueOf(_xfExtMap.size()));
+        return _xfExtMap.size();
     }
 
 	//20110118, henrichen@zkoss.org
@@ -2445,15 +2440,10 @@ public final class InternalWorkbook {
      * @return XFExtRecord at the given index
      */
     public XFExtRecord getXFExtAt(int index) {
-        int xfptr = records.getXfextpos() - (numxfexts - 1);
-
-        xfptr += index;
-        XFExtRecord retval =
-        ( XFExtRecord ) records.get(xfptr);
-
-        return retval;
+    	return _xfExtMap.get(Integer.valueOf(index));
     }
 
+	//20110118, henrichen@zkoss.org
     /**
      * Removes the given ExtendedFormatRecord record from the
      *  file's list. This will make all
@@ -2462,9 +2452,10 @@ public final class InternalWorkbook {
      */
     public void removeXFExtRecord(XFExtRecord rec) {
         records.remove(rec); // this updates XfextPos for us
-        numxfexts--;
+        _xfExtMap.remove(Integer.valueOf(rec.getIxfe()));
     }
 
+	//20110118, henrichen@zkoss.org
     /**
      * creates a new Cell-type XFExtRecord and adds it to the end of
      *  XFExtRecords collection
@@ -2472,15 +2463,16 @@ public final class InternalWorkbook {
      * @return XFExtRecord that was created
      */
 
-    public XFExtRecord createCellXFExt() {
+    public XFExtRecord createCellXFExt(short index) {
         XFExtRecord xf = createXFExt();
-
+        xf.setIxfe(index);
         records.add(records.getXfextpos()+1, xf);
         records.setXfextpos( records.getXfextpos() + 1 );
-        numxfexts++;
+        addXFExtRecord(xf);;
         return xf;
     }
 
+	//20110118, henrichen@zkoss.org
     /**
      * creates an default cell XFExtRecord object.
      * @return XFExtRecord with intial defaults (cell-type)
@@ -2488,22 +2480,12 @@ public final class InternalWorkbook {
     private static XFExtRecord createXFExt() {
         XFExtRecord retval = new XFExtRecord();
 
-        //TODO initial XFExtRecord
-        /*
-        retval.setFontIndex(( short ) 0);
-        retval.setFormatIndex(( short ) 0x0);
-        retval.setCellOptions(( short ) 0x1);
-        retval.setAlignmentOptions(( short ) 0x20);
-        retval.setIndentionOptions(( short ) 0);
-        retval.setBorderOptions(( short ) 0);
-        retval.setPaletteOptions(( short ) 0);
-        retval.setAdtlPaletteOptions(( short ) 0);
-        retval.setFillPaletteOptions(( short ) 0x20c0);
-        retval.setTopBorderPaletteIdx(HSSFColor.BLACK.index);
-        retval.setBottomBorderPaletteIdx(HSSFColor.BLACK.index);
-        retval.setLeftBorderPaletteIdx(HSSFColor.BLACK.index);
-        retval.setRightBorderPaletteIdx(HSSFColor.BLACK.index);
-        */
+        //TODO initial XFExtRecord?
         return retval;
+    }
+	//20110119, henrichen@zkoss.org
+    private Map<Integer, XFExtRecord> _xfExtMap = new HashMap<Integer, XFExtRecord>();
+    private void addXFExtRecord(XFExtRecord rec) {
+    	_xfExtMap.put(Integer.valueOf(rec.getIxfe()), rec);
     }
 }

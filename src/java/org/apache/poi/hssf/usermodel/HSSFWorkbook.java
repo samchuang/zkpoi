@@ -1112,7 +1112,9 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
         ExtendedFormatRecord xfr = workbook.createCellXF();
         short index = (short) (getNumCellStyles() - 1);
         HSSFCellStyle style = new HSSFCellStyle(index, xfr, this);
-
+        
+        //20110119, henrichen@zkoss.org: whenever we create a XF(ExtendedFormatRecord), we shall create an associated XFExt
+        workbook.createCellXFExt(index); 
         return style;
     }
 
