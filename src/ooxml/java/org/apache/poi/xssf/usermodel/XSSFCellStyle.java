@@ -1482,6 +1482,6 @@ public class XSSFCellStyle implements CellStyle {
     }
     //20110119, henrichen@zkoss.org: handle font color
     private void setFontColorColor(XSSFColor color) {
-    	_font.setColor(color);
+    	getFont().setColor(color);
     }
 }
