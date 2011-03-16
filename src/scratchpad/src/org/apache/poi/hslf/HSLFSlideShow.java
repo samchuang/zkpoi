@@ -28,14 +28,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.POIDocument;
 import org.apache.poi.hslf.exceptions.CorruptPowerPointFileException;
 import org.apache.poi.hslf.exceptions.EncryptedPowerPointFileException;
 import org.apache.poi.hslf.exceptions.HSLFException;
-import org.apache.poi.hslf.record.*;
+import org.apache.poi.hslf.record.CurrentUserAtom;
+import org.apache.poi.hslf.record.ExOleObjStg;
+import org.apache.poi.hslf.record.PersistPtrHolder;
+import org.apache.poi.hslf.record.PersistRecord;
+import org.apache.poi.hslf.record.PositionDependentRecord;
+import org.apache.poi.hslf.record.Record;
+import org.apache.poi.hslf.record.UserEditAtom;
 import org.apache.poi.hslf.usermodel.ObjectData;
 import org.apache.poi.hslf.usermodel.PictureData;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
@@ -76,8 +81,16 @@ public final class HSLFSlideShow extends POIDocument {
 	 *  that is open.
 	 */
 	protected POIFSFileSystem getPOIFSFileSystem() {
-		return filesystem;
+		return directory.getFileSystem();
 	}
+
+   /**
+    * Returns the directory in the underlying POIFSFileSystem for the 
+    *  document that is open.
+    */
+   protected DirectoryNode getPOIFSDirectory() {
+      return directory;
+   }
 
 	/**
 	 * Constructs a Powerpoint document from fileName. Parses the document
@@ -112,21 +125,34 @@ public final class HSLFSlideShow extends POIDocument {
 	 */
 	public HSLFSlideShow(POIFSFileSystem filesystem) throws IOException
 	{
-		this(filesystem.getRoot(), filesystem);
+		this(filesystem.getRoot());
 	}
 
+   /**
+    * Constructs a Powerpoint document from a specific point in a
+    *  POIFS Filesystem. Parses the document and places all the
+    *  important stuff into data structures.
+    *
+    * @param dir the POIFS directory to read from
+    * @param filesystem the POIFS FileSystem to read from
+    * @throws IOException if there is a problem while parsing the document.
+    */
+   public HSLFSlideShow(DirectoryNode dir, POIFSFileSystem filesystem) throws IOException
+   {
+      this(dir);
+   }
+   
 	/**
 	 * Constructs a Powerpoint document from a specific point in a
 	 *  POIFS Filesystem. Parses the document and places all the
 	 *  important stuff into data structures.
 	 *
 	 * @param dir the POIFS directory to read from
-	 * @param filesystem the POIFS FileSystem to read from
 	 * @throws IOException if there is a problem while parsing the document.
 	 */
-	public HSLFSlideShow(DirectoryNode dir, POIFSFileSystem filesystem) throws IOException
+	public HSLFSlideShow(DirectoryNode dir) throws IOException
 	{
-		super(dir, filesystem);
+		super(dir);
 
 		// First up, grab the "Current User" stream
 		// We need this before we can detect Encrypted Documents
@@ -148,9 +174,6 @@ public final class HSLFSlideShow extends POIDocument {
 
 		// Look for any other streams
 		readOtherStreams();
-
-		// Look for Picture Streams:
-		readPictures();
 	}
 	/**
 	 * Constructs a new, empty, Powerpoint document.
@@ -283,7 +306,8 @@ public final class HSLFSlideShow extends POIDocument {
 	}
 
 	/**
-	 * Find and read in pictures contained in this presentation
+	 * Find and read in pictures contained in this presentation.
+	 * This is lazily called as and when we want to touch pictures.
 	 */
 	private void readPictures() throws IOException {
         _pictures = new ArrayList<PictureData>();
@@ -446,6 +470,9 @@ public final class HSLFSlideShow extends POIDocument {
 
 
         // Write any pictures, into another stream
+        if(_pictures == null) {
+           readPictures();
+        }
         if (_pictures.size() > 0) {
             ByteArrayOutputStream pict = new ByteArrayOutputStream();
             for (PictureData p : _pictures) {
@@ -459,7 +486,7 @@ public final class HSLFSlideShow extends POIDocument {
 
         // If requested, write out any other streams we spot
         if(preserveNodes) {
-        	copyNodes(filesystem, outFS, writtenEntries);
+            copyNodes(directory.getFileSystem(), outFS, writtenEntries);
         }
 
         // Send the POIFSFileSystem object out to the underlying stream
@@ -500,15 +527,24 @@ public final class HSLFSlideShow extends POIDocument {
      * @return offset of this picture in the Pictures stream
 	 */
 	public int addPicture(PictureData img) {
-		int offset = 0;
-
-        if(_pictures.size() > 0){
-            PictureData prev = _pictures.get(_pictures.size() - 1);
-            offset = prev.getOffset() + prev.getRawData().length + 8;
-        }
-        img.setOffset(offset);
-        _pictures.add(img);
-        return offset;
+	   // Process any existing pictures if we haven't yet
+	   if(_pictures == null) {
+         try {
+            readPictures();
+         } catch(IOException e) {
+            throw new CorruptPowerPointFileException(e.getMessage());
+         }
+	   }
+	   
+	   // Add the new picture in
+      int offset = 0;
+	   if(_pictures.size() > 0) {
+	      PictureData prev = _pictures.get(_pictures.size() - 1);
+	      offset = prev.getOffset() + prev.getRawData().length + 8;
+	   }
+	   img.setOffset(offset);
+	   _pictures.add(img);
+	   return offset;
    }
 
 	/* ******************* fetching methods follow ********************* */
@@ -537,6 +573,14 @@ public final class HSLFSlideShow extends POIDocument {
 	 *  presentation doesn't contain pictures.
 	 */
 	public PictureData[] getPictures() {
+	   if(_pictures == null) {
+	      try {
+	         readPictures();
+	      } catch(IOException e) {
+	         throw new CorruptPowerPointFileException(e.getMessage());
+	      }
+	   }
+	   
 		return _pictures.toArray(new PictureData[_pictures.size()]);
 	}
 

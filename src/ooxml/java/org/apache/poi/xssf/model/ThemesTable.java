@@ -51,11 +51,44 @@ public class ThemesTable extends POIXMLDocumentPart {
             if (obj instanceof org.openxmlformats.schemas.drawingml.x2006.main.CTColor) {
                 if (cnt == idx) {
                     ctColor = (org.openxmlformats.schemas.drawingml.x2006.main.CTColor) obj;
-                    return new XSSFColor(ctColor.getSrgbClr().getVal());
+                    
+                    byte[] rgb = null;
+                    if (ctColor.getSrgbClr() != null) {
+                       // Colour is a regular one 
+                       rgb = ctColor.getSrgbClr().getVal();
+                    } else if (ctColor.getSysClr() != null) {
+                       // Colour is a tint of white or black
+                       rgb = ctColor.getSysClr().getLastClr();
+                    }
+
+                    return new XSSFColor(rgb);
                 }
                 cnt++;
             }
         }
         return null;
+    }
+    
+    /**
+     * If the colour is based on a theme, then inherit 
+     *  information (currently just colours) from it as
+     *  required.
+     */
+    public void inheritFromThemeAsRequired(XSSFColor color) {
+       if(color == null) {
+          // Nothing for us to do
+          return;
+       }
+       if(! color.getCTColor().isSetTheme()) {
+          // No theme set, nothing to do
+          return;
+       }
+       
+       // Get the theme colour
+       XSSFColor themeColor = getThemeColor(color.getTheme());
+       // Set the raw colour, not the adjusted one
+       color.setRgb(themeColor.getCTColor().getRgb());
+       
+       // All done
     }
 }

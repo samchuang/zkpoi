@@ -17,12 +17,16 @@
 
 package org.apache.poi.xssf.usermodel;
 
+import java.util.List;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.XSSFITestDataProvider;
 import org.apache.poi.xssf.XSSFTestDataSamples;
 import org.apache.poi.xssf.model.CommentsTable;
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.model.CalculationChain;
+import org.apache.poi.xssf.model.Table;
 import org.apache.poi.xssf.usermodel.helpers.ColumnHelper;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.hssf.record.PasswordRecord;
@@ -979,10 +983,19 @@ public final class TestXSSFSheet extends BaseTestSheet {
 
     public void testSetAutoFilter() {
         XSSFWorkbook wb = new XSSFWorkbook();
-        XSSFSheet sheet = wb.createSheet();
+        XSSFSheet sheet = wb.createSheet("new sheet");
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:D100"));
 
         assertEquals("A1:D100", sheet.getCTWorksheet().getAutoFilter().getRef());
+
+        // auto-filter must be registered in workboook.xml, see Bugzilla 50315
+        XSSFName nm = wb.getBuiltInName(XSSFName.BUILTIN_FILTER_DB, 0);
+        assertNotNull(nm);
+
+        assertEquals(0, nm.getCTName().getLocalSheetId());
+        assertEquals(true, nm.getCTName().getHidden());
+        assertEquals("_xlnm._FilterDatabase", nm.getCTName().getName());
+        assertEquals("'new sheet'!$A$1:$D$100", nm.getCTName().getStringValue());
     }
 
     public void testProtectSheet_lowlevel() {
@@ -1005,4 +1018,50 @@ public final class TestXSSFSheet extends BaseTestSheet {
         assertNull("protectSheet(null) should unset CTSheetProtection", sheet.getCTWorksheet().getSheetProtection());
     }
 
+
+    public void test49966() {
+        XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("49966.xlsx");
+        CalculationChain calcChain = wb.getCalculationChain();
+        assertNotNull(wb.getCalculationChain());
+        assertEquals(3, calcChain.getCTCalcChain().sizeOfCArray());
+
+        XSSFSheet sheet = wb.getSheetAt(0);
+        XSSFRow row = sheet.getRow(0);
+
+        sheet.removeRow(row);
+        assertEquals("XSSFSheet#removeRow did not clear calcChain entries",
+                0, calcChain.getCTCalcChain().sizeOfCArray());
+
+        //calcChain should be gone 
+        wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+        assertNull(wb.getCalculationChain());
+
+    }
+
+    /**
+     * See bug #50829
+     */
+    public void testTables() {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("WithTable.xlsx");
+       assertEquals(3, wb.getNumberOfSheets());
+       
+       // Check the table sheet
+       XSSFSheet s1 = wb.getSheetAt(0);
+       assertEquals("a", s1.getRow(0).getCell(0).getRichStringCellValue().toString());
+       assertEquals(1.0, s1.getRow(1).getCell(0).getNumericCellValue());
+       
+       List<Table> tables = s1.getTables();
+       assertNotNull(tables);
+       assertEquals(1, tables.size());
+       
+       Table table = tables.get(0);
+       assertEquals("Tabella1", table.getName());
+       assertEquals("Tabella1", table.getDisplayName());
+       
+       // And the others
+       XSSFSheet s2 = wb.getSheetAt(1);
+       assertEquals(0, s2.getTables().size());
+       XSSFSheet s3 = wb.getSheetAt(2);
+       assertEquals(0, s3.getTables().size());
+    }
 }

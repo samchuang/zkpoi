@@ -81,12 +81,14 @@ import org.apache.poi.hssf.record.WindowProtectRecord;
 import org.apache.poi.hssf.record.WriteAccessRecord;
 import org.apache.poi.hssf.record.WriteProtectRecord;
 import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
-import org.apache.poi.hssf.record.formula.Ptg;
+import org.apache.poi.ss.formula.ptg.NameXPtg;
+import org.apache.poi.ss.formula.FormulaShifter;
+import org.apache.poi.ss.formula.udf.UDFFinder;
+import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalName;
 import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
+import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
@@ -1283,15 +1285,16 @@ public final class InternalWorkbook {
         // we'll need multiple editions for
         // the different formats
 
+        
         switch (id) {
-            case 0: return new FormatRecord(5, "\"$\"#,##0_);\\(\"$\"#,##0\\)");
-            case 1: return new FormatRecord(6, "\"$\"#,##0_);[Red]\\(\"$\"#,##0\\)");
-            case 2: return new FormatRecord(7, "\"$\"#,##0.00_);\\(\"$\"#,##0.00\\)");
-            case 3: return new FormatRecord(8, "\"$\"#,##0.00_);[Red]\\(\"$\"#,##0.00\\)");
-            case 4: return new FormatRecord(0x2a, "_(\"$\"* #,##0_);_(\"$\"* \\(#,##0\\);_(\"$\"* \"-\"_);_(@_)");
-            case 5: return new FormatRecord(0x29, "_(* #,##0_);_(* \\(#,##0\\);_(* \"-\"_);_(@_)");
-            case 6: return new FormatRecord(0x2c, "_(\"$\"* #,##0.00_);_(\"$\"* \\(#,##0.00\\);_(\"$\"* \"-\"??_);_(@_)");
-            case 7: return new FormatRecord(0x2b, "_(* #,##0.00_);_(* \\(#,##0.00\\);_(* \"-\"??_);_(@_)");
+            case 0: return new FormatRecord(5, BuiltinFormats.getBuiltinFormat(5)); 
+            case 1: return new FormatRecord(6, BuiltinFormats.getBuiltinFormat(6)); 
+            case 2: return new FormatRecord(7, BuiltinFormats.getBuiltinFormat(7)); 
+            case 3: return new FormatRecord(8, BuiltinFormats.getBuiltinFormat(8)); 
+            case 4: return new FormatRecord(0x2a, BuiltinFormats.getBuiltinFormat(0x2a)); 
+            case 5: return new FormatRecord(0x29, BuiltinFormats.getBuiltinFormat(0x29)); 
+            case 6: return new FormatRecord(0x2c, BuiltinFormats.getBuiltinFormat(0x2c)); 
+            case 7: return new FormatRecord(0x2b, BuiltinFormats.getBuiltinFormat(0x2b)); 
         }
         throw new  IllegalArgumentException("Unexpected id " + id);
     }
@@ -2300,8 +2303,22 @@ public final class InternalWorkbook {
         return linkTable.resolveNameXText(refIndex, definedNameIndex);
     }
 
-    public NameXPtg getNameXPtg(String name) {
-        return getOrCreateLinkTable().getNameXPtg(name);
+    /**
+     *
+     * @param name the  name of an external function, typically a name of a UDF
+     * @param udf  locator of user-defiend functions to resolve names of VBA and Add-In functions
+     * @return the external name or null
+     */
+    public NameXPtg getNameXPtg(String name, UDFFinder udf) {
+        LinkTable lnk = getOrCreateLinkTable();
+        NameXPtg xptg = lnk.getNameXPtg(name);
+
+        if(xptg == null && udf.findFunction(name) != null) {
+            // the name was not found in the list of external names
+            // check if the Workbook's UDFFinder is aware about it and register the name if it is
+            xptg = lnk.addNameXPtg(name);
+        }
+        return xptg;
     }
 
     /**

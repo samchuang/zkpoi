@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.POIXMLException;
 import org.apache.poi.hssf.record.PasswordRecord;
-import org.apache.poi.hssf.record.formula.FormulaShifter;
+import org.apache.poi.ss.formula.FormulaShifter;
 import org.apache.poi.hssf.util.PaneInformation;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -49,15 +49,13 @@ import org.apache.poi.ss.usermodel.Footer;
 import org.apache.poi.ss.usermodel.Header;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.util.SSCellRange;
+import org.apache.poi.ss.util.*;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 import org.apache.poi.xssf.model.CommentsTable;
+import org.apache.poi.xssf.model.Table;
 import org.apache.poi.xssf.usermodel.helpers.ColumnHelper;
 import org.apache.poi.xssf.usermodel.helpers.XSSFRowShifter;
 import org.apache.xmlbeans.XmlException;
@@ -334,7 +332,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param useMergedCells whether to use the contents of merged cells when calculating the width of the column
      */
     public void autoSizeColumn(int column, boolean useMergedCells) {
-        double width = ColumnHelper.getColumnWidth(this, column, useMergedCells);
+        double width = SheetUtil.getColumnWidth(this, column, useMergedCells);
         if(width != -1){
             columnHelper.setColBestFit(column, true);
             columnHelper.setCustomWidth(column, true);
@@ -1371,13 +1369,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         if (row.getSheet() != this) {
             throw new IllegalArgumentException("Specified row does not belong to this sheet");
         }
-        for(Cell cell : row) {
-            XSSFCell xcell = (XSSFCell)cell;
-            String msg = "Row[rownum="+row.getRowNum()+"] contains cell(s) included in a multi-cell array formula. You cannot change part of an array.";
-            if(xcell.isPartOfArrayFormulaGroup()){
-                xcell.notifyArrayFormulaChanging(msg);
-            }
-        }
+        // collect cells into a temporary array to avoid ConcurrentModificationException
+        ArrayList<XSSFCell> cellsToDelete = new ArrayList<XSSFCell>();
+        for(Cell cell : row) cellsToDelete.add((XSSFCell)cell);
+
+        for(XSSFCell cell : cellsToDelete) row.removeCell(cell);
+
         _rows.remove(row.getRowNum());
     }
 
@@ -2944,6 +2941,32 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         String ref = norm.formatAsString();
         af.setRef(ref);
 
+        XSSFWorkbook wb = getWorkbook();
+        int sheetIndex = getWorkbook().getSheetIndex(this);
+        XSSFName name = wb.getBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
+        if (name == null) {
+            name = wb.createBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
+            name.getCTName().setHidden(true); 
+            CellReference r1 = new CellReference(getSheetName(), range.getFirstRow(), range.getFirstColumn(), true, true);
+            CellReference r2 = new CellReference(null, range.getLastRow(), range.getLastColumn(), true, true);
+            String fmla = r1.formatAsString() + ":" + r2.formatAsString();
+            name.setRefersToFormula(fmla);
+        }
+
         return new XSSFAutoFilter(this);
+    }
+    
+    /**
+     * Returns any tables associated with this Sheet
+     */
+    public List<Table> getTables() {
+       List<Table> tables = new ArrayList<Table>();
+       for(POIXMLDocumentPart p : getRelations()) {
+          if (p.getPackageRelationship().getRelationshipType().equals(XSSFRelation.TABLE.getRelation())) {
+             Table table = (Table) p;
+             tables.add(table);
+          }
+       }
+       return tables;
     }
 }

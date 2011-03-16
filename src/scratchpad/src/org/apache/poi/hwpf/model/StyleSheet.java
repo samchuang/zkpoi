@@ -238,6 +238,10 @@ public final class StyleSheet implements HDFType {
 
           }
 
+          if (parentPAP == null) {
+              parentPAP = new ParagraphProperties();
+          }
+
           pap = ParagraphSprmUncompressor.uncompressPAP(parentPAP, papx, 2);
           sd.setPAP(pap);
       }
@@ -317,11 +321,22 @@ public final class StyleSheet implements HDFType {
 
   public ParagraphProperties getParagraphStyle(int x)
   {
-    if (x == NIL_STYLE)
-    {
+    if (x == NIL_STYLE) {
+        return NIL_PAP;
+    }
+
+    if (x >= _styleDescriptions.length) {
       return NIL_PAP;
     }
-    return (_styleDescriptions[x] != null ? _styleDescriptions[x].getPAP() : null);
-  }
 
+    if (_styleDescriptions[x]==null) {
+      return NIL_PAP;
+    }
+
+    if (_styleDescriptions[x].getPAP()==null) {
+      return NIL_PAP;
+    }
+
+    return _styleDescriptions[x].getPAP();
+  }
 }

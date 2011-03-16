@@ -55,18 +55,18 @@ import org.apache.poi.hssf.record.SSTRecord;
 import org.apache.poi.hssf.record.UnknownRecord;
 import org.apache.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
 import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.record.formula.MemFuncPtg;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.hssf.record.formula.OperandPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.record.formula.Ref3DPtg;
-import org.apache.poi.hssf.record.formula.SheetNameFormatter;
-import org.apache.poi.hssf.record.formula.UnionPtg;
+import org.apache.poi.ss.formula.ptg.Area3DPtg;
+import org.apache.poi.ss.formula.ptg.MemFuncPtg;
+import org.apache.poi.ss.formula.ptg.OperandPtg;
+import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.ss.formula.ptg.Ref3DPtg;
+import org.apache.poi.ss.formula.SheetNameFormatter;
+import org.apache.poi.ss.formula.ptg.UnionPtg;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.formula.udf.AggregatingUDFFinder;
+import org.apache.poi.ss.formula.udf.UDFFinder;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.formula.FormulaType;
 import org.apache.poi.ss.util.WorkbookUtil;
@@ -90,6 +90,16 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     private static final int MAX_ROW = 0xFFFF;
     private static final short MAX_COLUMN = (short)0x00FF;
 
+    /**
+     * The maximum number of cell styles in a .xls workbook.
+     * The 'official' limit is 4,000, but POI allows a slightly larger number.
+     * This extra delta takes into account built-in styles that are automatically
+     * created for new workbooks
+     *
+     * See http://office.microsoft.com/en-us/excel-help/excel-specifications-and-limits-HP005199291.aspx
+     */
+    private static final int MAX_STYLES = 4030;
+
     private static final int DEBUG = POILogger.DEBUG;
 
     /**
@@ -111,13 +121,13 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
      * this holds the HSSFSheet objects attached to this workbook
      */
 
-    protected List _sheets;
+    protected List<HSSFSheet> _sheets;
 
     /**
      * this holds the HSSFName objects attached to this workbook
      */
 
-    private ArrayList names;
+    private ArrayList<HSSFName> names;
 
     /**
      * this holds the HSSFFont objects attached to this workbook.
@@ -148,6 +158,12 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
 
     private static POILogger log = POILogFactory.getLogger(HSSFWorkbook.class);
 
+    /**
+     * The locator of user-defined functions.
+     * By default includes functions from the Excel Analysis Toolpack
+     */
+    private UDFFinder _udfFinder = UDFFinder.DEFAULT;
+
     public static HSSFWorkbook create(InternalWorkbook book) {
     	return new HSSFWorkbook(book);
     }
@@ -160,10 +176,10 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     }
 
 	private HSSFWorkbook(InternalWorkbook book) {
-		super(null, null);
+		super((DirectoryNode)null);
 		workbook = book;
-		_sheets = new ArrayList(INITIAL_CAPACITY);
-		names = new ArrayList(INITIAL_CAPACITY);
+		_sheets = new ArrayList<HSSFSheet>(INITIAL_CAPACITY);
+		names = new ArrayList<HSSFName>(INITIAL_CAPACITY);
 	}
 
     public HSSFWorkbook(POIFSFileSystem fs) throws IOException {
@@ -241,7 +257,27 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     public HSSFWorkbook(DirectoryNode directory, POIFSFileSystem fs, boolean preserveNodes)
             throws IOException
     {
-        super(directory, fs);
+       this(directory, preserveNodes);
+    }
+    
+    /**
+     * given a POI POIFSFileSystem object, and a specific directory
+     *  within it, read in its Workbook and populate the high and
+     *  low level models.  If you're reading in a workbook...start here.
+     *
+     * @param directory the POI filesystem directory to process from
+     * @param fs the POI filesystem that contains the Workbook stream.
+     * @param preserveNodes whether to preseve other nodes, such as
+     *        macros.  This takes more memory, so only say yes if you
+     *        need to. If set, will store all of the POIFSFileSystem
+     *        in memory
+     * @see org.apache.poi.poifs.filesystem.POIFSFileSystem
+     * @exception IOException if the stream cannot be read
+     */
+    public HSSFWorkbook(DirectoryNode directory, boolean preserveNodes)
+            throws IOException
+    {
+        super(directory);
         String workbookName = getWorkbookDirEntryName(directory);
 
         this.preserveNodes = preserveNodes;
@@ -249,18 +285,17 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         // If we're not preserving nodes, don't track the
         //  POIFS any more
         if(! preserveNodes) {
-           this.filesystem = null;
            this.directory = null;
         }
 
-        _sheets = new ArrayList(INITIAL_CAPACITY);
-        names  = new ArrayList(INITIAL_CAPACITY);
+        _sheets = new ArrayList<HSSFSheet>(INITIAL_CAPACITY);
+        names  = new ArrayList<HSSFName>(INITIAL_CAPACITY);
 
         // Grab the data from the workbook stream, however
         //  it happens to be spelled.
         InputStream stream = directory.createDocumentInputStream(workbookName);
 
-        List records = RecordFactory.createRecords(stream);
+        List<Record> records = RecordFactory.createRecords(stream);
 
         workbook = InternalWorkbook.createWorkbook(records);
         setPropertiesFromWorkbook(workbook);
@@ -1096,12 +1131,19 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     }
 
     /**
-     * create a new Cell style and add it to the workbook's style table
+     * Create a new Cell style and add it to the workbook's style table.
+     * You can define up to 4000 unique styles in a .xls workbook.
+     *
      * @return the new Cell Style object
+     * @throws IllegalStateException if the maximum number of cell styles exceeded the limit
      */
 
     public HSSFCellStyle createCellStyle()
     {
+        if(workbook.getNumExFormats() == MAX_STYLES) {
+            throw new IllegalStateException("The maximum number of cell styles was exceeded. " +
+                    "You can define up to 4000 styles in a .xls workbook");
+        }
         ExtendedFormatRecord xfr = workbook.createCellXF();
         short index = (short) (getNumCellStyles() - 1);
         HSSFCellStyle style = new HSSFCellStyle(index, xfr, this);
@@ -1166,7 +1208,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             //  out correctly shortly, so don't include the old one
             excepts.add("WORKBOOK");
 
-            POIFSFileSystem srcFs = this.filesystem;
+            POIFSFileSystem srcFs = this.directory.getFileSystem();
             // Copy over all the other nodes to our new poifs
             copyNodes(srcFs, fs, excepts);
 
@@ -1347,7 +1389,7 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
             sb.append("!");
             sb.append(parts[i]);
         }
-        name.setNameDefinition(HSSFFormulaParser.parse(sb.toString(), this, FormulaType.CELL, sheetIndex));
+        name.setNameDefinition(HSSFFormulaParser.parse(sb.toString(), this, FormulaType.NAMEDRANGE, sheetIndex));
     }
 
     /**
@@ -1665,14 +1707,14 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
                     Object sub = subRecordIter.next();
                     if (sub instanceof EmbeddedObjectRefSubRecord)
                     {
-                        objects.add(new HSSFObjectData((ObjRecord) obj, filesystem));
+                        objects.add(new HSSFObjectData((ObjRecord) obj, directory.getFileSystem()));
                     }
                 }
             }
         }
     }
 
-    public CreationHelper getCreationHelper() {
+    public HSSFCreationHelper getCreationHelper() {
         return new HSSFCreationHelper(this);
     }
 
@@ -1681,10 +1723,24 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
     }
 
     /**
-     * Note - This method should only used by POI internally.
-     * It may get deleted or change definition in future POI versions
+     *
+     * Returns the locator of user-defined functions.
+     * The default instance extends the built-in functions with the Analysis Tool Pack
+     *
+     * @return the locator of user-defined functions
      */
-    public NameXPtg getNameXPtg(String name) {
-        return workbook.getNameXPtg(name);
+    /*package*/ UDFFinder getUDFFinder(){
+        return _udfFinder;
     }
+
+    /**
+     * Register a new toolpack in this workbook.
+     *
+     * @param toopack the toolpack to register
+     */
+    public void addToolPack(UDFFinder toopack){
+        AggregatingUDFFinder udfs = (AggregatingUDFFinder)_udfFinder;
+        udfs.add(toopack);
+    }
+
 }

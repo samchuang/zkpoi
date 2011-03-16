@@ -21,52 +21,49 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.record.formula.AreaErrPtg;
-import org.apache.poi.hssf.record.formula.AreaPtg;
-import org.apache.poi.hssf.record.formula.AttrPtg;
-import org.apache.poi.hssf.record.formula.BoolPtg;
-import org.apache.poi.hssf.record.formula.ControlPtg;
-import org.apache.poi.hssf.record.formula.DeletedArea3DPtg;
-import org.apache.poi.hssf.record.formula.DeletedRef3DPtg;
-import org.apache.poi.hssf.record.formula.ErrPtg;
-import org.apache.poi.hssf.record.formula.ExpPtg;
-import org.apache.poi.hssf.record.formula.FuncVarPtg;
-import org.apache.poi.hssf.record.formula.IntPtg;
-import org.apache.poi.hssf.record.formula.MemAreaPtg;
-import org.apache.poi.hssf.record.formula.MemErrPtg;
-import org.apache.poi.hssf.record.formula.MemFuncPtg;
-import org.apache.poi.hssf.record.formula.MissingArgPtg;
-import org.apache.poi.hssf.record.formula.NamePtg;
-import org.apache.poi.hssf.record.formula.NameXPtg;
-import org.apache.poi.hssf.record.formula.NumberPtg;
-import org.apache.poi.hssf.record.formula.OperationPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
-import org.apache.poi.hssf.record.formula.Ref3DPtg;
-import org.apache.poi.hssf.record.formula.RefErrorPtg;
-import org.apache.poi.hssf.record.formula.RefPtg;
-import org.apache.poi.hssf.record.formula.StringPtg;
-import org.apache.poi.hssf.record.formula.UnionPtg;
-import org.apache.poi.hssf.record.formula.UnknownPtg;
-import org.apache.poi.hssf.record.formula.eval.AreaEval;
-import org.apache.poi.hssf.record.formula.eval.BlankEval;
-import org.apache.poi.hssf.record.formula.eval.BoolEval;
-import org.apache.poi.hssf.record.formula.eval.ErrorEval;
-import org.apache.poi.hssf.record.formula.eval.EvaluationException;
-import org.apache.poi.hssf.record.formula.eval.MissingArgEval;
-import org.apache.poi.hssf.record.formula.eval.NameEval;
-import org.apache.poi.hssf.record.formula.eval.NameXEval;
-import org.apache.poi.hssf.record.formula.eval.NumberEval;
-import org.apache.poi.hssf.record.formula.eval.OperandResolver;
-import org.apache.poi.hssf.record.formula.eval.RefEval;
-import org.apache.poi.hssf.record.formula.eval.StringEval;
-import org.apache.poi.hssf.record.formula.eval.ValueEval;
-import org.apache.poi.hssf.record.formula.functions.Choose;
-import org.apache.poi.hssf.record.formula.functions.FreeRefFunction;
-import org.apache.poi.hssf.record.formula.functions.IfFunc;
-import org.apache.poi.hssf.record.formula.udf.UDFFinder;
-import org.apache.poi.hssf.usermodel.HSSFEvaluationWorkbook;
-import org.apache.poi.hssf.util.CellReference;
+import org.apache.poi.ss.formula.ptg.Area3DPtg;
+import org.apache.poi.ss.formula.ptg.AreaErrPtg;
+import org.apache.poi.ss.formula.ptg.AreaPtg;
+import org.apache.poi.ss.formula.ptg.AttrPtg;
+import org.apache.poi.ss.formula.ptg.BoolPtg;
+import org.apache.poi.ss.formula.ptg.ControlPtg;
+import org.apache.poi.ss.formula.ptg.DeletedArea3DPtg;
+import org.apache.poi.ss.formula.ptg.DeletedRef3DPtg;
+import org.apache.poi.ss.formula.ptg.ErrPtg;
+import org.apache.poi.ss.formula.ptg.ExpPtg;
+import org.apache.poi.ss.formula.ptg.FuncVarPtg;
+import org.apache.poi.ss.formula.ptg.IntPtg;
+import org.apache.poi.ss.formula.ptg.MemAreaPtg;
+import org.apache.poi.ss.formula.ptg.MemErrPtg;
+import org.apache.poi.ss.formula.ptg.MemFuncPtg;
+import org.apache.poi.ss.formula.ptg.MissingArgPtg;
+import org.apache.poi.ss.formula.ptg.NamePtg;
+import org.apache.poi.ss.formula.ptg.NameXPtg;
+import org.apache.poi.ss.formula.ptg.NumberPtg;
+import org.apache.poi.ss.formula.ptg.OperationPtg;
+import org.apache.poi.ss.formula.ptg.Ptg;
+import org.apache.poi.ss.formula.ptg.Ref3DPtg;
+import org.apache.poi.ss.formula.ptg.RefErrorPtg;
+import org.apache.poi.ss.formula.ptg.RefPtg;
+import org.apache.poi.ss.formula.ptg.StringPtg;
+import org.apache.poi.ss.formula.ptg.UnionPtg;
+import org.apache.poi.ss.formula.ptg.UnknownPtg;
+import org.apache.poi.ss.formula.eval.BlankEval;
+import org.apache.poi.ss.formula.eval.BoolEval;
+import org.apache.poi.ss.formula.eval.ErrorEval;
+import org.apache.poi.ss.formula.eval.EvaluationException;
+import org.apache.poi.ss.formula.eval.MissingArgEval;
+import org.apache.poi.ss.formula.eval.NameEval;
+import org.apache.poi.ss.formula.eval.NumberEval;
+import org.apache.poi.ss.formula.eval.OperandResolver;
+import org.apache.poi.ss.formula.eval.StringEval;
+import org.apache.poi.ss.formula.eval.ValueEval;
+import org.apache.poi.ss.formula.functions.Choose;
+import org.apache.poi.ss.formula.functions.FreeRefFunction;
+import org.apache.poi.ss.formula.functions.IfFunc;
+import org.apache.poi.ss.formula.udf.AggregatingUDFFinder;
+import org.apache.poi.ss.formula.udf.UDFFinder;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment.WorkbookNotFoundException;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -94,7 +91,7 @@ public final class WorkbookEvaluator {
 	private final Map<String, Integer> _sheetIndexesByName;
 	private CollaboratingWorkbooksEnvironment _collaboratingWorkbookEnvironment;
 	private final IStabilityClassifier _stabilityClassifier;
-	private final UDFFinder _udfFinder;
+	private final AggregatingUDFFinder _udfFinder;
 
 	/**
 	 * @param udfFinder pass <code>null</code> for default (AnalysisToolPak only)
@@ -112,7 +109,13 @@ public final class WorkbookEvaluator {
 		_collaboratingWorkbookEnvironment = CollaboratingWorkbooksEnvironment.EMPTY;
 		_workbookIx = 0;
 		_stabilityClassifier = stabilityClassifier;
-		_udfFinder = udfFinder == null ? UDFFinder.DEFAULT : udfFinder;
+
+        AggregatingUDFFinder defaultToolkit = // workbook can be null in unit tests
+                workbook == null ? null : (AggregatingUDFFinder)workbook.getUDFFinder();
+        if(defaultToolkit != null && udfFinder != null) {
+            defaultToolkit.add(udfFinder);
+        }
+        _udfFinder = defaultToolkit;
 	}
 
 	/**
@@ -127,10 +130,7 @@ public final class WorkbookEvaluator {
 	}
 	
 	/* package */ EvaluationName getName(String name, int sheetIndex) {
-		NamePtg namePtg = null;
-		if(_workbook instanceof HSSFEvaluationWorkbook){
-			namePtg =((HSSFEvaluationWorkbook)_workbook).getName(name, sheetIndex).createPtg();
-		}
+        NamePtg namePtg = _workbook.getName(name, sheetIndex).createPtg();
 
 		if(namePtg == null) {
 			return null;

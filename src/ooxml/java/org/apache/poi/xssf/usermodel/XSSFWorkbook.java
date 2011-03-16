@@ -37,7 +37,7 @@ import org.apache.poi.POIXMLDocument;
 import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.POIXMLException;
 import org.apache.poi.POIXMLProperties;
-import org.apache.poi.hssf.record.formula.SheetNameFormatter;
+import org.apache.poi.ss.formula.SheetNameFormatter;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -46,6 +46,7 @@ import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
 import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.openxml4j.opc.TargetMode;
+import org.apache.poi.ss.formula.udf.UDFFinder;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -53,11 +54,8 @@ import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.*;
-import org.apache.poi.xssf.model.CalculationChain;
-import org.apache.poi.xssf.model.MapInfo;
-import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.model.ThemesTable;
+import org.apache.poi.xssf.model.*;
+import org.apache.poi.xssf.usermodel.helpers.XSSFFormulaUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -122,6 +120,12 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     private StylesTable stylesSource;
 
     private ThemesTable theme;
+
+    /**
+     * The locator of user-defined functions.
+     * By default includes functions from the Excel Analysis Toolpack
+     */
+    private IndexedUDFFinder _udfFinder = new IndexedUDFFinder(UDFFinder.DEFAULT);
 
     /**
      * TODO
@@ -937,7 +941,6 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         XSSFName name = getBuiltInName(XSSFName.BUILTIN_PRINT_AREA, sheetIndex);
         if (name == null) {
             name = createBuiltInName(XSSFName.BUILTIN_PRINT_AREA, sheetIndex);
-            namedRanges.add(name);
         }
         //short externSheetIndex = getWorkbook().checkExternSheet(sheetIndex);
         //name.setExternSheetNumber(externSheetIndex);
@@ -1010,7 +1013,6 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         }
         if (name == null) {
             name = createBuiltInName(XSSFName.BUILTIN_PRINT_TITLE, sheetIndex);
-            namedRanges.add(name);
         }
 
         String reference = getReferenceBuiltInRecord(name.getSheetName(), startColumn, endColumn, startRow, endRow);
@@ -1057,7 +1059,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         return "$" + colRef.getCellRefParts()[2] + "$" + colRef.getCellRefParts()[1] + ":$" + colRef2.getCellRefParts()[2] + "$" + colRef2.getCellRefParts()[1];
     }
 
-    private XSSFName getBuiltInName(String builtInCode, int sheetNumber) {
+    XSSFName getBuiltInName(String builtInCode, int sheetNumber) {
         for (XSSFName name : namedRanges) {
             if (name.getNameName().equalsIgnoreCase(builtInCode) && name.getSheetIndex() == sheetNumber) {
                 return name;
@@ -1073,7 +1075,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * @throws IllegalArgumentException if sheetNumber is invalid
      * @throws POIXMLException if such a name already exists in the workbook
      */
-    private XSSFName createBuiltInName(String builtInName, int sheetNumber) {
+    XSSFName createBuiltInName(String builtInName, int sheetNumber) {
         validateSheetIndex(sheetNumber);
 
         CTDefinedNames names = workbook.getDefinedNames() == null ? workbook.addNewDefinedNames() : workbook.getDefinedNames();
@@ -1088,6 +1090,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                         + ") already exists for sheet (" + sheetNumber + ")");
         }
 
+        namedRanges.add(name);
         return name;
     }
 
@@ -1106,14 +1109,18 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * Will throw IllegalArgumentException if the name is greater than 31 chars
      * or contains /\?*[]
      *
-     * @param sheet number (0 based)
+     * @param sheetIndex number (0 based)
      */
-    public void setSheetName(int sheet, String name) {
-        validateSheetIndex(sheet);
+    public void setSheetName(int sheetIndex, String name) {
+        validateSheetIndex(sheetIndex);
         WorkbookUtil.validateSheetName(name);
-        if (containsSheet(name, sheet ))
+        if (containsSheet(name, sheetIndex ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
-        workbook.getSheets().getSheetArray(sheet).setName(name);
+
+        XSSFFormulaUtils utils = new XSSFFormulaUtils(this);
+        utils.updateSheetName(sheetIndex, name);
+
+        workbook.getSheets().getSheetArray(sheetIndex).setName(name);
     }
 
     /**
@@ -1492,4 +1499,31 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 			workbook.setWorkbookProtection(CTWorkbookProtection.Factory.newInstance());
 		}
 	}
+
+    /**
+     *
+     * Returns the locator of user-defined functions.
+     * <p>
+     * The default instance extends the built-in functions with the Excel Analysis Tool Pack.
+     * To set / evaluate custom functions you need to register them as follows:
+     *
+     *
+     *
+     * </p>
+     * @return wrapped instance of UDFFinder that allows seeking functions both by index and name
+     */
+    /*package*/ UDFFinder getUDFFinder() {
+        return _udfFinder;
+    }
+
+    /**
+     * Register a new toolpack in this workbook.
+     *
+     * @param toopack the toolpack to register
+     */
+    public void addToolPack(UDFFinder toopack){
+        _udfFinder.add(toopack);
+    }
+
+
 }
