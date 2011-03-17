@@ -15,21 +15,21 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.dev;
+package org.zkoss.poi.hmef.dev;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.poi.hmef.HMEFMessage;
-import org.apache.poi.hmef.attribute.TNEFAttribute;
-import org.apache.poi.hmef.attribute.MAPIAttribute;
-import org.apache.poi.hmef.attribute.TNEFDateAttribute;
-import org.apache.poi.hmef.attribute.TNEFProperty;
-import org.apache.poi.hmef.attribute.TNEFStringAttribute;
-import org.apache.poi.util.HexDump;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hmef.HMEFMessage;
+import org.zkoss.poi.hmef.attribute.TNEFAttribute;
+import org.zkoss.poi.hmef.attribute.MAPIAttribute;
+import org.zkoss.poi.hmef.attribute.TNEFDateAttribute;
+import org.zkoss.poi.hmef.attribute.TNEFProperty;
+import org.zkoss.poi.hmef.attribute.TNEFStringAttribute;
+import org.zkoss.poi.util.HexDump;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Developer focused raw dumper

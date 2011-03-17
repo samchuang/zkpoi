@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hdgf;
+package org.zkoss.poi.hdgf;
 
 import java.io.IOException;
 import java.io.InputStream;

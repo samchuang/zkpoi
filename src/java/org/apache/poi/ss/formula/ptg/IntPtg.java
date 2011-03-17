@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * Integer (unsigned short integer) Stores an unsigned short value (java int) in

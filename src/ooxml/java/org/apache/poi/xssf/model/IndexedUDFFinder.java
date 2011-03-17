@@ -14,12 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.xssf.model;
+package org.zkoss.poi.xssf.model;
 
-import org.apache.poi.ss.formula.functions.FreeRefFunction;
-import org.apache.poi.ss.formula.udf.AggregatingUDFFinder;
-import org.apache.poi.ss.formula.udf.UDFFinder;
-import org.apache.poi.util.Internal;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.udf.AggregatingUDFFinder;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
+import org.zkoss.poi.util.Internal;
 
 import java.util.HashMap;
 

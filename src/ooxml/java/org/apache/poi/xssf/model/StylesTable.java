@@ -140,17 +140,17 @@ public class StylesTable extends POIXMLDocumentPart {
             }
         }
 
-            CTFonts ctfonts = styleSheet.getFonts();
-            if(ctfonts != null){
-				int idx = 0;
-				for (CTFont font : ctfonts.getFontArray()) {
-				   // Create the font and save it. Themes Table supplied later
-					XSSFFont f = new XSSFFont(font, idx);
-					fonts.add(f);
-					idx++;
-				}
+        CTFonts ctfonts = styleSheet.getFonts();
+        if(ctfonts != null){
+			int idx = 0;
+			for (CTFont font : ctfonts.getFontArray()) {
+			   // Create the font and save it. Themes Table supplied later
+				XSSFFont f = new XSSFFont(font, idx);
+				fonts.add(f);
+				idx++;
 			}
 		}
+
         CTFills ctfills = styleSheet.getFills();
         if(ctfills != null){
             for (CTFill fill : ctfills.getFillArray()) {
@@ -158,11 +158,10 @@ public class StylesTable extends POIXMLDocumentPart {
             }
         }
 
-            CTBorders ctborders = styleSheet.getBorders();
-            if(ctborders != null) {
-                for (CTBorder border : ctborders.getBorderArray()) {
-                    borders.add(new XSSFCellBorder(border, theme));
-                }
+        CTBorders ctborders = styleSheet.getBorders();
+        if(ctborders != null) {
+            for (CTBorder border : ctborders.getBorderArray()) {
+                borders.add(new XSSFCellBorder(border, theme));
             }
         }
 

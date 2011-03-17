@@ -15,17 +15,17 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hsmf.dev;
+package org.zkoss.poi.hsmf.dev;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.poi.hsmf.datatypes.Chunk;
-import org.apache.poi.hsmf.datatypes.ChunkGroup;
-import org.apache.poi.hsmf.datatypes.MAPIProperty;
-import org.apache.poi.hsmf.datatypes.Types;
-import org.apache.poi.hsmf.parsers.POIFSChunkParser;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.hsmf.datatypes.Chunk;
+import org.zkoss.poi.hsmf.datatypes.ChunkGroup;
+import org.zkoss.poi.hsmf.datatypes.MAPIProperty;
+import org.zkoss.poi.hsmf.datatypes.Types;
+import org.zkoss.poi.hsmf.parsers.POIFSChunkParser;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * Dumps out the chunk details, and where possible contents

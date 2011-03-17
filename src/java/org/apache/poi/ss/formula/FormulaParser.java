@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.zkoss.poi.hssf.record.constant.ErrorConstant;
 import org.zkoss.poi.ss.formula.ptg.*;
+import org.zkoss.poi.ss.formula.constant.ErrorConstant;
 import org.zkoss.poi.ss.formula.function.FunctionMetadata;
 import org.zkoss.poi.ss.formula.function.FunctionMetadataRegistry;
 import org.zkoss.poi.ss.usermodel.ErrorConstants;

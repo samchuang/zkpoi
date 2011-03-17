@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * ReferencePtgBase - handles references (such as A1, A2, IA4)
@@ -45,7 +45,7 @@ public abstract class RefPtgBase extends OperandPtg {
      * YK: subclasses of RefPtgBase are used by the FormulaParser and FormulaEvaluator accross HSSF and XSSF.
      * The bit mask should accomodate the maximum number of avaiable columns, i.e. 0x3FFF.
      *
-     * @see org.apache.poi.ss.SpreadsheetVersion
+     * @see org.zkoss.poi.ss.SpreadsheetVersion
      */
     private static final BitField column = BitFieldFactory.getInstance(0x3FFF);
 

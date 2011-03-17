@@ -17,9 +17,6 @@
 
 package org.zkoss.poi.hssf.usermodel;
 
-import org.zkoss.poi.hssf.record.formula.udf.UDFFinder;
-import org.zkoss.poi.ss.formula.IStabilityClassifier;
-import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.usermodel.CreationHelper;
 
 public class HSSFCreationHelper implements CreationHelper {

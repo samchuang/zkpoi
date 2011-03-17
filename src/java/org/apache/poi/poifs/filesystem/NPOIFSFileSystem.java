@@ -17,7 +17,7 @@
 ==================================================================== */
 
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,26 +36,26 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.poifs.common.POIFSBigBlockSize;
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.dev.POIFSViewable;
-import org.apache.poi.poifs.nio.ByteArrayBackedDataSource;
-import org.apache.poi.poifs.nio.DataSource;
-import org.apache.poi.poifs.nio.FileBackedDataSource;
-import org.apache.poi.poifs.property.DirectoryProperty;
-import org.apache.poi.poifs.property.NPropertyTable;
-import org.apache.poi.poifs.storage.BATBlock;
-import org.apache.poi.poifs.storage.BlockAllocationTableReader;
-import org.apache.poi.poifs.storage.BlockAllocationTableWriter;
-import org.apache.poi.poifs.storage.HeaderBlock;
-import org.apache.poi.poifs.storage.HeaderBlockConstants;
-import org.apache.poi.poifs.storage.HeaderBlockWriter;
-import org.apache.poi.poifs.storage.BATBlock.BATBlockAndIndex;
-import org.apache.poi.util.CloseIgnoringInputStream;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.LongField;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.dev.POIFSViewable;
+import org.zkoss.poi.poifs.nio.ByteArrayBackedDataSource;
+import org.zkoss.poi.poifs.nio.DataSource;
+import org.zkoss.poi.poifs.nio.FileBackedDataSource;
+import org.zkoss.poi.poifs.property.DirectoryProperty;
+import org.zkoss.poi.poifs.property.NPropertyTable;
+import org.zkoss.poi.poifs.storage.BATBlock;
+import org.zkoss.poi.poifs.storage.BlockAllocationTableReader;
+import org.zkoss.poi.poifs.storage.BlockAllocationTableWriter;
+import org.zkoss.poi.poifs.storage.HeaderBlock;
+import org.zkoss.poi.poifs.storage.HeaderBlockConstants;
+import org.zkoss.poi.poifs.storage.HeaderBlockWriter;
+import org.zkoss.poi.poifs.storage.BATBlock.BATBlockAndIndex;
+import org.zkoss.poi.util.CloseIgnoringInputStream;
+import org.zkoss.poi.util.IOUtils;
+import org.zkoss.poi.util.LongField;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This is the main class of the POIFS system; it manages the entire

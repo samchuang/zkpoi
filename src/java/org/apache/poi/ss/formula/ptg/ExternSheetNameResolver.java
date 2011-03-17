@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
-import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
-import org.apache.poi.ss.formula.SheetNameFormatter;
+import org.zkoss.poi.ss.formula.FormulaRenderingWorkbook;
+import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
+import org.zkoss.poi.ss.formula.SheetNameFormatter;
 
 /**
  * @author Josh Micich

@@ -24,10 +24,10 @@ import org.zkoss.poi.hssf.model.RecordStream;
 import org.zkoss.poi.hssf.record.CFHeaderRecord;
 import org.zkoss.poi.hssf.record.CFRuleRecord;
 import org.zkoss.poi.hssf.record.Record;
-import org.zkoss.poi.ssf.formula.ptg.AreaErrPtg;
-import org.zkoss.poi.ssf.formula.ptg.AreaPtg;
-import org.zkoss.poi.ssf.formula.FormulaShifter;
-import org.zkoss.poi.ssf.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.ptg.AreaErrPtg;
+import org.zkoss.poi.ss.formula.ptg.AreaPtg;
+import org.zkoss.poi.ss.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**

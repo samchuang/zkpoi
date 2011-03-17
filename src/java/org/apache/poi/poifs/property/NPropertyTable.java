@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.property;
+package org.zkoss.poi.poifs.property;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.poifs.common.POIFSBigBlockSize;
-import org.apache.poi.poifs.common.POIFSConstants;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.NPOIFSStream;
-import org.apache.poi.poifs.storage.HeaderBlock;
+import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
+import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.zkoss.poi.poifs.filesystem.NPOIFSStream;
+import org.zkoss.poi.poifs.storage.HeaderBlock;
 
 /**
  * This class embodies the Property Table for a {@link NPOIFSFileSystem}; 

@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.eval;
+package org.zkoss.poi.ss.formula.eval;
 
 /**
  * This class is used to simplify error handling logic <i>within</i> operator and function

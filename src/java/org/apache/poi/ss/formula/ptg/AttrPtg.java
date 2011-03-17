@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.util.BitField;
-import org.apache.poi.util.BitFieldFactory;
-import org.apache.poi.util.LittleEndian;
-import org.apache.poi.util.LittleEndianInput;
-import org.apache.poi.util.LittleEndianOutput;
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.LittleEndianInput;
+import org.zkoss.poi.util.LittleEndianOutput;
 
 /**
  * "Special Attributes"

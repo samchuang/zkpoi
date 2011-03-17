@@ -15,20 +15,20 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef;
+package org.zkoss.poi.hmef;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.poi.hmef.attribute.MAPIAttribute;
-import org.apache.poi.hmef.attribute.MAPIStringAttribute;
-import org.apache.poi.hmef.attribute.TNEFAttribute;
-import org.apache.poi.hmef.attribute.TNEFDateAttribute;
-import org.apache.poi.hmef.attribute.TNEFMAPIAttribute;
-import org.apache.poi.hmef.attribute.TNEFProperty;
-import org.apache.poi.hmef.attribute.TNEFStringAttribute;
-import org.apache.poi.hsmf.datatypes.MAPIProperty;
+import org.zkoss.poi.hmef.attribute.MAPIAttribute;
+import org.zkoss.poi.hmef.attribute.MAPIStringAttribute;
+import org.zkoss.poi.hmef.attribute.TNEFAttribute;
+import org.zkoss.poi.hmef.attribute.TNEFDateAttribute;
+import org.zkoss.poi.hmef.attribute.TNEFMAPIAttribute;
+import org.zkoss.poi.hmef.attribute.TNEFProperty;
+import org.zkoss.poi.hmef.attribute.TNEFStringAttribute;
+import org.zkoss.poi.hsmf.datatypes.MAPIProperty;
 
 
 /**

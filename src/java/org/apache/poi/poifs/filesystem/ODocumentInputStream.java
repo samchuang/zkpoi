@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 import java.io.IOException;
 
-import org.apache.poi.poifs.storage.DataInputBlock;
+import org.zkoss.poi.poifs.storage.DataInputBlock;
 
 /**
  * This class provides methods to read a DocumentEntry managed by a

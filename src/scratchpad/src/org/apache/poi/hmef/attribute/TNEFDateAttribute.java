@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.attribute;
+package org.zkoss.poi.hmef.attribute;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +23,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.poi.hmef.Attachment;
-import org.apache.poi.hmef.HMEFMessage;
-import org.apache.poi.hpsf.Util;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hmef.Attachment;
+import org.zkoss.poi.hmef.HMEFMessage;
+import org.zkoss.poi.hpsf.Util;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * A Date attribute which applies to a {@link HMEFMessage}

@@ -19,7 +19,7 @@ package org.zkoss.poi.hwpf.model;
 
 import java.text.MessageFormat;
 
-import org.apache.poi.util.HexDump;
+import org.zkoss.poi.util.HexDump;
 
 /**
  * Class for the FLD structure.

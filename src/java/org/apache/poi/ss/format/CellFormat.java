@@ -17,10 +17,8 @@
 
 package org.zkoss.poi.ss.format;
 
-import org.zkoss.poi.hssf.record.constant.ErrorConstant;
-import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.usermodel.Cell;
-import org.zkoss.poi.ss.usermodel.ErrorConstants;
 
 import javax.swing.*;
 import java.util.ArrayList;

@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.functions;
+package org.zkoss.poi.ss.formula.functions;
 
-import org.apache.poi.ss.formula.eval.BlankEval;
-import org.apache.poi.ss.formula.eval.ErrorEval;
-import org.apache.poi.ss.formula.eval.EvaluationException;
-import org.apache.poi.ss.formula.eval.MissingArgEval;
-import org.apache.poi.ss.formula.eval.OperandResolver;
-import org.apache.poi.ss.formula.eval.ValueEval;
-import org.apache.poi.ss.formula.OperationEvaluationContext;
+import org.zkoss.poi.ss.formula.eval.BlankEval;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.EvaluationException;
+import org.zkoss.poi.ss.formula.eval.MissingArgEval;
+import org.zkoss.poi.ss.formula.eval.OperandResolver;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.OperationEvaluationContext;
 
 /**
  * Implementation for Excel function INDIRECT<p/>
@@ -94,11 +94,12 @@ public final class Indirect implements FreeRefFunction {
 		int plingPos = text.lastIndexOf('!');
 
 		String workbookName;
-		String sheetName;
+		String sheetName, lastSheetName; //20110317, henrichen@zkoss.org
 		String refText; // whitespace around this gets trimmed OK
 		if (plingPos < 0) {
 			workbookName = null;
 			sheetName = null;
+			lastSheetName = null; //20110317, henrichen@zkoss.org
 			refText = text;
 		} else {
 			String[] parts = parseWorkbookAndSheetName(text.subSequence(0, plingPos));
@@ -107,6 +108,7 @@ public final class Indirect implements FreeRefFunction {
 			}
 			workbookName = parts[0];
 			sheetName = parts[1];
+			lastSheetName = parts[2]; //20110317, henrichen@zkoss.org
 			refText = text.substring(plingPos + 1);
 		}
 
@@ -121,7 +123,7 @@ public final class Indirect implements FreeRefFunction {
 			refStrPart1 = refText.substring(0, colonPos).trim();
 			refStrPart2 = refText.substring(colonPos + 1).trim();
 		}
-		return ec.getDynamicReference(workbookName, sheetName, refStrPart1, refStrPart2, isA1style);
+		return ec.getDynamicReference(workbookName, sheetName, lastSheetName, refStrPart1, refStrPart2, isA1style);
 	}
 
 	/**

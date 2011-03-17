@@ -15,9 +15,9 @@
 * limitations under the License.
 */
 
-package org.apache.poi.ss.formula.eval;
+package org.zkoss.poi.ss.formula.eval;
 
-import org.apache.poi.ss.usermodel.ErrorConstants;
+import org.zkoss.poi.ss.usermodel.ErrorConstants;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
@@ -84,7 +84,7 @@ public final class ErrorEval implements ValueEval {
         // value expression that might appear in a formula.  In addition these error strings should
         // look unlike the standard Excel errors.  Hence tilde ('~') was used.
         switch(errorCode) {
-            case CIRCULAR_REF_ERROR_CODE: return "~CIRCULAR~REF~";
+            case CIRCULAR_REF_ERROR_CODE: return "#REF!"; //20101221, henrichen: degenerate to #REF! //return "~CIRCULAR~REF~";
             case FUNCTION_NOT_IMPLEMENTED_CODE: return "~FUNCTION~NOT~IMPLEMENTED~";
         }
         return "~non~std~err(" + errorCode + ")~";
@@ -107,5 +107,17 @@ public final class ErrorEval implements ValueEval {
         sb.append(getText(_errorCode));
         sb.append("]");
         return sb.toString();
+    }
+    
+	//20101221, henrichen@zkoss.org: error text tip!
+    public static String getTooltip(int errorCode) {
+        if(!ErrorConstants.isValidCode(errorCode)) {
+	        switch(errorCode) {
+	            case CIRCULAR_REF_ERROR_CODE: return "Error: Circular dependency detected";
+	            case FUNCTION_NOT_IMPLEMENTED_CODE: return "~FUNCTION~NOT~IMPLEMENTED~";
+	        }
+	        return "Error: Unknown error code ("+errorCode+")";
+        }
+        return null;
     }
 }

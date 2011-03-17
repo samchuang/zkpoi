@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.attribute;
+package org.zkoss.poi.hmef.attribute;
 
 import java.util.ArrayList;
 import java.util.HashMap;

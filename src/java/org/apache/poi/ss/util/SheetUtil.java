@@ -15,9 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.util;
+package org.zkoss.poi.ss.util;
 
-import org.apache.poi.ss.usermodel.*;
+import org.zkoss.poi.ss.formula.WorkbookEvaluator;
+import org.zkoss.poi.ss.usermodel.*;
 
 import java.text.AttributedString;
 import java.awt.font.TextLayout;
@@ -49,7 +50,7 @@ public class SheetUtil {
     /**
      *  Dummy formula evaluator that does nothing.
      *  YK: The only reason of having this class is that
-     *  {@link org.apache.poi.ss.usermodel.DataFormatter#formatCellValue(org.apache.poi.ss.usermodel.Cell)}
+     *  {@link org.zkoss.poi.ss.usermodel.DataFormatter#formatCellValue(org.zkoss.poi.ss.usermodel.Cell)}
      *  returns formula string for formula cells. Dummy evaluator makes it to format the cached formula result.
      *
      *  See Bugzilla #50021 
@@ -65,7 +66,9 @@ public class SheetUtil {
         public int evaluateFormulaCell(Cell cell) {
             return cell.getCachedFormulaResultType();
         }
-
+		public WorkbookEvaluator getWorkbookEvaluator() {
+			return null;
+		}
     };
 
     /**

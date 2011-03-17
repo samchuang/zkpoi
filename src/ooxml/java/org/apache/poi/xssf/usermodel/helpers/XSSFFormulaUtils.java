@@ -17,23 +17,23 @@
  * ====================================================================
  */
 
-package org.apache.poi.xssf.usermodel.helpers;
+package org.zkoss.poi.xssf.usermodel.helpers;
 
-import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
-import org.apache.poi.ss.formula.FormulaParser;
-import org.apache.poi.ss.formula.FormulaRenderer;
-import org.apache.poi.ss.formula.FormulaRenderingWorkbook;
-import org.apache.poi.ss.formula.FormulaType;
-import org.apache.poi.ss.formula.ptg.NamePtg;
-import org.apache.poi.ss.formula.ptg.NameXPtg;
-import org.apache.poi.ss.formula.ptg.Ptg;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFEvaluationWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFName;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
+import org.zkoss.poi.ss.formula.FormulaParser;
+import org.zkoss.poi.ss.formula.FormulaRenderer;
+import org.zkoss.poi.ss.formula.FormulaRenderingWorkbook;
+import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.ss.formula.ptg.NamePtg;
+import org.zkoss.poi.ss.formula.ptg.NameXPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.xssf.usermodel.XSSFCell;
+import org.zkoss.poi.xssf.usermodel.XSSFEvaluationWorkbook;
+import org.zkoss.poi.xssf.usermodel.XSSFName;
+import org.zkoss.poi.xssf.usermodel.XSSFWorkbook;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellFormula;
 
 /**

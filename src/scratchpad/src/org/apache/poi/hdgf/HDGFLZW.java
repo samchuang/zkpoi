@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.poi.util.LZWDecompresser;
+import org.zkoss.poi.util.LZWDecompresser;
 
 /**
  * A decoder for the crazy LZW implementation used

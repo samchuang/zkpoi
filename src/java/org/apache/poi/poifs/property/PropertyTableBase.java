@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.property;
+package org.zkoss.poi.poifs.property;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.apache.poi.poifs.filesystem.BATManaged;
-import org.apache.poi.poifs.storage.HeaderBlock;
+import org.zkoss.poi.poifs.filesystem.BATManaged;
+import org.zkoss.poi.poifs.storage.HeaderBlock;
 
 /**
  * This class embodies the Property Table for the filesystem,

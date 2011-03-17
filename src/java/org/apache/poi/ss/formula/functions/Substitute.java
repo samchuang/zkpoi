@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.functions;
+package org.zkoss.poi.ss.formula.functions;
 
-import org.apache.poi.ss.formula.eval.ErrorEval;
-import org.apache.poi.ss.formula.eval.EvaluationException;
-import org.apache.poi.ss.formula.eval.StringEval;
-import org.apache.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.EvaluationException;
+import org.zkoss.poi.ss.formula.eval.StringEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 
 /**
  * An implementation of the SUBSTITUTE function:<P/>

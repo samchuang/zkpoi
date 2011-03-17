@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.udf;
+package org.zkoss.poi.ss.formula.udf;
 
-import org.apache.poi.ss.formula.atp.AnalysisToolPak;
-import org.apache.poi.ss.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.atp.AnalysisToolPak;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
 
 /**
  * Common interface for "Add-in" libraries and user defined function libraries.

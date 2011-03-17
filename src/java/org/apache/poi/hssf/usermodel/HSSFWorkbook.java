@@ -62,6 +62,8 @@ import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.ss.formula.ptg.Ref3DPtg;
 import org.zkoss.poi.ss.formula.SheetNameFormatter;
 import org.zkoss.poi.ss.formula.ptg.UnionPtg;
+import org.zkoss.poi.ss.formula.udf.AggregatingUDFFinder;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.hssf.util.CellReference;
 import org.zkoss.poi.poifs.filesystem.DirectoryNode;
 import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;

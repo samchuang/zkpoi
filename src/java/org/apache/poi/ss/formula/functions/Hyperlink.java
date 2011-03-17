@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.functions;
+package org.zkoss.poi.ss.formula.functions;
 
-import org.apache.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 
 /**
  * Implementation of Excel HYPERLINK function.<p/>
@@ -31,7 +31,7 @@ import org.apache.poi.ss.formula.eval.ValueEval;
  * <b>link_location</b> The URL of the hyperlink <br/>
  * <b>friendly_name</b> (optional) the value to display<p/>
  *
- *  Returns last argument.  Leaves type unchanged (does not convert to {@link org.apache.poi.ss.formula.eval.StringEval}).
+ *  Returns last argument.  Leaves type unchanged (does not convert to {@link org.zkoss.poi.ss.formula.eval.StringEval}).
  *
  * @author Wayne Clingingsmith
  */

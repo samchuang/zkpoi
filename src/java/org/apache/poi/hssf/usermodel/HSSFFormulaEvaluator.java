@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
 import org.zkoss.poi.ss.formula.eval.NumberEval;
 import org.zkoss.poi.ss.formula.eval.StringEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;

@@ -16,12 +16,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.filesystem;
+package org.zkoss.poi.poifs.filesystem;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.poi.poifs.storage.BATBlock.BATBlockAndIndex;
+import org.zkoss.poi.poifs.storage.BATBlock.BATBlockAndIndex;
 
 /**
  * This abstract class describes a way to read, store, chain

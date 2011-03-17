@@ -73,26 +73,6 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbookProtection;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STSheetState;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
-import org.zkoss.poi.POIXMLDocument;
-import org.zkoss.poi.POIXMLDocumentPart;
-import org.zkoss.poi.POIXMLException;
-import org.zkoss.poi.POIXMLProperties;
-import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
-import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
-import org.zkoss.poi.openxml4j.opc.OPCPackage;
-import org.zkoss.poi.openxml4j.opc.PackagePart;
-import org.zkoss.poi.openxml4j.opc.PackagePartName;
-import org.zkoss.poi.openxml4j.opc.PackageRelationship;
-import org.zkoss.poi.openxml4j.opc.PackageRelationshipTypes;
-import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
-import org.zkoss.poi.openxml4j.opc.TargetMode;
-import org.zkoss.poi.ss.usermodel.Row;
-import org.zkoss.poi.ss.usermodel.Sheet;
-import org.zkoss.poi.ss.usermodel.Workbook;
-import org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy;
-import org.zkoss.poi.ss.util.CellReference;
-import org.zkoss.poi.ss.util.WorkbookUtil;
-import org.zkoss.poi.util.*;
 import org.zkoss.poi.xssf.model.CalculationChain;
 import org.zkoss.poi.xssf.model.ExternalLink;
 import org.zkoss.poi.xssf.model.MapInfo;
@@ -1194,12 +1174,13 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         if (containsSheet(name, sheetIndex ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
 
-        XSSFFormulaUtils utils = new XSSFFormulaUtils(this);
+/*        XSSFFormulaUtils utils = new XSSFFormulaUtils(this);
         utils.updateSheetName(sheetIndex, name);
 
         workbook.getSheets().getSheetArray(sheetIndex).setName(name);
+*/        
         //20110106, henrichen@zkoss.org: handle the externsheet reference
-        final Sheet wsheet = getSheetAt(sheet);
+        final Sheet wsheet = getSheetAt(sheetIndex);
         if (wsheet != null) {
 	        final String oldname = wsheet.getSheetName();
 	        for(String[] names : _externalSheetRefs) {
@@ -1218,7 +1199,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 	        for (XSSFName nm : namedRanges) {
 	            final CTDefinedName ct = nm.getCTName();
 	            if(ct.isSetLocalSheetId()) {
-		            if (ct.getLocalSheetId() == sheet) {
+		            if (ct.getLocalSheetId() == sheetIndex) {
 		            	final String ref = ct.getStringValue();
 		            	final String newref = ref.replaceAll(o+"!", n+"!");
 		            	ct.setStringValue(newref);
@@ -1226,7 +1207,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 	            }
 	        }
         }
-        workbook.getSheets().getSheetArray(sheet).setName(name);
+        workbook.getSheets().getSheetArray(sheetIndex).setName(name);
     }
 
     /**

@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.util.LittleEndianInput;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.util.LittleEndianInput;
 
 /**
  * ReferencePtg - handles references (such as A1, A2, IA4)

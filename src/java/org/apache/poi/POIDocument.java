@@ -161,7 +161,7 @@ public abstract class POIDocument {
 	   } catch(IOException ie) {
 	      // Must be corrupt or something like that
 	      logger.log(POILogger.WARN, "Error creating property set with name " + setName + "\n" + ie);
-	   } catch(org.apache.poi.hpsf.HPSFException he) {
+	   } catch(org.zkoss.poi.hpsf.HPSFException he) {
 	      // Oh well, doesn't exist
 	      logger.log(POILogger.WARN, "Error creating property set with name " + setName + "\n" + he);
 	   }

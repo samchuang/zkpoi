@@ -16,7 +16,7 @@
 ==================================================================== */
 package org.zkoss.poi.ss.usermodel;
 
-import org.zkoss.poi.hssf.record.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.ss.formula.IStabilityClassifier;
 import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 

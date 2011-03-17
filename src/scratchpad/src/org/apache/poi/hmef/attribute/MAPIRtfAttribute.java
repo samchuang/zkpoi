@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.attribute;
+package org.zkoss.poi.hmef.attribute;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.poi.hmef.Attachment;
-import org.apache.poi.hmef.CompressedRTF;
-import org.apache.poi.hmef.HMEFMessage;
-import org.apache.poi.hsmf.datatypes.MAPIProperty;
-import org.apache.poi.util.StringUtil;
+import org.zkoss.poi.hmef.Attachment;
+import org.zkoss.poi.hmef.CompressedRTF;
+import org.zkoss.poi.hmef.HMEFMessage;
+import org.zkoss.poi.hsmf.datatypes.MAPIProperty;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * A pure-MAPI attribute holding RTF (compressed or not), which applies 

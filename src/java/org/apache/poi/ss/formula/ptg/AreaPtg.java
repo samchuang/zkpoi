@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.ss.util.AreaReference;
-import org.apache.poi.util.LittleEndianInput;
+import org.zkoss.poi.ss.util.AreaReference;
+import org.zkoss.poi.util.LittleEndianInput;
 
 /**
  * Specifies a rectangular area of cells A1:A4 for instance.

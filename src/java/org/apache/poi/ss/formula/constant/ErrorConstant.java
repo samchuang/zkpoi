@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.constant;
+package org.zkoss.poi.ss.formula.constant;
 
-import org.apache.poi.ss.usermodel.ErrorConstants;
+import org.zkoss.poi.ss.usermodel.ErrorConstants;
 /**
  * Represents a constant error code value as encoded in a constant values array. <p/>
  * 

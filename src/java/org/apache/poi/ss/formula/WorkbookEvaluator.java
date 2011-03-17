@@ -66,6 +66,7 @@ import org.zkoss.poi.ss.formula.eval.ValuesEval;
 import org.zkoss.poi.ss.formula.functions.Choose;
 import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
 import org.zkoss.poi.ss.formula.functions.IfFunc;
+import org.zkoss.poi.ss.formula.udf.AggregatingUDFFinder;
 import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.hssf.usermodel.HSSFEvaluationWorkbook;
 import org.zkoss.poi.hssf.util.CellReference;

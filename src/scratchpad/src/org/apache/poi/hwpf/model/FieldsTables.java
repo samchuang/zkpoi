@@ -17,7 +17,7 @@
  * ====================================================================
  */
 
-package org.apache.poi.hwpf.model;
+package org.zkoss.poi.hwpf.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

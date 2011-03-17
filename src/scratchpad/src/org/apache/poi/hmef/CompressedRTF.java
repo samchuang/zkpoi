@@ -15,16 +15,16 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef;
+package org.zkoss.poi.hmef;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.LZWDecompresser;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.util.IOUtils;
+import org.zkoss.poi.util.LZWDecompresser;
+import org.zkoss.poi.util.LittleEndian;
 
 
 /**

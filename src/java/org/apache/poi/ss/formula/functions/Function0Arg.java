@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.functions;
+package org.zkoss.poi.ss.formula.functions;
 
-import org.apache.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 
 /**
  * Implemented by all functions that can be called with zero arguments

@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.attribute;
+package org.zkoss.poi.hmef.attribute;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.poi.hmef.Attachment;
-import org.apache.poi.hmef.HMEFMessage;
+import org.zkoss.poi.hmef.Attachment;
+import org.zkoss.poi.hmef.HMEFMessage;
 
 /**
  * A TNEF Attribute holding MAPI Attributes, which applies to a 

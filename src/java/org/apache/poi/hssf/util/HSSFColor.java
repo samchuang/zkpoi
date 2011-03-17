@@ -1701,4 +1701,42 @@ public class HSSFColor implements Color {
     public boolean isIndex() {
     	return true;
     }
+    
+    //20110317, henrichen@zkoss.org: handle r,g,b to index
+    /**
+     * this function returns all colors in a hastable.  Its not implemented as a
+     * static member/staticly initialized because that would be dirty in a
+     * server environment as it is intended.  This means you'll eat the time
+     * it takes to create it once per request but you will not hold onto it
+     * if you have none of those requests.
+     *
+     * @return a hashtable containing all colors keyed by String gnumeric-like triplets
+     */
+    private static Hashtable<short[],HSSFColor> rgbHash; 
+    public final static Hashtable<short[],HSSFColor> getRgbHash() {
+    	if (rgbHash == null) {
+    		rgbHash = createColorsByRgbMap();
+    	}
+    	return rgbHash;
+    }
+    private static synchronized Hashtable<short[],HSSFColor> createColorsByRgbMap() {
+        HSSFColor[] colors = getAllColors();
+        Hashtable<short[],HSSFColor> result = new Hashtable<short[],HSSFColor>(colors.length * 3 / 2);
+
+        for (int i = 0; i < colors.length; i++) {
+            HSSFColor color = colors[i];
+
+            short[] rgb = color.getTriplet();
+            if (result.containsKey(rgb)) {
+            	HSSFColor other = (HSSFColor)result.get(rgb);
+                throw new RuntimeException(
+                		"Dup color triplet (" + rgb
+                        + ") for color (" + color.getClass().getName() + ") - "
+                        + " already taken by (" + other.getClass().getName() + ")"
+                );
+            }
+            result.put(rgb, color);
+        }
+        return result;
+    }
 }

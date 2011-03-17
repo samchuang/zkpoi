@@ -565,7 +565,7 @@ final class LinkTable {
         int numberOfNames = extBlock.getNumberOfNames();
         // a new name is inserted in the end of the SupBookRecord, after the last name
         _workbookRecordList.add(supLinkIndex + numberOfNames, extNameRecord);
-        int ix = _externSheetRecord.getRefIxForSheet(extBlockIndex, -2 /* the scope is workbook*/);
+        int ix = _externSheetRecord.getRefIxForSheet(extBlockIndex, -2, -2/* the scope is workbook*/);
         return new NameXPtg(ix, nameIndex);
     }
 

@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.udf;
+package org.zkoss.poi.ss.formula.udf;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.ss.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
 
 /**
  * Default UDF finder - for adding your own user defined functions.

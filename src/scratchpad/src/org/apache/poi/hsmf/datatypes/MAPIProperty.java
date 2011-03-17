@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hsmf.datatypes;
+package org.zkoss.poi.hsmf.datatypes;
 
-import static org.apache.poi.hsmf.datatypes.Types.ASCII_STRING;
-import static org.apache.poi.hsmf.datatypes.Types.BINARY;
-import static org.apache.poi.hsmf.datatypes.Types.BOOLEAN;
-import static org.apache.poi.hsmf.datatypes.Types.DIRECTORY;
-import static org.apache.poi.hsmf.datatypes.Types.LONG;
-import static org.apache.poi.hsmf.datatypes.Types.TIME;
+import static org.zkoss.poi.hsmf.datatypes.Types.ASCII_STRING;
+import static org.zkoss.poi.hsmf.datatypes.Types.BINARY;
+import static org.zkoss.poi.hsmf.datatypes.Types.BOOLEAN;
+import static org.zkoss.poi.hsmf.datatypes.Types.DIRECTORY;
+import static org.zkoss.poi.hsmf.datatypes.Types.LONG;
+import static org.zkoss.poi.hsmf.datatypes.Types.TIME;
 
 import java.util.Collection;
 import java.util.Collections;

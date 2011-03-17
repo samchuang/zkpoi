@@ -24,8 +24,8 @@ import org.zkoss.poi.ss.formula.FormulaType;
 import org.zkoss.poi.ss.formula.FormulaRenderer;
 import org.zkoss.poi.ss.usermodel.Row;
 import org.zkoss.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.formula.FormulaShifter;
-import org.apache.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellFormula;
 

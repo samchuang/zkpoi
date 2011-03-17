@@ -15,14 +15,14 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.attribute;
+package org.zkoss.poi.hmef.attribute;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.poi.hmef.Attachment;
-import org.apache.poi.hmef.HMEFMessage;
-import org.apache.poi.util.StringUtil;
+import org.zkoss.poi.hmef.Attachment;
+import org.zkoss.poi.hmef.HMEFMessage;
+import org.zkoss.poi.util.StringUtil;
 
 /**
  * A String attribute which applies to a {@link HMEFMessage}

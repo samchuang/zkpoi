@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.extractor;
+package org.zkoss.poi.hmef.extractor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,10 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.poi.hmef.Attachment;
-import org.apache.poi.hmef.HMEFMessage;
-import org.apache.poi.hmef.attribute.MAPIRtfAttribute;
-import org.apache.poi.hsmf.datatypes.MAPIProperty;
+import org.zkoss.poi.hmef.Attachment;
+import org.zkoss.poi.hmef.HMEFMessage;
+import org.zkoss.poi.hmef.attribute.MAPIRtfAttribute;
+import org.zkoss.poi.hsmf.datatypes.MAPIProperty;
 
 /**
  * A utility for extracting out the message body, and all attachments

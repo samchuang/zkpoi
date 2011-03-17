@@ -15,11 +15,11 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.eval;
+package org.zkoss.poi.ss.formula.eval;
 
-import org.apache.poi.ss.formula.functions.Fixed2ArgFunction;
-import org.apache.poi.ss.formula.functions.Function;
-import org.apache.poi.ss.util.NumberComparer;
+import org.zkoss.poi.ss.formula.functions.Fixed2ArgFunction;
+import org.zkoss.poi.ss.formula.functions.Function;
+import org.zkoss.poi.ss.util.NumberComparer;
 
 /**
  * Base class for all comparison operator evaluators

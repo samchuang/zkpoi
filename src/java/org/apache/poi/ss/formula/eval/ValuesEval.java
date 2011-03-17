@@ -17,38 +17,21 @@
 
 package org.zkoss.poi.ss.formula.eval;
 
-import org.zkoss.poi.ss.formula.ptg.Ptg;
-import org.zkoss.poi.ss.formula.ptg.StringPtg;
 
 /**
- * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
+ * Represent many {@link ValueEval}s; used in 3d area or reference(e.g. Sheet1:Sheet3!A1:B1).
+ * @author	Henri Chen (henrichen at zkoss dot org) - Sheet1:Sheet3!xxx 3d reference
  */
-public final class StringEval implements StringValueEval {
-
-	public static final StringEval EMPTY_INSTANCE = new StringEval("");
-
-	private final String _value;
-
-	public StringEval(Ptg ptg) {
-		this(((StringPtg) ptg).getValue());
+public final class ValuesEval implements ValueEval {
+	private final ValueEval[] _evals;
+	public ValuesEval(ValueEval[] evals) {
+		_evals = evals;
 	}
-
-	public StringEval(String value) {
-		if (value == null) {
-			throw new IllegalArgumentException("value must not be null");
-		}
-		_value = value;
-	}
-
-	public String getStringValue() {
-		return _value;
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder(64);
-		sb.append(getClass().getName()).append(" [");
-		sb.append(_value);
-		sb.append("]");
-		return sb.toString();
+	/**
+	 * Return the containing ValueEvals.
+	 * @return the containing ValueEvals.
+	 */
+	public ValueEval[] getValueEvals() {
+		return _evals;
 	}
 }

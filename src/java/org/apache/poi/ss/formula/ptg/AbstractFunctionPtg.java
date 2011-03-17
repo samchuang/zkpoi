@@ -15,10 +15,10 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.ptg;
+package org.zkoss.poi.ss.formula.ptg;
 
-import org.apache.poi.ss.formula.function.FunctionMetadata;
-import org.apache.poi.ss.formula.function.FunctionMetadataRegistry;
+import org.zkoss.poi.ss.formula.function.FunctionMetadata;
+import org.zkoss.poi.ss.formula.function.FunctionMetadataRegistry;
 
 
 /**

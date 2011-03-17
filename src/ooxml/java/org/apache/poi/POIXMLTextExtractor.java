@@ -22,7 +22,7 @@ import org.zkoss.poi.POITextExtractor;
 import org.zkoss.poi.POIXMLProperties.CoreProperties;
 import org.zkoss.poi.POIXMLProperties.CustomProperties;
 import org.zkoss.poi.POIXMLProperties.ExtendedProperties;
-import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
 
 public abstract class POIXMLTextExtractor extends POITextExtractor {
 	/** The POIXMLDocument that's open */

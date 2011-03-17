@@ -15,9 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
-import org.apache.poi.ss.formula.ptg.*;
+import org.zkoss.poi.ss.formula.ptg.*;
 
 
 /**

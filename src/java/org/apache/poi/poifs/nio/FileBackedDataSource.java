@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.nio;
+package org.zkoss.poi.poifs.nio;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +27,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 
-import org.apache.poi.util.IOUtils;
+import org.zkoss.poi.util.IOUtils;
 
 /**
  * A POIFS {@link DataSource} backed by a File

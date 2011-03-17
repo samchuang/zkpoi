@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.poifs.nio;
+package org.zkoss.poi.poifs.nio;
 
 import java.io.IOException;
 import java.io.OutputStream;

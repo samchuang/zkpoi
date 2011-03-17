@@ -15,12 +15,12 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.util;
+package org.zkoss.poi.util;
 
 import java.io.FilterInputStream;
 import java.io.InputStream;
 
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
  * A wrapper around an {@link InputStream}, which 

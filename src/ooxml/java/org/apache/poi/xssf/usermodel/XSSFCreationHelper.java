@@ -16,10 +16,6 @@
 ==================================================================== */
 package org.zkoss.poi.xssf.usermodel;
 
-import org.zkoss.poi.hssf.record.formula.udf.UDFFinder;
-import org.zkoss.poi.hssf.usermodel.HSSFEvaluationWorkbook;
-import org.zkoss.poi.ss.formula.IStabilityClassifier;
-import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.usermodel.CreationHelper;
 
 public class XSSFCreationHelper implements CreationHelper {

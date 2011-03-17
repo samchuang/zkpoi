@@ -62,7 +62,7 @@ import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 import org.zkoss.poi.POIXMLDocumentPart;
-import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
+import org.zkoss.poi.ss.formula.SheetNameFormatter;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.ss.usermodel.ChartInfo;

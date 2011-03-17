@@ -21,9 +21,9 @@ import org.zkoss.poi.hssf.model.HSSFFormulaParser;
 import org.zkoss.poi.hssf.model.InternalWorkbook;
 import org.zkoss.poi.hssf.record.NameRecord;
 import org.zkoss.poi.hssf.record.aggregates.FormulaRecordAggregate;
-import org.zkoss.poi.hssf.record.formula.NamePtg;
-import org.zkoss.poi.hssf.record.formula.NameXPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.NamePtg;
+import org.zkoss.poi.ss.formula.ptg.NameXPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.formula.EvaluationCell;
 import org.zkoss.poi.ss.formula.EvaluationName;
@@ -33,7 +33,7 @@ import org.zkoss.poi.ss.formula.FormulaParseException;
 import org.zkoss.poi.ss.formula.FormulaParsingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaRenderingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaType;
-import org.apache.poi.ss.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
 
 /**
  * Internal POI use only

@@ -16,7 +16,7 @@
 ==================================================================== */
 package org.zkoss.poi.xssf.usermodel;
 
-import org.apache.poi.xssf.model.ThemesTable;
+import org.zkoss.poi.xssf.model.ThemesTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBooleanProperty;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFont;

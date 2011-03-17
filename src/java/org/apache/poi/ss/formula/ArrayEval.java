@@ -12,12 +12,12 @@ Copyright (C) 2010 Potix Corporation. All Rights Reserved.
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.AreaI;
-import org.zkoss.poi.hssf.record.formula.ArrayPtg;
-import org.zkoss.poi.hssf.record.formula.eval.AreaEval;
-import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
-import org.zkoss.poi.hssf.record.formula.eval.StringEval;
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.AreaEval;
+import org.zkoss.poi.ss.formula.eval.NumberEval;
+import org.zkoss.poi.ss.formula.eval.StringEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.ptg.AreaI;
+import org.zkoss.poi.ss.formula.ptg.ArrayPtg;
 
 import com.sun.org.apache.xml.internal.utils.UnImplNode;
 

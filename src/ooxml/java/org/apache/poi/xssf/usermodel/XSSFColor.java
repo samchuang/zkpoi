@@ -16,7 +16,7 @@
 ==================================================================== */
 package org.zkoss.poi.xssf.usermodel;
 
-import org.apache.poi.hssf.util.HSSFColor;
+import org.zkoss.poi.hssf.util.HSSFColor;
 import org.zkoss.poi.ss.usermodel.Color;
 import org.zkoss.poi.util.Internal;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;

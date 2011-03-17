@@ -15,13 +15,13 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula;
+package org.zkoss.poi.ss.formula;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.SpreadsheetVersion;
 
 /**
  * Formats sheet names for use in formula expressions.
@@ -181,7 +181,7 @@ public final class SheetNameFormatter {
 	 * For better or worse this implementation attempts to replicate Excel's formula renderer.
 	 * Excel uses range checking on the apparent 'row' and 'column' components.  Note however that
 	 * the maximum sheet size varies across versions.
-	 * @see org.apache.poi.ss.util.CellReference
+	 * @see org.zkoss.poi.ss.util.CellReference
 	 */
 	/* package */ static boolean cellReferenceIsWithinRange(String lettersPrefix, String numbersSuffix) {
 		return CellReference.cellReferenceIsWithinRange(lettersPrefix, numbersSuffix, SpreadsheetVersion.EXCEL97);

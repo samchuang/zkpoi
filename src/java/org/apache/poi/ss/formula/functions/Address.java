@@ -14,11 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.ss.formula.functions;
+package org.zkoss.poi.ss.formula.functions;
 
-import org.apache.poi.ss.formula.SheetNameFormatter;
-import org.apache.poi.ss.formula.eval.*;
-import org.apache.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.formula.SheetNameFormatter;
+import org.zkoss.poi.ss.formula.eval.*;
+import org.zkoss.poi.ss.util.CellReference;
 
 /**
  * Creates a text reference as text, given specified row and column numbers.

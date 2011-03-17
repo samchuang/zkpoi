@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.function;
+package org.zkoss.poi.ss.formula.function;
 
 import java.util.HashMap;
 import java.util.HashSet;

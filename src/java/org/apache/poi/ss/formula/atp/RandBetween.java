@@ -14,15 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.apache.poi.ss.formula.atp;
+package org.zkoss.poi.ss.formula.atp;
 
-import org.apache.poi.ss.formula.eval.ErrorEval;
-import org.apache.poi.ss.formula.eval.EvaluationException;
-import org.apache.poi.ss.formula.eval.NumberEval;
-import org.apache.poi.ss.formula.eval.OperandResolver;
-import org.apache.poi.ss.formula.eval.ValueEval;
-import org.apache.poi.ss.formula.functions.FreeRefFunction;
-import org.apache.poi.ss.formula.OperationEvaluationContext;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.EvaluationException;
+import org.zkoss.poi.ss.formula.eval.NumberEval;
+import org.zkoss.poi.ss.formula.eval.OperandResolver;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.OperationEvaluationContext;
 
 /**
  * Implementation of Excel 'Analysis ToolPak' function RANDBETWEEN()<br/>
@@ -50,7 +50,7 @@ final class RandBetween implements FreeRefFunction{
 	 * Bottom is rounded up and top value is rounded down. After rounding top has to be set greater
 	 * than top.
 	 * 
-	 * @see org.apache.poi.ss.formula.functions.FreeRefFunction#evaluate(org.apache.poi.ss.formula.eval.ValueEval[], org.apache.poi.ss.formula.OperationEvaluationContext)
+	 * @see org.zkoss.poi.ss.formula.functions.FreeRefFunction#evaluate(org.zkoss.poi.ss.formula.eval.ValueEval[], org.zkoss.poi.ss.formula.OperationEvaluationContext)
 	 */
 	public ValueEval evaluate(ValueEval[] args, OperationEvaluationContext ec) {
 		

@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hmef.attribute;
+package org.zkoss.poi.hmef.attribute;
 
 import java.util.Date;
 
-import org.apache.poi.hmef.Attachment;
-import org.apache.poi.hmef.HMEFMessage;
-import org.apache.poi.hpsf.Util;
-import org.apache.poi.hsmf.datatypes.MAPIProperty;
-import org.apache.poi.util.LittleEndian;
+import org.zkoss.poi.hmef.Attachment;
+import org.zkoss.poi.hmef.HMEFMessage;
+import org.zkoss.poi.hpsf.Util;
+import org.zkoss.poi.hsmf.datatypes.MAPIProperty;
+import org.zkoss.poi.util.LittleEndian;
 
 /**
  * A pure-MAPI attribute holding a Date, which applies 

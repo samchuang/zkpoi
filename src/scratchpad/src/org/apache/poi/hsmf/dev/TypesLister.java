@@ -15,15 +15,15 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.hsmf.dev;
+package org.zkoss.poi.hsmf.dev;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.apache.poi.hsmf.datatypes.MAPIProperty;
-import org.apache.poi.hsmf.datatypes.Types;
+import org.zkoss.poi.hsmf.datatypes.MAPIProperty;
+import org.zkoss.poi.hsmf.datatypes.Types;
 
 /**
  * Lists the different MAPI types

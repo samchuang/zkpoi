@@ -15,7 +15,7 @@
    limitations under the License.
 ==================================================================== */
 
-package org.apache.poi.ss.formula.function;
+package org.zkoss.poi.ss.formula.function;
 
 /**
  * Holds information about Excel built-in functions.
@@ -29,7 +29,7 @@ public final class FunctionMetadata {
 	 * from the SpreadsheetVersion enum.
 	 * Perhaps a value like 'M' should be used instead of '30' in functionMetadata.txt
 	 * to make that file more version neutral.
-	 * @see org.apache.poi.ss.formula.FormulaParser#validateNumArgs(int, FunctionMetadata)
+	 * @see org.zkoss.poi.ss.formula.FormulaParser#validateNumArgs(int, FunctionMetadata)
 	 */
 	private static final short FUNCTION_MAX_PARAMS = 30;
 
@@ -75,7 +75,7 @@ public final class FunctionMetadata {
 	 * can be passed.  Other functions (like SUM) don't have such a limit.  For those functions,
 	 * the spreadsheet version determines the maximum number of arguments that can be passed.
 	 * @return <code>true</code> if this function can the maximum number of arguments allowable by
-	 * the {@link org.apache.poi.ss.SpreadsheetVersion}
+	 * the {@link org.zkoss.poi.ss.SpreadsheetVersion}
 	 */
 	public boolean hasUnlimitedVarags() {
 		return FUNCTION_MAX_PARAMS == _maxParams;
