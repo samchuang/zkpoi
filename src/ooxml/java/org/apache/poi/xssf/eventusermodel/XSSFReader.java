@@ -23,11 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.xmlbeans.XmlException;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTExternalLink;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbook;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
 import org.zkoss.poi.POIXMLException;
 import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
 import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
@@ -35,11 +30,18 @@ import org.zkoss.poi.openxml4j.opc.OPCPackage;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackagePartName;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.zkoss.poi.openxml4j.opc.PackageRelationshipTypes;
 import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
+import org.zkoss.poi.xssf.model.CommentsTable;
 import org.zkoss.poi.xssf.model.SharedStringsTable;
 import org.zkoss.poi.xssf.model.StylesTable;
 import org.zkoss.poi.xssf.usermodel.XSSFRelation;
+import org.apache.xmlbeans.XmlException;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTExternalLink;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorkbook;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorkbookDocument;
 
 /**
  * This class makes it easy to get at individual parts
@@ -156,7 +158,7 @@ public class XSSFReader {
          * Current CTSheet bean
          */
         private CTSheet ctSheet;
-
+        
         /**
          * Iterator over CTSheet objects, returns sheets in <tt>logical</tt> order.
          * We can't rely on the Ooxml4J's relationship iterator because it returns objects in physical order,
@@ -229,7 +231,40 @@ public class XSSFReader {
         public String getSheetName() {
             return ctSheet.getName();
         }
+        
+        /**
+         * Returns the comments associated with this sheet,
+         *  or null if there aren't any
+         */
+        public CommentsTable getSheetComments() {
+           PackagePart sheetPkg = getSheetPart();
+           
+           // Do we have a comments relationship? (Only ever one if so)
+           try {
+              PackageRelationshipCollection commentsList = 
+                   sheetPkg.getRelationshipsByType(XSSFRelation.SHEET_COMMENTS.getRelation());
+              if(commentsList.size() > 0) {
+                 PackageRelationship comments = commentsList.getRelationship(0);
+                 PackagePartName commentsName = PackagingURIHelper.createPartName(comments.getTargetURI());
+                 PackagePart commentsPart = sheetPkg.getPackage().getPart(commentsName);
+                 return new CommentsTable(commentsPart, comments);
+              }
+           } catch (InvalidFormatException e) {
+              return null;
+           } catch (IOException e) {
+              return null;
+           }
+           return null;
+        }
+        
+        public PackagePart getSheetPart() {
+           String sheetId = ctSheet.getId();
+           return sheetMap.get(sheetId);
+        }
 
+        /**
+         * We're read only, so remove isn't supported
+         */
         public void remove() {
             throw new IllegalStateException("Not supported");
         }

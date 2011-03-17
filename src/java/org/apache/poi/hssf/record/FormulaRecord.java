@@ -17,8 +17,8 @@
 
 package org.zkoss.poi.hssf.record;
 
-import org.zkoss.poi.hssf.record.formula.Ptg;
-import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
 import org.zkoss.poi.hssf.usermodel.HSSFCell;
 import org.zkoss.poi.ss.formula.Formula;
 import org.zkoss.poi.util.BitField;
@@ -359,7 +359,7 @@ public final class FormulaRecord extends CellRecord {
 		sb.append("    .alwaysCalc= ").append(isAlwaysCalc()).append("\n");
 		sb.append("    .calcOnLoad= ").append(isCalcOnLoad()).append("\n");
 		sb.append("    .shared    = ").append(isSharedFormula()).append("\n");
-		sb.append("  .zero      = ").append(HexDump.intToHex(field_6_zero));
+		sb.append("  .zero      = ").append(HexDump.intToHex(field_6_zero)).append("\n");
 
 		Ptg[] ptgs = field_8_parsed_expr.getTokens();
 		for (int k = 0; k < ptgs.length; k++ ) {

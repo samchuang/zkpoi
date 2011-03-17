@@ -17,12 +17,12 @@
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.eval.BlankEval;
-import org.zkoss.poi.hssf.record.formula.eval.BoolEval;
-import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
-import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
-import org.zkoss.poi.hssf.record.formula.eval.StringEval;
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.BlankEval;
+import org.zkoss.poi.ss.formula.eval.BoolEval;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.NumberEval;
+import org.zkoss.poi.ss.formula.eval.StringEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.ss.formula.IEvaluationListener.ICacheEntry;
 
 /**

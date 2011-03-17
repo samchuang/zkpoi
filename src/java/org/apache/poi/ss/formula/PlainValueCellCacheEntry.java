@@ -17,7 +17,7 @@
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 
 /**
  * Used for non-formula cells, primarily to keep track of the referencing (formula) cells.

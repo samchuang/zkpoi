@@ -17,10 +17,10 @@
 
 package org.zkoss.poi.xssf.usermodel;
 
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDefinedName;
-import org.zkoss.poi.hssf.record.formula.NamePtg;
-import org.zkoss.poi.hssf.record.formula.NameXPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.ptg.NamePtg;
+import org.zkoss.poi.ss.formula.ptg.NameXPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.formula.EvaluationCell;
 import org.zkoss.poi.ss.formula.EvaluationName;
@@ -30,7 +30,11 @@ import org.zkoss.poi.ss.formula.FormulaParser;
 import org.zkoss.poi.ss.formula.FormulaParsingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaRenderingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaType;
-import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalName;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
+import org.zkoss.poi.xssf.model.IndexedUDFFinder;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDefinedName;
+
+import java.util.HashMap;
 
 /**
  * Internal POI use only
@@ -102,9 +106,17 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public NameXPtg getNameXPtg(String name) {
-		// may require to return null to make tests pass
-		throw new RuntimeException("Not implemented yet");
+        IndexedUDFFinder udfFinder = (IndexedUDFFinder)getUDFFinder();
+        FreeRefFunction func = udfFinder.findFunction(name);
+		if(func == null) return null;
+        else return new NameXPtg(0, udfFinder.getFunctionIndex(name));
 	}
+
+    public String resolveNameXText(NameXPtg n) {
+        int idx = n.getNameIndex();
+        IndexedUDFFinder udfFinder = (IndexedUDFFinder)getUDFFinder();
+        return udfFinder.getFunctionName(idx);
+    }
 
 	public EvaluationSheet getSheet(int sheetIndex) {
 		return new XSSFEvaluationSheet(_uBook.getSheetAt(sheetIndex));
@@ -128,14 +140,6 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 		return _uBook.getSheetIndex(sheetName);
 	}
 
-	/**
-	 * TODO - figure out what the hell this methods does in
-	 *  HSSF...
-	 */
-	public String resolveNameXText(NameXPtg n) {
-		throw new RuntimeException("method not implemented yet");
-	}
-
 	public String getSheetNameByExternSheet(int externSheetIndex) {
 		String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);
 		//20101213, henrichen@zkoss.org: sheet could have been deleted
@@ -152,8 +156,26 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	public Ptg[] getFormulaTokens(EvaluationCell evalCell) {
 		XSSFCell cell = ((XSSFEvaluationCell)evalCell).getXSSFCell();
 		XSSFEvaluationWorkbook frBook = XSSFEvaluationWorkbook.create(_uBook);
-		return FormulaParser.parse(cell.getCellFormula(), frBook, FormulaType.CELL, _uBook.getSheetIndex(cell.getSheet()));
+		String formulaText = cleanXSSFFormulaText(cell.getCellFormula());
+		return FormulaParser.parse(formulaText, frBook, FormulaType.CELL, _uBook.getSheetIndex(cell.getSheet()));
 	}
+
+    public UDFFinder getUDFFinder(){
+        return _uBook.getUDFFinder();
+    }
+    
+   /**
+    * XSSF allows certain extra textual characters in the formula that
+    *  HSSF does not. As these can't be composed down to HSSF-compatible
+    *  Ptgs, this method strips them out for us.
+    */
+   private String cleanXSSFFormulaText(String text) {
+      // Newlines are allowed in XSSF
+      text = text.replaceAll("\\n", "").replaceAll("\\r", "");
+      
+      // All done with cleaning
+      return text;
+   }
 
 	private static final class Name implements EvaluationName {
 

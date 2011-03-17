@@ -19,13 +19,13 @@ package org.zkoss.poi.xssf.usermodel;
 
 import java.util.Iterator;
 
-import org.zkoss.poi.hssf.record.formula.eval.BoolEval;
-import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
-import org.zkoss.poi.hssf.record.formula.eval.HyperlinkEval;
-import org.zkoss.poi.hssf.record.formula.eval.NumberEval;
-import org.zkoss.poi.hssf.record.formula.eval.StringEval;
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
-import org.zkoss.poi.hssf.record.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.formula.eval.BoolEval;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
+import org.zkoss.poi.ss.formula.eval.NumberEval;
+import org.zkoss.poi.ss.formula.eval.StringEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.ss.formula.IStabilityClassifier;
 import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.usermodel.Cell;

@@ -21,7 +21,7 @@ import org.zkoss.poi.hssf.model.HSSFFormulaParser;
 import org.zkoss.poi.hssf.record.cf.BorderFormatting;
 import org.zkoss.poi.hssf.record.cf.FontFormatting;
 import org.zkoss.poi.hssf.record.cf.PatternFormatting;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.usermodel.HSSFSheet;
 import org.zkoss.poi.ss.formula.Formula;
 import org.zkoss.poi.ss.formula.FormulaType;

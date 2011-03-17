@@ -19,7 +19,7 @@ package org.zkoss.poi.hssf.record.chart;
 
 import org.zkoss.poi.hssf.record.RecordInputStream;
 import org.zkoss.poi.hssf.record.StandardRecord;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.ss.formula.Formula;
 import org.zkoss.poi.util.BitField;
 import org.zkoss.poi.util.BitFieldFactory;

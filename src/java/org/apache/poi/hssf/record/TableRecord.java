@@ -17,7 +17,7 @@
 
 package org.zkoss.poi.hssf.record;
 
-import org.zkoss.poi.hssf.record.formula.TblPtg;
+import org.zkoss.poi.ss.formula.ptg.TblPtg;
 import org.zkoss.poi.hssf.util.CellRangeAddress8Bit;
 import org.zkoss.poi.hssf.util.CellReference;
 import org.zkoss.poi.util.BitField;

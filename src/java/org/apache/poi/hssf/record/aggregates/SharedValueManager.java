@@ -29,7 +29,7 @@ import org.zkoss.poi.hssf.record.FormulaRecord;
 import org.zkoss.poi.hssf.record.SharedFormulaRecord;
 import org.zkoss.poi.hssf.record.SharedValueRecordBase;
 import org.zkoss.poi.hssf.record.TableRecord;
-import org.zkoss.poi.hssf.record.formula.ExpPtg;
+import org.zkoss.poi.ss.formula.ptg.ExpPtg;
 import org.zkoss.poi.hssf.util.CellRangeAddress8Bit;
 import org.zkoss.poi.ss.util.CellReference;
 

@@ -791,6 +791,11 @@ public class Range { // TODO -instantiable superclass
 
 		int[] point = findRange(_paragraphs, _parStart, Math.max(chpx.getStart(), _start), chpx
 				.getEnd());
+
+        if (point[0] >= _paragraphs.size()) {
+            return null;
+        }
+
 		PAPX papx = _paragraphs.get(point[0]);
 		short istd = papx.getIstd();
 
@@ -973,6 +978,11 @@ public class Range { // TODO -instantiable superclass
 
 		while (node==null || (node.getEnd() <= start && x < rpl.size() - 1)) {
 			x++;
+
+            if (x>=rpl.size()) {
+                return new int[] {0, 0};
+            }
+
 			node = rpl.get(x);
 		}
 

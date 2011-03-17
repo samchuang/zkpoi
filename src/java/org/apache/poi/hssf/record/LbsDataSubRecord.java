@@ -16,7 +16,7 @@
 ==================================================================== */
 package org.zkoss.poi.hssf.record;
 
-import org.zkoss.poi.hssf.record.formula.*;
+import org.zkoss.poi.ss.formula.ptg.*;
 import org.zkoss.poi.util.*;
 
 /**

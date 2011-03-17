@@ -18,7 +18,7 @@
 package org.zkoss.poi.hssf.record;
 
 import org.zkoss.poi.hssf.record.common.UnicodeString;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.usermodel.HSSFDataValidation;
 import org.zkoss.poi.ss.formula.Formula;
 import org.zkoss.poi.ss.util.CellRangeAddress;

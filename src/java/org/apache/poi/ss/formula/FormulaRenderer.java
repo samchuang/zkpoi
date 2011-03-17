@@ -19,13 +19,13 @@ package org.zkoss.poi.ss.formula;
 
 import java.util.Stack;
 
-import org.zkoss.poi.hssf.record.formula.AttrPtg;
-import org.zkoss.poi.hssf.record.formula.MemAreaPtg;
-import org.zkoss.poi.hssf.record.formula.MemErrPtg;
-import org.zkoss.poi.hssf.record.formula.MemFuncPtg;
-import org.zkoss.poi.hssf.record.formula.OperationPtg;
-import org.zkoss.poi.hssf.record.formula.ParenthesisPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.AttrPtg;
+import org.zkoss.poi.ss.formula.ptg.MemAreaPtg;
+import org.zkoss.poi.ss.formula.ptg.MemErrPtg;
+import org.zkoss.poi.ss.formula.ptg.MemFuncPtg;
+import org.zkoss.poi.ss.formula.ptg.OperationPtg;
+import org.zkoss.poi.ss.formula.ptg.ParenthesisPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 
 /**
  * Common logic for rendering formulas.<br/>

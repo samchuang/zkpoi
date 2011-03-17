@@ -29,8 +29,8 @@ import org.zkoss.poi.hssf.record.Record;
 import org.zkoss.poi.hssf.record.RecordBase;
 import org.zkoss.poi.hssf.record.StringRecord;
 import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
-import org.zkoss.poi.hssf.record.formula.FormulaShifter;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 
 /**
  *

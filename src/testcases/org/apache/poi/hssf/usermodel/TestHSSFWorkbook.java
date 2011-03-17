@@ -32,10 +32,12 @@ import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.RecordBase;
 import org.apache.poi.hssf.record.RecordFormatException;
 import org.apache.poi.hssf.record.WindowOneRecord;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
+import org.apache.poi.ss.formula.ptg.Area3DPtg;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.util.TempFile;
 import org.apache.poi.ss.usermodel.BaseTestWorkbook;
+import org.apache.poi.poifs.filesystem.DirectoryNode;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.hpsf.ClassID;
@@ -529,5 +531,51 @@ public final class TestHSSFWorkbook extends BaseTestWorkbook {
         ClassID clsid2 = fs2.getRoot().getStorageClsid();
 
         assertTrue(clsid1.equals(clsid2));
+    }
+    
+    /**
+     * Tests that we can work with both {@link POIFSFileSystem}
+     *  and {@link NPOIFSFileSystem}
+     */
+    public void testDifferentPOIFS() throws Exception {
+       // Open the two filesystems
+       DirectoryNode[] files = new DirectoryNode[2];
+       files[0] = (new POIFSFileSystem(HSSFTestDataSamples.openSampleFileStream("Simple.xls"))).getRoot();
+       files[1] = (new NPOIFSFileSystem(HSSFTestDataSamples.getSampeFile("Simple.xls"))).getRoot();
+       
+       // Open without preserving nodes 
+       for(DirectoryNode dir : files) {
+          HSSFWorkbook workbook = new HSSFWorkbook(dir, false);
+          HSSFSheet sheet = workbook.getSheetAt(0);
+          HSSFCell cell = sheet.getRow(0).getCell(0);
+          assertEquals("replaceMe", cell .getRichStringCellValue().getString());
+       }
+
+       // Now re-check with preserving
+       for(DirectoryNode dir : files) {
+          HSSFWorkbook workbook = new HSSFWorkbook(dir, true);
+          HSSFSheet sheet = workbook.getSheetAt(0);
+          HSSFCell cell = sheet.getRow(0).getCell(0);
+          assertEquals("replaceMe", cell .getRichStringCellValue().getString());
+       }
+    }
+    public void testCellStylesLimit() {
+        HSSFWorkbook wb = new HSSFWorkbook();
+        int numBuiltInStyles = wb.getNumCellStyles();
+        int MAX_STYLES = 4030;
+        int limit = MAX_STYLES - numBuiltInStyles;
+        for(int i=0; i < limit; i++){
+            HSSFCellStyle style = wb.createCellStyle();
+        }
+
+        assertEquals(MAX_STYLES, wb.getNumCellStyles());
+        try {
+            HSSFCellStyle style = wb.createCellStyle();
+            fail("expected exception");
+        } catch (IllegalStateException e){
+            assertEquals("The maximum number of cell styles was exceeded. " +
+                    "You can define up to 4000 styles in a .xls workbook", e.getMessage());
+        }
+        assertEquals(MAX_STYLES, wb.getNumCellStyles());
     }
 }

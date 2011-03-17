@@ -32,12 +32,11 @@ import org.zkoss.poi.hwpf.model.ComplexFileTable;
 import org.zkoss.poi.hwpf.model.DocumentProperties;
 import org.zkoss.poi.hwpf.model.EscherRecordHolder;
 import org.zkoss.poi.hwpf.model.FSPATable;
+import org.zkoss.poi.hwpf.model.FieldsTables;
 import org.zkoss.poi.hwpf.model.FontTable;
-import org.zkoss.poi.hwpf.model.GenericPropertyNode;
 import org.zkoss.poi.hwpf.model.ListTables;
 import org.zkoss.poi.hwpf.model.PAPBinTable;
 import org.zkoss.poi.hwpf.model.PicturesTable;
-import org.zkoss.poi.hwpf.model.PlexOfCps;
 import org.zkoss.poi.hwpf.model.PropertyNode;
 import org.zkoss.poi.hwpf.model.RevisionMarkAuthorTable;
 import org.zkoss.poi.hwpf.model.SavedByTable;
@@ -100,6 +99,9 @@ public final class HWPFDocument extends HWPFDocumentCore
 
   /** Holds Office Art objects */
   protected ShapesTable _officeArts;
+  
+  /** Holds the fields PLCFs */
+  protected FieldsTables _fieldsTables;
 
   protected HWPFDocument()
   {
@@ -128,9 +130,23 @@ public final class HWPFDocument extends HWPFDocumentCore
    */
   public HWPFDocument(POIFSFileSystem pfilesystem) throws IOException
   {
-	this(pfilesystem.getRoot(), pfilesystem);
+	this(pfilesystem.getRoot());
   }
 
+  /**
+   * This constructor loads a Word document from a specific point
+   *  in a POIFSFileSystem, probably not the default.
+   * Used typically to open embedded documents.
+   *
+   * @param pfilesystem The POIFSFileSystem that contains the Word document.
+   * @throws IOException If there is an unexpected IOException from the passed
+   *         in POIFSFileSystem.
+   */
+  public HWPFDocument(DirectoryNode directory, POIFSFileSystem pfilesystem) throws IOException
+  {
+     this(directory);
+  }
+  
   /**
    * This constructor loads a Word document from a specific point
    *  in a POIFSFileSystem, probably not the default.
@@ -140,11 +156,11 @@ public final class HWPFDocument extends HWPFDocumentCore
    * @throws IOException If there is an unexpected IOException from the passed
    *         in POIFSFileSystem.
    */
-  public HWPFDocument(DirectoryNode directory, POIFSFileSystem pfilesystem) throws IOException
+  public HWPFDocument(DirectoryNode directory) throws IOException
   {
     // Load the main stream and FIB
     // Also handles HPSF bits
-	super(directory, pfilesystem);
+	super(directory);
 
     // Do the CP Split
     _cpSplit = new CPSplitCalculator(_fib);
@@ -182,7 +198,7 @@ public final class HWPFDocument extends HWPFDocumentCore
       DocumentEntry dataProps =
           (DocumentEntry)directory.getEntry("Data");
       _dataStream = new byte[dataProps.getSize()];
-      filesystem.createDocumentInputStream("Data").read(_dataStream);
+      directory.createDocumentInputStream("Data").read(_dataStream);
     }
     catch(java.io.FileNotFoundException e)
     {
@@ -250,13 +266,7 @@ public final class HWPFDocument extends HWPFDocumentCore
       _rmat = new RevisionMarkAuthorTable(_tableStream, rmarkOffset, rmarkLength);
     }
     
-    PlexOfCps plc = new PlexOfCps(_tableStream, _fib.getFcPlcffldMom(), _fib.getLcbPlcffldMom(), 2);
-    for (int x = 0; x < plc.length(); x++)
-    {
-      GenericPropertyNode node = plc.getProperty(x);
-      byte[] fld = node.getBytes();
-      int breakpoint = 0;
-    }
+    _fieldsTables = new FieldsTables(_tableStream, _fib);
   }
 
   public TextPieceTable getTextTable()
@@ -401,6 +411,13 @@ public final class HWPFDocument extends HWPFDocumentCore
 	  return _officeArts;
   }
 
+  /**
+   * @return FieldsTables object, that is able to extract fields descriptors from this document
+   */
+  public FieldsTables getFieldsTables() {
+      return _fieldsTables;
+  }
+  
   /**
    * Writes out the word file that is represented by an instance of this class.
    *

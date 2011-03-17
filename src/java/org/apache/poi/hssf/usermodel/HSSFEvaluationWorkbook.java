@@ -33,7 +33,7 @@ import org.zkoss.poi.ss.formula.FormulaParseException;
 import org.zkoss.poi.ss.formula.FormulaParsingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaRenderingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaType;
-import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalName;
+import org.apache.poi.ss.formula.udf.UDFFinder;
 
 /**
  * Internal POI use only
@@ -71,7 +71,7 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	}
 
 	public NameXPtg getNameXPtg(String name) {
-		return _iBook.getNameXPtg(name);
+        return _iBook.getNameXPtg(name, _uBook.getUDFFinder());
 	}
 
 	/**
@@ -153,6 +153,9 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 		FormulaRecordAggregate fra = (FormulaRecordAggregate) cell.getCellValueRecord();
 		return fra.getFormulaTokens();
 	}
+    public UDFFinder getUDFFinder(){
+        return _uBook.getUDFFinder();
+    }
 
 	private static final class Name implements EvaluationName {
 

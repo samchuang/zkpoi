@@ -17,7 +17,7 @@
 
 package org.zkoss.poi.hssf.model;
 
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.usermodel.HSSFEvaluationWorkbook;
 import org.zkoss.poi.hssf.usermodel.HSSFWorkbook;
 import org.zkoss.poi.ss.formula.FormulaParseException;

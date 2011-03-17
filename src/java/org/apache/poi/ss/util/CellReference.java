@@ -20,7 +20,7 @@ package org.zkoss.poi.ss.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
+import org.zkoss.poi.ss.formula.SheetNameFormatter;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.usermodel.Cell;
 
@@ -85,6 +85,10 @@ public class CellReference {
 	 * delimited and escaped as per normal syntax rules for formulas.
 	 */
 	public CellReference(String cellRef) {
+      if(cellRef.endsWith("#REF!")) {
+         throw new IllegalArgumentException("Cell reference invalid: " + cellRef);
+      }
+
 		String[] parts = separateRefParts(cellRef);
 		_sheetName = parts[0];
 		String colRef = parts[1];
@@ -335,7 +339,6 @@ public class CellReference {
 	 * name still in ALPHA-26 number format.  The third element is the row.
 	 */
 	private static String[] separateRefParts(String reference) {
-
 		int plingPos = reference.lastIndexOf(SHEET_NAME_DELIMITER);
 		String sheetName = parseSheetName(reference, plingPos);
 		int start = plingPos+1;

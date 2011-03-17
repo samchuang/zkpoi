@@ -33,6 +33,29 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
+import org.zkoss.poi.POIXMLDocument;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.POIXMLProperties;
+import org.zkoss.poi.ss.formula.SheetNameFormatter;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.opc.OPCPackage;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.PackageRelationshipTypes;
+import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
+import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.ss.usermodel.Workbook;
+import org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.ss.util.WorkbookUtil;
+import org.zkoss.poi.util.*;
+import org.zkoss.poi.xssf.model.*;
+import org.zkoss.poi.xssf.usermodel.helpers.XSSFFormulaUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -125,6 +148,12 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     private StylesTable stylesSource;
 
     private ThemesTable theme;
+
+    /**
+     * The locator of user-defined functions.
+     * By default includes functions from the Excel Analysis Toolpack
+     */
+    private IndexedUDFFinder _udfFinder = new IndexedUDFFinder(UDFFinder.DEFAULT);
 
     /**
      * TODO
@@ -989,7 +1018,6 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         XSSFName name = getBuiltInName(XSSFName.BUILTIN_PRINT_AREA, sheetIndex);
         if (name == null) {
             name = createBuiltInName(XSSFName.BUILTIN_PRINT_AREA, sheetIndex);
-            namedRanges.add(name);
         }
         //short externSheetIndex = getWorkbook().checkExternSheet(sheetIndex);
         //name.setExternSheetNumber(externSheetIndex);
@@ -1062,7 +1090,6 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         }
         if (name == null) {
             name = createBuiltInName(XSSFName.BUILTIN_PRINT_TITLE, sheetIndex);
-            namedRanges.add(name);
         }
 
         String reference = getReferenceBuiltInRecord(name.getSheetName(), startColumn, endColumn, startRow, endRow);
@@ -1109,7 +1136,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         return "$" + colRef.getCellRefParts()[2] + "$" + colRef.getCellRefParts()[1] + ":$" + colRef2.getCellRefParts()[2] + "$" + colRef2.getCellRefParts()[1];
     }
 
-    private XSSFName getBuiltInName(String builtInCode, int sheetNumber) {
+    XSSFName getBuiltInName(String builtInCode, int sheetNumber) {
         for (XSSFName name : namedRanges) {
             if (name.getNameName().equalsIgnoreCase(builtInCode) && name.getSheetIndex() == sheetNumber) {
                 return name;
@@ -1125,7 +1152,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * @throws IllegalArgumentException if sheetNumber is invalid
      * @throws POIXMLException if such a name already exists in the workbook
      */
-    private XSSFName createBuiltInName(String builtInName, int sheetNumber) {
+    XSSFName createBuiltInName(String builtInName, int sheetNumber) {
         validateSheetIndex(sheetNumber);
 
         CTDefinedNames names = workbook.getDefinedNames() == null ? workbook.addNewDefinedNames() : workbook.getDefinedNames();
@@ -1140,6 +1167,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                         + ") already exists for sheet (" + sheetNumber + ")");
         }
 
+        namedRanges.add(name);
         return name;
     }
 
@@ -1158,13 +1186,18 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * Will throw IllegalArgumentException if the name is greater than 31 chars
      * or contains /\?*[]
      *
-     * @param sheet number (0 based)
+     * @param sheetIndex number (0 based)
      */
-    public void setSheetName(int sheet, String name) {
-        validateSheetIndex(sheet);
+    public void setSheetName(int sheetIndex, String name) {
+        validateSheetIndex(sheetIndex);
         WorkbookUtil.validateSheetName(name);
-        if (containsSheet(name, sheet ))
+        if (containsSheet(name, sheetIndex ))
             throw new IllegalArgumentException( "The workbook already contains a sheet of this name" );
+
+        XSSFFormulaUtils utils = new XSSFFormulaUtils(this);
+        utils.updateSheetName(sheetIndex, name);
+
+        workbook.getSheets().getSheetArray(sheetIndex).setName(name);
         //20110106, henrichen@zkoss.org: handle the externsheet reference
         final Sheet wsheet = getSheetAt(sheet);
         if (wsheet != null) {
@@ -1572,6 +1605,33 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 			workbook.setWorkbookProtection(CTWorkbookProtection.Factory.newInstance());
 		}
 	}
+
+    /**
+     *
+     * Returns the locator of user-defined functions.
+     * <p>
+     * The default instance extends the built-in functions with the Excel Analysis Tool Pack.
+     * To set / evaluate custom functions you need to register them as follows:
+     *
+     *
+     *
+     * </p>
+     * @return wrapped instance of UDFFinder that allows seeking functions both by index and name
+     */
+    /*package*/ UDFFinder getUDFFinder() {
+        return _udfFinder;
+    }
+
+    /**
+     * Register a new toolpack in this workbook.
+     *
+     * @param toopack the toolpack to register
+     */
+    public void addToolPack(UDFFinder toopack){
+        _udfFinder.add(toopack);
+    }
+
+
 
 	/*package*/ String getBookNameFromExternalLinkIndex(String externalLinkIndex) {
 		return linkIndexToBookName.get(externalLinkIndex);

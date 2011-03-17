@@ -17,12 +17,12 @@
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.AreaI;
-import org.zkoss.poi.hssf.record.formula.AreaI.OffsetArea;
-import org.zkoss.poi.hssf.record.formula.eval.AreaEval;
-import org.zkoss.poi.hssf.record.formula.eval.AreaEvalBase;
-import org.zkoss.poi.hssf.record.formula.eval.HyperlinkEval;
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.ptg.AreaI;
+import org.zkoss.poi.ss.formula.ptg.AreaI.OffsetArea;
+import org.zkoss.poi.ss.formula.eval.AreaEval;
+import org.zkoss.poi.ss.formula.eval.AreaEvalBase;
+import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.hssf.util.CellReference;
 import org.zkoss.poi.ss.usermodel.Hyperlink;
 

@@ -22,7 +22,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.AssertionFailedError;
 
@@ -37,9 +40,9 @@ import org.apache.poi.hssf.record.Record;
 import org.apache.poi.hssf.record.TabIdRecord;
 import org.apache.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.apache.poi.hssf.record.common.UnicodeString;
-import org.apache.poi.hssf.record.formula.Area3DPtg;
-import org.apache.poi.hssf.record.formula.DeletedArea3DPtg;
-import org.apache.poi.hssf.record.formula.Ptg;
+import org.apache.poi.ss.formula.ptg.Area3DPtg;
+import org.apache.poi.ss.formula.ptg.DeletedArea3DPtg;
+import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.usermodel.BaseTestBugzillaIssues;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -1649,10 +1652,7 @@ public final class TestBugs extends BaseTestBugzillaIssues {
              "new_sheet!$A$1:$C$1", 
              ((Area3DPtg)nr.getNameDefinition()[0]).toFormulaString(HSSFEvaluationWorkbook.create(wb))
        );
-       // TODO - fix me to be Reference not Value!
-if(1==2) {       
        assertEquals('R', nr.getNameDefinition()[0].getRVAType());
-}
     }
     
     /**
@@ -1894,4 +1894,138 @@ if(1==2) {
        HSSFWorkbook wb = openSample("50020.xls");
        writeOutAndReadBack(wb);
     }
+
+    public void test50426() throws Exception {
+       HSSFWorkbook wb = openSample("50426.xls");
+       writeOutAndReadBack(wb);
+    }
+    
+    /**
+     * Last row number when shifting rows
+     */
+    public void test50416LastRowNumber() {
+       // Create the workbook with 1 sheet which contains 3 rows
+       HSSFWorkbook workbook = new HSSFWorkbook();
+       Sheet sheet = workbook.createSheet("Bug50416");
+       Row row1 = sheet.createRow(0);
+       Cell cellA_1 = row1.createCell(0,Cell.CELL_TYPE_STRING);
+       cellA_1.setCellValue("Cell A,1");
+       Row row2 = sheet.createRow(1);
+       Cell cellA_2 = row2.createCell(0,Cell.CELL_TYPE_STRING);
+       cellA_2.setCellValue("Cell A,2");
+       Row row3 = sheet.createRow(2);
+       Cell cellA_3 = row3.createCell(0,Cell.CELL_TYPE_STRING);
+       cellA_3.setCellValue("Cell A,3");
+       
+       // Test the last Row number it currently correct
+       assertEquals(2, sheet.getLastRowNum());
+       
+       // Shift the first row to the end
+       sheet.shiftRows(0, 0, 3);
+       assertEquals(3, sheet.getLastRowNum());
+       assertEquals(-1,         sheet.getRow(0).getLastCellNum());
+       assertEquals("Cell A,2", sheet.getRow(1).getCell(0).getStringCellValue());
+       assertEquals("Cell A,3", sheet.getRow(2).getCell(0).getStringCellValue());
+       assertEquals("Cell A,1", sheet.getRow(3).getCell(0).getStringCellValue());
+       
+       // Shift the 2nd row up to the first one
+       sheet.shiftRows(1, 1, -1);
+       assertEquals(3, sheet.getLastRowNum());
+       assertEquals("Cell A,2", sheet.getRow(0).getCell(0).getStringCellValue());
+       assertEquals(-1,         sheet.getRow(1).getLastCellNum());
+       assertEquals("Cell A,3", sheet.getRow(2).getCell(0).getStringCellValue());
+       assertEquals("Cell A,1", sheet.getRow(3).getCell(0).getStringCellValue());
+
+       // Shift the 4th row up into the gap in the 3rd row
+       sheet.shiftRows(3, 3, -2);
+       assertEquals(2, sheet.getLastRowNum());
+       assertEquals("Cell A,2", sheet.getRow(0).getCell(0).getStringCellValue());
+       assertEquals("Cell A,1", sheet.getRow(1).getCell(0).getStringCellValue());
+       assertEquals("Cell A,3", sheet.getRow(2).getCell(0).getStringCellValue());
+       assertEquals(-1,         sheet.getRow(3).getLastCellNum());
+       
+       // Now zap the empty 4th row - won't do anything
+       sheet.removeRow(sheet.getRow(3));
+       
+       // Test again the last row number which should be 2
+       assertEquals(2, sheet.getLastRowNum());
+       assertEquals("Cell A,2", sheet.getRow(0).getCell(0).getStringCellValue());
+       assertEquals("Cell A,1", sheet.getRow(1).getCell(0).getStringCellValue());
+       assertEquals("Cell A,3", sheet.getRow(2).getCell(0).getStringCellValue());
+    }
+    
+    /**
+     * If you send a file between Excel and OpenOffice enough, something
+     *  will turn the "General" format into "GENERAL"
+     */
+    public void test50756() throws Exception {
+       HSSFWorkbook wb = openSample("50756.xls");
+       HSSFSheet s = wb.getSheetAt(0);
+       HSSFRow r17 = s.getRow(16);
+       HSSFRow r18 = s.getRow(17);
+       HSSFDataFormatter df = new HSSFDataFormatter();
+       
+       assertEquals(10.0, r17.getCell(1).getNumericCellValue());
+       assertEquals(20.0, r17.getCell(2).getNumericCellValue());
+       assertEquals(20.0, r17.getCell(3).getNumericCellValue());
+       assertEquals("GENERAL", r17.getCell(1).getCellStyle().getDataFormatString());
+       assertEquals("GENERAL", r17.getCell(2).getCellStyle().getDataFormatString());
+       assertEquals("GENERAL", r17.getCell(3).getCellStyle().getDataFormatString());
+       assertEquals("10", df.formatCellValue(r17.getCell(1)));
+       assertEquals("20", df.formatCellValue(r17.getCell(2)));
+       assertEquals("20", df.formatCellValue(r17.getCell(3)));
+       
+       assertEquals(16.0, r18.getCell(1).getNumericCellValue());
+       assertEquals(35.0, r18.getCell(2).getNumericCellValue());
+       assertEquals(123.0, r18.getCell(3).getNumericCellValue());
+       assertEquals("GENERAL", r18.getCell(1).getCellStyle().getDataFormatString());
+       assertEquals("GENERAL", r18.getCell(2).getCellStyle().getDataFormatString());
+       assertEquals("GENERAL", r18.getCell(3).getCellStyle().getDataFormatString());
+       assertEquals("16", df.formatCellValue(r18.getCell(1)));
+       assertEquals("35", df.formatCellValue(r18.getCell(2)));
+       assertEquals("123", df.formatCellValue(r18.getCell(3)));
+    }
+    
+    /**
+     * A protected sheet with comments, when written out by
+     *  POI, ends up upsetting excel.
+     * TODO Identify the cause and add extra asserts for
+     *  the bit excel cares about
+     */
+    public void test50833() throws Exception {
+       HSSFWorkbook wb = openSample("50833.xls");
+       HSSFSheet s = wb.getSheetAt(0);
+       assertEquals("Sheet1", s.getSheetName());
+       assertEquals(false, s.getProtect());
+       
+       HSSFCell c = s.getRow(0).getCell(0);
+       assertEquals("test cell value", c.getRichStringCellValue().getString());
+       
+       HSSFComment cmt = c.getCellComment();
+       assertNotNull(cmt);
+       assertEquals("Robert Lawrence", cmt.getAuthor());
+       assertEquals("Robert Lawrence:\ntest comment", cmt.getString().getString());
+       
+       // Reload
+       wb = writeOutAndReadBack(wb);
+       s = wb.getSheetAt(0);
+       c = s.getRow(0).getCell(0);
+       
+       // Re-check the comment
+       cmt = c.getCellComment();
+       assertNotNull(cmt);
+       assertEquals("Robert Lawrence", cmt.getAuthor());
+       assertEquals("Robert Lawrence:\ntest comment", cmt.getString().getString());
+       
+       // TODO Identify what excel doesn't like, and check for that
+    }
+
+    public void test50779() throws Exception {
+       HSSFWorkbook wb1 = openSample("50779_1.xls");
+       writeOutAndReadBack(wb1);
+
+        HSSFWorkbook wb2 = openSample("50779_2.xls");
+        writeOutAndReadBack(wb2);
+    }
+
 }

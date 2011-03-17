@@ -17,8 +17,8 @@
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.NamePtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.apache.poi.ss.formula.ptg.NamePtg;
+import org.apache.poi.ss.formula.ptg.Ptg;
 /**
  * Abstracts a name record for formula evaluation.<br/>
  *

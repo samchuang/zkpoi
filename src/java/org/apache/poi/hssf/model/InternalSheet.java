@@ -73,7 +73,7 @@ import org.zkoss.poi.hssf.record.aggregates.RowRecordsAggregate;
 import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
 import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.PositionTrackingVisitor;
 import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
-import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.FormulaShifter;
 import org.zkoss.poi.hssf.util.PaneInformation;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 import org.zkoss.poi.util.Internal;

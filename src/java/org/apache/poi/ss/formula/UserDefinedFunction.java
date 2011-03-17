@@ -17,10 +17,10 @@
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.eval.NameEval;
-import org.zkoss.poi.hssf.record.formula.eval.NameXEval;
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
-import org.zkoss.poi.hssf.record.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.eval.NameEval;
+import org.zkoss.poi.ss.formula.eval.NameXEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
 import org.zkoss.poi.ss.formula.OperationEvaluationContext;
 import org.zkoss.poi.ss.formula.eval.NotImplementedException;
 /**

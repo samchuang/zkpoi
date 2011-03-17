@@ -17,7 +17,7 @@
 
 package org.zkoss.poi.hssf.record;
 
-import org.zkoss.poi.hssf.record.constant.ConstantValueParser;
+import org.zkoss.poi.ss.formula.constant.ConstantValueParser;
 import org.zkoss.poi.util.LittleEndianOutput;
 
 /**

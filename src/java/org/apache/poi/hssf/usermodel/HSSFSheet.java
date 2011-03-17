@@ -17,14 +17,7 @@
 
 package org.zkoss.poi.hssf.usermodel;
 
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextAttribute;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
 import java.io.PrintWriter;
-import java.text.AttributedString;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,9 +31,9 @@ import org.zkoss.poi.hssf.record.*;
 import org.zkoss.poi.hssf.record.aggregates.DataValidityTable;
 import org.zkoss.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
-import org.zkoss.poi.hssf.record.formula.Area3DPtg;
-import org.zkoss.poi.hssf.record.formula.FormulaShifter;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Area3DPtg;
 import org.zkoss.poi.hssf.util.PaneInformation;
 import org.zkoss.poi.hssf.util.Region;
 import org.zkoss.poi.ss.SpreadsheetVersion;
@@ -54,6 +47,7 @@ import org.zkoss.poi.ss.usermodel.Row;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 import org.zkoss.poi.ss.util.CellReference;
 import org.zkoss.poi.ss.util.SSCellRange;
+import org.zkoss.poi.ss.util.SheetUtil;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
 
@@ -1149,7 +1143,8 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
              }
 
              //only shift if the region outside the shifted rows is not merged too
-             if (!containsCell(merged, startRow-1, 0) && !containsCell(merged, endRow+1, 0)){
+             if (!SheetUtil.containsCell(merged, startRow-1, 0) &&
+                 !SheetUtil.containsCell(merged, endRow+1, 0)){
                  merged.setFirstRow(merged.getFirstRow()+n);
                  merged.setLastRow(merged.getLastRow()+n);
                  //have to remove/add it back
@@ -1166,14 +1161,6 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
 
             this.addMergedRegion(region);
         }
-    }
-    private static boolean containsCell(CellRangeAddress cr, int rowIx, int colIx) {
-        if (cr.getFirstRow() <= rowIx && cr.getLastRow() >= rowIx
-                && cr.getFirstColumn() <= colIx && cr.getLastColumn() >= colIx)
-        {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1237,10 +1224,14 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
         if (n < 0) {
             s = startRow;
             inc = 1;
-        } else {
+        } else if (n > 0) {
             s = endRow;
             inc = -1;
+        } else {
+           // Nothing to do
+           return;
         }
+        
         NoteRecord[] noteRecs;
         if (moveComments) {
             noteRecs = _sheet.getNoteRecords();
@@ -1318,8 +1309,39 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
                 }
             }
         }
-        if ( endRow == _lastrow || endRow + n > _lastrow ) _lastrow = Math.min( endRow + n, SpreadsheetVersion.EXCEL97.getLastRowIndex() );
-        if ( startRow == _firstrow || startRow + n < _firstrow ) _firstrow = Math.max( startRow + n, 0 );
+        
+        // Re-compute the first and last rows of the sheet as needed
+        if(n > 0) {
+           // Rows are moving down
+           if ( startRow == _firstrow ) {
+              // Need to walk forward to find the first non-blank row
+              _firstrow = Math.max( startRow + n, 0 );
+              for( int i=startRow+1; i < startRow+n; i++ ) {
+                 if (getRow(i) != null) {
+                    _firstrow = i;
+                    break;
+                 }
+              }
+           }
+           if ( endRow + n > _lastrow ) {
+              _lastrow = Math.min( endRow + n, SpreadsheetVersion.EXCEL97.getLastRowIndex() );
+           }
+        } else {
+           // Rows are moving up
+           if ( startRow + n < _firstrow ) {
+              _firstrow = Math.max( startRow + n, 0 );
+           }
+           if ( endRow == _lastrow  ) {
+              // Need to walk backward to find the last non-blank row
+              _lastrow = Math.min( endRow + n, SpreadsheetVersion.EXCEL97.getLastRowIndex() );
+              for (int i=endRow-1; i > endRow+n; i++) {
+                 if (getRow(i) != null) {
+                    _lastrow = i;
+                    break;
+                 }
+              }
+           }
+        }
 
         // Update any formulas on this sheet that point to
         //  rows which have been moved
@@ -1745,153 +1767,8 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
      * @param useMergedCells whether to use the contents of merged cells when calculating the width of the column
      */
     public void autoSizeColumn(int column, boolean useMergedCells) {
-        AttributedString str;
-        TextLayout layout;
-        /**
-         * Excel measures columns in units of 1/256th of a character width
-         * but the docs say nothing about what particular character is used.
-         * '0' looks to be a good choice.
-         */
-        char defaultChar = '0';
-
-        /**
-         * This is the multiple that the font height is scaled by when determining the
-         * boundary of rotated text.
-         */
-        double fontHeightMultiple = 2.0;
-
-        FontRenderContext frc = new FontRenderContext(null, true, true);
-
-        HSSFWorkbook wb = HSSFWorkbook.create(_book); // TODO - is it important to not use _workbook?
-        HSSFDataFormatter formatter = new HSSFDataFormatter();
-        HSSFFont defaultFont = wb.getFontAt((short) 0);
-
-        str = new AttributedString("" + defaultChar);
-        copyAttributes(defaultFont, str, 0, 1);
-        layout = new TextLayout(str.getIterator(), frc);
-        int defaultCharWidth = (int)layout.getAdvance();
-
-        double width = -1;
-        rows:
-        for (Iterator<Row> it = rowIterator(); it.hasNext();) {
-            HSSFRow row = (HSSFRow) it.next();
-            HSSFCell cell = row.getCell(column);
-
-            if (cell == null) {
-                continue;
-            }
-
-            int colspan = 1;
-            for (int i = 0 ; i < getNumMergedRegions(); i++) {
-                CellRangeAddress region = getMergedRegion(i);
-                if (containsCell(region, row.getRowNum(), column)) {
-                    if (!useMergedCells) {
-                        // If we're not using merged cells, skip this one and move on to the next.
-                        continue rows;
-                    }
-                    cell = row.getCell(region.getFirstColumn());
-                    colspan = 1 + region.getLastColumn() - region.getFirstColumn();
-                }
-            }
-
-            HSSFCellStyle style = cell.getCellStyle();
-            int cellType = cell.getCellType();
-            if(cellType == HSSFCell.CELL_TYPE_FORMULA) cellType = cell.getCachedFormulaResultType();
-
-            HSSFFont font = wb.getFontAt(style.getFontIndex());
-
-            if (cellType == HSSFCell.CELL_TYPE_STRING) {
-                HSSFRichTextString rt = cell.getRichStringCellValue();
-                String[] lines = rt.getString().split("\\n");
-                for (int i = 0; i < lines.length; i++) {
-                    String txt = lines[i] + defaultChar;
-                    str = new AttributedString(txt);
-                    copyAttributes(font, str, 0, txt.length());
-
-                    if (rt.numFormattingRuns() > 0) {
-                        for (int j = 0; j < lines[i].length(); j++) {
-                            int idx = rt.getFontAtIndex(j);
-                            if (idx != 0) {
-                                HSSFFont fnt = wb.getFontAt((short) idx);
-                                copyAttributes(fnt, str, j, j + 1);
-                            }
-                        }
-                    }
-
-                    layout = new TextLayout(str.getIterator(), frc);
-                    if(style.getRotation() != 0){
-                        /*
-                         * Transform the text using a scale so that it's height is increased by a multiple of the leading,
-                         * and then rotate the text before computing the bounds. The scale results in some whitespace around
-                         * the unrotated top and bottom of the text that normally wouldn't be present if unscaled, but
-                         * is added by the standard Excel autosize.
-                         */
-                        AffineTransform trans = new AffineTransform();
-                        trans.concatenate(AffineTransform.getRotateInstance(style.getRotation()*2.0*Math.PI/360.0));
-                        trans.concatenate(
-                        AffineTransform.getScaleInstance(1, fontHeightMultiple)
-                        );
-                        width = Math.max(width, ((layout.getOutline(trans).getBounds().getWidth() / colspan) / defaultCharWidth) + cell.getCellStyle().getIndention());
-                    } else {
-                        width = Math.max(width, ((layout.getBounds().getWidth() / colspan) / defaultCharWidth) + cell.getCellStyle().getIndention());
-                    }
-                }
-            } else {
-                String sval = null;
-                if (cellType == HSSFCell.CELL_TYPE_NUMERIC) {
-                    // Try to get it formatted to look the same as excel
-                    try {
-                        sval = formatter.formatCellValue(cell);
-                    } catch (Exception e) {
-                        sval = "" + cell.getNumericCellValue();
-                    }
-                } else if (cellType == HSSFCell.CELL_TYPE_BOOLEAN) {
-                    sval = String.valueOf(cell.getBooleanCellValue());
-                }
-                if(sval != null) {
-                    String txt = sval + defaultChar;
-                    str = new AttributedString(txt);
-                    copyAttributes(font, str, 0, txt.length());
-
-                    layout = new TextLayout(str.getIterator(), frc);
-                    if(style.getRotation() != 0){
-                        /*
-                         * Transform the text using a scale so that it's height is increased by a multiple of the leading,
-                         * and then rotate the text before computing the bounds. The scale results in some whitespace around
-                         * the unrotated top and bottom of the text that normally wouldn't be present if unscaled, but
-                         * is added by the standard Excel autosize.
-                         */
-                        AffineTransform trans = new AffineTransform();
-                        trans.concatenate(AffineTransform.getRotateInstance(style.getRotation()*2.0*Math.PI/360.0));
-                        trans.concatenate(
-                        AffineTransform.getScaleInstance(1, fontHeightMultiple)
-                        );
-                        width = Math.max(width, ((layout.getOutline(trans).getBounds().getWidth() / colspan) / defaultCharWidth) + cell.getCellStyle().getIndention());
-                    } else {
-                        width = Math.max(width, ((layout.getBounds().getWidth() / colspan) / defaultCharWidth) + cell.getCellStyle().getIndention());
-                    }
-                }
-            }
-
-        }
-        if (width != -1) {
-            width *= 256;
-            if (width > Short.MAX_VALUE) { //width can be bigger that Short.MAX_VALUE!
-                width = Short.MAX_VALUE;
-            }
-            _sheet.setColumnWidth(column, (short) (width));
-        }
-    }
-
-    /**
-     * Copy text attributes from the supplied HSSFFont to Java2D AttributedString
-     */
-    private void copyAttributes(HSSFFont font, AttributedString str, int startIdx, int endIdx) {
-        str.addAttribute(TextAttribute.FAMILY, font.getFontName(), startIdx, endIdx);
-        str.addAttribute(TextAttribute.SIZE, new Float(font.getFontHeightInPoints()));
-        if (font.getBoldweight() == HSSFFont.BOLDWEIGHT_BOLD) str.addAttribute(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, startIdx, endIdx);
-        if (font.getItalic() ) str.addAttribute(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, startIdx, endIdx);
-        if (font.getUnderline() == HSSFFont.U_SINGLE ) str.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON, startIdx, endIdx);
+        double width = SheetUtil.getColumnWidth(this, column, useMergedCells);
+        if(width != -1) setColumnWidth(column, (int) (256*width));
     }
 
     /**

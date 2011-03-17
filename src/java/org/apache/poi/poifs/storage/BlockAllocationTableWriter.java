@@ -19,6 +19,7 @@ package org.zkoss.poi.poifs.storage;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 import org.zkoss.poi.poifs.common.POIFSBigBlockSize;
 import org.zkoss.poi.poifs.common.POIFSConstants;
@@ -154,6 +155,15 @@ public final class BlockAllocationTableWriter implements BlockWritable, BATManag
         {
             _blocks[ j ].writeBlocks(stream);
         }
+    }
+    
+    /**
+     * Write the BAT into its associated block
+     */
+    public static void writeBlock(final BATBlock bat, final ByteBuffer block) 
+        throws IOException
+    {
+        bat.writeData(block);
     }
 
     /**

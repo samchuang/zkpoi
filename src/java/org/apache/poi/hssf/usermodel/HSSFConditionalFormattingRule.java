@@ -23,7 +23,7 @@ import org.zkoss.poi.hssf.record.CFRuleRecord.ComparisonOperator;
 import org.zkoss.poi.hssf.record.cf.BorderFormatting;
 import org.zkoss.poi.hssf.record.cf.FontFormatting;
 import org.zkoss.poi.hssf.record.cf.PatternFormatting;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 
 /**
  *

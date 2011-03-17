@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.zkoss.poi.hssf.model.RecordStream;
 import org.zkoss.poi.hssf.record.CFHeaderRecord;
-import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.FormulaShifter;
 
 /**
  * Holds all the conditional formatting for a workbook sheet.<p/>

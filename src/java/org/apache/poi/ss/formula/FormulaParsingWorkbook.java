@@ -17,7 +17,7 @@
 
 package org.zkoss.poi.ss.formula;
 
-import org.zkoss.poi.hssf.record.formula.NameXPtg;
+import org.zkoss.poi.ss.formula.ptg.NameXPtg;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 
 /**

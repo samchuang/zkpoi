@@ -20,7 +20,7 @@ package org.zkoss.poi.ss.formula;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.zkoss.poi.hssf.record.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 
 /**
  * Stores details about the current evaluation of a cell.<br/>

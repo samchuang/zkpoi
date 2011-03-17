@@ -17,12 +17,17 @@
 
 package org.zkoss.poi.xssf.usermodel;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import javax.xml.namespace.QName;
 
+import org.zkoss.poi.ss.usermodel.Font;
+import org.zkoss.poi.ss.usermodel.RichTextString;
+import org.zkoss.poi.xssf.model.StylesTable;
+import org.zkoss.poi.xssf.model.ThemesTable;
+import org.zkoss.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFont;
@@ -30,10 +35,6 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRElt;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRPrElt;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STXstring;
-import org.zkoss.poi.ss.usermodel.Font;
-import org.zkoss.poi.ss.usermodel.RichTextString;
-import org.zkoss.poi.util.Internal;
-import org.zkoss.poi.xssf.model.StylesTable;
 
 
 /**
@@ -132,7 +133,6 @@ public class XSSFRichTextString implements RichTextString {
      * @param endIndex      The end index to apply to font to (exclusive)
      * @param font          The index of the font to use.
      */
-    @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
     public void applyFont(int startIndex, int endIndex, Font font) {
         if (startIndex > endIndex)
             throw new IllegalArgumentException("Start index must be less than end index.");
@@ -148,56 +148,15 @@ public class XSSFRichTextString implements RichTextString {
         }
 
         String text = getString();
-
         XSSFFont xssfFont = (XSSFFont)font;
-        ArrayList<CTRElt> runs = new ArrayList<CTRElt>();
 
-        CTRElt[] r = st.getRArray();
-        int pos = 0;
-        for (int i = 0; i < r.length; i++) {
-            int rStart = pos;
-            String t = r[i].getT();
-            int rEnd = rStart + t.length();
+        TreeMap<Integer, CTRPrElt> formats = getFormatMap(st);
+        CTRPrElt fmt = CTRPrElt.Factory.newInstance();
+        setRunAttributes(xssfFont.getCTFont(), fmt);
+        applyFont(formats, startIndex, endIndex, fmt);
 
-            if(rEnd <= startIndex) {
-                runs.add(r[i]);
-                pos += r[i].getT().length();
-            }
-            else if (startIndex > rStart && startIndex < rEnd){
-                CTRElt c = (CTRElt)r[i].copy();
-                String txt = text.substring(rStart, startIndex);
-                c.setT(txt);
-                runs.add(c);
-                pos += txt.length();
-            } else {
-                break;
-            }
-        }
-        CTRElt rt = CTRElt.Factory.newInstance();
-        String txt = text.substring(startIndex, endIndex);
-        rt.setT(txt);
-        CTRPrElt pr = rt.addNewRPr();
-        setRunAttributes(xssfFont.getCTFont(), pr);
-        runs.add(rt);
-        pos += txt.length();
-
-        for (int i = 0; i < r.length; i++) {
-            int rStart = pos;
-            String t = r[i].getT();
-            int rEnd = Math.min(rStart + t.length(), text.length());
-
-            if (endIndex < rEnd){
-                CTRElt c = (CTRElt)r[i].copy();
-                txt = text.substring(rStart, rEnd);
-                c.setT(txt);
-                runs.add(c);
-                pos += txt.length();
-                preserveSpaces(c.xgetT());
-            }
-        }
-
-
-        st.setRArray(runs.toArray(new CTRElt[runs.size()]));
+        CTRst newSt = buildCTRst(text, formats);
+        st.set(newSt);
     }
 
     /**
@@ -205,17 +164,8 @@ public class XSSFRichTextString implements RichTextString {
      * @param font          The font to use.
      */
     public void applyFont(Font font) {
-        if(st.sizeOfRArray() == 0 && st.isSetT()) {
-            CTRElt r = st.addNewR();
-            r.setT(st.getT());
-            setRunAttributes(((XSSFFont)font).getCTFont(), r.addNewRPr());
-            st.unsetT();
-        } else {
-            CTRElt r = CTRElt.Factory.newInstance();
-            r.setT(getString());
-            setRunAttributes(((XSSFFont)font).getCTFont(), r.addNewRPr());
-            st.setRArray(new CTRElt[]{r});
-        }
+        String text = getString();
+        applyFont(0, text.length(), font);
     }
 
     /**
@@ -231,7 +181,8 @@ public class XSSFRichTextString implements RichTextString {
         } else {
             font = styles.getFontAt(fontIndex);
         }
-        applyFont(font);
+        String text = getString();
+        applyFont(0, text.length(), font);
     }
 
     /**
@@ -295,9 +246,7 @@ public class XSSFRichTextString implements RichTextString {
      */
     public void clearFormatting() {
         String text = getString();
-        while (st.sizeOfRArray() > 0) {
-            st.removeR(st.sizeOfRArray()-1);
-        }
+        st.setRArray(null);
         st.setT(text);
     }
 
@@ -398,7 +347,12 @@ public class XSSFRichTextString implements RichTextString {
 //          if(i == index) return new XSSFFont(toCTFont(r.getRPr()));
             if(i == index) {
             	final CTRPrElt rpr =  r.getRPr(); //20100927, henrichen@zkoss.org: property of the text run
-           		return rpr != null ? new XSSFFont(toCTFont(rpr)) : null;
+				if (rpr != null) {
+					XSSFFont fnt = new XSSFFont(toCTFont(rpr));
+					fnt.setThemesTable(getThemesTable());
+					return fnt;
+				}
+           		return null;
             }
         }
         return null;
@@ -418,7 +372,11 @@ public class XSSFRichTextString implements RichTextString {
         int pos = 0;
         for(int i = 0; i < st.sizeOfRArray(); i++){
             CTRElt r = st.getRArray(i);
-            if(index >= pos && index < pos + r.getT().length()) return new XSSFFont(toCTFont(r.getRPr()));
+            if(index >= pos && index < pos + r.getT().length()) {
+               XSSFFont fnt = new XSSFFont(toCTFont(r.getRPr()));
+               fnt.setThemesTable(getThemesTable());
+               return fnt;
+            }
 
             pos += r.getT().length();
         }
@@ -535,5 +493,74 @@ public class XSSFRichTextString implements RichTextString {
         }
         buf.append(value.substring(idx));
         return buf.toString();
+    }
+
+    @SuppressWarnings("deprecation")
+    void applyFont(TreeMap<Integer, CTRPrElt> formats, int startIndex, int endIndex, CTRPrElt fmt) {
+            // delete format runs that fit between startIndex and endIndex
+            // runs intersecting startIndex and endIndex remain
+            int runStartIdx = 0;
+            for (Iterator<Integer> it = formats.keySet().iterator(); it.hasNext();) {
+                int runEndIdx = it.next();
+                if (runStartIdx >= startIndex && runEndIdx < endIndex) {
+                   it.remove();
+                }
+                runStartIdx = runEndIdx;
+            }
+
+            if(startIndex > 0 && !formats.containsKey(startIndex)) {
+                // If there's a format that starts later in the string, make it start now
+                for(Map.Entry<Integer, CTRPrElt> entry : formats.entrySet()) {
+                   if(entry.getKey() > startIndex) {
+                      formats.put(startIndex, entry.getValue());
+                      break;
+                   }
+                }
+            }
+            formats.put(endIndex, fmt);
+
+            // assure that the range [startIndex, endIndex] consists if a single run
+            // there can be two or three runs depending whether startIndex or endIndex
+            // intersected existing format runs
+            SortedMap<Integer, CTRPrElt> sub = formats.subMap(startIndex, endIndex);
+            while(sub.size() > 1) sub.remove(sub.lastKey());
+        }
+
+        TreeMap<Integer, CTRPrElt> getFormatMap(CTRst entry){
+            int length = 0;
+            TreeMap<Integer, CTRPrElt> formats = new TreeMap<Integer, CTRPrElt>();
+            for (CTRElt r : entry.getRArray()) {
+                String txt = r.getT();
+                CTRPrElt fmt = r.getRPr();
+
+                length += txt.length();
+                formats.put(length, fmt);
+            }
+            return formats;
+        }
+
+    CTRst buildCTRst(String text, TreeMap<Integer, CTRPrElt> formats){
+        if(text.length() != formats.lastKey()) {
+            throw new IllegalArgumentException("Text length was " + text.length() +
+                    " but the last format index was " + formats.lastKey());
+        }
+        CTRst st = CTRst.Factory.newInstance();
+        int runStartIdx = 0;
+        for (Iterator<Integer> it = formats.keySet().iterator(); it.hasNext();) {
+            int runEndIdx = it.next();
+            CTRElt run = st.addNewR();
+            String fragment = text.substring(runStartIdx, runEndIdx);
+            run.setT(fragment);
+            preserveSpaces(run.xgetT());
+            CTRPrElt fmt = formats.get(runEndIdx);
+            if(fmt != null) run.setRPr(fmt);
+            runStartIdx = runEndIdx;
+        }
+        return st;
+    }
+    
+    private ThemesTable getThemesTable() {
+       if(styles == null) return null;
+       return styles.getTheme();
     }
 }

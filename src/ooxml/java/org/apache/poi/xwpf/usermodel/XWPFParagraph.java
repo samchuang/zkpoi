@@ -107,6 +107,8 @@ public class XWPFParagraph implements IBodyElement{
              }
           }
        }
+
+       c.dispose();
        
        // Look for bits associated with the runs
        for(XWPFRun run : runs) {
@@ -140,6 +142,7 @@ public class XWPFParagraph implements IBodyElement{
                    footnoteText.append("]");
                 }
              }
+             c.dispose();
           }
       }
     }
@@ -1158,6 +1161,8 @@ public class XWPFParagraph implements IBodyElement{
 	    		else
 	    			candCharPos=0;
 	    	}
+
+            c.dispose();
     	}
     	return null;
     }

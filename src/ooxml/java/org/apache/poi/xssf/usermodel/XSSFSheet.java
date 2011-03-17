@@ -30,14 +30,10 @@ import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlOptions;
-import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.POIXMLException;
 import org.zkoss.poi.hssf.record.PasswordRecord;
-import org.zkoss.poi.hssf.record.formula.FormulaShifter;
+import org.zkoss.poi.ss.formula.FormulaShifter;
 import org.zkoss.poi.hssf.util.PaneInformation;
 import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
@@ -53,17 +49,19 @@ import org.zkoss.poi.ss.usermodel.Footer;
 import org.zkoss.poi.ss.usermodel.Header;
 import org.zkoss.poi.ss.usermodel.Row;
 import org.zkoss.poi.ss.usermodel.Sheet;
-import org.zkoss.poi.ss.util.CellRangeAddress;
-import org.zkoss.poi.ss.util.CellRangeAddressList;
-import org.zkoss.poi.ss.util.CellReference;
-import org.zkoss.poi.ss.util.SSCellRange;
+import org.zkoss.poi.ss.util.*;
 import org.zkoss.poi.util.HexDump;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
 import org.zkoss.poi.xssf.model.CommentsTable;
+import org.zkoss.poi.xssf.model.Table;
 import org.zkoss.poi.xssf.usermodel.helpers.ColumnHelper;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFRowShifter;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
+import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 
 /**
  * High level representation of a SpreadsheetML worksheet.
@@ -334,7 +332,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param useMergedCells whether to use the contents of merged cells when calculating the width of the column
      */
     public void autoSizeColumn(int column, boolean useMergedCells) {
-        double width = ColumnHelper.getColumnWidth(this, column, useMergedCells);
+        double width = SheetUtil.getColumnWidth(this, column, useMergedCells);
         if(width != -1){
             columnHelper.setColBestFit(column, true);
             columnHelper.setCustomWidth(column, true);
@@ -1371,13 +1369,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         if (row.getSheet() != this) {
             throw new IllegalArgumentException("Specified row does not belong to this sheet");
         }
-        for(Cell cell : row) {
-            XSSFCell xcell = (XSSFCell)cell;
-            String msg = "Row[rownum="+row.getRowNum()+"] contains cell(s) included in a multi-cell array formula. You cannot change part of an array.";
-            if(xcell.isPartOfArrayFormulaGroup()){
-                xcell.notifyArrayFormulaChanging(msg);
-            }
-        }
+        // collect cells into a temporary array to avoid ConcurrentModificationException
+        ArrayList<XSSFCell> cellsToDelete = new ArrayList<XSSFCell>();
+        for(Cell cell : row) cellsToDelete.add((XSSFCell)cell);
+
+        for(XSSFCell cell : cellsToDelete) row.removeCell(cell);
+
         _rows.remove(row.getRowNum());
     }
 
@@ -2944,7 +2941,33 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         String ref = norm.formatAsString();
         af.setRef(ref);
 
+        XSSFWorkbook wb = getWorkbook();
+        int sheetIndex = getWorkbook().getSheetIndex(this);
+        XSSFName name = wb.getBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
+        if (name == null) {
+            name = wb.createBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
+            name.getCTName().setHidden(true); 
+            CellReference r1 = new CellReference(getSheetName(), range.getFirstRow(), range.getFirstColumn(), true, true);
+            CellReference r2 = new CellReference(null, range.getLastRow(), range.getLastColumn(), true, true);
+            String fmla = r1.formatAsString() + ":" + r2.formatAsString();
+            name.setRefersToFormula(fmla);
+        }
+
         return new XSSFAutoFilter(this);
+    }
+    
+    /**
+     * Returns any tables associated with this Sheet
+     */
+    public List<Table> getTables() {
+       List<Table> tables = new ArrayList<Table>();
+       for(POIXMLDocumentPart p : getRelations()) {
+          if (p.getPackageRelationship().getRelationshipType().equals(XSSFRelation.TABLE.getRelation())) {
+             Table table = (Table) p;
+             tables.add(table);
+          }
+       }
+       return tables;
     }
 	
 	//20100914, henrichen@zkoss.org: expose _rows

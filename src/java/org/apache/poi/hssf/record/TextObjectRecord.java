@@ -19,8 +19,8 @@ package org.zkoss.poi.hssf.record;
 
 import org.zkoss.poi.hssf.record.cont.ContinuableRecord;
 import org.zkoss.poi.hssf.record.cont.ContinuableRecordOutput;
-import org.zkoss.poi.hssf.record.formula.OperandPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.OperandPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.usermodel.HSSFRichTextString;
 import org.zkoss.poi.util.BitField;
 import org.zkoss.poi.util.BitFieldFactory;

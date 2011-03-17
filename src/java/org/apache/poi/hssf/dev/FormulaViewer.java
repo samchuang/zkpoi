@@ -24,10 +24,10 @@ import org.zkoss.poi.hssf.model.HSSFFormulaParser;
 import org.zkoss.poi.hssf.record.FormulaRecord;
 import org.zkoss.poi.hssf.record.Record;
 import org.zkoss.poi.hssf.record.RecordFactory;
-import org.zkoss.poi.hssf.record.formula.ExpPtg;
-import org.zkoss.poi.hssf.record.formula.FuncPtg;
-import org.zkoss.poi.hssf.record.formula.OperationPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.ExpPtg;
+import org.zkoss.poi.ss.formula.ptg.FuncPtg;
+import org.zkoss.poi.ss.formula.ptg.OperationPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.usermodel.HSSFWorkbook;
 import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 

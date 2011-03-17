@@ -24,10 +24,10 @@ import org.zkoss.poi.hssf.record.Record;
 import org.zkoss.poi.hssf.record.RecordFormatException;
 import org.zkoss.poi.hssf.record.SharedFormulaRecord;
 import org.zkoss.poi.hssf.record.StringRecord;
-import org.zkoss.poi.hssf.record.formula.ExpPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ssf.formula.ptg.ExpPtg;
+import org.zkoss.poi.ssf.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.util.CellRangeAddress8Bit;
-import org.zkoss.poi.hssf.util.CellReference;
+import org.zkoss.poi.ss.util.CellReference;
 import org.zkoss.poi.ss.formula.Formula;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 

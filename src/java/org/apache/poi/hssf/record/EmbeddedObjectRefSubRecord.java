@@ -19,11 +19,11 @@ package org.zkoss.poi.hssf.record;
 
 import java.io.ByteArrayInputStream;
 
-import org.zkoss.poi.hssf.record.formula.Area3DPtg;
-import org.zkoss.poi.hssf.record.formula.AreaPtg;
-import org.zkoss.poi.hssf.record.formula.Ptg;
-import org.zkoss.poi.hssf.record.formula.Ref3DPtg;
-import org.zkoss.poi.hssf.record.formula.RefPtg;
+import org.zkoss.poi.ss.formula.ptg.Area3DPtg;
+import org.zkoss.poi.ss.formula.ptg.AreaPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ref3DPtg;
+import org.zkoss.poi.ss.formula.ptg.RefPtg;
 import org.zkoss.poi.util.HexDump;
 import org.zkoss.poi.util.LittleEndian;
 import org.zkoss.poi.util.LittleEndianInput;

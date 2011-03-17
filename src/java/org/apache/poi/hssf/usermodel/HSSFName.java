@@ -21,7 +21,7 @@ import org.zkoss.poi.hssf.model.HSSFFormulaParser;
 import org.zkoss.poi.hssf.model.InternalWorkbook;
 import org.zkoss.poi.hssf.record.NameCommentRecord;
 import org.zkoss.poi.hssf.record.NameRecord;
-import org.zkoss.poi.hssf.record.formula.Ptg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.ss.formula.FormulaType;
 import org.zkoss.poi.ss.usermodel.Name;
 

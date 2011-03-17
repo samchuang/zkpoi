@@ -22,14 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellFormula;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellFormulaType;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
-import org.zkoss.poi.hssf.record.SharedFormulaRecord;
-import org.zkoss.poi.hssf.record.formula.Ptg;
-import org.zkoss.poi.hssf.record.formula.SheetNameFormatter;
-import org.zkoss.poi.hssf.record.formula.eval.ErrorEval;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.SharedFormula;
+import org.zkoss.poi.ss.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.formula.FormulaParser;
 import org.zkoss.poi.ss.formula.FormulaRenderer;
@@ -44,9 +39,13 @@ import org.zkoss.poi.ss.usermodel.Hyperlink;
 import org.zkoss.poi.ss.usermodel.RichTextString;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 import org.zkoss.poi.ss.util.CellReference;
-import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.xssf.model.SharedStringsTable;
 import org.zkoss.poi.xssf.model.StylesTable;
+import org.zkoss.poi.util.Internal;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellFormula;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellFormulaType;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
 
 /**
  * High level representation of a cell in a row of a spreadsheet.
@@ -326,7 +325,7 @@ public final class XSSFCell implements Cell {
      */
     public void setCellValue(RichTextString str) {
         if(str == null || str.getString() == null){
-            setBlank();
+            setCellType(Cell.CELL_TYPE_BLANK);
             return;
         }
         int cellType = getCellType();
@@ -392,8 +391,10 @@ public final class XSSFCell implements Cell {
 
         int sheetIndex = sheet.getWorkbook().getSheetIndex(sheet);
         XSSFEvaluationWorkbook fpb = XSSFEvaluationWorkbook.create(sheet.getWorkbook());
+        SharedFormula sf = new SharedFormula(SpreadsheetVersion.EXCEL2007);
+
         Ptg[] ptgs = FormulaParser.parse(sharedFormula, fpb, FormulaType.CELL, sheetIndex);
-        Ptg[] fmla = SharedFormulaRecord.convertSharedFormulas(ptgs,
+        Ptg[] fmla = sf.convertSharedFormulas(ptgs,
                 getRowIndex() - ref.getFirstRow(), getColumnIndex() - ref.getFirstColumn());
         return FormulaRenderer.toFormulaString(fpb, fmla);
     }
