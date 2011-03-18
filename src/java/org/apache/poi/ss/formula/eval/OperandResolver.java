@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
  *
  * @author Josh Micich
  * @author Brendan Nolan
+ * @author henrichen@zkoss.org: handle HYPERLINK function
  */
 public final class OperandResolver {
 
@@ -64,6 +65,10 @@ public final class OperandResolver {
 			result = chooseSingleElementFromArea((AreaEval) arg, srcCellRow, srcCellCol);
 		} else {
 			result = arg;
+		}
+		//20100720, henrichen@zkoss.org: HYPERLINK function
+		if (arg instanceof HyperlinkEval && result instanceof HyperlinkEval) { 
+			((HyperlinkEval)result).setHyperlink(((HyperlinkEval)arg).getHyperlink());
 		}
 		if (result instanceof ErrorEval) {
 			throw new EvaluationException((ErrorEval) result);
@@ -149,7 +154,7 @@ public final class OperandResolver {
 		cells this method could not detect it.
 
 		Logic to detect evaluation cycles of all kinds has been coded in EvaluationCycleDetector
-		(and FormulaEvaluator).
+		(and HSSFFormulaEvaluator).
 		 */
 		}
 

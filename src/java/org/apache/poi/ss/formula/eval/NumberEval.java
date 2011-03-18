@@ -23,13 +23,14 @@ package org.zkoss.poi.ss.formula.eval;
 import org.zkoss.poi.ss.formula.ptg.IntPtg;
 import org.zkoss.poi.ss.formula.ptg.NumberPtg;
 import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 import org.zkoss.poi.ss.util.NumberToTextConverter;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
- *  
+ * @author henrichen@zkoss.org: HYPERLINK function 
  */
-public final class NumberEval implements NumericValueEval, StringValueEval {
+public final class NumberEval implements NumericValueEval, StringValueEval, HyperlinkEval {
     
     public static final NumberEval ZERO = new NumberEval(0);
 
@@ -70,4 +71,14 @@ public final class NumberEval implements NumericValueEval, StringValueEval {
         sb.append("]");
         return sb.toString();
     }
+
+	//20100720, henrichen@zkoss.org: handle HYPERLINK function
+	private Hyperlink _hyperlink;
+	public void setHyperlink(Hyperlink hyperlink) {
+		_hyperlink = hyperlink;
+	}
+	
+	public Hyperlink getHyperlink() {
+		return _hyperlink;
+	}
 }

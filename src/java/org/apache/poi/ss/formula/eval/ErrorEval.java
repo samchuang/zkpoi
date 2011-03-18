@@ -18,12 +18,13 @@
 package org.zkoss.poi.ss.formula.eval;
 
 import org.zkoss.poi.ss.usermodel.ErrorConstants;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
- *
+ * @author henrichen@zkoss.org: HYPERLINK function
  */
-public final class ErrorEval implements ValueEval {
+public final class ErrorEval implements ValueEval, HyperlinkEval {
 
     // convenient access to namespace
     private static final ErrorConstants EC = null;
@@ -109,6 +110,15 @@ public final class ErrorEval implements ValueEval {
         return sb.toString();
     }
     
+	//20100720, henrichen@zkoss.org: handle HYPERLINK function
+	private Hyperlink _hyperlink;
+	public void setHyperlink(Hyperlink hyperlink) {
+		_hyperlink = hyperlink;
+	}
+	
+	public Hyperlink getHyperlink() {
+		return _hyperlink;
+	}
 	//20101221, henrichen@zkoss.org: error text tip!
     public static String getTooltip(int errorCode) {
         if(!ErrorConstants.isValidCode(errorCode)) {

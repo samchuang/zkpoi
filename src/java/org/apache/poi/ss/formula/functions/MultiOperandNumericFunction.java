@@ -26,6 +26,7 @@ import org.zkoss.poi.ss.formula.eval.OperandResolver;
 import org.zkoss.poi.ss.formula.eval.RefEval;
 import org.zkoss.poi.ss.formula.eval.StringEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.eval.ValuesEval;
 import org.zkoss.poi.ss.formula.TwoDEval;
 
 /**
@@ -188,6 +189,14 @@ public abstract class MultiOperandNumericFunction implements Function {
 		if (ve == BlankEval.instance) {
 			if (_isBlankCounted) {
 				temp.add(0.0);
+			}
+			return;
+		}
+		//henrichen@zkoss.org: handle multiple ValueEval from 3d area references
+		if (ve instanceof ValuesEval) {
+			ValueEval[] ves = ((ValuesEval) ve).getValueEvals();
+			for(ValueEval xve : ves) {
+				collectValue(xve, isViaReference, temp); //recursive
 			}
 			return;
 		}

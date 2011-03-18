@@ -243,7 +243,7 @@ public class CellFormatPart {
     	String ldesc = m.group(LOCALE_GROUP);
     	if (ldesc == null || ldesc.length() == 0)
     		return null;
-System.out.println("format locale: "+ldesc);
+   		logger.finer("format locale: "+ldesc);
     	Locale l = getLocale(ldesc);
     	if (l == null)
     		logger.warning("Unknown locale: " + quote(ldesc));
