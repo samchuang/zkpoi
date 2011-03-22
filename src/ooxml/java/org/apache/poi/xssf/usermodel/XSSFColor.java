@@ -144,13 +144,15 @@ public class XSSFColor implements Color {
          }
          
          // For RGB colours, but not ARGB (we think...)
-         // Excel gets black and white the wrong way around, so switch them 
-         if (rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0) {
-            rgb = new byte[] {-1, -1, -1};
-         }
-         else if (rgb[0] == -1 && rgb[1] == -1 && rgb[2] == -1) {
-            rgb = new byte[] {0, 0, 0};
-         }
+         // Excel gets black and white the wrong way around, so switch them
+         
+         // 20110321, henrichen@zkoss.org: Theme 0 and 1 shall switch, Theme 2 and 3 shall switch. It is not correct to change here!
+         //if (rgb[0] == 0 && rgb[1] == 0 && rgb[2] == 0) {
+         //   rgb = new byte[] {-1, -1, -1};
+         //}
+         //else if (rgb[0] == -1 && rgb[1] == -1 && rgb[2] == -1) {
+         //   rgb = new byte[] {0, 0, 0};
+         //}
          return rgb;
     }
 
