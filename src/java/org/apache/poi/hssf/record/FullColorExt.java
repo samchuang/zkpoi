@@ -22,7 +22,7 @@ import org.zkoss.poi.util.LittleEndianOutput;
 public class FullColorExt {
 	private short xclrType; //2.5.279 XColorType. [MS-XLS].pdf, page 938.
 	private short nTintShade;
-	private int xclrValue;
+	private int xclrValue; //0-7 red, 8-15 green, 16-23 blue, 24-31 alpha (native bits). 2.5.178 LongRGBA. [MS-XLS].pdf, page 749
 	private byte[] unused = new byte[8];
 	
 	public FullColorExt(RecordInputStream in) {
@@ -36,9 +36,9 @@ public class FullColorExt {
 		xclrType = 2;
 		nTintShade = 0;
 		xclrValue = 0xff000000 //alpha 
-					| (((int)r) << 16 ) & 0xff0000 //red 
+					| (((int)b) << 16 ) & 0xff0000 //blue 
 					| (((int)g) << 8 ) & 0x00ff00 //green
-					| (((int)b) & 0x0000ff); //blue
+					| (((int)r) & 0x0000ff); //red
 	}
 	
 	public int getDataSize() {
@@ -88,10 +88,15 @@ public class FullColorExt {
 	public void setXclrValue(int xclrValue) {
 		this.xclrValue = xclrValue;
 	}
-	
+	private int BGRToRGB() {
+		return (xclrValue & 0xff000000) //alpha 
+			| ((xclrValue << 16 ) & 0xff0000) //red 
+			| (xclrValue & 0x00ff00) //green
+			| ((xclrValue >> 16 ) & 0x000000ff); //blue
+	}
 	public int getRGB() {
 		if (isRGB()) {
-			return getXclrValue();
+			return BGRToRGB(); //20110322, henrichen@zkoss.org: BGR -> RGB
 		} else if (isTheme()) {
 			return DEFAULT_THEME[getXclrValue()];
 		} else if (isIndex()) {
