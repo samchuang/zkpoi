@@ -664,6 +664,7 @@ public class CellNumberFormatter extends CellFormatter {
         StringMod nextChange = (changes.hasNext() ? changes.next() : null);
         int adjust = 0;
         BitSet deletedChars = new BitSet(); // records chars already deleted
+        final String groupSeparator = ""+Formatters.getGroupingSeparator();
         while (it.hasNext()) {
             Special s = it.next();
             int adjustedPos = s.pos + adjust;
@@ -679,7 +680,7 @@ public class CellNumberFormatter extends CellFormatter {
                 switch (nextChange.op) {
                 case StringMod.AFTER:
                     // ignore adding a comma after a deleted char (which was a '#')
-                    if (nextChange.toAdd.equals(",") && deletedChars.get(s.pos))
+                    if (nextChange.toAdd.equals(groupSeparator) && deletedChars.get(s.pos)) //20110321, henrichen@zkoss.org: respect current locale
                         break;
                     posTweak = 1;
                     //noinspection fallthrough

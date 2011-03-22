@@ -17,6 +17,8 @@
 
 package org.zkoss.poi.ss.util;
 
+import org.zkoss.poi.ss.format.Formatters;
+
 
 /**
  * Excel converts numbers to text with different rules to those of java, so
@@ -149,7 +151,9 @@ public final class NumberToTextConverter {
 			// Normally one would not create HybridDecimal objects from these values
 			// except in these cases Excel really tries to render them as if they were normal numbers
 			if(rawBits == EXCEL_NAN_BITS) {
-				return "3.484840871308E+308";
+				//20110322, henrichen@zkoss.org: respect current locale
+				//return "3.484840871308E+308";
+				return "3"+Formatters.getDecimalSeparator()+"484840871308E+308";
 			}
 			// This is where excel really gets it wrong
 			// Special numbers like Infinity and NaN are interpreted according to
@@ -190,17 +194,22 @@ public final class NumberToTextConverter {
 		int nLeadingZeros = -decExponent - 1;
 		int normalLength = 2 + nLeadingZeros + countSigDigits; // 2 == "0.".length()
 
+		final char dot = Formatters.getDecimalSeparator(); //20110322, henrichen@zkoss.org: respect current locale
 		if (needsScientificNotation(normalLength)) {
 			sb.append(decimalDigits.charAt(0));
 			if (countSigDigits > 1) {
-    			sb.append('.');
+				//20110322, henrichen@zkoss.org: respect current locale
+    			//sb.append('.');
+				sb.append(dot);
     			sb.append(decimalDigits.subSequence(1, countSigDigits));
 			}
 			sb.append("E-");
 			appendExp(sb, -decExponent);
 			return;
 		}
-		sb.append("0.");
+		//20110322, henrichen@zkoss.org: respect current locale
+		//sb.append("0.");
+		sb.append("0").append(dot);
 		for (int i=nLeadingZeros; i>0; i--) {
 			sb.append('0');
 		}
@@ -209,11 +218,14 @@ public final class NumberToTextConverter {
 
 	private static void formatGreaterThanOne(StringBuilder sb, String decimalDigits, int decExponent, int countSigDigits) {
 
+		final char dot = Formatters.getDecimalSeparator(); //20110322, henrichen@zkoss.org: respect current locale
 		if (decExponent > 19) {
 			// scientific notation
 			sb.append(decimalDigits.charAt(0));
 			if (countSigDigits>1) {
-				sb.append('.');
+				//20110322, henrichen@zkoss.org: respect current locale
+    			//sb.append('.');
+				sb.append(dot);
 				sb.append(decimalDigits.subSequence(1, countSigDigits));
 			}
 			sb.append("E+");
@@ -223,7 +235,9 @@ public final class NumberToTextConverter {
 		int nFractionalDigits = countSigDigits - decExponent-1;
 		if (nFractionalDigits > 0) {
 			sb.append(decimalDigits.subSequence(0, decExponent+1));
-			sb.append('.');
+			//20110322, henrichen@zkoss.org: respect current locale
+			//sb.append('.');
+			sb.append(dot);
 			sb.append(decimalDigits.subSequence(decExponent+1, countSigDigits));
 			return;
 		}
