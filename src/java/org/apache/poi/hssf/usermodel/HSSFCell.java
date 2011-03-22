@@ -629,7 +629,9 @@ public class HSSFCell implements Cell {
         if (!(_record instanceof FormulaRecordAggregate)) {
             throw typeMismatch(CELL_TYPE_FORMULA, _cellType, true);
         }
-        return HSSFFormulaParser.toFormulaString(_book, ((FormulaRecordAggregate)_record).getFormulaTokens());
+        //20110322, henrichen@zkoss.org: formula tokens could be empty, shall check before parse it
+        final Ptg[] ptgs = ((FormulaRecordAggregate)_record).getFormulaTokens();
+        return ptgs.length > 0 ? HSSFFormulaParser.toFormulaString(_book, ptgs) : "";
     }
 
     /**
