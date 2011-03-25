@@ -114,4 +114,21 @@ public abstract class RefPtgBase extends OperandPtg {
 	public final byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
 	}
+	
+	//20110324, henrichen@zkoss.org: override hashCode
+	public int hashCode() {
+		return field_1_row ^ field_2_col;
+	}
+
+	//20110324, henrichen@zkoss.org: override equals
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof RefPtgBase)) {
+			return false;
+		}
+		final RefPtgBase other = (RefPtgBase) o;
+		return other.field_1_row == this.field_1_row && other.field_2_col == this.field_2_col; 
+	}
 }

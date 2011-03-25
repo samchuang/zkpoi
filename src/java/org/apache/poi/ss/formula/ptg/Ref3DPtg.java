@@ -93,4 +93,21 @@ public final class Ref3DPtg extends RefPtgBase implements WorkbookDependentFormu
     public String toFormulaString() {
         throw new RuntimeException("3D references need a workbook to determine formula text");
     }
+    
+	//20110324, henrichen@zkoss.org: override hashCode
+	public int hashCode() {
+		return super.hashCode() ^ field_1_index_extern_sheet;
+	}
+
+	//20110324, henrichen@zkoss.org: override equals
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof Ref3DPtg)) {
+			return false;
+		}
+		final Ref3DPtg other = (Ref3DPtg) o;
+		return super.equals(o) && other.field_1_index_extern_sheet == this.field_1_index_extern_sheet;
+	}
 }

@@ -18,6 +18,7 @@
 package org.zkoss.poi.ss.formula;
 
 import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
 
 /**
  * Interface for constructing the formula dependency.
@@ -33,5 +34,12 @@ public interface DependencyTracker {
 	 * @param eval whether this reference is an evaluated result(e.g. from INDIRECT() function(true), or directly specified in formula(false))
 	 * @return the ValueEval after the dependency checking
 	 */
-	public ValueEval addDependency(OperationEvaluationContext ec, ValueEval opResult, boolean eval);
+	public ValueEval postProcessValueEval(OperationEvaluationContext ec, ValueEval opResult, boolean eval);
+	
+	/**
+	 * Construct formula reference dependencies.
+	 * @param ec the evaluation context of the evaluated formula cell.
+	 * @param ptgs the precedent that might change the formula cell.
+	 */
+	public void addDependency(OperationEvaluationContext ec, Ptg[] ptgs);
 }

@@ -365,9 +365,24 @@ public final class WorkbookEvaluator {
 		}
 		throw new RuntimeException("Unexpected cell type (" + cellType + ")");
 	}
+	//20110324, henrichen@zkoss.org: after process the ValueEval 
+	private ValueEval postProcessValueEval(OperationEvaluationContext ec, ValueEval opResult, boolean eval) {
+		if (_dependencyTracker != null) {
+			opResult = _dependencyTracker.postProcessValueEval(ec, opResult, eval);
+		}
+		return opResult;
+	}
+
+	//20110324, henrichen@zkoss.org: constructs the dependency DAG per the given formula
+	private void addDependency(OperationEvaluationContext ec, Ptg[] ptgs) {
+		if (_dependencyTracker != null) {
+			_dependencyTracker.addDependency(ec, ptgs);
+		}
+	}
 	// visibility raised for testing
 	/* package */ ValueEval evaluateFormula(OperationEvaluationContext ec, Ptg[] ptgs) {
-
+		addDependency(ec, ptgs); //20110324, henrichen@zkoss.org: construct the dependency DAG per this formula (bug#290)
+		
 		Stack<ValueEval> stack = new Stack<ValueEval>();
 		for (int i = 0, iSize = ptgs.length; i < iSize; i++) {
 
@@ -468,15 +483,15 @@ public final class WorkbookEvaluator {
 					ValueEval p = stack.pop();
 					//20101115, henrichen@zkoss.org: add dependency before operation
 					//FuncVarPtg, the NamePtg(functionname) should be as is
-					p = addDependency(ec, p, !(optg instanceof FuncVarPtg) || j > 0); 
+					p = postProcessValueEval(ec, p, !(optg instanceof FuncVarPtg) || j > 0); 
 					ops[j] = p;
 				}
 //				logDebug("invoke " + operation + " (nAgs=" + numops + ")");
 				opResult = OperationEvaluatorFactory.evaluate(optg, ops, ec);
-				opResult = addDependency(ec, opResult, true);
+				opResult = postProcessValueEval(ec, opResult, true);
 			} else {
 				opResult = getEvalForPtg(ptg, ec);
-//				opResult = addDependency(ec, opResult, false);
+				opResult = postProcessValueEval(ec, opResult, false);
 			}
 			if (opResult == null) {
 				throw new RuntimeException("Evaluation result must not be null");
@@ -489,15 +504,8 @@ public final class WorkbookEvaluator {
 		if (!stack.isEmpty()) {
 			throw new IllegalStateException("evaluation stack not empty");
 		}
-		value = addDependency(ec, value, true); //20101115, henrichen@zkoss.org: might be simple one operand formula
+		value = postProcessValueEval(ec, value, true); //20101115, henrichen@zkoss.org: might be simple one operand formula
 		return dereferenceResult(value, ec.getRowIndex(), ec.getColumnIndex());
-	}
-	
-	private ValueEval addDependency(OperationEvaluationContext ec, ValueEval opResult, boolean eval) {
-		if (_dependencyTracker != null) {
-			opResult = _dependencyTracker.addDependency(ec, opResult, eval);
-		}
-		return opResult;
 	}
 	/**
 	 * Calculates the number of tokens that the evaluator should skip upon reaching a tAttrSkip.
@@ -553,7 +561,7 @@ public final class WorkbookEvaluator {
 	 * StringPtg, BoolPtg <br/>special Note: OperationPtg subtypes cannot be
 	 * passed here!
 	 */
-	private ValueEval getEvalForPtg(Ptg ptg, OperationEvaluationContext ec) {
+	/*package*/ ValueEval getEvalForPtg(Ptg ptg, OperationEvaluationContext ec) { //20110324, henrichen@zkoss.org: raise access right
 		//  consider converting all these (ptg instanceof XxxPtg) expressions to (ptg.getClass() == XxxPtg.class)
 
 		if (ptg instanceof NamePtg) {
