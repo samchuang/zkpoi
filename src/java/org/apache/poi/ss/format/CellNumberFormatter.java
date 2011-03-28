@@ -17,6 +17,7 @@
 package org.zkoss.poi.ss.format;
 
 import org.zkoss.poi.ss.format.CellFormatPart.PartHandler;
+import org.zkoss.poi.ss.util.NumberToTextConverter;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -71,7 +72,9 @@ public class CellNumberFormatter extends CellFormatter {
                 if (num.doubleValue() % 1.0 == 0)
                     SIMPLE_INT.formatValue(toAppendTo, value);
                 else
-                    SIMPLE_FLOAT.formatValue(toAppendTo, value);
+                	//20110328, henrichen@zkoss.org: shall consider the Excel 15 digits limit(bug# 311)
+                    //SIMPLE_FLOAT.formatValue(toAppendTo, value);
+                	toAppendTo.append(NumberToTextConverter.toText(((Number)value).doubleValue()));
             } else {
                 CellTextFormatter.SIMPLE_TEXT.formatValue(toAppendTo, value);
             }
