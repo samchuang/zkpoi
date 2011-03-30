@@ -318,7 +318,7 @@ public class HSSFCell implements Cell {
                     frec.setRow(row);
                     frec.setColumn(col);
                 }
-                if (setValue)
+                if (setValue && _cellType == Cell.CELL_TYPE_NUMERIC) //20110330, henrichen@zkoss.org: if original is not a number
                 {
                     frec.getFormulaRecord().setValue(getNumericCellValue());
                 }
