@@ -92,11 +92,21 @@ public class DateUtil {
         return internalGetExcelDate( (Calendar)date.clone(), use1904windowing );
     }
     private static double internalGetExcelDate(Calendar date, boolean use1904windowing) {
-        if ((!use1904windowing && date.get(Calendar.YEAR) < 1900) ||
-            (use1904windowing && date.get(Calendar.YEAR) < 1904))
-        {
-            return BAD_DATE;
-        }
+    	//henrichen@zkoss.org: Excel date 0 is Java Date Dec. 31, 1989 00:00. Original date check is not correct
+        //if ((!use1904windowing && date.get(Calendar.YEAR) < 1900) ||
+        //    (use1904windowing && date.get(Calendar.YEAR) < 1904))
+        //{
+        //    return BAD_DATE;
+        //}
+    	final int minY = use1904windowing ? 1903 : 1899;
+		final int y = date.get(Calendar.YEAR);
+		final int m = date.get(Calendar.MONTH);
+		final int d = date.get(Calendar.DAY_OF_MONTH);
+		if ((y == minY && m == 11 && d < 31)
+			|| (y == minY && m < 11)
+			|| y < minY) {
+	        return BAD_DATE;
+		}
         // Because of daylight time saving we cannot use
         //     date.getTime() - calStart.getTimeInMillis()
         // as the difference in milliseconds between 00:00 and 04:00
@@ -368,15 +378,21 @@ public class DateUtil {
      */
     protected static int absoluteDay(Calendar cal, boolean use1904windowing)
     {
-        return cal.get(Calendar.DAY_OF_YEAR)
-               + daysInPriorYears(cal.get(Calendar.YEAR), use1904windowing);
+    	//20110402, henrichen@zkoss.org: could be 1989/12/31
+        //return cal.get(Calendar.DAY_OF_YEAR)
+        //       + daysInPriorYears(cal.get(Calendar.YEAR), use1904windowing);
+    	final int minY = use1904windowing ? 1903 : 1899;
+    	final int year = cal.get(Calendar.YEAR);
+    	return year == minY ? 0 :
+            cal.get(Calendar.DAY_OF_YEAR)
+                   + daysInPriorYears(cal.get(Calendar.YEAR), use1904windowing);
     }
 
     /**
      * Return the number of days in prior years since 1900
      *
      * @return    days  number of days in years prior to yr.
-     * @param     yr    a year (1900 < yr < 4000)
+     * @param     yr    a year (1899 <= yr < 4000)
      * @param use1904windowing
      * @exception IllegalArgumentException if year is outside of range.
      */
@@ -386,7 +402,6 @@ public class DateUtil {
         if ((!use1904windowing && yr < 1900) || (use1904windowing && yr < 1900)) {
             throw new IllegalArgumentException("'year' must be 1900 or greater");
         }
-
         int yr1  = yr - 1;
         int leapDays =   yr1 / 4   // plus julian leap days in prior years
                        - yr1 / 100 // minus prior century years

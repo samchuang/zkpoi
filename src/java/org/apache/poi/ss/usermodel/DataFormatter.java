@@ -813,4 +813,9 @@ public class DataFormatter {
             return df.parseObject(source, pos);
         }
     }
+    
+    //20110330, henrichen@zkoss.org:
+    public static final Format getJavaFormat(Cell cell) {
+    	return new DataFormatter().getFormat(cell);
+    }
 }
