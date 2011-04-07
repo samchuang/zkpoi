@@ -85,7 +85,7 @@ public final class ErrorEval implements ValueEval, HyperlinkEval {
         // value expression that might appear in a formula.  In addition these error strings should
         // look unlike the standard Excel errors.  Hence tilde ('~') was used.
         switch(errorCode) {
-            case CIRCULAR_REF_ERROR_CODE: return "#REF!"; //20101221, henrichen: degenerate to #REF! //return "~CIRCULAR~REF~";
+            case CIRCULAR_REF_ERROR_CODE: return "~CIRCULAR~REF~";
             case FUNCTION_NOT_IMPLEMENTED_CODE: return "~FUNCTION~NOT~IMPLEMENTED~";
         }
         return "~non~std~err(" + errorCode + ")~";

@@ -271,7 +271,9 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 			cv = new CellValue(ne.getStringValue());
 		}
 		if (eval instanceof ErrorEval) {
-			cv = CellValue.getError(((ErrorEval)eval).getErrorCode());
+			//20110407, henrichne@zkoss.org: degenerate CIRCULAR_REF_ERROR to REF_INVALID
+			cv = CellValue.getError(((ErrorEval)eval).getErrorCode() == ErrorEval.CIRCULAR_REF_ERROR.getErrorCode() ? 
+					ErrorEval.REF_INVALID.getErrorCode() : ((ErrorEval)eval).getErrorCode());
 		}
 		if (cv != null) {
 			if (eval instanceof HyperlinkEval) {
