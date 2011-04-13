@@ -1116,7 +1116,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
         return "$" + colRef.getCellRefParts()[2] + "$" + colRef.getCellRefParts()[1] + ":$" + colRef2.getCellRefParts()[2] + "$" + colRef2.getCellRefParts()[1];
     }
 
-    XSSFName getBuiltInName(String builtInCode, int sheetNumber) {
+    public XSSFName getBuiltInName(String builtInCode, int sheetNumber) {
         for (XSSFName name : namedRanges) {
             if (name.getNameName().equalsIgnoreCase(builtInCode) && name.getSheetIndex() == sheetNumber) {
                 return name;
