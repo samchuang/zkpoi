@@ -1628,6 +1628,25 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
         return pictures;
     }
 
+    
+    //TODO, get all autofilter info
+    public List<NameRecord> getAllAutofilters(){
+    	List<NameRecord> records = new ArrayList<NameRecord>();
+        Iterator<Record> recordIter = workbook.getRecords().iterator();
+        while (recordIter.hasNext())
+        {
+            Record r = recordIter.next();
+            if (r instanceof NameRecord)
+            {	
+            	NameRecord nameRecord = (NameRecord)r;
+                if(nameRecord.getNameText().equals("_FilterDatabase")){
+                	records.add(nameRecord);
+                }
+            }
+        }
+        return records;
+    }
+    
     /**
      * Performs a recursive search for pictures in the given list of escher records.
      *
