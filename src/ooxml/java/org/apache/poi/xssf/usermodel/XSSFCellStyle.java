@@ -608,7 +608,7 @@ public class XSSFCellStyle implements CellStyle {
      * @return whether the cell using this style are locked
      */
     public boolean getLocked() {
-        return getCellProtection().getLocked();
+        return _cellXf.getProtection() == null ? true : getCellProtection().getLocked(); //bug#322. 20110428, henrichen@zkoss.org: default to true
     }
 
     /**
