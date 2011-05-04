@@ -33,6 +33,7 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.xssf.model.AutoFilter;
 import org.zkoss.poi.xssf.model.CalculationChain;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.zkoss.poi.xssf.model.ExternalLink;
@@ -249,6 +250,14 @@ public final class XSSFRelation extends POIXMLRelation {
     		"/x1/externalLinks/externalLink#.xml",
     		ExternalLink.class
     );
+    //TODO: autofilter
+    public static final XSSFRelation AUTOFILTER = new XSSFRelation(
+    		"application/vnd.openxmlformats-officedocument.spreadsheetml.autofilter+xml",
+    		"http://schemas.openxmlformats.org/officeDocument/2006/relationships/autoFilter",
+    		"/x1/autofilter.xml",
+    		AutoFilter.class
+    );
+    
 	public static final XSSFRelation CHARTS = new XSSFRelation(
 			"application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
 			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",

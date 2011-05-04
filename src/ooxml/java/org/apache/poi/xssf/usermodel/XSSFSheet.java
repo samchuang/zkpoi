@@ -54,8 +54,10 @@ import org.zkoss.poi.util.HexDump;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.xssf.model.AutoFilter;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.zkoss.poi.xssf.model.Table;
+import org.zkoss.poi.xssf.model.AutoFilter.FilterColumn;
 import org.zkoss.poi.xssf.usermodel.helpers.ColumnHelper;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFRowShifter;
 import org.apache.xmlbeans.XmlException;
@@ -83,7 +85,14 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     private List<XSSFHyperlink> hyperlinks;
     private ColumnHelper columnHelper;
     private CommentsTable sheetComments;
-    /**
+    
+    //TODO: autofilter
+    private AutoFilter autoFilter;
+    
+    public AutoFilter getAutoFilter() {
+		return autoFilter;
+	}
+	/**
      * cache of master shared formulas in this sheet.
      * Master shared formula is the first formula in a group of shared formulas is saved in the f element.
      */
@@ -147,6 +156,8 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
         // Look for bits we're interested in
         for(POIXMLDocumentPart p : getRelations()){
+        	//TODO: test to dump p
+        	System.out.println(">>>>>> POIXMLDocumentPart: "+p);
             if(p instanceof CommentsTable) {
                sheetComments = (CommentsTable)p;
                break;
@@ -155,6 +166,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         
         // Process external hyperlinks for the sheet, if there are any
         initHyperlinks();
+        
+        //TODO: for autofilter
+        initAutofilter();
     }
 
     /**
@@ -207,7 +221,35 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         }
     }
 
+    //TODO: for autofilter
+    private void initAutofilter(){
+			CTAutoFilter af = worksheet.getAutoFilter();			
+			System.out.println(">>>>>>> af :"+af);
+			if(af != null)
+				fillInAutoFilter(af);
+    	
+    }
+    
     /**
+     * Parse from CTAutoFilter to fill the user model autoFilter
+     * @param af
+     */
+    private void fillInAutoFilter(CTAutoFilter af) {
+		List<CTFilterColumn> fcList = af.getFilterColumnList();
+		if(fcList == null)
+			return;
+		
+		if(autoFilter == null){
+			autoFilter = new AutoFilter();
+		}
+		
+		for(CTFilterColumn fc: fcList){
+			autoFilter.addFilterColumn(fc);
+		}
+		System.out.println(">>>> parsed: "+autoFilter);
+	}
+
+	/**
      * Create a new CTWorksheet instance with all values set to defaults
      *
      * @return a new instance
@@ -2463,6 +2505,26 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
             worksheet.getHyperlinks().setHyperlinkArray(ctHls);
         }
 
+        //TODO: for autofilter
+        //look how setAutoFilter() implemented, just don't care ?
+        //remember to update model autoFilter while any action
+        //if find other tag available, here has to modify accordingly
+        if(autoFilter != null){
+        	CTAutoFilter ctAF = worksheet.getAutoFilter();
+        	List<CTFilterColumn> ctFilterColumn = ctAF.getFilterColumnList();
+        	ctFilterColumn.clear();
+        	for(FilterColumn fc :autoFilter.getFilterColumns()){
+        		CTFilterColumn ctFC = CTFilterColumn.Factory.newInstance();
+        		ctFC.setColId(fc.getColId());
+        		CTFilters ctFilters = CTFilters.Factory.newInstance();
+        		ctFC.setFilters(ctFilters);
+        		for(String val:autoFilter.getValuesOfFilter(fc.getColId())){
+        			CTFilter ctFilter = ctFilters.addNewFilter();
+        			ctFilter.setVal(val);
+        		}
+        	}
+        }
+        
         for(XSSFRow row : _rows.values()){
             row.onDocumentWrite();
         }

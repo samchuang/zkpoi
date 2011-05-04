@@ -9,10 +9,10 @@ public final class XSSFCombo extends XSSFShape implements Combo{
 	private ClientAnchor clientAnchor;
 	
 	
-	public XSSFCombo(int col, int row){
+	public XSSFCombo(int col, int row1){
 		clientAnchor = new XSSFClientAnchor();
 		clientAnchor.setCol1(col);
-		clientAnchor.setRow1(row);
+		clientAnchor.setRow1(row1);
 	}
 	
 	@Override

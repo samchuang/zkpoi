@@ -276,6 +276,10 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                 	linkIndexToBookName.put(el.getLinkIndex(), el.getBookName());
                 	bookNameToLinkIndex.put(el.getBookName(), el.getLinkIndex());
                 }
+                //TODO: autofilter? can it be read from here?
+                else if (p instanceof AutoFilter){
+                	System.out.println(">>>>>> got autofilter in xssfworkbook");
+                }
             }
             stylesSource.setTheme(theme);
 
