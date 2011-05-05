@@ -83,13 +83,13 @@ import org.zkoss.poi.hssf.record.WriteAccessRecord;
 import org.zkoss.poi.hssf.record.WriteProtectRecord;
 import org.zkoss.poi.hssf.record.XFExtRecord;
 import org.zkoss.poi.hssf.record.common.UnicodeString;
-import org.zkoss.poi.ss.formula.ptg.NameXPtg;
-import org.zkoss.poi.ss.formula.FormulaShifter;
-import org.zkoss.poi.ss.formula.udf.UDFFinder;
-import org.zkoss.poi.ss.formula.ptg.Ptg;
 import org.zkoss.poi.hssf.util.HSSFColor;
+import org.zkoss.poi.ss.formula.FormulaShifter;
 import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalName;
 import org.zkoss.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
+import org.zkoss.poi.ss.formula.ptg.NameXPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.ss.usermodel.BuiltinFormats;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
@@ -158,7 +158,8 @@ public final class InternalWorkbook {
     private final List<BoundSheetRecord> boundsheets;
     private final List<FormatRecord> formats;
     private final List<HyperlinkRecord> hyperlinks;
-
+    
+    
     /** the number of extended format records */
 	private int numxfs;
     /** the number of font records */
@@ -185,6 +186,7 @@ public final class InternalWorkbook {
 		boundsheets = new ArrayList<BoundSheetRecord>();
 		formats = new ArrayList<FormatRecord>();
 		hyperlinks = new ArrayList<HyperlinkRecord>();
+
 		numxfs = 0;
 		numfonts = 0;
 		maxformatid = -1;

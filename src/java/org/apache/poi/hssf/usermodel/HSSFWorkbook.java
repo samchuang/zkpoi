@@ -151,6 +151,9 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
      */
     private HSSFDataFormat formatter;
 
+	//20110505 , peterkuo@potix.com
+    private List<HSSFAutoFilter> autofilters;
+    
     /**
      * The policy to apply in the event of missing or
      *  blank cells when fetching from a row.
@@ -1128,6 +1131,7 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
         return retval;
     }
 
+    
     /**
      * Reset the fonts cache, causing all new calls
      *  to getFontAt() to create new objects.

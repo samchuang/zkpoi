@@ -16,17 +16,28 @@
 ==================================================================== */
 
 package org.zkoss.poi.hssf.usermodel;
+import java.util.List;
+
+import org.zkoss.poi.hssf.record.aggregates.AutoFilterInfoRecordAggregate;
 import org.zkoss.poi.ss.usermodel.AutoFilter;
 
 /**
  * Represents autofiltering for the specified worksheet.
  *
- * @author Yegor Kozlov
+ * @author Peterkuo
  */
 public final class HSSFAutoFilter implements AutoFilter {
     private HSSFSheet _sheet;
 
-    HSSFAutoFilter(HSSFSheet sheet){
+    private AutoFilterInfoRecordAggregate _record;
+    
+    HSSFAutoFilter(HSSFSheet sheet, AutoFilterInfoRecordAggregate record){
         _sheet = sheet;
+        _record = record;
     }
+
+	public List<String> getValuesOfFilter(int column) {
+		
+		return _record.getValuesOfFilter(column);
+	}
 }

@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.zkoss.lang.Classes;
 import org.zkoss.lang.Library;
+import org.zkoss.poi.hssf.record.AutoFilterInfoRecord;
+import org.zkoss.poi.hssf.record.AutoFilterRecord;
 import org.zkoss.poi.hssf.record.BOFRecord;
 import org.zkoss.poi.hssf.record.CFHeaderRecord;
 import org.zkoss.poi.hssf.record.CalcCountRecord;
@@ -61,6 +63,7 @@ import org.zkoss.poi.hssf.record.SelectionRecord;
 import org.zkoss.poi.hssf.record.UncalcedRecord;
 import org.zkoss.poi.hssf.record.WSBoolRecord;
 import org.zkoss.poi.hssf.record.WindowTwoRecord;
+import org.zkoss.poi.hssf.record.aggregates.AutoFilterInfoRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.ChartSubstreamRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.ColumnInfoRecordsAggregate;
 import org.zkoss.poi.hssf.record.aggregates.ConditionalFormattingTable;
@@ -136,7 +139,8 @@ public final class InternalSheet {
     protected final RowRecordsAggregate  _rowsAggregate;
     private   DataValidityTable          _dataValidityTable=     null;
     private   ConditionalFormattingTable condFormatting;
-
+    private   AutoFilterInfoRecordAggregate _autofilter;
+    
     private   Iterator<RowRecord>        rowRecIterator    =     null;
 
     /** Add an UncalcedRecord if not true indicating formulas have not been calculated */
@@ -184,6 +188,13 @@ public final class InternalSheet {
         while (rs.hasNext()) {
             int recSid = rs.peekNextSid();
 
+            //20110505, peterkuo@potix.com
+            if( recSid == AutoFilterInfoRecord.sid){
+            	_autofilter = new AutoFilterInfoRecordAggregate(rs);
+            	records.add(_autofilter);
+                continue;
+            }
+            
             if ( recSid == CFHeaderRecord.sid ) {
                 condFormatting = new ConditionalFormattingTable(rs);
                 records.add(condFormatting);
@@ -532,6 +543,16 @@ public final class InternalSheet {
         return condFormatting;
     }
 
+	//20110505, peterkuo@potix.com
+    public AutoFilterInfoRecordAggregate getAutoFilterInfoRecordAggregate() {
+        if (_autofilter == null) {
+        	_autofilter = new AutoFilterInfoRecordAggregate();
+            RecordOrderer.addNewSheetRecord(_records, _autofilter);
+        }
+        return _autofilter;
+    }
+
+    
     /**
      * Per an earlier reported bug in working with Andy Khan's excel read library.  This
      * sets the values in the sheet's DimensionsRecord object to be correct.  Excel doesn't

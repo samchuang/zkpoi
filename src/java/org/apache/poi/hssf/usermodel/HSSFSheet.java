@@ -28,6 +28,7 @@ import org.zkoss.poi.hssf.model.HSSFFormulaParser;
 import org.zkoss.poi.hssf.model.InternalSheet;
 import org.zkoss.poi.hssf.model.InternalWorkbook;
 import org.zkoss.poi.hssf.record.*;
+import org.zkoss.poi.hssf.record.aggregates.AutoFilterInfoRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.DataValidityTable;
 import org.zkoss.poi.hssf.record.aggregates.FormulaRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
@@ -83,8 +84,14 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
     protected final InternalWorkbook _book;
     protected final HSSFWorkbook _workbook;
     private HSSFPatriarch _patriarch;
-    private int _firstrow;
+    private HSSFAutoFilter _autofilter;
+	private int _firstrow;
     private int _lastrow;
+
+	//20110505 , peterkuo@potix.com
+    public HSSFAutoFilter getAutofilter() {
+		return _autofilter;
+	}
 
     /**
      * Creates new HSSFSheet   - called by HSSFWorkbook to create a sheet from
@@ -145,6 +152,10 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
             row = sheet.getNextRow();
         }
 
+		//20110505 , peterkuo@potix.com
+        AutoFilterInfoRecordAggregate autofilter = sheet.getAutoFilterInfoRecordAggregate();
+        _autofilter = createAutofilterFromRecord(autofilter);
+        
         CellValueRecordInterface[] cvals = sheet.getValueRecords();
         long timestart = System.currentTimeMillis();
 
@@ -189,7 +200,14 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
                 Long.valueOf(System.currentTimeMillis() - timestart));
     }
 
-    /**
+	//20110505 , peterkuo@potix.com
+    private HSSFAutoFilter createAutofilterFromRecord(
+			AutoFilterInfoRecordAggregate autofilter) {
+    	HSSFAutoFilter hautofilter = new HSSFAutoFilter(this, autofilter);
+		return hautofilter;
+	}
+
+	/**
      * Create a new row within the sheet and return the high level representation
      *
      * @param rownum  row number
@@ -1876,8 +1894,6 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
 	}
     
     public HSSFAutoFilter setAutoFilter(CellRangeAddress range) {
-
-
         InternalWorkbook workbook = _workbook.getWorkbook();
         int sheetIndex = _workbook.getSheetIndex(this);
 
@@ -1893,13 +1909,19 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
                 false, false, false, false, sheetIndex);
         name.setNameDefinition(new Ptg[]{ptg});
 
-        AutoFilterInfoRecord r = new AutoFilterInfoRecord();
-        // the number of columns that have AutoFilter enabled.
+//        AutoFilterInfoRecord r = new AutoFilterInfoRecord();
+//        // the number of columns that have AutoFilter enabled.
+//        int numcols = 1 + range.getLastColumn() - range.getFirstColumn();
+//        r.setNumEntries((short)numcols);
+//        int idx = _sheet.findFirstRecordLocBySid(DimensionsRecord.sid);
+//        _sheet.getRecords().add(idx, r);
+        
+		//20110505 , peterkuo@potix.com
+        AutoFilterInfoRecordAggregate r = _sheet.getAutoFilterInfoRecordAggregate();
         int numcols = 1 + range.getLastColumn() - range.getFirstColumn();
         r.setNumEntries((short)numcols);
-        int idx = _sheet.findFirstRecordLocBySid(DimensionsRecord.sid);
-        _sheet.getRecords().add(idx, r);
-
+        //TODO: more action about the record ?????
+        
         //create a combobox control for each column
         HSSFPatriarch p = createDrawingPatriarch();
         for(int col = range.getFirstColumn(); col <= range.getLastColumn(); col++){
@@ -1907,7 +1929,7 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
                     (short)col, range.getFirstRow(), (short)(col+1), range.getFirstRow()+1));
         }
         
-        return new HSSFAutoFilter(this);
+        return new HSSFAutoFilter(this,r);
     }
 
 

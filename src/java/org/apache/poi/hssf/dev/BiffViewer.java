@@ -122,6 +122,12 @@ public final class BiffViewer {
 			case AxisParentRecord.sid:     return new AxisParentRecord(in);
 			case AxisRecord.sid:           return new AxisRecord(in);
 			case AxisUsedRecord.sid:       return new AxisUsedRecord(in);
+			
+			//20110429, peterkuo@potix.com
+			case AutoFilterRecord.sid: 	   return new AutoFilterRecord(in);
+			case AutoFilter12Record.sid:   return new AutoFilter12Record(in);
+			case ContinueFrt12Record.sid:   return new ContinueFrt12Record(in);
+			
 			case AutoFilterInfoRecord.sid: return new AutoFilterInfoRecord(in);
 			case BOFRecord.sid:            return new BOFRecord(in);
 			case BackupRecord.sid:         return new BackupRecord(in);
