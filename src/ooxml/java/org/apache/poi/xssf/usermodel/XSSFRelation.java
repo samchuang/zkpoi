@@ -250,13 +250,6 @@ public final class XSSFRelation extends POIXMLRelation {
     		"/x1/externalLinks/externalLink#.xml",
     		ExternalLink.class
     );
-    //TODO: autofilter
-    public static final XSSFRelation AUTOFILTER = new XSSFRelation(
-    		"application/vnd.openxmlformats-officedocument.spreadsheetml.autofilter+xml",
-    		"http://schemas.openxmlformats.org/officeDocument/2006/relationships/autoFilter",
-    		"/x1/autofilter.xml",
-    		AutoFilter.class
-    );
     
 	public static final XSSFRelation CHARTS = new XSSFRelation(
 			"application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
