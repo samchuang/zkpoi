@@ -84,14 +84,10 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
     protected final InternalWorkbook _book;
     protected final HSSFWorkbook _workbook;
     private HSSFPatriarch _patriarch;
-    private HSSFAutoFilter _autofilter;
+
 	private int _firstrow;
     private int _lastrow;
 
-	//20110505 , peterkuo@potix.com
-    public HSSFAutoFilter getAutofilter() {
-		return _autofilter;
-	}
 
     /**
      * Creates new HSSFSheet   - called by HSSFWorkbook to create a sheet from
@@ -200,12 +196,6 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
                 Long.valueOf(System.currentTimeMillis() - timestart));
     }
 
-	//20110505 , peterkuo@potix.com
-    private HSSFAutoFilter createAutofilterFromRecord(
-			AutoFilterInfoRecordAggregate autofilter) {
-    	HSSFAutoFilter hautofilter = new HSSFAutoFilter(this, autofilter);
-		return hautofilter;
-	}
 
 	/**
      * Create a new row within the sheet and return the high level representation
@@ -1940,5 +1930,18 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
 	//20100903, henrichen@zkoss.org: allow extending the HSSFSheet
 	protected void setFirstRowNum(int row) {
 		_firstrow = row;
+	}
+	
+	//20110505 , peterkuo@potix.com
+    private HSSFAutoFilter _autofilter;
+    public HSSFAutoFilter getAutofilter() {
+		return _autofilter;
+	}
+
+	//20110505 , peterkuo@potix.com
+    private HSSFAutoFilter createAutofilterFromRecord(
+			AutoFilterInfoRecordAggregate autofilter) {
+    	HSSFAutoFilter hautofilter = new HSSFAutoFilter(this, autofilter);
+		return hautofilter;
 	}
 }

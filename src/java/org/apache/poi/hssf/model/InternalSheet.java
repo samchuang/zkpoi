@@ -188,12 +188,6 @@ public final class InternalSheet {
         while (rs.hasNext()) {
             int recSid = rs.peekNextSid();
 
-            //20110505, peterkuo@potix.com
-            if( recSid == AutoFilterInfoRecord.sid){
-            	_autofilter = new AutoFilterInfoRecordAggregate(rs);
-            	records.add(_autofilter);
-                continue;
-            }
             
             if ( recSid == CFHeaderRecord.sid ) {
                 condFormatting = new ConditionalFormattingTable(rs);
@@ -281,7 +275,7 @@ public final class InternalSheet {
                 _isUncalced = true; // this flag is enough
                 continue;
             }
-
+            
             if (recSid == FeatRecord.sid ||
             		recSid == FeatHdrRecord.sid) {
                 records.add(rec);
@@ -334,6 +328,14 @@ public final class InternalSheet {
                 _gutsRecord = (GutsRecord) rec;
             }
 
+
+            //20110505, peterkuo@potix.com
+            if( recSid == AutoFilterInfoRecord.sid){
+            	_autofilter = new AutoFilterInfoRecordAggregate(rs);
+            	records.add(_autofilter);
+                continue;
+            }
+            
             records.add(rec);
         }
         if (windowTwo == null) {
@@ -541,15 +543,6 @@ public final class InternalSheet {
             RecordOrderer.addNewSheetRecord(_records, condFormatting);
         }
         return condFormatting;
-    }
-
-	//20110505, peterkuo@potix.com
-    public AutoFilterInfoRecordAggregate getAutoFilterInfoRecordAggregate() {
-        if (_autofilter == null) {
-        	_autofilter = new AutoFilterInfoRecordAggregate();
-            RecordOrderer.addNewSheetRecord(_records, _autofilter);
-        }
-        return _autofilter;
     }
 
     
@@ -1683,4 +1676,13 @@ public final class InternalSheet {
 	    }
 	    return false;
     }
+    
+	//20110505, peterkuo@potix.com
+    public AutoFilterInfoRecordAggregate getAutoFilterInfoRecordAggregate() {
+        if (_autofilter == null) {
+        	_autofilter = new AutoFilterInfoRecordAggregate();
+            RecordOrderer.addNewSheetRecord(_records, _autofilter);
+        }
+        return _autofilter;
+    }    
 }

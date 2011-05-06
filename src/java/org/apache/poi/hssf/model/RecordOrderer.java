@@ -122,22 +122,6 @@ final class RecordOrderer {
 		throw new RuntimeException("Unexpected record class (" + recClass.getName() + ")");
 	}
 
-	//20110505 , peterkuo@potix.com
-	//TODO: for autofilter
-	private static int getAutofilterInsertPos(List<RecordBase> records) {
-        int max = records.size();
-        for (int i=0; i< max; i++) {
-            Object rb = records.get(i);
-            if (!(rb instanceof Record)) {
-                continue;
-            }
-            Record record = (Record) rb;
-            if (record.getSid() == DimensionsRecord.sid) {
-                return i;
-            }
-        }
-        return -1;
-	}
 	
 	/**
 	 * Finds the index where the protection block should be inserted
@@ -478,4 +462,21 @@ final class RecordOrderer {
 		}
 		return false;
 	}
+	
+	//20110505 , peterkuo@potix.com
+	//TODO: for autofilter
+	private static int getAutofilterInsertPos(List<RecordBase> records) {
+        int max = records.size();
+        for (int i=0; i< max; i++) {
+            Object rb = records.get(i);
+            if (!(rb instanceof Record)) {
+                continue;
+            }
+            Record record = (Record) rb;
+            if (record.getSid() == DimensionsRecord.sid) {
+                return i;
+            }
+        }
+        return -1;
+	}	
 }
