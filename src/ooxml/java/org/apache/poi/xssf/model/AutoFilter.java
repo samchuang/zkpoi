@@ -14,11 +14,15 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CommentsDocument;
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.xssf.usermodel.XSSFName;
+import org.zkoss.poi.xssf.usermodel.XSSFSheet;
+import org.zkoss.poi.xssf.usermodel.XSSFWorkbook;
 
 
 public class AutoFilter extends POIXMLDocumentPart {
 	private CTAutoFilter _autofilter;
 	
+	private XSSFSheet _sheet;
 	
 	/**
 	 * what value is acceptable? 0:means no filter 1: means there is filter?
@@ -37,7 +41,7 @@ public class AutoFilter extends POIXMLDocumentPart {
 			return colId;
 		}
 
-		List<String> filter = new ArrayList<String>();
+		List<String> filter ;
 		
 		public List<String> getFilter() {
 			return filter;
@@ -48,6 +52,9 @@ public class AutoFilter extends POIXMLDocumentPart {
 		}
 		
 		public void addFilterValue(String value){
+			if(filter == null){
+				filter = new ArrayList<String>();
+			}
 			filter.add(value);
 		}
 	}
@@ -80,9 +87,10 @@ public class AutoFilter extends POIXMLDocumentPart {
 		filterColumns.add(fc);
 	}
 	
-	public AutoFilter(){
+	public AutoFilter(XSSFSheet sheet){
 		super();
 		_autofilter = CTAutoFilter.Factory.newInstance();
+		_sheet = sheet;
 	}
 	
     public AutoFilter(PackagePart part, PackageRelationship rel) throws IOException {
@@ -108,5 +116,21 @@ public class AutoFilter extends POIXMLDocumentPart {
         OutputStream out = part.getOutputStream();
         writeTo(out);
         out.close();
+    }
+
+    /**
+     * 
+     * @param colNum
+     * @return whether column colNum has filtering
+     */
+    //TODO:
+    public boolean isFilteringCol(int colNum){
+    	//if column in autofilter name range, and such column has values to filter
+    	//then it's filtering
+    	//if such column has values to filter, it's enough
+    	if(getValuesOfFilter(colNum) != null){
+    		return true;
+    	}
+    	return false;
     }
 }
