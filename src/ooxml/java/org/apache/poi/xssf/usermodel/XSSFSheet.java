@@ -2995,11 +2995,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 	}
 
     public XSSFAutoFilter setAutoFilter(CellRangeAddress range) {
-    	if(isAutoFilterMode()){
-    		removeAutoFilter();
-    		return null;
-    	}
-    	
         CTAutoFilter af = worksheet.getAutoFilter();
         if(af == null) af = worksheet.addNewAutoFilter();
 
@@ -3049,7 +3044,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 	}
 
     //20110506, peterkuo@potix.com
-    private boolean isAutoFilterMode() {
+    public boolean isAutoFilterMode() {
     	//if there is autofilter, the CTAutoFilter must not be null
 //    	CTAutoFilter af = worksheet.getAutoFilter();
 //		return af != null;
@@ -3058,7 +3053,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     //TO remove current autofilter
     //20110506, peterkuo@potix.com
-    private void removeAutoFilter(){
+    public CellRangeAddress removeAutoFilter(){
     	//remove CTAutoFilter and related name range
     	//TODO:also have to remove related button? send a event?
     	//TODO:also have to restore the height of certain rows
@@ -3069,6 +3064,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         XSSFWorkbook wb = getWorkbook();
         int sheetIndex = getWorkbook().getSheetIndex(this);
         XSSFName name = wb.getBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
+        
+        
     	wb.removeName(name.getNameName());
+    	return CellRangeAddress.valueOf(name.getRefersToFormula());
     }
 }
