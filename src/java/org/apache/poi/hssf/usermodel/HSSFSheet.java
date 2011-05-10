@@ -1944,4 +1944,17 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
     	HSSFAutoFilter hautofilter = new HSSFAutoFilter(this, autofilter);
 		return hautofilter;
 	}
+
+	@Override
+	public boolean isAutoFilterMode() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public CellRangeAddress removeAutoFilter() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

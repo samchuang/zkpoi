@@ -789,6 +789,12 @@ public interface Sheet extends Iterable<Row> {
 
 
     /**
+     * 
+     * @return <code>true</code> if the sheet already has an autofilter 
+     */
+    boolean isAutoFilterMode(); 
+    
+    /**
      * Sets array formula to specified region for result.
      *
      * @param formula text representation of the formula
@@ -804,6 +810,13 @@ public interface Sheet extends Iterable<Row> {
      * @return the {@link CellRange} of cells affected by this change
      */
     CellRange<? extends Cell> removeArrayFormula(Cell cell);
+    
+    
+    /**
+     * remove the autoFilter
+     * @return the {@link CellRange} of cells affected by this change
+     */
+    CellRangeAddress removeAutoFilter();
     
     public DataValidationHelper getDataValidationHelper();
 
