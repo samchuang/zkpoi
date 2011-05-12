@@ -39,6 +39,7 @@ import org.zkoss.poi.hssf.util.PaneInformation;
 import org.zkoss.poi.hssf.util.Region;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.formula.FormulaType;
+import org.zkoss.poi.ss.usermodel.AutoFilter;
 import org.zkoss.poi.ss.usermodel.Cell;
 import org.zkoss.poi.ss.usermodel.CellRange;
 import org.zkoss.poi.ss.usermodel.CellStyle;
@@ -1934,7 +1935,8 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
 	
 	//20110505 , peterkuo@potix.com
     private HSSFAutoFilter _autofilter;
-    public HSSFAutoFilter getAutofilter() {
+    @Override
+    public AutoFilter getAutoFilter() {
 		return _autofilter;
 	}
 

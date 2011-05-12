@@ -16,18 +16,166 @@
 ==================================================================== */
 
 package org.zkoss.poi.xssf.usermodel;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.xmlbeans.XmlException;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTAutoFilter;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFilter;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFilterColumn;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFilters;
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.ss.usermodel.AutoFilter;
+import org.zkoss.poi.ss.usermodel.FilterColumn;
+import org.zkoss.poi.ss.util.CellRangeAddress;
+import org.zkoss.poi.xssf.usermodel.XSSFSheet;
 
 /**
  * Represents autofiltering for the specified worksheet.
  *
  * @author Yegor Kozlov
+ * @author peterkuo@zkoss.org
+ * @author henrichen@zkoss.org
  */
-public final class XSSFAutoFilter implements AutoFilter {
+public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilter {
     private XSSFSheet _sheet;
 
     XSSFAutoFilter(XSSFSheet sheet){
-        _sheet = sheet;
+        this(sheet, null);
     }
 
+	private CTAutoFilter _autofilter;
+	private List<FilterColumn> filterColumns;
+	
+	public XSSFAutoFilter(XSSFSheet sheet, CTAutoFilter ctaf) {
+		super();
+		_autofilter = ctaf != null ? ctaf : CTAutoFilter.Factory.newInstance();
+		_sheet = sheet;
+	}
+	
+	public class XSSFFilterColumn implements org.zkoss.poi.ss.usermodel.FilterColumn {
+		private CTFilterColumn _ctfc;
+		public long getColId() {
+			return _ctfc.getColId();
+		}
+
+		List<String> filter ;
+		
+		@Override
+		public int getColumn() {
+			return (int) getColId();
+		}
+		
+		@Override
+		public List<String> getFilters() {
+			CTFilters fts = _ctfc.getFilters();
+			CTFilter[] ftary = fts.getFilterArray();
+			List<String> result = new ArrayList<String>(ftary.length);
+			for(int j = 0; j < ftary.length; ++j) {
+				result.add(ftary[j].getVal());
+			}
+			return result;
+		}
+
+		private XSSFFilterColumn(CTFilterColumn ctfc) {
+			_ctfc = ctfc;
+		}
+		
+		public void addFilterValue(String value){
+			if(filter == null){
+				filter = new ArrayList<String>();
+			}
+			filter.add(value);
+		}
+	}
+	
+	//TODO remove this, shall use FilterColumn dirctly.
+	public List<String> getValuesOfFilter(long col){
+		for(FilterColumn fc : filterColumns){
+			if(((XSSFFilterColumn)fc).getColId() == col){
+				return fc.getFilters();
+			}
+		}
+		return null;
+	}
+	
+	public void addFilterColumn(CTFilterColumn ctFC){
+		if(filterColumns == null)
+			filterColumns = new ArrayList<FilterColumn>();
+
+		XSSFFilterColumn fc = new XSSFFilterColumn(ctFC);
+		CTFilter[] ctFilterArray = ctFC.getFilters().getFilterArray();
+		for(int i = 0; i < ctFilterArray.length; i++){
+			fc.addFilterValue(ctFilterArray[i].getVal());
+		}
+		
+		filterColumns.add(fc);
+	}
+	
+    public XSSFAutoFilter(PackagePart part, PackageRelationship rel) throws IOException {
+        super(part, rel);
+        readFrom(part.getInputStream());
+    }
+	
+    public void readFrom(InputStream is) throws IOException {
+        try {
+        	_autofilter = CTAutoFilter.Factory.parse(is);
+        } catch (XmlException e) {
+            throw new IOException(e.getLocalizedMessage());
+        }
+    }
+
+    public void writeTo(OutputStream out) throws IOException {
+    	_autofilter.save(out, DEFAULT_XML_OPTIONS);
+    }
+
+    @Override
+    protected void commit() throws IOException {
+        PackagePart part = getPackagePart();
+        OutputStream out = part.getOutputStream();
+        writeTo(out);
+        out.close();
+    }
+
+	@Override
+	public CellRangeAddress getRangeAddress() {
+		final String ref = _autofilter.getRef();
+		return CellRangeAddress.valueOf(ref);
+	}
+
+	@Override
+	public List<org.zkoss.poi.ss.usermodel.FilterColumn> getFilterColumns() {
+		return filterColumns;
+	}
+	
+	@Override
+	public FilterColumn getFilterColumn(int col) {
+		for (FilterColumn fc : filterColumns) {
+			if (fc.getColumn() == col) {
+				return fc;
+			}
+		}
+		return null;
+	}
+
+    /**
+     * 
+     * @param colNum
+     * @return whether column colNum has filtering
+     */
+    //TODO:
+    public boolean isFilteringCol(int colNum){
+    	//if column in autofilter name range, and such column has values to filter
+    	//then it's filtering
+    	//if such column has values to filter, it's enough
+    	if(getValuesOfFilter(colNum) != null){
+    		return true;
+    	}
+    	return false;
+    }
 }

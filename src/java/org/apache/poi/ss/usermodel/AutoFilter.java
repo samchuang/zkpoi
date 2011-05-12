@@ -16,6 +16,10 @@
 ==================================================================== */
 package org.zkoss.poi.ss.usermodel;
 
+import java.util.List;
+
+import org.zkoss.poi.ss.util.CellRangeAddress;
+
 /**
  * Represents autofiltering for the specified worksheet.
  *
@@ -75,5 +79,21 @@ public interface AutoFilter {
      *
      * void applyFilter(int columnIndex, String ... values);
      */
-    
+
+	/**
+	 * Returns the filtered Range.
+	 */
+	CellRangeAddress getRangeAddress();
+	
+	/**
+	 * Return filter setting of each filtered column.
+	 */
+	List<FilterColumn> getFilterColumns();
+	
+	/**
+	 * Returns the column filter information of the specified column; null if the column is not filtered.
+	 * @param col the column index
+	 * @return the column filter information of the specified column; null if the column is not filtered.
+	 */
+	FilterColumn getFilterColumn(int col);
 }

@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.zkoss.poi.hssf.record.aggregates.AutoFilterInfoRecordAggregate;
 import org.zkoss.poi.ss.usermodel.AutoFilter;
+import org.zkoss.poi.ss.usermodel.FilterColumn;
+import org.zkoss.poi.ss.util.CellRangeAddress;
 
 /**
  * Represents autofiltering for the specified worksheet.
@@ -39,5 +41,21 @@ public final class HSSFAutoFilter implements AutoFilter {
 	public List<String> getValuesOfFilter(int column) {
 		
 		return _record.getValuesOfFilter(column);
+	}
+
+	@Override
+	public CellRangeAddress getRangeAddress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<FilterColumn> getFilterColumns() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public FilterColumn getFilterColumn(int col) {
+		return null;
 	}
 }

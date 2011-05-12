@@ -33,7 +33,6 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.zkoss.poi.openxml4j.opc.PackagingURIHelper;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
-import org.zkoss.poi.xssf.model.AutoFilter;
 import org.zkoss.poi.xssf.model.CalculationChain;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.zkoss.poi.xssf.model.ExternalLink;

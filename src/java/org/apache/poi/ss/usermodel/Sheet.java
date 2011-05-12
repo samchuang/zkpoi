@@ -831,8 +831,15 @@ public interface Sheet extends Iterable<Row> {
      * 
      * @param range the range of cells to filter
      */
-    AutoFilter setAutoFilter(CellRangeAddress range);
-    
+    public AutoFilter setAutoFilter(CellRangeAddress range);
+
+    //20110509, henrichen@zkoss.org: handle autofilter
+    /**
+     * Returns AutoFilter of this sheet; null if not exist.
+     * @return AutoFilter of this sheet; null if not exist.
+     */
+    public AutoFilter getAutoFilter();
+
     //20110511, peterkuo@potix.com
     public void removeValidationData(DataValidation dataValidation);
     

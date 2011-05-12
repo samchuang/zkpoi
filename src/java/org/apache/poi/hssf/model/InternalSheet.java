@@ -287,6 +287,13 @@ public final class InternalSheet {
                 break;
             }
 
+            //20110505, peterkuo@potix.com
+            if( recSid == AutoFilterInfoRecord.sid){
+            	_autofilter = new AutoFilterInfoRecordAggregate(rs);
+            	records.add(_autofilter);
+                continue;
+            }
+            
             if (recSid == DimensionsRecord.sid)
             {
                 // Make a columns aggregate if one hasn't ready been created.
@@ -328,14 +335,6 @@ public final class InternalSheet {
                 _gutsRecord = (GutsRecord) rec;
             }
 
-
-            //20110505, peterkuo@potix.com
-            if( recSid == AutoFilterInfoRecord.sid){
-            	_autofilter = new AutoFilterInfoRecordAggregate(rs);
-            	records.add(_autofilter);
-                continue;
-            }
-            
             records.add(rec);
         }
         if (windowTwo == null) {

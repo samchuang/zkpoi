@@ -83,11 +83,13 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.zkoss.poi.ss.SpreadsheetVersion;
 import org.zkoss.poi.ss.formula.FormulaShifter;
+import org.zkoss.poi.ss.usermodel.AutoFilter;
 import org.zkoss.poi.ss.usermodel.Cell;
 import org.zkoss.poi.ss.usermodel.CellRange;
 import org.zkoss.poi.ss.usermodel.CellStyle;
 import org.zkoss.poi.ss.usermodel.DataValidation;
 import org.zkoss.poi.ss.usermodel.DataValidationHelper;
+import org.zkoss.poi.ss.usermodel.FilterColumn;
 import org.zkoss.poi.ss.usermodel.Footer;
 import org.zkoss.poi.ss.usermodel.Header;
 import org.zkoss.poi.ss.usermodel.Row;
@@ -101,10 +103,10 @@ import org.zkoss.poi.util.HexDump;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
-import org.zkoss.poi.xssf.model.AutoFilter;
+import org.zkoss.poi.xssf.usermodel.XSSFAutoFilter;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.zkoss.poi.xssf.model.Table;
-import org.zkoss.poi.xssf.model.AutoFilter.FilterColumn;
+import org.zkoss.poi.xssf.usermodel.XSSFAutoFilter.XSSFFilterColumn;
 import org.zkoss.poi.xssf.usermodel.helpers.ColumnHelper;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFRowShifter;
 
@@ -129,12 +131,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     private ColumnHelper columnHelper;
     private CommentsTable sheetComments;
     
-    //TODO: autofilter
-    private AutoFilter autoFilter;
-    
-    public AutoFilter getAutoFilter() {
-		return autoFilter;
-	}
     
         
 	/**
@@ -202,7 +198,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         // Look for bits we're interested in
         for(POIXMLDocumentPart p : getRelations()){
         	//TODO: test to dump p
-        	System.out.println(">>>>>> POIXMLDocumentPart: "+p);
             if(p instanceof CommentsTable) {
                sheetComments = (CommentsTable)p;
                break;
@@ -270,7 +265,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     //for autofilter
     private void initAutofilter(){
 			CTAutoFilter af = worksheet.getAutoFilter();			
-			System.out.println(">>>>>>> af :"+af);
 			if(af != null)
 				fillInAutoFilter(af);
     }
@@ -280,16 +274,15 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param af
      */
     private void fillInAutoFilter(CTAutoFilter af) {
-		List<CTFilterColumn> fcList = af.getFilterColumnList();
-		if(fcList == null)
+		CTFilterColumn[] fcList = af.getFilterColumnArray();
+		if(fcList == null || fcList.length == 0)
 			return;
 		
-		autoFilter = new AutoFilter(this);
+		autoFilter = new XSSFAutoFilter(this, af);
 		
 		for(CTFilterColumn fc: fcList){
 			autoFilter.addFilterColumn(fc);
 		}
-		System.out.println(">>>> parsed: "+autoFilter);
 	}
 
 	/**
@@ -799,8 +792,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         }
         return worksheet.getHeaderFooter();
     }
-
-
 
     /**
      * Returns the default footer for the sheet,
@@ -2559,10 +2550,10 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         	if(autoFilter.getFilterColumns() != null){
             	for(FilterColumn fc :autoFilter.getFilterColumns()){
             		CTFilterColumn ctFC = CTFilterColumn.Factory.newInstance();
-            		ctFC.setColId(fc.getColId());
+            		ctFC.setColId(((XSSFFilterColumn)fc).getColId());
             		CTFilters ctFilters = CTFilters.Factory.newInstance();
             		ctFC.setFilters(ctFilters);
-            		for(String val:autoFilter.getValuesOfFilter(fc.getColId())){
+            		for(String val:autoFilter.getValuesOfFilter(((XSSFFilterColumn)fc).getColId())){
             			CTFilter ctFilter = ctFilters.addNewFilter();
             			ctFilter.setVal(val);
             		}
@@ -3039,7 +3030,15 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
 	}
 
-    public XSSFAutoFilter setAutoFilter(CellRangeAddress range) {
+	@Override
+    public AutoFilter setAutoFilter(CellRangeAddress range) {
+    	if(isAutoFilterMode()){
+    		removeAutoFilter();
+    		if (range == null) {
+    			return null;
+    		}
+    	}
+    	
         CTAutoFilter af = worksheet.getAutoFilter();
         if(af == null) af = worksheet.addNewAutoFilter();
 
@@ -3090,10 +3089,8 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     //20110506, peterkuo@potix.com
     public boolean isAutoFilterMode() {
-    	//if there is autofilter, the CTAutoFilter must not be null
-//    	CTAutoFilter af = worksheet.getAutoFilter();
-//		return af != null;
-    	return autoFilter != null;
+        CTSheetPr sheetPr = worksheet.getSheetPr();
+    	return sheetPr != null && sheetPr.getFilterMode();
 	}
 
     //TO remove current autofilter
@@ -3113,6 +3110,41 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         
     	wb.removeName(name.getNameName());
     	return CellRangeAddress.valueOf(name.getRefersToFormula());
+    }
+
+    //20100504: peterkuo@zkoss.org: get autofilter
+    private XSSFAutoFilter autoFilter;
+    
+    @Override
+    public AutoFilter getAutoFilter() {
+		return autoFilter;
+	}
+    
+    //20110504, henrichen@zkoss.org: set auto filter mode
+    /**
+     * Set false to remove AutoFilter; set true is ignored.
+     * @param b false to remove current AutoFilter; set true is ignored.
+     */
+    public void setAutoFilterMode(boolean b) {
+    	if (!b && isAutoFilterMode()) {
+    		removeAutoFilter();
+    	}
+    }
+    
+    //20110504, henrichne@zkoss.org: returns whther auto filter mode is in use.
+    public boolean isFilterMode() {
+    	if (autoFilter != null) {
+    		final List<FilterColumn> fcs = autoFilter.getFilterColumns();
+    		if (fcs != null) {
+    			for(FilterColumn fc : fcs) {
+    				List<String> filters = fc.getFilters();
+    				if (filters.size() > 0) { //in use
+    					return true;
+    				}
+    			}
+    		}
+    	}
+    	return false;
     }
     
 	//20110512, peterkuo@potix.com

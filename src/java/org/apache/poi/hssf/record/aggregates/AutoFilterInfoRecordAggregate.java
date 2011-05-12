@@ -9,6 +9,7 @@ import org.zkoss.poi.hssf.record.AutoFilterInfoRecord;
 import org.zkoss.poi.hssf.record.AutoFilterRecord;
 import org.zkoss.poi.hssf.record.ContinueFrt12Record;
 import org.zkoss.poi.hssf.record.Record;
+import org.zkoss.poi.ss.usermodel.FilterColumn;
 
 /**
  * 
@@ -66,6 +67,22 @@ public class AutoFilterInfoRecordAggregate extends RecordAggregate {
 		}
 	}
 
+	//TODO HSSFFilterColumn
+	public class HSSFFilterColumn implements FilterColumn {
+
+		@Override
+		public List<String> getFilters() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public int getColumn() {
+			//TODO Don't know how to get the column index
+			return -1; 
+		}
+		
+	}
 	//TODO:
 	public List<String> getValuesOfFilter(int column) {
 		List<String> result = new ArrayList<String>();
