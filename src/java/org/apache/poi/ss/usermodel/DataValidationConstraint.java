@@ -115,4 +115,23 @@ public interface DataValidationConstraint {
 			}
 		}
 	}
+	
+	//20110511, peterkuo@potix.com
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isExplicitList();
+	
+	//20110511, peterkuo@potix.com
+	/**
+	 * 
+	 */
+	public boolean isRefRange();
+	
+	//20110511, peterkuo@potix.com
+	/**
+	 * 
+	 */
+	public String getRefRange();
 }

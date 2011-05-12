@@ -833,4 +833,7 @@ public interface Sheet extends Iterable<Row> {
      */
     AutoFilter setAutoFilter(CellRangeAddress range);
     
+    //20110511, peterkuo@potix.com
+    public void removeValidationData(DataValidation dataValidation);
+    
 }

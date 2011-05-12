@@ -1957,4 +1957,11 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
 		return null;
 	}
 
+	//20110511, peterkuo@potix.com
+	@Override
+	public void removeValidationData(DataValidation dataValidation) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -109,4 +109,5 @@ public class CellRangeAddress extends CellRangeAddressBase {
         }
         return new CellRangeAddress(a.getRow(), b.getRow(), a.getCol(), b.getCol());
     }
+
 }

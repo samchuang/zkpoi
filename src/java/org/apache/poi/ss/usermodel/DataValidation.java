@@ -149,4 +149,13 @@ public interface DataValidation {
 
 	public abstract CellRangeAddressList getRegions();
 
+	//20110511, peterkuo@potix.com
+	public abstract boolean getShowInputMessage();
+	//20110511, peterkuo@potix.com
+	public abstract void setShowInputMessage(boolean showInputMessage);
+	//20110511, peterkuo@potix.com
+	public abstract boolean getShowErrorMessage();
+	//20110511, peterkuo@potix.com
+	public abstract void setShowErrorMessage(boolean showErrorMessage);
+	
 }
