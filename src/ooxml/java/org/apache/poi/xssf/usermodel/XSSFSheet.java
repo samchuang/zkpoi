@@ -56,6 +56,7 @@ import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
 import org.zkoss.poi.xssf.model.AutoFilter;
 import org.zkoss.poi.xssf.model.CommentsTable;
+import org.zkoss.poi.xssf.model.DataValidations;
 import org.zkoss.poi.xssf.model.Table;
 import org.zkoss.poi.xssf.model.AutoFilter.FilterColumn;
 import org.zkoss.poi.xssf.usermodel.helpers.ColumnHelper;
@@ -92,6 +93,8 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     public AutoFilter getAutoFilter() {
 		return autoFilter;
 	}
+    
+        
 	/**
      * cache of master shared formulas in this sheet.
      * Master shared formula is the first formula in a group of shared formulas is saved in the f element.
@@ -167,11 +170,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         // Process external hyperlinks for the sheet, if there are any
         initHyperlinks();
         
-        //TODO: for autofilter
+        // for autofilter
         initAutofilter();
+        
     }
 
-    /**
+	/**
      * Initialize worksheet data when creating a new sheet.
      */
     @Override
@@ -221,13 +225,12 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         }
     }
 
-    //TODO: for autofilter
+    //for autofilter
     private void initAutofilter(){
 			CTAutoFilter af = worksheet.getAutoFilter();			
 			System.out.println(">>>>>>> af :"+af);
 			if(af != null)
 				fillInAutoFilter(af);
-    	
     }
     
     /**
@@ -3069,4 +3072,23 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     	wb.removeName(name.getNameName());
     	return CellRangeAddress.valueOf(name.getRefersToFormula());
     }
+    
+	//20110512, peterkuo@potix.com
+	public void removeValidationData(DataValidation dataValidation) {
+		XSSFDataValidation xssfDataValidation = (XSSFDataValidation)dataValidation;		
+		CTDataValidations dataValidations = worksheet.getDataValidations();
+		if( dataValidations==null ) {
+			return;
+		}
+		int currentCount = dataValidations.sizeOfDataValidationArray();
+		
+		CTDataValidation[] dvArray = dataValidations.getDataValidationArray();
+		
+		for(int i = 0;i<dvArray.length;i++){
+			if(dvArray[i].equals(xssfDataValidation.getCtDdataValidation())){
+				dataValidations.removeDataValidation(i);
+			}
+		}
+		dataValidations.setCount(currentCount - 1);
+	}
 }

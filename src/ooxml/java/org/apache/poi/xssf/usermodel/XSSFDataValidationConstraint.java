@@ -70,8 +70,12 @@ public class XSSFDataValidationConstraint implements DataValidationConstraint {
 		validate();
 		
 		//FIXME: Need to confirm if this is not a formula.
+		//Peterkuo, it maybe a string that's a reference?
+		//20110511, peterkuo@potix.com
 		if( ValidationType.LIST==validationType) {
-			explicitListOfValues = formula1.split(",");
+			if(formula1.startsWith("\"")){
+				explicitListOfValues = formula1.substring(1, formula1.length()-1).split(",");	
+			}
 		}
 	}
 
@@ -231,5 +235,42 @@ public class XSSFDataValidationConstraint implements DataValidationConstraint {
 		return s1 == s2 
 			|| (s1 != null && s1.equals(s2))
 			|| (s2 != null && s2.equals(s1));
+	}
+	
+	//20110511, peterkuo@potix.com
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isExplicitList(){
+		if(validationType == ValidationType.LIST){
+			if(formula1.startsWith("\""))
+				return true;
+		}
+		return false;
+	}
+	
+	//20110511, peterkuo@potix.com
+	/**
+	 * 
+	 */
+	public boolean isRefRange(){
+		if(validationType == ValidationType.LIST){
+			if(formula1.startsWith("$"))
+				return true;
+		}
+		return false;
+	}
+	
+	//20110511, peterkuo@potix.com
+	/**
+	 * 
+	 */
+	public String getRefRange(){
+		if(isRefRange()){
+			return formula1;
+		}else{
+			return null;
+		}
 	}
 }
