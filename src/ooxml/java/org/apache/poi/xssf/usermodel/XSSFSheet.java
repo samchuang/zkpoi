@@ -265,8 +265,11 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     //for autofilter
     private void initAutofilter(){
 			CTAutoFilter af = worksheet.getAutoFilter();			
-			if(af != null)
+			if(af != null){
+				autoFilter = new XSSFAutoFilter(this, af);
 				fillInAutoFilter(af);
+			}
+				
     }
     
     /**
@@ -277,8 +280,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		CTFilterColumn[] fcList = af.getFilterColumnArray();
 		if(fcList == null || fcList.length == 0)
 			return;
-		
-		autoFilter = new XSSFAutoFilter(this, af);
 		
 		for(CTFilterColumn fc: fcList){
 			autoFilter.addFilterColumn(fc);
