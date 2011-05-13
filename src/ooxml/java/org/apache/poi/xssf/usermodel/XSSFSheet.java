@@ -3040,13 +3040,13 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     		}
     	}
     	
-        CTAutoFilter af = worksheet.getAutoFilter();
-        if(af == null) af = worksheet.addNewAutoFilter();
+        CTAutoFilter ctaf = worksheet.getAutoFilter();
+        if(ctaf == null) ctaf = worksheet.addNewAutoFilter();
 
         CellRangeAddress norm = new CellRangeAddress(range.getFirstRow(), range.getLastRow(),
                 range.getFirstColumn(), range.getLastColumn());
         String ref = norm.formatAsString();
-        af.setRef(ref);
+        ctaf.setRef(ref);
         
         XSSFWorkbook wb = getWorkbook();
         int sheetIndex = getWorkbook().getSheetIndex(this);
@@ -3059,10 +3059,18 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
             String fmla = r1.formatAsString() + ":" + r2.formatAsString();
             name.setRefersToFormula(fmla);
         }
-
-        initAutofilter();
         
-        return new XSSFAutoFilter(this);
+        //set FilterMode in SheetPr to true
+        CTSheetPr sheetPr = worksheet.getSheetPr();
+        if (sheetPr == null) {
+        	sheetPr = worksheet.addNewSheetPr();
+        }
+        sheetPr.setFilterMode(true);
+        
+        autoFilter = new XSSFAutoFilter(this, ctaf); 
+        //initAutofilter();
+        
+        return autoFilter; 
     }
     
     /**
@@ -3100,14 +3108,16 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     	//remove CTAutoFilter and related name range
     	//TODO:also have to remove related button? send a event?
     	//TODO:also have to restore the height of certain rows
-    	
+    	CTSheetPr sheetPr = worksheet.getSheetPr();
+    	if (sheetPr != null) {
+    		sheetPr.setFilterMode(false);
+    	}
     	worksheet.unsetAutoFilter();
     	autoFilter = null;
     	
         XSSFWorkbook wb = getWorkbook();
         int sheetIndex = getWorkbook().getSheetIndex(this);
         XSSFName name = wb.getBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
-        
         
     	wb.removeName(name.getNameName());
     	return CellRangeAddress.valueOf(name.getRefersToFormula());
