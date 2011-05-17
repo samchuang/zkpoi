@@ -16,6 +16,7 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 package org.zkoss.poi.ss.usermodel;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represent a filtered column.
@@ -24,14 +25,22 @@ import java.util.List;
  */
 public interface FilterColumn {
 	/**
-	 * Returns the column number of this FilterColumn. 
-	 * @return the column number of this FilterColumn.
+	 * Returns the column id of this FilterColumn. 
+	 * @return the column id of this FilterColumn.
 	 */
-	public int getColumn();
+	public int getColId();
 	
 	/**
 	 * Returns the filter String list of this FilterColumn.
 	 * @return the filter String list of this FilterColumn.
 	 */
 	public List<String> getFilters();
+	
+	public Set getCriteria1();
+	
+	public Set getCriteria2();
+	
+	public boolean isOn();
+	
+	public int getOperator();
 }

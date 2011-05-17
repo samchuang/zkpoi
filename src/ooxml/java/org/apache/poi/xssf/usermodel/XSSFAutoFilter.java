@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTAutoFilter;
@@ -60,15 +62,53 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 	
 	public class XSSFFilterColumn implements org.zkoss.poi.ss.usermodel.FilterColumn {
 		private CTFilterColumn _ctfc;
-		public long getColId() {
-			return _ctfc.getColId();
-		}
 
-		List<String> filter ;
+		private List<String> filter ;
+		
+		private Set _criteria1;
+		private Set _criteria2;
+		private int _operator;
+		private boolean _on;
+
+		private Set getCriteriaSet(Object criteria) {
+			final Set set = new HashSet();
+			if (criteria instanceof String[]) {
+				String[] strings = (String[]) criteria;
+				for(int j = 0; j < strings.length; ++j) {
+					set.add(strings[j]);
+				}
+			}
+			return set;
+		}
+		
+		public void setProperties(Object criteria1, int filterOp, Object criteria2, boolean visibleDropDown) {
+			_operator = filterOp;
+			_criteria1 = getCriteriaSet(criteria1);
+			_criteria2 = getCriteriaSet(criteria2);
+			_on = visibleDropDown;
+			
+			if (criteria1 == null) { //remove filtering
+				_ctfc.unsetFilters();
+				return;
+			}
+			
+			//TODO, more filtering operation
+			switch(_operator) {
+			case FILTEROP_VALUES:
+				final String[] filters = (String[]) criteria1;
+				//remove old
+				_ctfc.unsetFilters();
+				final CTFilters cflts = _ctfc.addNewFilters();
+				for(int j = 0; j < filters.length; ++j) {
+					final CTFilter cflt = cflts.addNewFilter();
+					cflt.setVal(filters[j]);
+				}
+			}
+		}
 		
 		@Override
-		public int getColumn() {
-			return (int) getColId();
+		public int getColId() {
+			return (int)_ctfc.getColId();
 		}
 		
 		@Override
@@ -92,6 +132,26 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			}
 			filter.add(value);
 		}
+
+		@Override
+		public Set getCriteria1() {
+			return _criteria1;
+		}
+
+		@Override
+		public Set getCriteria2() {
+			return _criteria2;
+		}
+
+		@Override
+		public boolean isOn() {
+			return _on;
+		}
+
+		@Override
+		public int getOperator() {
+			return _operator;
+		}
 	}
 	
 	//TODO remove this, shall use FilterColumn dirctly.
@@ -104,7 +164,22 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		return null;
 	}
 	
-	public void addFilterColumn(CTFilterColumn ctFC){
+	public FilterColumn getOrCreateFilterColumn(int colId) {
+		//check if in range
+		final CellRangeAddress rng = getRangeAddress();
+		final int sz = rng.getLastColumn() - rng.getFirstColumn() + 1;
+		if (colId >= sz) {
+			throw new RuntimeException("Column not in filter range: "+colId);
+		}
+		FilterColumn fc = getFilterColumn(colId);
+		if (fc == null) {
+			final CTFilterColumn ctFC = _autofilter.insertNewFilterColumn(colId);
+			fc = addFilterColumn(ctFC);
+		}
+		return fc;
+	}
+	
+	private FilterColumn addFilterColumn(CTFilterColumn ctFC){
 		if(filterColumns == null)
 			filterColumns = new ArrayList<FilterColumn>();
 
@@ -115,6 +190,7 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		}
 		
 		filterColumns.add(fc);
+		return fc;
 	}
 	
     public XSSFAutoFilter(PackagePart part, PackageRelationship rel) throws IOException {
@@ -155,9 +231,11 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 	
 	@Override
 	public FilterColumn getFilterColumn(int col) {
-		for (FilterColumn fc : filterColumns) {
-			if (fc.getColumn() == col) {
-				return fc;
+		if (filterColumns != null) {
+			for (FilterColumn fc : filterColumns) {
+				if (fc.getColId() == col) {
+					return fc;
+				}
 			}
 		}
 		return null;
