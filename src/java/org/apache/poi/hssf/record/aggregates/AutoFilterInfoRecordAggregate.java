@@ -67,22 +67,6 @@ public class AutoFilterInfoRecordAggregate extends RecordAggregate {
 		}
 	}
 
-	//TODO HSSFFilterColumn
-	public class HSSFFilterColumn implements FilterColumn {
-
-		@Override
-		public List<String> getFilters() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
-		public int getColumn() {
-			//TODO Don't know how to get the column index
-			return -1; 
-		}
-		
-	}
 	//TODO:
 	public List<String> getValuesOfFilter(int column) {
 		List<String> result = new ArrayList<String>();

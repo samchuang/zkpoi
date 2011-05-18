@@ -179,7 +179,7 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		return fc;
 	}
 	
-	private FilterColumn addFilterColumn(CTFilterColumn ctFC){
+	/*package*/ FilterColumn addFilterColumn(CTFilterColumn ctFC){
 		if(filterColumns == null)
 			filterColumns = new ArrayList<FilterColumn>();
 
