@@ -103,7 +103,7 @@ public final class HSSFAutoFilter implements AutoFilter {
 			return 0;
 		}
 		
-		public void setProperties(String criteria1, int filterOp, String criteria2, boolean visibleDropDown) {
+		public void setProperties(Object criteria1, int filterOp, Object criteria2, boolean visibleDropDown) {
 			// TODO 
 		}
 	}
