@@ -3076,8 +3076,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     //20110506, peterkuo@potix.com
     public boolean isAutoFilterMode() {
-        CTSheetPr sheetPr = worksheet.getSheetPr();
-    	return sheetPr != null && sheetPr.getFilterMode();
+        return worksheet.getAutoFilter() != null;
 	}
 
     //TO remove current autofilter
