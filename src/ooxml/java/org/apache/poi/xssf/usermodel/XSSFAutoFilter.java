@@ -87,7 +87,10 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			_on = visibleDropDown;
 			
 			if (criteria1 == null) { //remove filtering
-				_ctfc.unsetFilters();
+				final CTFilters ctflts = _ctfc.getFilters();
+				if (ctflts != null) {
+					_ctfc.unsetFilters();
+				}
 				return;
 			}
 			
@@ -96,7 +99,10 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			case FILTEROP_VALUES:
 				final String[] filters = (String[]) criteria1;
 				//remove old
-				_ctfc.unsetFilters();
+				final CTFilters ctflts = _ctfc.getFilters();
+				if (ctflts != null) {
+					_ctfc.unsetFilters();
+				}
 				final CTFilters cflts = _ctfc.addNewFilters();
 				for(int j = 0; j < filters.length; ++j) {
 					final CTFilter cflt = cflts.addNewFilter();
