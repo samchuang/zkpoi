@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
@@ -63,8 +64,6 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 	public class XSSFFilterColumn implements org.zkoss.poi.ss.usermodel.FilterColumn {
 		private CTFilterColumn _ctfc;
 
-		private List<String> filter ;
-		
 		private Set _criteria1;
 		private Set _criteria2;
 		private int _operator;
@@ -113,24 +112,20 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		
 		@Override
 		public List<String> getFilters() {
-			CTFilters fts = _ctfc.getFilters();
-			CTFilter[] ftary = fts.getFilterArray();
-			List<String> result = new ArrayList<String>(ftary.length);
-			for(int j = 0; j < ftary.length; ++j) {
-				result.add(ftary[j].getVal());
+			final CTFilters fts = _ctfc.getFilters();
+			if (fts != null) {
+				final CTFilter[] ftary = fts.getFilterArray();
+				final List<String> result = new ArrayList<String>(ftary.length);
+				for(int j = 0; j < ftary.length; ++j) {
+					result.add(ftary[j].getVal());
+				}
+				return result;
 			}
-			return result;
+			return Collections.emptyList();
 		}
 
 		private XSSFFilterColumn(CTFilterColumn ctfc) {
 			_ctfc = ctfc;
-		}
-		
-		public void addFilterValue(String value){
-			if(filter == null){
-				filter = new ArrayList<String>();
-			}
-			filter.add(value);
 		}
 
 		@Override
@@ -184,10 +179,6 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			filterColumns = new ArrayList<FilterColumn>();
 
 		XSSFFilterColumn fc = new XSSFFilterColumn(ctFC);
-		CTFilter[] ctFilterArray = ctFC.getFilters().getFilterArray();
-		for(int i = 0; i < ctFilterArray.length; i++){
-			fc.addFilterValue(ctFilterArray[i].getVal());
-		}
 		
 		filterColumns.add(fc);
 		return fc;
