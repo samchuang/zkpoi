@@ -149,16 +149,6 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		}
 	}
 	
-	//TODO remove this, shall use FilterColumn dirctly.
-	public List<String> getValuesOfFilter(long col){
-		for(FilterColumn fc : filterColumns){
-			if(((XSSFFilterColumn)fc).getColId() == col){
-				return fc.getFilters();
-			}
-		}
-		return null;
-	}
-	
 	public FilterColumn getOrCreateFilterColumn(int colId) {
 		//check if in range
 		final CellRangeAddress rng = getRangeAddress();
@@ -231,20 +221,4 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		}
 		return null;
 	}
-
-    /**
-     * 
-     * @param colNum
-     * @return whether column colNum has filtering
-     */
-    //TODO:
-    public boolean isFilteringCol(int colNum){
-    	//if column in autofilter name range, and such column has values to filter
-    	//then it's filtering
-    	//if such column has values to filter, it's enough
-    	if(getValuesOfFilter(colNum) != null){
-    		return true;
-    	}
-    	return false;
-    }
 }

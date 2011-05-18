@@ -2540,28 +2540,6 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
             worksheet.getHyperlinks().setHyperlinkArray(ctHls);
         }
 
-        //TODO: for autofilter
-        //look how setAutoFilter() implemented, just don't care ?
-        //remember to update model autoFilter while any action
-        //if find other tag available, here has to modify accordingly
-        if(autoFilter != null){
-        	CTAutoFilter ctAF = worksheet.getAutoFilter();
-        	List<CTFilterColumn> ctFilterColumn = ctAF.getFilterColumnList();
-        	ctFilterColumn.clear();
-        	if(autoFilter.getFilterColumns() != null){
-            	for(FilterColumn fc :autoFilter.getFilterColumns()){
-            		CTFilterColumn ctFC = CTFilterColumn.Factory.newInstance();
-            		ctFC.setColId(((XSSFFilterColumn)fc).getColId());
-            		CTFilters ctFilters = CTFilters.Factory.newInstance();
-            		ctFC.setFilters(ctFilters);
-            		for(String val:autoFilter.getValuesOfFilter(((XSSFFilterColumn)fc).getColId())){
-            			CTFilter ctFilter = ctFilters.addNewFilter();
-            			ctFilter.setVal(val);
-            		}
-            	}        		
-        	}
-        }
-        
         for(XSSFRow row : _rows.values()){
             row.onDocumentWrite();
         }
