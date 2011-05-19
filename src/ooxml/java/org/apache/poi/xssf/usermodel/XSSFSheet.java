@@ -3021,19 +3021,21 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         CTAutoFilter ctaf = worksheet.getAutoFilter();
         if(ctaf == null) ctaf = worksheet.addNewAutoFilter();
 
-        CellRangeAddress norm = new CellRangeAddress(range.getFirstRow(), range.getLastRow(),
-                range.getFirstColumn(), range.getLastColumn());
-        String ref = norm.formatAsString();
+        String ref = range.formatAsString();
         ctaf.setRef(ref);
         
+        final int left = range.getFirstColumn();
+        final int top = range.getFirstRow();
+        final int right = range.getLastColumn();
+        final int bottom = range.getLastRow();
         XSSFWorkbook wb = getWorkbook();
         int sheetIndex = getWorkbook().getSheetIndex(this);
         XSSFName name = wb.getBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
         if (name == null) {
             name = wb.createBuiltInName(XSSFName.BUILTIN_FILTER_DB, sheetIndex);
             name.getCTName().setHidden(true); 
-            CellReference r1 = new CellReference(getSheetName(), range.getFirstRow(), range.getFirstColumn(), true, true);
-            CellReference r2 = new CellReference(null, range.getLastRow(), range.getLastColumn(), true, true);
+            CellReference r1 = new CellReference(getSheetName(), top, left, true, true);
+            CellReference r2 = new CellReference(null, bottom, right, true, true);
             String fmla = r1.formatAsString() + ":" + r2.formatAsString();
             name.setRefersToFormula(fmla);
         }
@@ -3045,9 +3047,25 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         }
         sheetPr.setFilterMode(true);
         
-        autoFilter = new XSSFAutoFilter(this, ctaf); 
-        //initAutofilter();
+        autoFilter = new XSSFAutoFilter(this, ctaf);
         
+        //handle the showButton on merged cell
+		for (int i = 0; i < this.getNumMergedRegions(); i++) {
+			final CellRangeAddress mrng = this.getMergedRegion(i);
+			final int t = mrng.getFirstRow();
+	        final int b = mrng.getLastRow();
+	        final int l = mrng.getFirstColumn();
+	        final int r = mrng.getLastColumn();
+	        
+	        if (t == top && l <= right && l >= left) { // to be add filter column to hide button
+	        	for(int c = l; c < r; ++c) {
+		        	final int colId = c - left; 
+		        	final XSSFFilterColumn fc = (XSSFFilterColumn) autoFilter.getOrCreateFilterColumn(colId);
+		        	fc.setProperties(null, AutoFilter.FILTEROP_AND, null, false);
+	        	}
+	        }
+		}
+		
         return autoFilter; 
     }
     

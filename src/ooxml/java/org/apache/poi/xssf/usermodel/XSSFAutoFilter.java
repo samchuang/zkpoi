@@ -67,7 +67,6 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		private Set _criteria1;
 		private Set _criteria2;
 		private int _operator;
-		private boolean _on;
 
 		private Set getCriteriaSet(Object criteria) {
 			final Set set = new HashSet();
@@ -80,15 +79,23 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			return set;
 		}
 		
-		public void setProperties(Object criteria1, int filterOp, Object criteria2, boolean visibleDropDown) {
+		public void setProperties(Object criteria1, int filterOp, Object criteria2, Boolean visibleDropDown) {
 			_operator = filterOp;
 			_criteria1 = getCriteriaSet(criteria1);
 			_criteria2 = getCriteriaSet(criteria2);
-			_on = visibleDropDown;
+			
+			if (visibleDropDown != null) {
+				if (visibleDropDown.booleanValue()) {
+					if (_ctfc.isSetShowButton()) {
+						_ctfc.unsetShowButton();
+					}
+				} else {
+					_ctfc.setShowButton(false);
+				}
+			}
 			
 			if (criteria1 == null) { //remove filtering
-				final CTFilters ctflts = _ctfc.getFilters();
-				if (ctflts != null) {
+				if (_ctfc.isSetFilters()) {
 					_ctfc.unsetFilters();
 				}
 				return;
@@ -99,8 +106,7 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			case FILTEROP_VALUES:
 				final String[] filters = (String[]) criteria1;
 				//remove old
-				final CTFilters ctflts = _ctfc.getFilters();
-				if (ctflts != null) {
+				if (_ctfc.isSetFilters()) {
 					_ctfc.unsetFilters();
 				}
 				final CTFilters cflts = _ctfc.addNewFilters();
@@ -146,7 +152,7 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 
 		@Override
 		public boolean isOn() {
-			return _on;
+			return !_ctfc.isSetShowButton() || _ctfc.getShowButton();
 		}
 
 		@Override
@@ -162,15 +168,31 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 		if (colId >= sz) {
 			throw new RuntimeException("Column not in filter range: "+colId);
 		}
-		FilterColumn fc = getFilterColumn(colId);
+
+		FilterColumn fc = null;
+		int j = 0;
+		if (filterColumns != null) {
+			for (FilterColumn fc0 : filterColumns) {
+				final int fc0Id = fc0.getColId(); 
+				if (fc0Id == colId) { //found
+					fc = fc0;
+					break;
+				} else if (fc0Id > colId) { //pass over
+					break;
+				}
+				++j;
+			}
+		}
+		
 		if (fc == null) {
-			final CTFilterColumn ctFC = _autofilter.insertNewFilterColumn(colId);
+			final CTFilterColumn ctFC = _autofilter.insertNewFilterColumn(j);
+			ctFC.setColId(colId);
 			fc = addFilterColumn(ctFC);
 		}
 		return fc;
 	}
 	
-	/*package*/ FilterColumn addFilterColumn(CTFilterColumn ctFC){
+	/*package*/ XSSFFilterColumn addFilterColumn(CTFilterColumn ctFC){
 		if(filterColumns == null)
 			filterColumns = new ArrayList<FilterColumn>();
 
