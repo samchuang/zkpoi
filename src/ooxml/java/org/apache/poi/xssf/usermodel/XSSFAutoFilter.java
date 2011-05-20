@@ -133,7 +133,7 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 				}
 				return result;
 			}
-			return Collections.emptyList();
+			return null;
 		}
 
 		private XSSFFilterColumn(CTFilterColumn ctfc) {
