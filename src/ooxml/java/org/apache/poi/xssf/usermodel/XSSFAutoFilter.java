@@ -124,8 +124,6 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 				final CTFilters cflts = _ctfc.addNewFilters();
 				if (blank1) {
 					cflts.setBlank(blank1);
-				} else if (cflts.isSetBlank()){
-					cflts.unsetBlank();
 				}
 				for(int j = 0; j < filters.length; ++j) {
 					final CTFilter cflt = cflts.addNewFilter();
