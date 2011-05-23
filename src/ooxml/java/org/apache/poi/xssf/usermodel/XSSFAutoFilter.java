@@ -79,6 +79,14 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			return set;
 		}
 		
+		/*package*/ void init() {
+			List<String> filters = getFilters();
+			if (filters != null) {
+				_criteria1 = getCriteriaSet(filters.toArray(new String[filters.size()]));
+				_operator = AutoFilter.FILTEROP_VALUES;
+			}
+		}
+		
 		public void setProperties(Object criteria1, int filterOp, Object criteria2, Boolean visibleDropDown) {
 			_operator = filterOp;
 			_criteria1 = getCriteriaSet(criteria1);

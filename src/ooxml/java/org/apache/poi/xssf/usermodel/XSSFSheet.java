@@ -284,6 +284,13 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		for(CTFilterColumn fc: fcList){
 			autoFilter.addFilterColumn(fc);
 		}
+		
+		List<FilterColumn> fcs = autoFilter.getFilterColumns();
+		if (fcs != null) {
+			for(FilterColumn fc: fcs) {
+				((XSSFFilterColumn)fc).init();
+			}
+		}
 	}
 
 	/**
