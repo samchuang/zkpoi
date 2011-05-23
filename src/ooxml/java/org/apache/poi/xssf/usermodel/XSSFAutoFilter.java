@@ -83,6 +83,9 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			List<String> filters = getFilters();
 			if (filters != null) {
 				_criteria1 = getCriteriaSet(filters.toArray(new String[filters.size()]));
+				if (isShowBlank()) {
+					_criteria1.add("=");
+				}
 				_operator = AutoFilter.FILTEROP_VALUES;
 			}
 		}
@@ -91,6 +94,7 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 			_operator = filterOp;
 			_criteria1 = getCriteriaSet(criteria1);
 			_criteria2 = getCriteriaSet(criteria2);
+			boolean blank1 = _criteria1.contains("=");
 			
 			if (visibleDropDown != null) {
 				if (visibleDropDown.booleanValue()) {
@@ -118,6 +122,11 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 					_ctfc.unsetFilters();
 				}
 				final CTFilters cflts = _ctfc.addNewFilters();
+				if (blank1) {
+					cflts.setBlank(blank1);
+				} else {
+					cflts.unsetBlank();
+				}
 				for(int j = 0; j < filters.length; ++j) {
 					final CTFilter cflt = cflts.addNewFilter();
 					cflt.setVal(filters[j]);
@@ -142,6 +151,11 @@ public final class XSSFAutoFilter extends POIXMLDocumentPart implements AutoFilt
 				return result;
 			}
 			return null;
+		}
+		
+		private boolean isShowBlank() {
+			final CTFilters fts = _ctfc.getFilters();
+			return fts == null || (fts.isSetBlank() && fts.getBlank());
 		}
 
 		private XSSFFilterColumn(CTFilterColumn ctfc) {
