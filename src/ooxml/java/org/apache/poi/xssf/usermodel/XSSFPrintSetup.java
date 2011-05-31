@@ -128,8 +128,12 @@ public class XSSFPrintSetup implements PrintSetup {
      * @param ls landscape
      */
     public void setLandscape(boolean ls) {
-        if (ls)
+        if (ls) {
             setOrientation(PrintOrientation.LANDSCAPE);
+        } else {
+        	setOrientation(PrintOrientation.PORTRAIT);
+        }
+        	
     }
 
     /**
