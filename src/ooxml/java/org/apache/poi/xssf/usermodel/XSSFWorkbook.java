@@ -1246,7 +1246,12 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                 i++;
             }
             names.setDefinedNameArray(nr);
-            workbook.setDefinedNames(names);
+            workbook.setDefinedNames(names); 
+            
+            //bug#ZSS-36: Exception when exporting excel twice.
+            //names.setDefinedNameArray() will instantiate new CTDefinedNames and those in namedRanged is orphaned
+            //20110818, henrichen: have to sync back CTDefinedName into namedRanges
+            syncNamedRange();
         } else {
             if(workbook.isSetDefinedNames()) {
                 workbook.unsetDefinedNames();
@@ -1616,5 +1621,15 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 
 	/*package*/ String getBookNameFromExternalLinkIndex(String externalLinkIndex) {
 		return linkIndexToBookName.get(externalLinkIndex);
+	}
+	
+	//20110818, henrichen: sync CTDefinedName and namedRanges
+	private void syncNamedRange() {
+        namedRanges = new ArrayList<XSSFName>();
+        if(workbook.isSetDefinedNames()) {
+            for(CTDefinedName ctName : workbook.getDefinedNames().getDefinedNameArray()) {
+                namedRanges.add(new XSSFName(ctName, this));
+            }
+        }
 	}
 }
