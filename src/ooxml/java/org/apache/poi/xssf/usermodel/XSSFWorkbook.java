@@ -1249,8 +1249,8 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
             workbook.setDefinedNames(names); 
             
             //bug#ZSS-36: Exception when exporting excel twice.
-            //names.setDefinedNameArray() will instantiate new CTDefinedNames and those in namedRanged is orphaned
-            //20110818, henrichen: have to sync back CTDefinedName into namedRanges
+            //20110818, henrichen: names.setDefinedNameArray() will instantiate new CTDefinedNames 
+            // and those in namedRanged is orphaned. Have to sync back CTDefinedName into namedRanges
             syncNamedRange();
         } else {
             if(workbook.isSetDefinedNames()) {
