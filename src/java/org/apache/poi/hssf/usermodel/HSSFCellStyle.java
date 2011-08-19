@@ -834,7 +834,16 @@ public final class HSSFCellStyle implements CellStyle {
     	//  record
     	_format.cloneStyleFrom(source._format);
     	//20110119, henrichen@zkoss.org: then clone XFExt record
-    	_workbook.getXFExtAt(_index).cloneXFExtFrom(source._workbook.getXFExtAt(source._index));
+    	//ZSS-33: Nullpointer when change the color of cell
+    	//20110819, henrichen@zkoss.org: sometimes, no such XFExt record at all  
+    	final XFExtRecord extRecord = source._workbook.getXFExtAt(source._index);
+    	if (extRecord != null) {
+    		XFExtRecord target = _workbook.getXFExtAt(_index);
+    		if (target == null) {
+    			target = _workbook.createCellXFExt(_index);
+    		}
+    		target.cloneXFExtFrom(extRecord);
+    	}
     	
     	// Handle matching things if we cross workbooks
     	if(_workbook != source._workbook) {
