@@ -17,7 +17,10 @@
 
 package org.apache.poi.hwpf.model;
 
+import java.util.Collections;
+
 import org.apache.poi.poifs.common.POIFSConstants;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 
 /**
@@ -28,6 +31,7 @@ import org.apache.poi.util.LittleEndian;
  * In common with the rest of the old support, it 
  *  is read only
  */
+@Internal
 public final class OldCHPBinTable extends CHPBinTable
 {
   /**
@@ -53,14 +57,17 @@ public final class OldCHPBinTable extends CHPBinTable
       int pageOffset = POIFSConstants.SMALLER_BIG_BLOCK_SIZE * pageNum;
 
       CHPFormattedDiskPage cfkp = new CHPFormattedDiskPage(documentStream,
-        pageOffset, fcMin, tpt);
+        pageOffset, tpt);
 
       int fkpSize = cfkp.size();
 
       for (int y = 0; y < fkpSize; y++)
       {
-        _textRuns.add(cfkp.getCHPX(y));
+        CHPX chpx = cfkp.getCHPX(y);
+        if (chpx != null)
+            _textRuns.add(chpx);
       }
     }
+    Collections.sort( _textRuns, PropertyNode.StartComparator.instance );
   }
 }

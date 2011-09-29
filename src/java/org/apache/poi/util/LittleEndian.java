@@ -118,7 +118,7 @@ public class LittleEndian implements LittleEndianConsts {
      */
     public static long getUInt(byte[] data, int offset) {
         long retNum = getInt(data, offset);
-        return retNum & 0x00FFFFFFFF;
+        return retNum & 0x00FFFFFFFFl;
     }
 
     /**
@@ -140,7 +140,7 @@ public class LittleEndian implements LittleEndianConsts {
      */
     public static long getLong(byte[] data, int offset) {
         long result = 0;
-		
+
 		for (int j = offset + LONG_SIZE - 1; j >= offset; j--) {
 		    result <<= 8;
 		    result |= 0xff & data[j];
@@ -186,6 +186,24 @@ public class LittleEndian implements LittleEndianConsts {
     }
 
     /**
+     * put an unsigned byte value into a byte array
+     * 
+     * @param data
+     *            the byte array
+     * @param offset
+     *            a starting offset into the byte array
+     * @param value
+     *            the short (16-bit) value
+     * 
+     * @exception ArrayIndexOutOfBoundsException
+     *                may be thrown
+     */
+    public static void putUByte( byte[] data, int offset, short value )
+    {
+        data[offset] = (byte) ( value & 0xFF );
+    }
+
+    /**
      * put an unsigned short value into a byte array
      *
      * @param data the byte array
@@ -226,7 +244,6 @@ public class LittleEndian implements LittleEndianConsts {
         data[i++] = (byte)((value >>> 24) & 0xFF);
     }
 
-
     /**
      *  put an int value into beginning of a byte array
      *
@@ -237,6 +254,32 @@ public class LittleEndian implements LittleEndianConsts {
         putInt(data, 0, value);
     }
 
+    /**
+     * put an unsigned int value into a byte array
+     *
+     * @param data the byte array
+     * @param offset a starting offset into the byte array
+     * @param value the int (32-bit) value
+     *
+     * @exception ArrayIndexOutOfBoundsException may be thrown
+     */
+    public static void putUInt(byte[] data, int offset, long value) {
+        int i = offset;
+        data[i++] = (byte)((value >>>  0) & 0xFF);
+        data[i++] = (byte)((value >>>  8) & 0xFF);
+        data[i++] = (byte)((value >>> 16) & 0xFF);
+        data[i++] = (byte)((value >>> 24) & 0xFF);
+    }
+
+    /**
+     *  put an unsigned int value into beginning of a byte array
+     *
+     *@param  data   the byte array
+     *@param  value  the int (32-bit) value
+     */
+    public static void putUInt(byte[] data, long value) {
+        putUInt(data, 0, value);
+    }
 
     /**
      *  put a long value into a byte array
@@ -248,7 +291,7 @@ public class LittleEndian implements LittleEndianConsts {
     public static void putLong(byte[] data, int offset, long value) {
         int limit = LONG_SIZE + offset;
         long v = value;
-        
+
         for (int j = offset; j < limit; j++) {
             data[j] = (byte) (v & 0xFF);
             v >>= 8;
@@ -303,7 +346,7 @@ public class LittleEndian implements LittleEndianConsts {
         }
         return (ch2 << 8) + (ch1 << 0);
     }
-    
+
 
     /**
      *  get an int value from an InputStream
@@ -347,8 +390,8 @@ public class LittleEndian implements LittleEndianConsts {
         if ((ch1 | ch2 | ch3 | ch4 | ch5 | ch6 | ch7 | ch8) < 0) {
             throw new BufferUnderrunException();
         }
-        
-        return 
+
+        return
             ((long)ch8 << 56) +
             ((long)ch7 << 48) +
             ((long)ch6 << 40) +

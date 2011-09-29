@@ -15,7 +15,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-        
+
 
 package org.apache.poi.poifs.filesystem;
 
@@ -53,7 +53,7 @@ public class DirectoryNode
     // the POIFSFileSystem we belong to
     private POIFSFileSystem   _ofilesystem;
     // the NPOIFSFileSytem we belong to
-    private NPOIFSFileSystem  _nfilesystem; 
+    private NPOIFSFileSystem  _nfilesystem;
 
     // the path described by this document
     private POIFSDocumentPath _path;
@@ -70,10 +70,9 @@ public class DirectoryNode
                   final POIFSFileSystem filesystem,
                   final DirectoryNode parent)
     {
-       this(property, parent);
-       _ofilesystem = filesystem;
+       this(property, parent, filesystem, (NPOIFSFileSystem)null);
     }
-    
+
     /**
      * create a DirectoryNode. This method is not public by design; it
      * is intended strictly for the internal use of this package
@@ -86,14 +85,18 @@ public class DirectoryNode
                   final NPOIFSFileSystem nfilesystem,
                   final DirectoryNode parent)
     {
-       this(property, parent);
-       _nfilesystem = nfilesystem;
+       this(property, parent, (POIFSFileSystem)null, nfilesystem);
     }
-    
+
     private DirectoryNode(final DirectoryProperty property,
-                          final DirectoryNode parent)
+                          final DirectoryNode parent,
+                          final POIFSFileSystem ofilesystem,
+                          final NPOIFSFileSystem nfilesystem)
     {
         super(property, parent);
+        this._ofilesystem = ofilesystem;
+        this._nfilesystem = nfilesystem;
+
         if (parent == null)
         {
             _path = new POIFSDocumentPath();
@@ -140,23 +143,23 @@ public class DirectoryNode
     {
         return _path;
     }
-    
+
     /**
      * @return the filesystem that this belongs to
      */
     public POIFSFileSystem getFileSystem()
     {
-        return _ofilesystem; 
+        return _ofilesystem;
     }
-    
+
     /**
      * @return the filesystem that this belongs to
      */
     public NPOIFSFileSystem getNFileSystem()
     {
-        return _nfilesystem; 
+        return _nfilesystem;
     }
-    
+
     /**
      * open a document in the directory's entry's list of entries
      *
@@ -177,7 +180,7 @@ public class DirectoryNode
     /**
      * open a document in the directory's entry's list of entries
      *
-     * @param documentEntry the document to be opened
+     * @param document the document to be opened
      *
      * @return a newly opened DocumentInputStream or NDocumentInputStream
      *
@@ -192,7 +195,7 @@ public class DirectoryNode
             throw new IOException("Entry '" + document.getName()
                                   + "' is not a DocumentEntry");
         }
-        
+
         DocumentEntry entry = (DocumentEntry)document;
         return new DocumentInputStream(entry);
     }
@@ -214,7 +217,7 @@ public class DirectoryNode
 
         (( DirectoryProperty ) getProperty()).addChild(property);
         _ofilesystem.addDocument(document);
-        
+
         _entries.add(rval);
         _byname.put(property.getName(), rval);
         return rval;
@@ -237,7 +240,7 @@ public class DirectoryNode
 
         (( DirectoryProperty ) getProperty()).addChild(property);
         _nfilesystem.addDocument(document);
-        
+
         _entries.add(rval);
         _byname.put(property.getName(), rval);
         return rval;
@@ -287,7 +290,7 @@ public class DirectoryNode
         {
             _entries.remove(entry);
         	   _byname.remove(entry.getName());
-        	   
+
         	   if(_ofilesystem != null) {
                _ofilesystem.remove(entry);
         	   } else {
@@ -339,6 +342,11 @@ public class DirectoryNode
         return _entries.size();
     }
 
+    public boolean hasEntry( String name )
+    {
+        return name != null && _byname.containsKey( name );
+    }
+
     /**
      * get a specified Entry by name
      *
@@ -386,7 +394,11 @@ public class DirectoryNode
                                         final InputStream stream)
         throws IOException
     {
-        return createDocument(new POIFSDocument(name, stream));
+        if(_nfilesystem != null) {
+           return createDocument(new NPOIFSDocument(name, _nfilesystem, stream));
+        } else {
+           return createDocument(new POIFSDocument(name, stream));
+        }
     }
 
     /**
@@ -423,7 +435,7 @@ public class DirectoryNode
     {
         DirectoryNode rval;
         DirectoryProperty property = new DirectoryProperty(name);
-        
+
         if(_ofilesystem != null) {
            rval = new DirectoryNode(property, _ofilesystem, this);
            _ofilesystem.addDirectory(property);
@@ -555,7 +567,7 @@ public class DirectoryNode
      * Returns an Iterator over all the entries
      */
     public Iterator<Entry> iterator() {
-        return getEntries(); 
+        return getEntries();
     }
 
     /* **********  END  begin implementation of POIFSViewable ********** */

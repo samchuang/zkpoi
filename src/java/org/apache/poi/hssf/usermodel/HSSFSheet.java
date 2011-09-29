@@ -142,7 +142,7 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
             row = sheet.getNextRow();
         }
 
-        CellValueRecordInterface[] cvals = sheet.getValueRecords();
+        Iterator<CellValueRecordInterface> iter = sheet.getCellValueIterator();
         long timestart = System.currentTimeMillis();
 
         if (log.check( POILogger.DEBUG ))
@@ -151,8 +151,8 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
         HSSFRow lastrow = null;
 
         // Add every cell to its row
-        for (int i = 0; i < cvals.length; i++) {
-            CellValueRecordInterface cval = cvals[i];
+        while (iter.hasNext()) {
+            CellValueRecordInterface cval = iter.next();
 
             long cellstart = System.currentTimeMillis();
             HSSFRow hrow = lastrow;
@@ -429,15 +429,47 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
     /**
      * Set the width (in units of 1/256th of a character width)
+     *
      * <p>
      * The maximum column width for an individual cell is 255 characters.
      * This value represents the number of characters that can be displayed
-     * in a cell that is formatted with the standard font.
+     * in a cell that is formatted with the standard font (first font in the workbook).
      * </p>
+     *
+     * <p>
+     * Character width is defined as the maximum digit width
+     * of the numbers <code>0, 1, 2, ... 9</code> as rendered
+     * using the default font (first font in the workbook).
+     * <br/>
+     * Unless you are using a very special font, the default character is '0' (zero),
+     * this is true for Arial (default font font in HSSF) and Calibri (default font in XSSF)
+     * </p>
+     *
+     * <p>
+     * Please note, that the width set by this method includes 4 pixels of margin padding (two on each side),
+     * plus 1 pixel padding for the gridlines (Section 3.3.1.12 of the OOXML spec).
+     * This results is a slightly less value of visible characters than passed to this method (approx. 1/2 of a character).
+     * </p>
+     * <p>
+     * To compute the actual number of visible characters,
+     *  Excel uses the following formula (Section 3.3.1.12 of the OOXML spec):
+     * </p>
+     * <code>
+     *     width = Truncate([{Number of Visible Characters} *
+     *      {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+     * </code>
+     * <p>Using the Calibri font as an example, the maximum digit width of 11 point font size is 7 pixels (at 96 dpi).
+     *  If you set a column width to be eight characters wide, e.g. <code>setColumnWidth(columnIndex, 8*256)</code>,
+     *  then the actual value of visible characters (the value shown in Excel) is derived from the following equation:
+     *  <code>
+            Truncate([numChars*7+5]/7*256)/256 = 8;
+     *  </code>
+     *
+     *  which gives <code>7.29</code>.
      *
      * @param columnIndex - the column to set (0-based)
      * @param width - the width in units of 1/256th of a character width
-     * @throws IllegalArgumentException if width > 65280 (the maximum column width in Excel)
+     * @throws IllegalArgumentException if width > 255*256 (the maximum column width in Excel is 255 characters)
      */
     public void setColumnWidth(int columnIndex, int width) {
         _sheet.setColumnWidth(columnIndex, width);
@@ -608,9 +640,24 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     }
 
     /**
-     * Whether a record must be inserted or not at generation to indicate that
-     * formula must be recalculated when workbook is opened.
-     * @param value true if an uncalced record must be inserted or not at generation
+     * Control if Excel should be asked to recalculate all formulas on this sheet
+     * when the workbook is opened.
+     *
+     *  <p>
+     *  Calculating the formula values with {@link org.apache.poi.ss.usermodel.FormulaEvaluator} is the
+     *  recommended solution, but this may be used for certain cases where
+     *  evaluation in POI is not possible.
+     *  </p>
+     *
+     *  <p>
+     *  It is recommended to force recalcuation of formulas on workbook level using
+     *  {@link org.apache.poi.ss.usermodel.Workbook#setForceFormulaRecalculation(boolean)}
+     *  to ensure that all cross-worksheet formuals and external dependencies are updated.
+     *  </p>
+     * @param value true if the application will perform a full recalculation of
+     * this worksheet values when the workbook is opened
+     *
+     * @see org.apache.poi.ss.usermodel.Workbook#setForceFormulaRecalculation(boolean)
      */
     public void setForceFormulaRecalculation(boolean value)
     {
@@ -1377,6 +1424,11 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
     /**
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
+     *
+     * <p>
+     *     If both colSplit and rowSplit are zero then the existing freeze pane is removed
+     * </p>
+     *
      * @param colSplit      Horizonatal position of split.
      * @param rowSplit      Vertical position of split.
      * @param leftmostColumn   Left column visible in right pane.
@@ -1392,6 +1444,11 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
     /**
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
+     *
+     * <p>
+     *     If both colSplit and rowSplit are zero then the existing freeze pane is removed
+     * </p>
+     *
      * @param colSplit      Horizonatal position of split.
      * @param rowSplit      Vertical position of split.
      */
@@ -1474,7 +1531,14 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
     /**
      * Sets a page break at the indicated row
-     * @param row FIXME: Document this!
+     * Breaks occur above the specified row and left of the specified column inclusive.
+     *
+     * For example, <code>sheet.setColumnBreak(2);</code> breaks the sheet into two parts
+     * with columns A,B,C in the first and D,E,... in the second. Simuilar, <code>sheet.setRowBreak(2);</code>
+     * breaks the sheet into two parts with first three rows (rownum=1...3) in the first part
+     * and rows starting with rownum=4 in the second.
+     *
+     * @param row the row to break, inclusive
      */
     public void setRowBreak(int row) {
         validateRow(row);
@@ -1513,8 +1577,15 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
 
 
     /**
-     * Sets a page break at the indicated column
-     * @param column
+     * Sets a page break at the indicated column.
+     * Breaks occur above the specified row and left of the specified column inclusive.
+     *
+     * For example, <code>sheet.setColumnBreak(2);</code> breaks the sheet into two parts
+     * with columns A,B,C in the first and D,E,... in the second. Simuilar, <code>sheet.setRowBreak(2);</code>
+     * breaks the sheet into two parts with first three rows (rownum=1...3) in the first part
+     * and rows starting with rownum=4 in the second.
+     *
+     * @param column the column to break, inclusive
      */
     public void setColumnBreak(int column) {
         validateColumn((short)column);
@@ -1589,14 +1660,14 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     public HSSFPatriarch createDrawingPatriarch() {
         if(_patriarch == null){
             // Create the drawing group if it doesn't already exist.
-            _book.createDrawingGroup();
+            _workbook.initDrawings();
 
-            _sheet.aggregateDrawingRecords(_book.getDrawingManager(), true);
-            EscherAggregate agg = (EscherAggregate) _sheet.findFirstRecordBySid(EscherAggregate.sid);
-            _patriarch = new HSSFPatriarch(this, agg);
-            agg.clear();     // Initially the behaviour will be to clear out any existing shapes in the sheet when
-                             // creating a new patriarch.
-            agg.setPatriarch(_patriarch);
+            if(_patriarch == null){
+                _sheet.aggregateDrawingRecords(_book.getDrawingManager(), true);
+                EscherAggregate agg = (EscherAggregate) _sheet.findFirstRecordBySid(EscherAggregate.sid);
+                _patriarch = new HSSFPatriarch(this, agg);
+                agg.setPatriarch(_patriarch);
+            }
         }
         return _patriarch;
     }
@@ -1764,7 +1835,16 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      */
     public void autoSizeColumn(int column, boolean useMergedCells) {
         double width = SheetUtil.getColumnWidth(this, column, useMergedCells);
-        if(width != -1) setColumnWidth(column, (int) (256*width));
+
+        if (width != -1) {
+            width *= 256;
+            int maxColumnWidth = 255*256; // The maximum column width for an individual cell is 255 characters
+            if (width > maxColumnWidth) {
+                width = maxColumnWidth;
+            }
+            setColumnWidth(column, (int)(width));
+        }
+
     }
 
     /**

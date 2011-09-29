@@ -51,7 +51,7 @@ under the License.
 
     <description>The Apache POI project Ant build.</description>
 
-    <property name="version.id" value="3.8-beta2"/>
+    <property name="version.id" value="3.8-beta5"/>
 
     <property environment="env"/>
     <!-- the repository to download jars from -->
@@ -65,6 +65,12 @@ under the License.
     <property name="jdk.version.source" value="1.5" description="JDK version of source code"/>
     <property name="jdk.version.class" value="1.5" description="JDK version of generated class files"/>
     <property name="compile.debug" value="true"/>
+
+    <!-- 
+        Logging is suppressed by default. 
+        To redirect log output to console, run ant with -Dorg.apache.poi.util.POILogger=org.apache.poi.util.SystemOutLogger  
+    -->
+    <property name="org.apache.poi.util.POILogger" value="org.apache.poi.util.NullLogger"/>
 
     <!-- issue warnings if source code contains unmappable characters for encoding ASCII  -->
     <property name="java.source.encoding" value="ASCII"/>
@@ -122,6 +128,9 @@ under the License.
     <property name="main.commons-logging.jar" location="${main.lib}/commons-logging-1.1.jar"/>
     <property name="main.commons-logging.url"
               value="${repository.m2}/maven2/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
+    <property name="main.commons-codec.jar" location="${main.lib}/commons-codec-1.5.jar"/>
+    <property name="main.commons-codec.url"
+              value="${repository.m2}/maven2/commons-codec/commons-codec/1.5/commons-codec-1.5.jar"/>
     <property name="main.log4j.jar" location="${main.lib}/log4j-1.2.13.jar"/>
     <property name="main.log4j.url" value="${repository.m2}/maven2/log4j/log4j/1.2.13/log4j-1.2.13.jar"/>
     <property name="main.junit.jar" location="${main.lib}/junit-3.8.1.jar"/>
@@ -162,10 +171,12 @@ under the License.
     <propertyset id="junit.properties">
         <propertyref name="POI.testdata.path"/>
         <propertyref name="java.awt.headless"/>
+        <propertyref name="org.apache.poi.util.POILogger"/>
     </propertyset>
 
     <path id="main.classpath">
         <pathelement location="${main.commons-logging.jar}"/>
+        <pathelement location="${main.commons-codec.jar}"/>
         <pathelement location="${main.log4j.jar}"/>
         <pathelement location="${main.junit.jar}"/>
     </path>
@@ -295,6 +306,7 @@ under the License.
             <or>
                 <and>
                     <available file="${main.commons-logging.jar}"/>
+                    <available file="${main.commons-codec.jar}"/>
                     <available file="${main.log4j.jar}"/>
                     <available file="${main.junit.jar}"/>
                     <available file="${main.ant.jar}"/>
@@ -310,6 +322,10 @@ under the License.
         <antcall target="downloadfile">
             <param name="sourcefile" value="${main.commons-logging.url}"/>
             <param name="destfile" value="${main.commons-logging.jar}"/>
+        </antcall>
+        <antcall target="downloadfile">
+            <param name="sourcefile" value="${main.commons-codec.url}"/>
+            <param name="destfile" value="${main.commons-codec.jar}"/>
         </antcall>
         <antcall target="downloadfile">
             <param name="sourcefile" value="${main.log4j.url}"/>
@@ -611,6 +627,7 @@ under the License.
             <classpath refid="test.classpath"/>
             <syspropertyset refid="junit.properties"/>
             <jvmarg value="${poi.test.locale}"/>
+            <jvmarg value="-ea"/>
             <formatter type="plain"/>
             <batchtest todir="${main.reports.test}">
                 <fileset dir="${main.src.test}">
@@ -648,6 +665,13 @@ under the License.
             <classpath refid="test.scratchpad.classpath"/>
             <syspropertyset refid="junit.properties"/>
             <jvmarg value="${poi.test.locale}"/>
+            <jvmarg value="-ea"/>
+            <!-- 
+              YK: ensure that JUnit has enough memory to run tests. 
+              Without the line below tests fail on Mac OS X with jdk-1.6.26 
+              and on Windows with jdk-1.5.22 
+            -->
+            <jvmarg value="-Xmx256M"/>            
             <formatter type="plain"/>
             <batchtest todir="${scratchpad.reports.test}">
                 <fileset dir="${scratchpad.src.test}">
@@ -679,6 +703,7 @@ under the License.
               <classpath refid="@{classpath}"/>
               <syspropertyset refid="junit.properties"/>
               <jvmarg value="${poi.test.locale}"/>
+<!--              <jvmarg value="-ea"/> -->
               <formatter type="plain"/>
               <batchtest todir="${ooxml.reports.test}">
                   <fileset dir="${ooxml.src.test}">
@@ -733,6 +758,7 @@ under the License.
             <classpath refid="test.excelant.classpath"/>
             <syspropertyset refid="junit.properties"/>
             <jvmarg value="${poi.test.locale}"/>
+            <jvmarg value="-ea"/>
             <formatter type="plain"/>
             <batchtest todir="${excelant.reports.test}">
                 <fileset dir="${excelant.src.test}">

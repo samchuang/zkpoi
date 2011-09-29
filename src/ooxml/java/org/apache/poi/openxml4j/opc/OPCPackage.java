@@ -18,6 +18,7 @@
 package org.apache.poi.openxml4j.opc;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,12 +31,16 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JRuntimeException;
+import org.apache.poi.openxml4j.exceptions.PartAlreadyExistsException;
 import org.apache.poi.openxml4j.opc.internal.ContentType;
 import org.apache.poi.openxml4j.opc.internal.ContentTypeManager;
 import org.apache.poi.openxml4j.opc.internal.PackagePropertiesPart;
@@ -56,7 +61,7 @@ import org.apache.poi.util.POILogFactory;
  * @author Julien Chable, CDubet
  * @version 0.1
  */
-public abstract class OPCPackage implements RelationshipSource {
+public abstract class OPCPackage implements RelationshipSource, Closeable {
 
 	/**
 	 * Logger.
@@ -159,7 +164,10 @@ public abstract class OPCPackage implements RelationshipSource {
 		} catch (InvalidFormatException e) {
 			// Should never happen
 			throw new OpenXML4JRuntimeException(
-					"Package.init() : this exception should never happen, if you read this message please send a mail to the developers team.");
+					"Package.init() : this exception should never happen, " +
+					"if you read this message please send a mail to the developers team. : " +
+					e.getMessage()
+			);
 		}
 	}
 
@@ -549,6 +557,22 @@ public abstract class OPCPackage implements RelationshipSource {
 		return retArr;
 	}
 
+	public List<PackagePart> getPartsByName(final Pattern namePattern) {
+	    if (namePattern == null) {
+	        throw new IllegalArgumentException("name pattern must not be null");
+	    }
+	    ArrayList<PackagePart> result = new ArrayList<PackagePart>();
+	    for (PackagePart part : partList.values()) {
+	        PackagePartName partName = part.getPartName();
+	        String name = partName.getName();
+	        Matcher matcher = namePattern.matcher(name);
+	        if (matcher.matches()) {
+	            result.add(part);
+	        }
+	    }
+	    return result;
+	}
+
 	/**
 	 * Get the target part from the specified relationship.
 	 *
@@ -693,7 +717,7 @@ public abstract class OPCPackage implements RelationshipSource {
 		// Check if the specified part name already exists
 		if (partList.containsKey(partName)
 				&& !partList.get(partName).isDeleted()) {
-			throw new InvalidOperationException(
+			throw new PartAlreadyExistsException(
 					"A part with the name '"
 							+ partName.getName()
 							+ "' already exists : Packages shall not contain equivalent part names and package implementers shall neither create nor recognize packages with equivalent part names. [M1.12]");

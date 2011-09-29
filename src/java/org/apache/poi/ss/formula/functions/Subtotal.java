@@ -22,6 +22,7 @@ import org.apache.poi.ss.formula.eval.EvaluationException;
 import org.apache.poi.ss.formula.eval.OperandResolver;
 import org.apache.poi.ss.formula.eval.ValueEval;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
+import static org.apache.poi.ss.formula.functions.AggregateFunction.subtotalInstance;
 
 /**
  * Implementation for the Excel function SUBTOTAL<p>
@@ -44,7 +45,7 @@ import org.apache.poi.ss.formula.eval.NotImplementedException;
  *      <tr align='center'><td>6</td><td>PRODUCT</td></tr>
  *      <tr align='center'><td>7</td><td>STDEV</td></tr>
  *      <tr align='center'><td>8</td><td>STDEVP *</td></tr>
- *      <tr align='center'><td>9</td><td>AVERAGE</td></tr>
+ *      <tr align='center'><td>9</td><td>SUM</td></tr>
  *      <tr align='center'><td>10</td><td>VAR *</td></tr>
  *      <tr align='center'><td>11</td><td>VARP *</td></tr>
  *      <tr align='center'><td>101-111</td><td>*</td></tr>
@@ -58,16 +59,17 @@ import org.apache.poi.ss.formula.eval.NotImplementedException;
 public class Subtotal implements Function {
 
 	private static Function findFunction(int functionCode) throws EvaluationException {
-		switch (functionCode) {
-			case 1: return AggregateFunction.AVERAGE;
-			case 2: return new Count();
-			case 3: return new Counta();
-			case 4: return AggregateFunction.MAX;
-			case 5: return AggregateFunction.MIN;
-			case 6: return AggregateFunction.PRODUCT;
-			case 7: return AggregateFunction.STDEV;
+		Function func;
+        switch (functionCode) {
+			case 1: return subtotalInstance(AggregateFunction.AVERAGE);
+			case 2: return Count.subtotalInstance();
+			case 3: return Counta.subtotalInstance();
+			case 4: return subtotalInstance(AggregateFunction.MAX);
+			case 5: return subtotalInstance(AggregateFunction.MIN);
+			case 6: return subtotalInstance(AggregateFunction.PRODUCT);
+			case 7: return subtotalInstance(AggregateFunction.STDEV);
 			case 8: throw new NotImplementedException("STDEVP");
-			case 9: return AggregateFunction.SUM;
+			case 9: return subtotalInstance(AggregateFunction.SUM);
 			case 10: throw new NotImplementedException("VAR");
 			case 11: throw new NotImplementedException("VARP");
 		}

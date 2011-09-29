@@ -18,12 +18,15 @@
 package org.apache.poi.hwpf.model;
 
 import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.util.Internal;
 
 /**
  * Helper class for {@link HWPFDocument}, which figures out
  *  where different kinds of text can be found within the
  *  overall CP splurge.
  */
+@Deprecated
+@Internal
 public final class CPSplitCalculator {
 	private FileInformationBlock fib;
 	public CPSplitCalculator(FileInformationBlock fib) {

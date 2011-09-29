@@ -37,7 +37,7 @@ public abstract class BaseTestWorkbook extends TestCase {
     _testDataProvider = testDataProvider;
     }
 
-    public final void testCreateSheet() {
+    public void testCreateSheet() {
         Workbook wb = _testDataProvider.createWorkbook();
         assertEquals(0, wb.getNumberOfSheets());
 
@@ -99,6 +99,22 @@ public abstract class BaseTestWorkbook extends TestCase {
             // expected during successful test
         }
 
+        //try to assign an invalid name to the 2nd sheet
+        try {
+            wb.createSheet(null);
+            fail("should have thrown exceptiuon due to invalid sheet name");
+        } catch (IllegalArgumentException e) {
+            // expected during successful test
+        }
+
+        try {
+            wb.setSheetName(2, null);
+
+            fail("should have thrown exceptiuon due to invalid sheet name");
+        } catch (IllegalArgumentException e) {
+            // expected during successful test
+        }
+
         //check
         assertEquals(0, wb.getSheetIndex("sheet0"));
         assertEquals(1, wb.getSheetIndex("sheet1"));
@@ -125,13 +141,18 @@ public abstract class BaseTestWorkbook extends TestCase {
      * avoid funny duplicate sheet name errors, POI enforces uniqueness on only the first 31 chars.
      * but for the purpose of uniqueness long sheet names are silently truncated to 31 chars.
      */
-    public final void testCreateSheetWithLongNames() {
+    public void testCreateSheetWithLongNames() {
         Workbook wb = _testDataProvider.createWorkbook();
 
         String sheetName1 = "My very long sheet name which is longer than 31 chars";
+        String truncatedSheetName1 = sheetName1.substring(0, 31);
         Sheet sh1 = wb.createSheet(sheetName1);
-        assertEquals(sheetName1, sh1.getSheetName());
-        assertSame(sh1, wb.getSheet(sheetName1));
+        assertEquals(truncatedSheetName1, sh1.getSheetName());
+        assertSame(sh1, wb.getSheet(truncatedSheetName1));
+        // now via wb.setSheetName
+        wb.setSheetName(0, sheetName1);
+        assertEquals(truncatedSheetName1, sh1.getSheetName());
+        assertSame(sh1, wb.getSheet(truncatedSheetName1));
 
         String sheetName2 = "My very long sheet name which is longer than 31 chars " +
                 "and sheetName2.substring(0, 31) == sheetName1.substring(0, 31)";
@@ -144,18 +165,19 @@ public abstract class BaseTestWorkbook extends TestCase {
         }
 
         String sheetName3 = "POI allows creating sheets with names longer than 31 characters";
+        String truncatedSheetName3 = sheetName3.substring(0, 31);
         Sheet sh3 = wb.createSheet(sheetName3);
-        assertEquals(sheetName3, sh3.getSheetName());
-        assertSame(sh3, wb.getSheet(sheetName3));
+        assertEquals(truncatedSheetName3, sh3.getSheetName());
+        assertSame(sh3, wb.getSheet(truncatedSheetName3));
 
         //serialize and read again
         wb = _testDataProvider.writeOutAndReadBack(wb);
         assertEquals(2, wb.getNumberOfSheets());
-        assertEquals(0, wb.getSheetIndex(sheetName1));
-        assertEquals(1, wb.getSheetIndex(sheetName3));
+        assertEquals(0, wb.getSheetIndex(truncatedSheetName1));
+        assertEquals(1, wb.getSheetIndex(truncatedSheetName3));
     }
 
-    public final void testRemoveSheetAt() {
+    public void testRemoveSheetAt() {
         Workbook workbook = _testDataProvider.createWorkbook();
         workbook.createSheet("sheet1");
         workbook.createSheet("sheet2");
@@ -177,7 +199,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertEquals(3, workbook.getNumberOfSheets());
     }
 
-    public final void testDefaultValues() {
+    public void testDefaultValues() {
         Workbook b = _testDataProvider.createWorkbook();
         assertEquals(0, b.getActiveSheetIndex());
         assertEquals(0, b.getFirstVisibleTab());
@@ -185,7 +207,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertEquals(0, b.getNumberOfSheets());
     }
 
-    public final void testSheetSelection() {
+    public void testSheetSelection() {
         Workbook b = _testDataProvider.createWorkbook();
         b.createSheet("Sheet One");
         b.createSheet("Sheet Two");
@@ -196,7 +218,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertEquals(1, b.getFirstVisibleTab());
     }
 
-    public final void testPrintArea() {
+    public void testPrintArea() {
         Workbook workbook = _testDataProvider.createWorkbook();
         Sheet sheet1 = workbook.createSheet("Test Print Area");
         String sheetName1 = sheet1.getSheetName();
@@ -215,7 +237,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertNull(workbook.getPrintArea(0));
     }
 
-    public final void testGetSetActiveSheet(){
+    public void testGetSetActiveSheet(){
         Workbook workbook = _testDataProvider.createWorkbook();
         assertEquals(0, workbook.getActiveSheetIndex());
 
@@ -232,7 +254,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertEquals(0, workbook.getActiveSheetIndex());
     }
 
-    public final void testSetSheetOrder() {
+    public void testSetSheetOrder() {
         Workbook wb = _testDataProvider.createWorkbook();
 
         for (int i=0; i < 10; i++) {
@@ -288,7 +310,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         }
     }
 
-    public final void testCloneSheet() {
+    public void testCloneSheet() {
         Workbook book = _testDataProvider.createWorkbook();
         Sheet sheet = book.createSheet("TEST");
         sheet.createRow(0).createCell(0).setCellValue("Test");
@@ -316,7 +338,7 @@ public abstract class BaseTestWorkbook extends TestCase {
 
     }
 
-    public final void testParentReferences(){
+    public void testParentReferences(){
         Workbook workbook = _testDataProvider.createWorkbook();
         Sheet sheet = workbook.createSheet();
         assertSame(workbook, sheet.getWorkbook());
@@ -340,7 +362,7 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertSame(row, cell.getRow());
     }
 
-    public final void testSetRepeatingRowsAnsColumns(){
+    public void testSetRepeatingRowsAnsColumns(){
         Workbook wb = _testDataProvider.createWorkbook();
         Sheet sheet1 = wb.createSheet();
         wb.setRepeatingRowsAndColumns(wb.getSheetIndex(sheet1), 0, 0, 0, 3);
@@ -353,7 +375,7 @@ public abstract class BaseTestWorkbook extends TestCase {
     /**
      * Tests that all of the unicode capable string fields can be set, written and then read back
      */
-    public final void testUnicodeInAll() {
+    public void testUnicodeInAll() {
         Workbook wb = _testDataProvider.createWorkbook();
         CreationHelper factory = wb.getCreationHelper();
         //Create a unicode dataformat (contains euro symbol)
@@ -467,7 +489,7 @@ public abstract class BaseTestWorkbook extends TestCase {
      *
      * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=47100">Bugzilla 47100</a>
      */
-    public final void testSetSheetName() throws Exception {
+    public void testSetSheetName() throws Exception {
 
         Workbook wb = newSetSheetNameTestingWorkbook();
 
@@ -546,4 +568,28 @@ public abstract class BaseTestWorkbook extends TestCase {
         assertEquals(6.0, evaluator.evaluate(cell2).getNumberValue());
     }
 
+    public void changeSheetNameWithSharedFormulas(String sampleFile){
+        Workbook wb = _testDataProvider.openSampleWorkbook(sampleFile);
+
+        FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
+
+        Sheet sheet = wb.getSheetAt(0);
+
+        for (int rownum = 1; rownum <= 40; rownum++) {
+            Cell cellA = sheet.getRow(1).getCell(0);
+            Cell cellB = sheet.getRow(1).getCell(1);
+
+            assertEquals(cellB.getStringCellValue(), evaluator.evaluate(cellA).getStringValue());
+        }
+
+        wb.setSheetName(0, "Renamed by POI");
+        evaluator.clearAllCachedResultValues();
+
+        for (int rownum = 1; rownum <= 40; rownum++) {
+            Cell cellA = sheet.getRow(1).getCell(0);
+            Cell cellB = sheet.getRow(1).getCell(1);
+
+            assertEquals(cellB.getStringCellValue(), evaluator.evaluate(cellA).getStringValue());
+        }
+    }
 }

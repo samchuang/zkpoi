@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.util.Internal;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
@@ -51,14 +52,12 @@ public class XWPFTable implements IBodyElement{
         this(table, part);
         for (int i = 0; i < row; i++) {
             XWPFTableRow tabRow = (getRow(i) == null) ? createRow() : getRow(i);
-            tableRows.add(tabRow);
             for (int k = 0; k < col; k++) {
                 XWPFTableCell tabCell = (tabRow.getCell(k) == null) ? tabRow
                         .createCell() : null;
             }
         }
     }
-
 
     public XWPFTable(CTTbl table, IBody part){
     	this.part = part;
@@ -132,17 +131,17 @@ public class XWPFTable implements IBodyElement{
         return text.toString();
     }
 
-
     public void addNewRowBetween(int start, int end) {
         // TODO
     }
-
 
     /**
      * add a new column for each row in this table
      */
     public void addNewCol() {
-        if (ctTbl.sizeOfTrArray() == 0) createRow();
+        if (ctTbl.sizeOfTrArray() == 0) {
+            createRow();
+        }
         for (int i = 0; i < ctTbl.sizeOfTrArray(); i++) {
             XWPFTableRow tabRow = new XWPFTableRow(ctTbl.getTrArray(i), this);
             tabRow.createCell();
@@ -159,6 +158,7 @@ public class XWPFTable implements IBodyElement{
                 .sizeOfTcArray() : 0;
         XWPFTableRow tabRow = new XWPFTableRow(ctTbl.addNewTr(), this);
         addColumn(tabRow, sizeCol);
+        tableRows.add(tabRow);
         return tabRow;
     }
 
@@ -268,12 +268,12 @@ public class XWPFTable implements IBodyElement{
      * @param pos	position the Row in the Table
      */
     public boolean removeRow(int pos) throws IndexOutOfBoundsException {
-    	if(pos > 0 && pos < tableRows.size()){
-    		ctTbl.removeTr(pos);
-    		tableRows.remove(pos);
-    		return true;
-    	}
-    	return false;
+        if (pos >= 0 && pos < tableRows.size()) {
+            ctTbl.removeTr(pos);
+            tableRows.remove(pos);
+            return true;
+        }
+        return false;
     }
 	
     public List<XWPFTableRow> getRows() {
@@ -289,26 +289,29 @@ public class XWPFTable implements IBodyElement{
 		return BodyElementType.TABLE;
 	}
 
+    public IBody getBody()
+    {
+        return part;
+    }
 
-	/**
-	 * returns the part of the bodyElement
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPart()
-	 */
-	public IBody getPart() {
-		if(part != null){
-			return part.getPart();
-		}
-		return null;
-	}
+    /**
+     * returns the part of the bodyElement
+     * @see org.apache.poi.xwpf.usermodel.IBody#getPart()
+     */
+    public POIXMLDocumentPart getPart() {
+        if(part != null){
+            return part.getPart();
+        }
+        return null;
+    }
 
-
-	/**
-	 * returns the partType of the bodyPart which owns the bodyElement
-	 * @see org.apache.poi.xwpf.usermodel.IBody#getPartType()
-	 */
-	public BodyType getPartType() {
-		return ((IBody)part).getPartType();
-	}
+    /**
+     * returns the partType of the bodyPart which owns the bodyElement
+     * @see org.apache.poi.xwpf.usermodel.IBody#getPartType()
+     */
+    public BodyType getPartType() {
+        return part.getPartType();
+    }
 
 	/**
 	 * returns the XWPFRow which belongs to the CTRow row

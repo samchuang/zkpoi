@@ -30,20 +30,24 @@ import org.apache.poi.ss.usermodel.BaseTestBugzillaIssues;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Name;
-import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.XSSFITestDataProvider;
 import org.apache.poi.xssf.XSSFTestDataSamples;
 import org.apache.poi.xssf.model.CalculationChain;
-import org.apache.poi.xssf.model.Table;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellFill;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCols;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 
 public final class TestXSSFBugs extends BaseTestBugzillaIssues {
@@ -742,12 +746,26 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
      *  should still be able to get colours
      */
     public void test50846() throws Exception {
-       // TODO Get file and test
-       //Workbook wb = XSSFTestDataSamples.openSampleWorkbook("50846.xlsx");
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("50846-border_colours.xlsx");
        
-       // Check the style that is theme based
+       XSSFSheet sheet = wb.getSheetAt(0);
+       XSSFRow row = sheet.getRow(0);
        
-       // Check the one that isn't
+       // Border from a theme, brown
+       XSSFCell cellT = row.getCell(0);
+       XSSFCellStyle styleT = cellT.getCellStyle();
+       XSSFColor colorT = styleT.getBottomBorderXSSFColor();
+       
+       assertEquals(5, colorT.getTheme());
+       assertEquals("FFC0504D", colorT.getARGBHex());
+       
+       // Border from a style direct, red
+       XSSFCell cellS = row.getCell(1);
+       XSSFCellStyle styleS = cellS.getCellStyle();
+       XSSFColor colorS = styleS.getBottomBorderXSSFColor();
+       
+       assertEquals(0, colorS.getTheme());
+       assertEquals("FFFF0000", colorS.getARGBHex());
     }
     
     /**
@@ -788,22 +806,26 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
        String text = "Use \n with word wrap on to create a new line.\n" +
           "This line finishes with two trailing spaces.  ";
        
-       Workbook wb = new XSSFWorkbook();
-       Sheet sheet = wb.createSheet();
+       XSSFWorkbook wb = new XSSFWorkbook();
+       XSSFSheet sheet = wb.createSheet();
 
        Font font1 = wb.createFont();
        font1.setColor((short) 20);
+       Font font2 = wb.createFont();
+       font2.setColor(Font.COLOR_RED);
+       Font font3 = wb.getFontAt((short)0);
 
-       Row row = sheet.createRow(2);
-       Cell cell = row.createCell(2);
+       XSSFRow row = sheet.createRow(2);
+       XSSFCell cell = row.createCell(2);
 
-       RichTextString richTextString =
+       XSSFRichTextString richTextString =
           wb.getCreationHelper().createRichTextString(text);
        
        // Check the text has the newline
        assertEquals(text, richTextString.getString());
        
        // Apply the font
+       richTextString.applyFont(font3);
        richTextString.applyFont(0, 3, font1);
        cell.setCellValue(richTextString);
 
@@ -821,6 +843,28 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
        row = sheet.getRow(2);
        cell = row.getCell(2);
        assertEquals(text, cell.getStringCellValue());
+       
+       // Now add a 2nd, and check again
+       int fontAt = text.indexOf("\n", 6);
+       cell.getRichStringCellValue().applyFont(10, fontAt+1, font2);
+       assertEquals(text, cell.getStringCellValue());
+       
+       assertEquals(4, cell.getRichStringCellValue().numFormattingRuns());
+       assertEquals("Use", cell.getRichStringCellValue().getCTRst().getRList().get(0).getT());
+       
+       String r3 = cell.getRichStringCellValue().getCTRst().getRList().get(2).getT();
+       assertEquals("line.\n", r3.substring(r3.length()-6));
+       
+       // Save and re-check
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       sheet = wb.getSheetAt(0);
+       row = sheet.getRow(2);
+       cell = row.getCell(2);
+       assertEquals(text, cell.getStringCellValue());
+       
+//       FileOutputStream out = new FileOutputStream("/tmp/test48877.xlsx");
+//       wb.write(out);
+//       out.close();
     }
     
     /**
@@ -837,7 +881,7 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
        assertEquals(0, s2.getTables().size());
        assertEquals(0, s3.getTables().size());
        
-       Table t = s1.getTables().get(0);
+       XSSFTable t = s1.getTables().get(0);
        assertEquals("Tabella1", t.getName());
        assertEquals("Tabella1", t.getDisplayName());
        assertEquals("A1:C3", t.getCTTable().getRef());
@@ -877,5 +921,313 @@ public final class TestXSSFBugs extends BaseTestBugzillaIssues {
        assertEquals("Tabella1", t.getName());
        assertEquals("Tabella1", t.getDisplayName());
        assertEquals("A1:C3", t.getCTTable().getRef());
+
+       
+       // Add some more tables, and check
+       t = s2.createTable();
+       t.setName("New 2");
+       t.setDisplayName("New 2");
+       t = s3.createTable();
+       t.setName("New 3");
+       t.setDisplayName("New 3");
+       
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       s1 = wb.getSheetAt(0);
+       s2 = wb.getSheetAt(1);
+       s3 = wb.getSheetAt(2);
+       s4 = wb.getSheetAt(3);
+       assertEquals(0, s1.getTables().size());
+       assertEquals(2, s2.getTables().size());
+       assertEquals(1, s3.getTables().size());
+       assertEquals(0, s4.getTables().size());
+       
+       t = s2.getTables().get(0);
+       assertEquals("Tabella1", t.getName());
+       assertEquals("Tabella1", t.getDisplayName());
+       assertEquals("A1:C3", t.getCTTable().getRef());
+       
+       t = s2.getTables().get(1);
+       assertEquals("New 2", t.getName());
+       assertEquals("New 2", t.getDisplayName());
+       
+       t = s3.getTables().get(0);
+       assertEquals("New 3", t.getName());
+       assertEquals("New 3", t.getDisplayName());
+       
+       // Check the relationships
+       assertEquals(0, s1.getRelations().size());
+       assertEquals(3, s2.getRelations().size());
+       assertEquals(1, s3.getRelations().size());
+       assertEquals(0, s4.getRelations().size());
+       
+       assertEquals(
+             XSSFRelation.PRINTER_SETTINGS.getContentType(), 
+             s2.getRelations().get(0).getPackagePart().getContentType()
+       );
+       assertEquals(
+             XSSFRelation.TABLE.getContentType(), 
+             s2.getRelations().get(1).getPackagePart().getContentType()
+       );
+       assertEquals(
+             XSSFRelation.TABLE.getContentType(), 
+             s2.getRelations().get(2).getPackagePart().getContentType()
+       );
+       assertEquals(
+             XSSFRelation.TABLE.getContentType(), 
+             s3.getRelations().get(0).getPackagePart().getContentType()
+       );
+       assertEquals(
+             "/xl/tables/table3.xml",
+             s3.getRelations().get(0).getPackagePart().getPartName().toString()
+       );
+    }
+    
+    /**
+     * Setting repeating rows and columns shouldn't break
+     *  any print settings that were there before
+     */
+    public void test49253() throws Exception {
+       XSSFWorkbook wb1 = new XSSFWorkbook();
+       XSSFWorkbook wb2 = new XSSFWorkbook();
+       
+       // No print settings before repeating
+       XSSFSheet s1 = wb1.createSheet(); 
+       assertEquals(false, s1.getCTWorksheet().isSetPageSetup());
+       assertEquals(true, s1.getCTWorksheet().isSetPageMargins());
+       
+       wb1.setRepeatingRowsAndColumns(0, 2, 3, 1, 2);
+       
+       assertEquals(true, s1.getCTWorksheet().isSetPageSetup());
+       assertEquals(true, s1.getCTWorksheet().isSetPageMargins());
+       
+       XSSFPrintSetup ps1 = s1.getPrintSetup();
+       assertEquals(false, ps1.getValidSettings());
+       assertEquals(false, ps1.getLandscape());
+       
+       
+       // Had valid print settings before repeating
+       XSSFSheet s2 = wb2.createSheet();
+       XSSFPrintSetup ps2 = s2.getPrintSetup();
+       assertEquals(true, s2.getCTWorksheet().isSetPageSetup());
+       assertEquals(true, s2.getCTWorksheet().isSetPageMargins());
+       
+       ps2.setLandscape(false);
+       assertEquals(true, ps2.getValidSettings());
+       assertEquals(false, ps2.getLandscape());
+       
+       wb2.setRepeatingRowsAndColumns(0, 2, 3, 1, 2);
+       
+       ps2 = s2.getPrintSetup();
+       assertEquals(true, s2.getCTWorksheet().isSetPageSetup());
+       assertEquals(true, s2.getCTWorksheet().isSetPageMargins());
+       assertEquals(true, ps2.getValidSettings());
+       assertEquals(false, ps2.getLandscape());
+    }
+
+    /**
+     * Default Column style
+     */
+    public void test51037() throws Exception {
+       XSSFWorkbook wb = new XSSFWorkbook();
+       XSSFSheet s = wb.createSheet();
+       
+       CellStyle defaultStyle = wb.getCellStyleAt((short)0);
+       assertEquals(0, defaultStyle.getIndex());
+       
+       CellStyle blueStyle = wb.createCellStyle();
+       blueStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+       blueStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+       assertEquals(1, blueStyle.getIndex());
+
+       CellStyle pinkStyle = wb.createCellStyle();
+       pinkStyle.setFillForegroundColor(IndexedColors.PINK.getIndex());
+       pinkStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+       assertEquals(2, pinkStyle.getIndex());
+
+       // Starts empty
+       assertEquals(1, s.getCTWorksheet().sizeOfColsArray());
+       CTCols cols = s.getCTWorksheet().getColsArray(0);
+       assertEquals(0, cols.sizeOfColArray());
+       
+       // Add some rows and columns
+       XSSFRow r1 = s.createRow(0);
+       XSSFRow r2 = s.createRow(1);
+       r1.createCell(0);
+       r1.createCell(2);
+       r2.createCell(0);
+       r2.createCell(3);
+       
+       // Check no style is there
+       assertEquals(1, s.getCTWorksheet().sizeOfColsArray());
+       assertEquals(0, cols.sizeOfColArray());
+       
+       assertEquals(defaultStyle, s.getColumnStyle(0));
+       assertEquals(defaultStyle, s.getColumnStyle(2));
+       assertEquals(defaultStyle, s.getColumnStyle(3));
+       
+       
+       // Apply the styles
+       s.setDefaultColumnStyle(0, pinkStyle);
+       s.setDefaultColumnStyle(3, blueStyle);
+       
+       // Check
+       assertEquals(pinkStyle, s.getColumnStyle(0));
+       assertEquals(defaultStyle, s.getColumnStyle(2));
+       assertEquals(blueStyle, s.getColumnStyle(3));
+       
+       assertEquals(1, s.getCTWorksheet().sizeOfColsArray());
+       assertEquals(2, cols.sizeOfColArray());
+       
+       assertEquals(1, cols.getColArray(0).getMin());
+       assertEquals(1, cols.getColArray(0).getMax());
+       assertEquals(pinkStyle.getIndex(), cols.getColArray(0).getStyle());
+       
+       assertEquals(4, cols.getColArray(1).getMin());
+       assertEquals(4, cols.getColArray(1).getMax());
+       assertEquals(blueStyle.getIndex(), cols.getColArray(1).getStyle());
+       
+       
+       // Save, re-load and re-check 
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       s = wb.getSheetAt(0);
+       defaultStyle = wb.getCellStyleAt(defaultStyle.getIndex());
+       blueStyle = wb.getCellStyleAt(blueStyle.getIndex());
+       pinkStyle = wb.getCellStyleAt(pinkStyle.getIndex());
+       
+       assertEquals(pinkStyle, s.getColumnStyle(0));
+       assertEquals(defaultStyle, s.getColumnStyle(2));
+       assertEquals(blueStyle, s.getColumnStyle(3));
+    }
+    
+    /**
+     * Repeatedly writing a file.
+     * Something with the SharedStringsTable currently breaks...
+     */
+    public void DISABLEDtest46662() throws Exception {
+       // New file
+       XSSFWorkbook wb = new XSSFWorkbook();
+       XSSFTestDataSamples.writeOutAndReadBack(wb);
+       XSSFTestDataSamples.writeOutAndReadBack(wb);
+       XSSFTestDataSamples.writeOutAndReadBack(wb);
+       
+       // Simple file
+       wb = XSSFTestDataSamples.openSampleWorkbook("sample.xlsx");
+       XSSFTestDataSamples.writeOutAndReadBack(wb);
+       XSSFTestDataSamples.writeOutAndReadBack(wb);
+       XSSFTestDataSamples.writeOutAndReadBack(wb);
+       
+       // Complex file
+       // TODO
+    }
+    
+    /**
+     * Colours and styles when the list has gaps in it 
+     */
+    public void test51222() throws Exception {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("51222.xlsx");
+       XSSFSheet s = wb.getSheetAt(0);
+       
+       XSSFCell cA4_EEECE1 = s.getRow(3).getCell(0);
+       XSSFCell cA5_1F497D = s.getRow(4).getCell(0);
+       
+       // Check the text
+       assertEquals("A4", cA4_EEECE1.getRichStringCellValue().getString());
+       assertEquals("A5", cA5_1F497D.getRichStringCellValue().getString());
+       
+       // Check the styles assigned to them
+       assertEquals(4, cA4_EEECE1.getCTCell().getS());
+       assertEquals(5, cA5_1F497D.getCTCell().getS());
+       
+       // Check we look up the correct style
+       assertEquals(4, cA4_EEECE1.getCellStyle().getIndex());
+       assertEquals(5, cA5_1F497D.getCellStyle().getIndex());
+       
+       // Check the fills on them at the low level
+       assertEquals(5, cA4_EEECE1.getCellStyle().getCoreXf().getFillId());
+       assertEquals(6, cA5_1F497D.getCellStyle().getCoreXf().getFillId());
+
+       // These should reference themes 2 and 3
+       assertEquals(2, wb.getStylesSource().getFillAt(5).getCTFill().getPatternFill().getFgColor().getTheme());
+       assertEquals(3, wb.getStylesSource().getFillAt(6).getCTFill().getPatternFill().getFgColor().getTheme());
+       
+       // Ensure we get the right colours for these themes
+       // TODO fix
+//       assertEquals("FFEEECE1", wb.getTheme().getThemeColor(2).getARGBHex());
+//       assertEquals("FF1F497D", wb.getTheme().getThemeColor(3).getARGBHex());
+       
+       // Finally check the colours on the styles
+       // TODO fix
+//       assertEquals("FFEEECE1", cA4_EEECE1.getCellStyle().getFillForegroundXSSFColor().getARGBHex());
+//       assertEquals("FF1F497D", cA5_1F497D.getCellStyle().getFillForegroundXSSFColor().getARGBHex());
+    }
+
+    public void test51470() throws Exception {
+        XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("51470.xlsx");
+        XSSFSheet sh0 = wb.getSheetAt(0);
+        XSSFSheet sh1 = wb.cloneSheet(0);
+        List<POIXMLDocumentPart> rels0 = sh0.getRelations();
+        List<POIXMLDocumentPart> rels1 = sh1.getRelations();
+        assertEquals(1, rels0.size());
+        assertEquals(1, rels1.size());
+
+        assertEquals(rels0.get(0).getPackageRelationship(), rels1.get(0).getPackageRelationship());
+    }
+    
+    /**
+     * Add comments to Sheet 1, when Sheet 2 already has
+     *  comments (so /xl/comments1.xml is taken)
+     */
+    public void test51850() {
+       XSSFWorkbook wb = XSSFTestDataSamples.openSampleWorkbook("51850.xlsx");
+       XSSFSheet sh1 = wb.getSheetAt(0);
+       XSSFSheet sh2 = wb.getSheetAt(1);
+ 
+       // Sheet 2 has comments
+       assertNotNull(sh2.getCommentsTable(false));
+       assertEquals(1, sh2.getCommentsTable(false).getNumberOfComments());
+       
+       // Sheet 1 doesn't (yet)
+       assertNull(sh1.getCommentsTable(false));
+       
+       // Try to add comments to Sheet 1
+       CreationHelper factory = wb.getCreationHelper();
+       Drawing drawing = sh1.createDrawingPatriarch();
+
+       ClientAnchor anchor = factory.createClientAnchor();
+       anchor.setCol1(0);
+       anchor.setCol2(4);
+       anchor.setRow1(0);
+       anchor.setRow2(1);
+
+       Comment comment1 = drawing.createCellComment(anchor);
+       comment1.setString(
+             factory.createRichTextString("I like this cell. It's my favourite."));
+       comment1.setAuthor("Bob T. Fish");
+       
+       Comment comment2 = drawing.createCellComment(anchor);
+       comment2.setString(
+             factory.createRichTextString("This is much less fun..."));
+       comment2.setAuthor("Bob T. Fish");
+
+       Cell c1 = sh1.getRow(0).createCell(4);
+       c1.setCellValue(2.3);
+       c1.setCellComment(comment1);
+       
+       Cell c2 = sh1.getRow(0).createCell(5);
+       c2.setCellValue(2.1);
+       c2.setCellComment(comment2);
+       
+       
+       // Save and re-load
+       wb = XSSFTestDataSamples.writeOutAndReadBack(wb);
+       sh1 = wb.getSheetAt(0);
+       sh2 = wb.getSheetAt(1);
+       
+       // Check the comments
+       assertNotNull(sh2.getCommentsTable(false));
+       assertEquals(1, sh2.getCommentsTable(false).getNumberOfComments());
+       
+       assertNotNull(sh1.getCommentsTable(false));
+       assertEquals(2, sh1.getCommentsTable(false).getNumberOfComments());
     }
 }

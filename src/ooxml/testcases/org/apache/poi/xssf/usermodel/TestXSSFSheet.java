@@ -26,7 +26,6 @@ import org.apache.poi.xssf.XSSFTestDataSamples;
 import org.apache.poi.xssf.model.CommentsTable;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.model.CalculationChain;
-import org.apache.poi.xssf.model.Table;
 import org.apache.poi.xssf.usermodel.helpers.ColumnHelper;
 import org.apache.poi.util.HexDump;
 import org.apache.poi.hssf.record.PasswordRecord;
@@ -214,7 +213,7 @@ public final class TestXSSFSheet extends BaseTestSheet {
 
     }
 
-    public void testCreateFreezePane() {
+    public void testCreateFreezePane_XSSF() {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
         CTWorksheet ctWorksheet = sheet.getCTWorksheet();
@@ -902,7 +901,7 @@ public final class TestXSSFSheet extends BaseTestSheet {
 
     /**
      * Rows and cells can be created in random order,
-     * but serialization forces strict ascending order of the CTRow and CTCell xml beans
+     * but CTRows are kept in ascending order
      */
     public void testCreateRow() {
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -930,20 +929,20 @@ public final class TestXSSFSheet extends BaseTestSheet {
         CTRow[] xrow = sheetData.getRowArray();
         assertEquals(3, xrow.length);
 
-        //rows are unsorted: {2, 1, 0}
-        assertEquals(2, xrow[0].sizeOfCArray());
-        assertEquals(3, xrow[0].getR());
-        assertTrue(xrow[0].equals(row1.getCTRow()));
+        //rows are sorted: {0, 1, 2}
+        assertEquals(4, xrow[0].sizeOfCArray());
+        assertEquals(1, xrow[0].getR());
+        assertTrue(xrow[0].equals(row3.getCTRow()));
 
         assertEquals(3, xrow[1].sizeOfCArray());
         assertEquals(2, xrow[1].getR());
         assertTrue(xrow[1].equals(row2.getCTRow()));
 
-        assertEquals(4, xrow[2].sizeOfCArray());
-        assertEquals(1, xrow[2].getR());
-        assertTrue(xrow[2].equals(row3.getCTRow()));
+        assertEquals(2, xrow[2].sizeOfCArray());
+        assertEquals(3, xrow[2].getR());
+        assertTrue(xrow[2].equals(row1.getCTRow()));
 
-        CTCell[] xcell = xrow[2].getCArray();
+        CTCell[] xcell = xrow[0].getCArray();
         assertEquals("D1", xcell[0].getR());
         assertEquals("A1", xcell[1].getR());
         assertEquals("C1", xcell[2].getR());
@@ -1050,11 +1049,11 @@ public final class TestXSSFSheet extends BaseTestSheet {
        assertEquals("a", s1.getRow(0).getCell(0).getRichStringCellValue().toString());
        assertEquals(1.0, s1.getRow(1).getCell(0).getNumericCellValue());
        
-       List<Table> tables = s1.getTables();
+       List<XSSFTable> tables = s1.getTables();
        assertNotNull(tables);
        assertEquals(1, tables.size());
        
-       Table table = tables.get(0);
+       XSSFTable table = tables.get(0);
        assertEquals("Tabella1", table.getName());
        assertEquals("Tabella1", table.getDisplayName());
        
@@ -1064,4 +1063,25 @@ public final class TestXSSFSheet extends BaseTestSheet {
        XSSFSheet s3 = wb.getSheetAt(2);
        assertEquals(0, s3.getTables().size());
     }
+    
+    /**
+     * Test to trigger OOXML-LITE generating to include org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetCalcPr
+     */
+    public void testSetForceFormulaRecalculation() {
+    	   XSSFWorkbook workbook = new XSSFWorkbook();
+         XSSFSheet sheet = workbook.createSheet("Sheet 1");
+
+         // Set
+         sheet.setForceFormulaRecalculation(true);
+         assertEquals(true, sheet.getForceFormulaRecalculation());
+         
+         // Check
+         sheet.setForceFormulaRecalculation(false);
+         assertEquals(false, sheet.getForceFormulaRecalculation());
+         
+         // Save, re-load, and re-check
+         workbook = XSSFTestDataSamples.writeOutAndReadBack(workbook);
+         sheet = workbook.getSheet("Sheet 1");
+         assertEquals(false, sheet.getForceFormulaRecalculation());
+	}
 }

@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.poifs.common.POIFSConstants;
+import org.apache.poi.poifs.storage.BATBlock;
 
 /**
  * Tests {@link NPOIFSStream}
@@ -602,8 +603,189 @@ public final class TestNPOIFSStream extends TestCase {
     */
    public void testWriteMiniStreams() throws Exception {
       NPOIFSFileSystem fs = new NPOIFSFileSystem(_inst.openResourceAsStream("BlockSize512.zvi"));
+      NPOIFSMiniStore ministore = fs.getMiniStore();
+      NPOIFSStream stream = new NPOIFSStream(ministore, 178);
       
-      // TODO
+      // 178 -> 179 -> 180 -> end
+      assertEquals(179, ministore.getNextBlock(178));
+      assertEquals(180, ministore.getNextBlock(179));
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(180));
+      
+      
+      // Try writing 3 full blocks worth
+      byte[] data = new byte[64*3];
+      for(int i=0; i<data.length; i++) {
+         data[i] = (byte)i;
+      }
+      stream = new NPOIFSStream(ministore, 178);
+      stream.updateContents(data);
+      
+      // Check
+      assertEquals(179, ministore.getNextBlock(178));
+      assertEquals(180, ministore.getNextBlock(179));
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(180));
+      
+      stream = new NPOIFSStream(ministore, 178);
+      Iterator<ByteBuffer> it = stream.getBlockIterator();
+      ByteBuffer b178 = it.next();
+      ByteBuffer b179 = it.next();
+      ByteBuffer b180 = it.next();
+      assertEquals(false, it.hasNext());
+      
+      assertEquals((byte)0x00, b178.get());
+      assertEquals((byte)0x01, b178.get());
+      assertEquals((byte)0x40, b179.get());
+      assertEquals((byte)0x41, b179.get());
+      assertEquals((byte)0x80, b180.get());
+      assertEquals((byte)0x81, b180.get());
+
+      
+      // Try writing just into 3 blocks worth
+      data = new byte[64*2 + 12];
+      for(int i=0; i<data.length; i++) {
+         data[i] = (byte)(i+4);
+      }
+      stream = new NPOIFSStream(ministore, 178);
+      stream.updateContents(data);
+      
+      // Check
+      assertEquals(179, ministore.getNextBlock(178));
+      assertEquals(180, ministore.getNextBlock(179));
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(180));
+      
+      stream = new NPOIFSStream(ministore, 178);
+      it = stream.getBlockIterator();
+      b178 = it.next();
+      b179 = it.next();
+      b180 = it.next();
+      assertEquals(false, it.hasNext());
+      
+      assertEquals((byte)0x04, b178.get(0));
+      assertEquals((byte)0x05, b178.get(1));
+      assertEquals((byte)0x44, b179.get(0));
+      assertEquals((byte)0x45, b179.get(1));
+      assertEquals((byte)0x84, b180.get(0));
+      assertEquals((byte)0x85, b180.get(1));
+
+      
+      // Try writing 1, should truncate
+      data = new byte[12];
+      for(int i=0; i<data.length; i++) {
+         data[i] = (byte)(i+9);
+      }
+      stream = new NPOIFSStream(ministore, 178);
+      stream.updateContents(data);
+
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(178));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(179));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(180));
+      
+      stream = new NPOIFSStream(ministore, 178);
+      it = stream.getBlockIterator();
+      b178 = it.next();
+      assertEquals(false, it.hasNext());
+      
+      assertEquals((byte)0x09, b178.get(0));
+      assertEquals((byte)0x0a, b178.get(1));
+
+      
+      // Try writing 5, should extend
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(178));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(179));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(180));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(181));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(182));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(183));
+      
+      data = new byte[64*4 + 12];
+      for(int i=0; i<data.length; i++) {
+         data[i] = (byte)(i+3);
+      }
+      stream = new NPOIFSStream(ministore, 178);
+      stream.updateContents(data);
+      
+      assertEquals(179, ministore.getNextBlock(178));
+      assertEquals(180, ministore.getNextBlock(179));
+      assertEquals(181, ministore.getNextBlock(180));
+      assertEquals(182, ministore.getNextBlock(181));
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(182));
+      
+      stream = new NPOIFSStream(ministore, 178);
+      it = stream.getBlockIterator();
+      b178 = it.next();
+      b179 = it.next();
+      b180 = it.next();
+      ByteBuffer b181 = it.next();
+      ByteBuffer b182 = it.next();
+      assertEquals(false, it.hasNext());
+      
+      assertEquals((byte)0x03, b178.get(0));
+      assertEquals((byte)0x04, b178.get(1));
+      assertEquals((byte)0x43, b179.get(0));
+      assertEquals((byte)0x44, b179.get(1));
+      assertEquals((byte)0x83, b180.get(0));
+      assertEquals((byte)0x84, b180.get(1));
+      assertEquals((byte)0xc3, b181.get(0));
+      assertEquals((byte)0xc4, b181.get(1));
+      assertEquals((byte)0x03, b182.get(0));
+      assertEquals((byte)0x04, b182.get(1));
+
+      
+      // Write lots, so it needs another big block
+      ministore.getBlockAt(183);
+      try {
+         ministore.getBlockAt(184);
+         fail("Block 184 should be off the end of the list");
+      } catch(IndexOutOfBoundsException e) {}
+      
+      data = new byte[64*6 + 12];
+      for(int i=0; i<data.length; i++) {
+         data[i] = (byte)(i+1);
+      }
+      stream = new NPOIFSStream(ministore, 178);
+      stream.updateContents(data);
+      
+      // Should have added 2 more blocks to the chain
+      assertEquals(179, ministore.getNextBlock(178));
+      assertEquals(180, ministore.getNextBlock(179));
+      assertEquals(181, ministore.getNextBlock(180));
+      assertEquals(182, ministore.getNextBlock(181));
+      assertEquals(183, ministore.getNextBlock(182));
+      assertEquals(184, ministore.getNextBlock(183));
+      assertEquals(POIFSConstants.END_OF_CHAIN, ministore.getNextBlock(184));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, ministore.getNextBlock(185));
+      
+      // Block 184 should exist
+      ministore.getBlockAt(183);
+      ministore.getBlockAt(184);
+      ministore.getBlockAt(185);
+      
+      // Check contents
+      stream = new NPOIFSStream(ministore, 178);
+      it = stream.getBlockIterator();
+      b178 = it.next();
+      b179 = it.next();
+      b180 = it.next();
+      b181 = it.next();
+      b182 = it.next();
+      ByteBuffer b183 = it.next();
+      ByteBuffer b184 = it.next();
+      assertEquals(false, it.hasNext());
+      
+      assertEquals((byte)0x01, b178.get(0));
+      assertEquals((byte)0x02, b178.get(1));
+      assertEquals((byte)0x41, b179.get(0));
+      assertEquals((byte)0x42, b179.get(1));
+      assertEquals((byte)0x81, b180.get(0));
+      assertEquals((byte)0x82, b180.get(1));
+      assertEquals((byte)0xc1, b181.get(0));
+      assertEquals((byte)0xc2, b181.get(1));
+      assertEquals((byte)0x01, b182.get(0));
+      assertEquals((byte)0x02, b182.get(1));
+      assertEquals((byte)0x41, b183.get(0));
+      assertEquals((byte)0x42, b183.get(1));
+      assertEquals((byte)0x81, b184.get(0));
+      assertEquals((byte)0x82, b184.get(1));
    }
 
    /**
@@ -637,5 +819,71 @@ public final class TestNPOIFSStream extends TestCase {
          stream.updateContents(data);
          fail("Loop should have been detected but wasn't!");
       } catch(IllegalStateException e) {}
+   }
+   
+   /**
+    * Tests adding a new stream, writing and reading it.
+    */
+   public void testReadWriteNewStream() throws Exception {
+      NPOIFSFileSystem fs = new NPOIFSFileSystem();
+      NPOIFSStream stream = new NPOIFSStream(fs);
+      
+      // Check our filesystem has a BAT and the Properties
+      assertEquals(2, fs.getFreeBlock());
+      BATBlock bat = fs.getBATBlockAndIndex(0).getBlock();
+      assertEquals(POIFSConstants.FAT_SECTOR_BLOCK, bat.getValueAt(0));
+      assertEquals(POIFSConstants.END_OF_CHAIN, bat.getValueAt(1));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, bat.getValueAt(2));
+      
+      // Check the stream as-is
+      assertEquals(POIFSConstants.END_OF_CHAIN, stream.getStartBlock());
+      try {
+         stream.getBlockIterator();
+         fail("Shouldn't be able to get an iterator before writing");
+      } catch(IllegalStateException e) {}
+      
+      // Write in two blocks
+      byte[] data = new byte[512+20];
+      for(int i=0; i<512; i++) {
+         data[i] = (byte)(i%256);
+      }
+      for(int i=512; i<data.length; i++) {
+         data[i] = (byte)(i%256 + 100);
+      }
+      stream.updateContents(data);
+      
+      // Check now
+      assertEquals(4, fs.getFreeBlock());
+      bat = fs.getBATBlockAndIndex(0).getBlock();
+      assertEquals(POIFSConstants.FAT_SECTOR_BLOCK, bat.getValueAt(0));
+      assertEquals(POIFSConstants.END_OF_CHAIN, bat.getValueAt(1));
+      assertEquals(3,                           bat.getValueAt(2));
+      assertEquals(POIFSConstants.END_OF_CHAIN, bat.getValueAt(3));
+      assertEquals(POIFSConstants.UNUSED_BLOCK, bat.getValueAt(4));
+      
+      
+      Iterator<ByteBuffer> it = stream.getBlockIterator();
+      assertEquals(true, it.hasNext());
+      ByteBuffer b = it.next();
+      
+      byte[] read = new byte[512];
+      b.get(read);
+      for(int i=0; i<read.length; i++) {
+         assertEquals("Wrong value at " + i, data[i], read[i]);
+      }
+      
+      assertEquals(true, it.hasNext());
+      b = it.next();
+      
+      read = new byte[512];
+      b.get(read);
+      for(int i=0; i<20; i++) {
+         assertEquals(data[i+512], read[i]);
+      }
+      for(int i=20; i<read.length; i++) {
+         assertEquals(0, read[i]);
+      }
+      
+      assertEquals(false, it.hasNext());
    }
 }
