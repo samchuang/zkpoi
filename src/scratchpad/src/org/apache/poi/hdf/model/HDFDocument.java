@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.zkoss.poi.hdf.event.EventBridge;
 import org.zkoss.poi.hdf.event.HDFParsingListener;
 
+@Deprecated
 public final class HDFDocument
 {
 

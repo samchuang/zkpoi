@@ -26,18 +26,20 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.ChartInfo;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
-import org.zkoss.poi.xssf.usermodel.XSSFChart.XSSFSeries;
 
+import org.zkoss.poi.xssf.usermodel.ZssXSSFChart;
+import org.zkoss.poi.xssf.usermodel.ZssXSSFChart.XSSFSeries;
+import org.zkoss.poi.ss.usermodel.ZssChart;
 /**
  * 
  * @author henrichen
  *
  */
-public class XSSFChartX implements Chart {
+public class XSSFChartX implements ZssChart {
 	private XSSFDrawing _patriarch;
 	private XSSFClientAnchor _anchor;
 	private String _name;
-	private XSSFChart _chart;
+	private ZssXSSFChart _chart;
 
 	public XSSFChartX(XSSFDrawing patriarch, XSSFClientAnchor anchor, String name, String chartId) {
 		_patriarch = patriarch;
@@ -50,10 +52,10 @@ public class XSSFChartX implements Chart {
 	public ClientAnchor getPreferredSize() {
 		return _anchor;
 	}
-	private XSSFChart getXSSFChart0(String chartId) {
+	private ZssXSSFChart getXSSFChart0(String chartId) {
         for(POIXMLDocumentPart part : _patriarch.getRelations()){
-	        if(part instanceof XSSFChart && part.getPackageRelationship().getId().equals(chartId)){
-	            return (XSSFChart)part;
+	        if(part instanceof ZssXSSFChart && part.getPackageRelationship().getId().equals(chartId)){
+	            return (ZssXSSFChart)part;
 	        }
         }
         return null;

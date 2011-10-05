@@ -22,8 +22,7 @@ package org.zkoss.poi.hdf.model.hdftypes;
  *
  * @author Ryan Ackley
  */
-
-
+@Deprecated
 public final class LVL
 {
   public int _iStartAt;

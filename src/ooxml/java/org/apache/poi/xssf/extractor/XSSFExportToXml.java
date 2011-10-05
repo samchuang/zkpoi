@@ -48,11 +48,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
-import org.zkoss.poi.xssf.model.Table;
 import org.zkoss.poi.xssf.usermodel.XSSFCell;
 import org.zkoss.poi.xssf.usermodel.XSSFMap;
 import org.zkoss.poi.xssf.usermodel.XSSFRow;
 import org.zkoss.poi.xssf.usermodel.XSSFSheet;
+import org.zkoss.poi.xssf.usermodel.XSSFTable;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFSingleXmlCell;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFXmlColumnPr;
 
@@ -123,7 +123,7 @@ public class XSSFExportToXml implements Comparator<String>{
      */
     public void exportToXML(OutputStream os, String encoding, boolean validate) throws SAXException, ParserConfigurationException, TransformerException{
         List<XSSFSingleXmlCell> singleXMLCells = map.getRelatedSingleXMLCell();
-        List<Table> tables = map.getRelatedTables();
+        List<XSSFTable> tables = map.getRelatedTables();
 
         String rootElement = map.getCtMap().getRootElement();
 
@@ -141,13 +141,13 @@ public class XSSFExportToXml implements Comparator<String>{
 
         List<String> xpaths = new Vector<String>();
         Map<String,XSSFSingleXmlCell> singleXmlCellsMappings = new HashMap<String,XSSFSingleXmlCell>();
-        Map<String,Table> tableMappings = new HashMap<String,Table>();
+        Map<String,XSSFTable> tableMappings = new HashMap<String,XSSFTable>();
 
         for(XSSFSingleXmlCell simpleXmlCell : singleXMLCells) {
             xpaths.add(simpleXmlCell.getXpath());
             singleXmlCellsMappings.put(simpleXmlCell.getXpath(), simpleXmlCell);
         }
-        for(Table table : tables) {
+        for(XSSFTable table : tables) {
             String commonXPath = table.getCommonXpath();
             xpaths.add(commonXPath);
             tableMappings.put(commonXPath, table);
@@ -159,7 +159,7 @@ public class XSSFExportToXml implements Comparator<String>{
         for(String xpath : xpaths) {
 
             XSSFSingleXmlCell simpleXmlCell = singleXmlCellsMappings.get(xpath);
-            Table table = tableMappings.get(xpath);
+            XSSFTable table = tableMappings.get(xpath);
 
             if (!xpath.matches(".*\\[.*")) {
 

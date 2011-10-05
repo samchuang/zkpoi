@@ -23,7 +23,7 @@ import org.zkoss.poi.hdf.model.hdftypes.definitions.PAPAbstractType;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class ParagraphProperties  extends PAPAbstractType implements Cloneable
 {
 

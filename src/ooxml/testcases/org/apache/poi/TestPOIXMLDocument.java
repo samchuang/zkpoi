@@ -141,4 +141,15 @@ public final class TestPOIXMLDocument extends TestCase {
                 PackageHelper.open(POIDataSamples.getDocumentInstance().openResourceAsStream("WordWithAttachments.docx"))
                 );
     }
+
+    public void testRelationOrder() throws Exception {
+        OPCPackage pkg = PackageHelper.open(POIDataSamples.getDocumentInstance().openResourceAsStream("WordWithAttachments.docx"));
+        OPCParser doc = new OPCParser(pkg);
+        doc.parse(new TestFactory());
+
+        for(POIXMLDocumentPart rel : doc.getRelations()){
+            //TODO finish me
+        }
+
+    }
 }

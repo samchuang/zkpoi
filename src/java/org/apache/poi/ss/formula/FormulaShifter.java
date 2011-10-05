@@ -26,6 +26,11 @@ import org.zkoss.poi.ss.SpreadsheetVersion;
  */
 public final class FormulaShifter {
 
+    static enum ShiftMode {
+        Row,
+        Sheet
+    }
+
 	/**
 	 * Extern sheet index of sheet where moving is occurring
 	 */
@@ -35,6 +40,16 @@ public final class FormulaShifter {
 	private final int _amountToMove;
 	private final boolean _isRow;
 
+    private final int _srcSheetIndex;
+    private final int _dstSheetIndex;
+
+    private final ShiftMode _mode;
+
+    /**
+     * Create an instance for shifting row.
+     *
+     * For example, this will be called on {@link org.zkoss.poi.hssf.usermodel.HSSFSheet#shiftRows(int, int, int)} }
+     */
 	private FormulaShifter(int externSheetIndex, int firstMovedIndex, int lastMovedIndex, int amountToMove, boolean isRow) {
 		if (amountToMove == 0) {
 			throw new IllegalArgumentException("amountToMove must not be zero");
@@ -46,13 +61,34 @@ public final class FormulaShifter {
 		_firstMovedIndex = firstMovedIndex;
 		_lastMovedIndex = lastMovedIndex;
 		_amountToMove = amountToMove;
+        _mode = ShiftMode.Row;
+
+        _srcSheetIndex = _dstSheetIndex = -1;
 		_isRow = isRow;
 	}
+
+    /**
+     * Create an instance for shifting sheets.
+     *
+     * For example, this will be called on {@link org.zkoss.poi.hssf.usermodel.HSSFWorkbook#setSheetOrder(String, int)}  
+     */
+    private FormulaShifter(int srcSheetIndex, int dstSheetIndex) {
+        _externSheetIndex = _firstMovedIndex = _lastMovedIndex = _amountToMove = -1;
+        _isRow = true;
+
+        _srcSheetIndex = srcSheetIndex;
+        _dstSheetIndex = dstSheetIndex;
+        _mode = ShiftMode.Sheet;
+    }
 
 	public static FormulaShifter createForRowShift(int externSheetIndex, int firstMovedRowIndex, int lastMovedRowIndex, int numberOfRowsToMove) {
 		return new FormulaShifter(externSheetIndex, firstMovedRowIndex, lastMovedRowIndex, numberOfRowsToMove, true);
 	}
 	
+    public static FormulaShifter createForSheetShift(int srcSheetIndex, int dstSheetIndex) {
+        return new FormulaShifter(srcSheetIndex, dstSheetIndex);
+    }
+
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 
@@ -83,8 +119,16 @@ public final class FormulaShifter {
 	}
 
 	private Ptg adjustPtg(Ptg ptg, int currentExternSheetIx) {
-		return _isRow ?	adjustPtgDueToRowMove(ptg, currentExternSheetIx):
-						adjustPtgDueToColMove(ptg, currentExternSheetIx); //20100525, henrichen@zkoss.org
+		switch(_mode){
+            case Row:
+                //return adjustPtgDueToRowMove(ptg, currentExternSheetIx);
+        		return _isRow ?	adjustPtgDueToRowMove(ptg, currentExternSheetIx):
+					adjustPtgDueToColMove(ptg, currentExternSheetIx); //20100525, henrichen@zkoss.org
+            case Sheet:
+                return adjustPtgDueToShiftMove(ptg);
+            default:
+                throw new IllegalStateException("Unsupported shift mode: " + _mode);
+        }
 	}
 	/**
 	 * @return <code>true</code> if this Ptg needed to be changed
@@ -125,6 +169,21 @@ public final class FormulaShifter {
 		}
 		return null;
 	}
+
+    private Ptg adjustPtgDueToShiftMove(Ptg ptg) {
+        Ptg updatedPtg = null;
+        if(ptg instanceof Ref3DPtg) {
+            Ref3DPtg ref = (Ref3DPtg)ptg;
+            if(ref.getExternSheetIndex() == _srcSheetIndex){
+                ref.setExternSheetIndex(_dstSheetIndex);
+                updatedPtg = ref;
+            } else if (ref.getExternSheetIndex() == _dstSheetIndex){
+                ref.setExternSheetIndex(_srcSheetIndex);
+                updatedPtg = ref;
+            }
+        }
+        return updatedPtg;
+    }
 
 	private Ptg rowMoveRefPtg(RefPtgBase rptg) {
 		int refRow = rptg.getRow();

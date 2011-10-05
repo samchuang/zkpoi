@@ -50,9 +50,15 @@ public interface Picture {
     void resize(double scale);
 
     ClientAnchor getPreferredSize();
+    
+    /**
+     * Return picture data for this picture
+     *
+     * @return picture data for this picture
+     */
+    PictureData getPictureData();
 
     //20101015, henrichen@zkoss.org
-    PictureData getPictureData();
     String getName();
     String getAlt();
     ClientAnchor getClientAnchor();

@@ -17,12 +17,14 @@
 
 package org.zkoss.poi.hwpf.model;
 
-import org.zkoss.poi.util.BitField;
-import org.zkoss.poi.util.BitFieldFactory;
-import org.zkoss.poi.util.LittleEndian;
-
 import java.util.Arrays;
 
+import org.zkoss.poi.util.BitField;
+import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.LittleEndian;
+
+@Internal
 public final class ListFormatOverrideLevel
 {
   private static final int BASE_SIZE = 8;

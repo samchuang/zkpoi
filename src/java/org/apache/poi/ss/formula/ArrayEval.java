@@ -147,4 +147,9 @@ public class ArrayEval implements AreaEval {
 	public boolean isRow() {
 		return false;
 	}
+
+	@Override
+	public boolean isSubTotal(int rowIndex, int columnIndex) {
+		return false;
+	}
 }

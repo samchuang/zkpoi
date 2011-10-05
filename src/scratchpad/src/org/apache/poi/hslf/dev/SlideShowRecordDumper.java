@@ -252,7 +252,7 @@ public final class SlideShowRecordDumper {
 		if(cname.startsWith("class ")) {
 			cname = cname.substring(6);
 		}
-		if(cname.startsWith("org.apache.poi.hslf.record.")) {
+		if(cname.startsWith("org.zkoss.poi.hslf.record.")) {
 			cname = cname.substring(27);
 		}
 

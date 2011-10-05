@@ -35,6 +35,7 @@ import org.zkoss.poi.util.LittleEndian;
  * that represent the data.
  * @author  andy
  */
+@Deprecated
 public final class HDFObjectFactory {
 
     /** OLE stuff*/

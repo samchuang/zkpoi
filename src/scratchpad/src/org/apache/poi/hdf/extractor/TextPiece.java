@@ -24,7 +24,7 @@ import org.zkoss.poi.hdf.extractor.util.*;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class TextPiece extends PropertyNode implements Comparable
 {
   private boolean _usesUnicode;

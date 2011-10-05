@@ -40,10 +40,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
-import org.zkoss.poi.xssf.model.Table;
 import org.zkoss.poi.xssf.usermodel.XSSFCell;
 import org.zkoss.poi.xssf.usermodel.XSSFMap;
 import org.zkoss.poi.xssf.usermodel.XSSFRow;
+import org.zkoss.poi.xssf.usermodel.XSSFTable;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFSingleXmlCell;
 import org.zkoss.poi.xssf.usermodel.helpers.XSSFXmlColumnPr;
 
@@ -85,7 +85,7 @@ public class XSSFImportFromXML {
 
         List<XSSFSingleXmlCell> singleXmlCells = _map.getRelatedSingleXMLCell();
 
-        List<Table> tables = _map.getRelatedTables();
+        List<XSSFTable> tables = _map.getRelatedTables();
 
         XPathFactory xpathFactory = XPathFactory.newInstance();
         XPath xpath = xpathFactory.newXPath();
@@ -107,7 +107,7 @@ public class XSSFImportFromXML {
             cell.setCellValue(textContent);
         }
 
-        for (Table table : tables) {
+        for (XSSFTable table : tables) {
 
             String commonXPath = table.getCommonXpath();
             NodeList result = (NodeList) xpath.evaluate(commonXPath, doc, XPathConstants.NODESET);

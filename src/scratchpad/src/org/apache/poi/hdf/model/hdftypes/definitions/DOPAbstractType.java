@@ -32,6 +32,7 @@ import org.zkoss.poi.util.LittleEndian;
 
  * @author S. Ryan Ackley
  */
+@Deprecated
 public abstract class DOPAbstractType
     implements HDFType
 {

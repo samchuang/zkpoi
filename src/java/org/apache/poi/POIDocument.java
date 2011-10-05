@@ -20,9 +20,7 @@ package org.zkoss.poi;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.List;
 
 import org.zkoss.poi.hpsf.DocumentSummaryInformation;
@@ -32,10 +30,12 @@ import org.zkoss.poi.hpsf.PropertySetFactory;
 import org.zkoss.poi.hpsf.SummaryInformation;
 import org.zkoss.poi.poifs.filesystem.DirectoryEntry;
 import org.zkoss.poi.poifs.filesystem.DirectoryNode;
-import org.zkoss.poi.poifs.filesystem.DocumentEntry;
 import org.zkoss.poi.poifs.filesystem.DocumentInputStream;
 import org.zkoss.poi.poifs.filesystem.Entry;
+import org.zkoss.poi.poifs.filesystem.EntryUtils;
+import org.zkoss.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
 
@@ -64,12 +64,18 @@ public abstract class POIDocument {
     protected POIDocument(DirectoryNode dir) {
     	this.directory = dir;
     }
+    /**
+     * @deprecated use {@link POIDocument#POIDocument(DirectoryNode)} instead 
+     */
     @Deprecated
     protected POIDocument(DirectoryNode dir, POIFSFileSystem fs) {
        this.directory = dir;
-     }
+    }
     protected POIDocument(POIFSFileSystem fs) {
-    	this(fs.getRoot());
+       this(fs.getRoot());
+    }
+    protected POIDocument(NPOIFSFileSystem fs) {
+       this(fs.getRoot());
     }
 
 	/**
@@ -180,7 +186,7 @@ public abstract class POIDocument {
 	 * @param outFS the POIFSFileSystem to write the properties into
 	 * @param writtenEntries a list of POIFS entries to add the property names too
 	 */
-	protected void writeProperties(POIFSFileSystem outFS, List writtenEntries) throws IOException {
+	protected void writeProperties(POIFSFileSystem outFS, List<String> writtenEntries) throws IOException {
         SummaryInformation si = getSummaryInformation();
         if(si != null) {
 			writePropertySet(SummaryInformation.DEFAULT_STREAM_NAME, si, outFS);
@@ -230,56 +236,34 @@ public abstract class POIDocument {
 	 * @param target is the target POIFS to copy to
 	 * @param excepts is a list of Strings specifying what nodes NOT to copy
 	 */
-	protected void copyNodes(POIFSFileSystem source, POIFSFileSystem target,
-	                          List excepts) throws IOException {
-		//System.err.println("CopyNodes called");
+	@Deprecated
+    protected void copyNodes( POIFSFileSystem source, POIFSFileSystem target,
+            List<String> excepts ) throws IOException
+    {
+        EntryUtils.copyNodes( source, target, excepts );
+    }
 
-		DirectoryEntry root = source.getRoot();
-		DirectoryEntry newRoot = target.getRoot();
-
-		Iterator entries = root.getEntries();
-
-		while (entries.hasNext()) {
-			Entry entry = (Entry)entries.next();
-			if (!isInList(entry.getName(), excepts)) {
-				copyNodeRecursively(entry,newRoot);
-			}
-		}
-	}
-		
-	/**
-	 * Checks to see if the String is in the list, used when copying
-	 *  nodes between one POIFS and another
-	 */
-	private boolean isInList(String entry, List list) {
-		for (int k = 0; k < list.size(); k++) {
-			if (list.get(k).equals(entry)) {
-				return true;
-			}
-		}
-		return false;
-	}
+   /**
+    * Copies nodes from one POIFS to the other minus the excepts
+    * @param source is the source POIFS to copy from
+    * @param target is the target POIFS to copy to
+    * @param excepts is a list of Strings specifying what nodes NOT to copy
+    */
+    @Deprecated
+    protected void copyNodes( DirectoryNode sourceRoot,
+            DirectoryNode targetRoot, List<String> excepts ) throws IOException
+    {
+        EntryUtils.copyNodes( sourceRoot, targetRoot, excepts );
+    }
 
 	/**
 	 * Copies an Entry into a target POIFS directory, recursively
 	 */
-	private void copyNodeRecursively(Entry entry, DirectoryEntry target)
-	throws IOException {
-		//System.err.println("copyNodeRecursively called with "+entry.getName()+
-		//                   ","+target.getName());
-		DirectoryEntry newTarget = null;
-		if (entry.isDirectoryEntry()) {
-			newTarget = target.createDirectory(entry.getName());
-			Iterator entries = ((DirectoryEntry)entry).getEntries();
-
-			while (entries.hasNext()) {
-				copyNodeRecursively((Entry)entries.next(),newTarget);
-			}
-		} else {
-			DocumentEntry dentry = (DocumentEntry)entry;
-			DocumentInputStream dstream = new DocumentInputStream(dentry);
-			target.createDocument(dentry.getName(),dstream);
-			dstream.close();
-		}
-	}
+    @Internal
+    @Deprecated
+    protected void copyNodeRecursively( Entry entry, DirectoryEntry target )
+            throws IOException
+    {
+        EntryUtils.copyNodeRecursively( entry, target );
+    }
 }

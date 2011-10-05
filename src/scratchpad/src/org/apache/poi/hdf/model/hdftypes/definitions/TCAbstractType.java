@@ -28,6 +28,7 @@ import org.zkoss.poi.util.BitFieldFactory;
 
  * @author S. Ryan Ackley
  */
+@Deprecated
 public abstract class TCAbstractType
     implements HDFType
 {

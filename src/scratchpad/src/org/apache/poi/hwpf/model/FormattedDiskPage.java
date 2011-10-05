@@ -17,6 +17,7 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 
 /**
@@ -39,6 +40,7 @@ import org.zkoss.poi.util.LittleEndian;
  *
  * @author Ryan Ackley
  */
+@Internal
 public abstract class FormattedDiskPage
 {
     protected byte[] _fkp;

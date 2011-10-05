@@ -28,6 +28,7 @@ import org.zkoss.poi.util.LittleEndian;
  *
  * @author Ryan Ackley
  */
+@Deprecated
 public final class StyleSheet implements HDFType {
 
   private static final int NIL_STYLE = 4095;

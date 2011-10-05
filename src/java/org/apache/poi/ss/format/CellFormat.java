@@ -223,7 +223,7 @@ public class CellFormat {
         case Cell.CELL_TYPE_BLANK:
             return EMPTY_CELL_FORMAT_RESULT;
         case Cell.CELL_TYPE_BOOLEAN:
-            return apply(c.getBooleanCellValue());
+            return apply(Boolean.toString(c.getBooleanCellValue()));
         case Cell.CELL_TYPE_NUMERIC:
             return apply(posNumFmt.getCellFormatType() == CellFormatType.DATE ? c.getDateCellValue() : c.getNumericCellValue()); //20100615, Henri Chen
         case Cell.CELL_TYPE_STRING:
@@ -269,7 +269,7 @@ public class CellFormat {
         case Cell.CELL_TYPE_BLANK:
             return apply(label, "");
         case Cell.CELL_TYPE_BOOLEAN:
-            return apply(label, c.getStringCellValue());
+            return apply(Boolean.toString(c.getBooleanCellValue()));
         case Cell.CELL_TYPE_NUMERIC:
             return apply(label, c.getNumericCellValue());
         case Cell.CELL_TYPE_STRING:

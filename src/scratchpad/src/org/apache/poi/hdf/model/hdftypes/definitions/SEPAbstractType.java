@@ -27,6 +27,7 @@ import org.zkoss.poi.hdf.model.hdftypes.HDFType;
 
  * @author S. Ryan Ackley
  */
+@Deprecated
 public abstract class SEPAbstractType
     implements HDFType
 {

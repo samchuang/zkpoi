@@ -31,6 +31,7 @@ import org.zkoss.poi.util.LittleEndian;
 
  * @author Andrew C. Oliver
  */
+@Deprecated
 public abstract class FIBAbstractType
     implements HDFType
 {

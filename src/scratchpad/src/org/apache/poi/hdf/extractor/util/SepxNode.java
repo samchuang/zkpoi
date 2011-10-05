@@ -22,7 +22,7 @@ package org.zkoss.poi.hdf.extractor.util;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class SepxNode extends PropertyNode
 {
 

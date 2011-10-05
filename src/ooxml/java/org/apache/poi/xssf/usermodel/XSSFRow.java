@@ -20,6 +20,16 @@ package org.zkoss.poi.xssf.usermodel;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.zkoss.poi.ss.SpreadsheetVersion;
+import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.CellStyle;
+import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.util.CellReference;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.xssf.model.CalculationChain;
+import org.zkoss.poi.xssf.model.StylesTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRow;
 import org.zkoss.poi.ss.SpreadsheetVersion;
@@ -355,6 +365,53 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
 
     }
 
+    /**
+     * Is this row formatted? Most aren't, but some rows
+     *  do have whole-row styles. For those that do, you
+     *  can get the formatting from {@link #getRowStyle()}
+     */
+    public boolean isFormatted() {
+        return _row.isSetS();
+    }
+    /**
+     * Returns the whole-row cell style. Most rows won't
+     *  have one of these, so will return null. Call
+     *  {@link #isFormatted()} to check first.
+     */
+    public XSSFCellStyle getRowStyle() {
+       if(!isFormatted()) return null;
+       
+       StylesTable stylesSource = getSheet().getWorkbook().getStylesSource();
+       if(stylesSource.getNumCellStyles() > 0) {
+           return stylesSource.getStyleAt((int)_row.getS());
+       } else {
+          return null;
+       }
+    }
+    
+    /**
+     * Applies a whole-row cell styling to the row.
+     * If the value is null then the style information is removed,
+     *  causing the cell to used the default workbook style.
+     */
+    public void setRowStyle(CellStyle style) {
+        if(style == null) {
+           if(_row.isSetS()) {
+              _row.unsetS();
+              _row.unsetCustomFormat();
+           }
+        } else {
+            StylesTable styleSource = getSheet().getWorkbook().getStylesSource();
+            
+            XSSFCellStyle xStyle = (XSSFCellStyle)style;
+            xStyle.verifyBelongsToStylesSource(styleSource);
+
+            long idx = styleSource.putStyle(xStyle);
+            _row.setS(idx);
+            _row.setCustomFormat(true);
+        }
+    }
+    
     /**
      * Remove the Cell from this row.
      *

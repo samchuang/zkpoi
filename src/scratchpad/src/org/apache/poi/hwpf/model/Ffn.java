@@ -17,11 +17,12 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import java.util.Arrays;
+
 import org.zkoss.poi.util.BitField;
 import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
-
-import java.util.Arrays;
 
 /**
  * FFN - Font Family Name. FFN is a data structure that stores the names of the Main
@@ -30,6 +31,7 @@ import java.util.Arrays;
  *
  * @author Praveen Mathew
  */
+@Internal
 public final class Ffn
 {
   private int _cbFfnM1;//total length of FFN - 1.

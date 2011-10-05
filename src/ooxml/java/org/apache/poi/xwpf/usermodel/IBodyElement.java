@@ -17,6 +17,7 @@
 
 package org.zkoss.poi.xwpf.usermodel;
 
+import org.zkoss.poi.POIXMLDocumentPart;
 
 /**
  * 9 Jan 2010
@@ -24,7 +25,8 @@ package org.zkoss.poi.xwpf.usermodel;
  *
  */
 public interface IBodyElement{
-	IBody getPart();
+	IBody getBody();
+    POIXMLDocumentPart getPart();
 	BodyType getPartType();
 	BodyElementType getElementType();
 }

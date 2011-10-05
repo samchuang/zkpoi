@@ -17,8 +17,11 @@
 
 package org.zkoss.poi.hwpf.sprm;
 
+import org.zkoss.poi.util.Internal;
 
 
+
+@Internal
 public abstract class SprmUncompressor
 {
   protected SprmUncompressor()

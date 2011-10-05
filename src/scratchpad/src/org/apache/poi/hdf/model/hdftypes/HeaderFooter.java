@@ -22,7 +22,7 @@ package org.zkoss.poi.hdf.model.hdftypes;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class HeaderFooter
 {
   public static final int HEADER_EVEN = 1;

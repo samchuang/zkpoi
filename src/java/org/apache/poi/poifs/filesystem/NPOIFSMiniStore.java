@@ -69,16 +69,16 @@ public class NPOIFSMiniStore extends BlockStore
           it.next();
        }
        ByteBuffer dataBlock = it.next();
-       
-       // Our blocks are small, so duplicating it is fine 
-       byte[] data = new byte[POIFSConstants.SMALL_BLOCK_SIZE];
+       if(dataBlock == null) {
+          throw new IndexOutOfBoundsException("Big block " + bigBlockNumber + " outside stream");
+       }
+
+       // Position ourselves, and take a slice 
        dataBlock.position(
              dataBlock.position() + bigBlockOffset
        );
-       dataBlock.get(data, 0, data.length);
-       
-       // Return a ByteBuffer on this
-       ByteBuffer miniBuffer = ByteBuffer.wrap(data);
+       ByteBuffer miniBuffer = dataBlock.slice();
+       miniBuffer.limit(POIFSConstants.SMALL_BLOCK_SIZE);
        return miniBuffer;
     }
     
@@ -86,9 +86,35 @@ public class NPOIFSMiniStore extends BlockStore
      * Load the block, extending the underlying stream if needed
      */
     protected ByteBuffer createBlockIfNeeded(final int offset) throws IOException {
-       // TODO Extend the stream if needed
-       // TODO Needs append support on the underlying stream
-       return getBlockAt(offset);
+       // Try to get it without extending the stream
+       try {
+          return getBlockAt(offset);
+       } catch(IndexOutOfBoundsException e) {
+          // Need to extend the stream
+          // TODO Replace this with proper append support
+          // For now, do the extending by hand...
+          
+          // Ask for another block
+          int newBigBlock = _filesystem.getFreeBlock();
+          _filesystem.createBlockIfNeeded(newBigBlock);
+          
+          // Tack it onto the end of our chain
+          ChainLoopDetector loopDetector = _filesystem.getChainLoopDetector();
+          int block = _mini_stream.getStartBlock();
+          while(true) {
+             loopDetector.claim(block);
+             int next = _filesystem.getNextBlock(block);
+             if(next == POIFSConstants.END_OF_CHAIN) {
+                break;
+             }
+             block = next;
+          }
+          _filesystem.setNextBlock(block, newBigBlock);
+          _filesystem.setNextBlock(newBigBlock, POIFSConstants.END_OF_CHAIN);
+
+          // Now try again to get it
+          return createBlockIfNeeded(offset);
+       }
     }
     
     /**

@@ -17,10 +17,14 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import org.zkoss.poi.util.Internal;
+
 /**
  *
  * @author  andy
  */
+@Internal
+@Deprecated
 public interface HDFType {
 
 }

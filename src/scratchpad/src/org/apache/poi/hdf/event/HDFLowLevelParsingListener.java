@@ -26,6 +26,7 @@ import org.zkoss.poi.hdf.model.hdftypes.SepxNode;
 import org.zkoss.poi.hdf.model.hdftypes.StyleSheet;
 import org.zkoss.poi.hdf.model.hdftypes.TextPiece;
 
+@Deprecated
 public interface HDFLowLevelParsingListener
 {
   public void mainDocument(byte[] mainDocument);

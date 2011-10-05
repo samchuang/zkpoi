@@ -21,7 +21,10 @@ import java.io.IOException;
 
 import org.zkoss.poi.hwpf.model.io.HWPFFileSystem;
 import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * FontTable or in MS terminology sttbfffn is a common data structure written in all
@@ -31,8 +34,10 @@ import org.zkoss.poi.util.LittleEndian;
  *
  * @author Praveen Mathew
  */
+@Internal
 public final class FontTable
 {
+  private final static POILogger _logger = POILogFactory.getLogger(FontTable.class);
   private short _stringCount;// how many strings are included in the string table
   private short _extraDataSz;// size in bytes of the extra data
 
@@ -87,7 +92,7 @@ public final class FontTable
   {
     if(chpFtc >= _stringCount)
     {
-      System.out.println("Mismatch in chpFtc with stringCount");
+      _logger.log(POILogger.INFO, "Mismatch in chpFtc with stringCount");
       return null;
     }
 
@@ -98,7 +103,7 @@ public final class FontTable
   {
     if(chpFtc >= _stringCount)
     {
-      System.out.println("Mismatch in chpFtc with stringCount");
+      _logger.log(POILogger.INFO, "Mismatch in chpFtc with stringCount");
       return null;
     }
 
@@ -110,11 +115,15 @@ public final class FontTable
     this._stringCount = stringCount;
   }
 
-  public void writeTo(HWPFFileSystem sys)
-	  throws IOException
-  {
-	  HWPFOutputStream tableStream = sys.getStream("1Table");
+    @Deprecated
+    public void writeTo( HWPFFileSystem sys ) throws IOException
+    {
+        HWPFOutputStream tableStream = sys.getStream( "1Table" );
+        writeTo( tableStream );
+    }
 
+    public void writeTo( HWPFOutputStream tableStream ) throws IOException
+    {
 	  byte[] buf = new byte[LittleEndian.SHORT_SIZE];
 	  LittleEndian.putShort(buf, _stringCount);
 	  tableStream.write(buf);

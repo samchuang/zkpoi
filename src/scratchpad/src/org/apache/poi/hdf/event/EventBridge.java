@@ -26,6 +26,7 @@ import org.zkoss.poi.util.LittleEndian;
 
 import java.util.ArrayList;
 
+@Deprecated
 public final class EventBridge implements HDFLowLevelParsingListener
 {
 

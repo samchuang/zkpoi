@@ -19,98 +19,149 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.util.Internal;
 
 /**
  * This class provides access to all the fields Plex.
  * 
  * @author Cedric Bosdonnat <cbosdonnat@novell.com>
- *
+ * 
  */
+@Internal
 public class FieldsTables
 {
-  public static final int PLCFFLDATN = 0;
-  public static final int PLCFFLDEDN = 1;
-  public static final int PLCFFLDFTN = 2;
-  public static final int PLCFFLDHDR = 3;
-  public static final int PLCFFLDHDRTXBX = 4;
-  public static final int PLCFFLDMOM = 5;
-  public static final int PLCFFLDTXBX = 6;
+    // The size in bytes of the FLD data structure
+    private static final int FLD_SIZE = 2;
 
-  // The size in bytes of the FLD data structure
-  private static final int FLD_SIZE = 2;
+    /**
+     * annotation subdocument
+     */
+    @Deprecated
+    public static final int PLCFFLDATN = 0;
 
-  private HashMap<Integer, ArrayList<PlexOfField>> _tables;
+    /**
+     * endnote subdocument
+     */
+    @Deprecated
+    public static final int PLCFFLDEDN = 1;
+    /**
+     * footnote subdocument
+     */
+    @Deprecated
+    public static final int PLCFFLDFTN = 2;
+    /**
+     * header subdocument
+     */
+    @Deprecated
+    public static final int PLCFFLDHDR = 3;
+    /**
+     * header textbox subdoc
+     */
+    @Deprecated
+    public static final int PLCFFLDHDRTXBX = 4;
+    /**
+     * main document
+     */
+    @Deprecated
+    public static final int PLCFFLDMOM = 5;
+    /**
+     * textbox subdoc
+     */
+    @Deprecated
+    public static final int PLCFFLDTXBX = 6;
 
-  public FieldsTables(byte[] tableStream, FileInformationBlock fib)
-  {
-    _tables = new HashMap<Integer, ArrayList<PlexOfField>>();
-
-    for (int i = PLCFFLDATN; i <= PLCFFLDTXBX; i++ )
+    private static ArrayList<PlexOfField> toArrayList( PlexOfCps plexOfCps )
     {
-      _tables.put(i, readPLCF(tableStream, fib, i));
-    }
-  }
-  
-  public ArrayList<PlexOfField> getFieldsPLCF( int type )
-  {
-    return _tables.get(type);
-  }
+        if ( plexOfCps == null )
+            return new ArrayList<PlexOfField>();
 
-  private ArrayList<PlexOfField> readPLCF(byte[] tableStream, FileInformationBlock fib, int type)
-  {
-    int start = 0;
-    int length = 0;
+        ArrayList<PlexOfField> fields = new ArrayList<PlexOfField>(
+                plexOfCps.length() );
+        for ( int i = 0; i < plexOfCps.length(); i++ )
+        {
+            GenericPropertyNode propNode = plexOfCps.getProperty( i );
+            PlexOfField plex = new PlexOfField( propNode );
+            fields.add( plex );
+        }
 
-    switch (type)
-    {
-    case PLCFFLDATN:
-      start = fib.getFcPlcffldAtn();
-      length = fib.getLcbPlcffldAtn();
-      break;
-    case PLCFFLDEDN:
-      start = fib.getFcPlcffldEdn();
-      length = fib.getLcbPlcffldEdn();
-      break;
-    case PLCFFLDFTN:
-      start = fib.getFcPlcffldFtn();
-      length = fib.getLcbPlcffldFtn();
-      break;
-    case PLCFFLDHDR:
-      start = fib.getFcPlcffldHdr();
-      length = fib.getLcbPlcffldHdr();
-      break;
-    case PLCFFLDHDRTXBX:
-      start = fib.getFcPlcffldHdrtxbx();
-      length = fib.getLcbPlcffldHdrtxbx();
-      break;
-    case PLCFFLDMOM:
-      start = fib.getFcPlcffldMom();
-      length = fib.getLcbPlcffldMom();
-      break;
-    case PLCFFLDTXBX:
-      start = fib.getFcPlcffldTxbx();
-      length = fib.getLcbPlcffldTxbx();
-    default:
-      break;
+        return fields;
     }
 
-    ArrayList<PlexOfField> fields = new ArrayList<PlexOfField>();
+    private Map<FieldsDocumentPart, PlexOfCps> _tables;
 
-    if (start > 0 && length > 0)
+    public FieldsTables( byte[] tableStream, FileInformationBlock fib )
     {
-      PlexOfCps plcf = new PlexOfCps(tableStream, start, length, FLD_SIZE);
-      fields.ensureCapacity(plcf.length());
+        _tables = new HashMap<FieldsDocumentPart, PlexOfCps>(
+                FieldsDocumentPart.values().length );
 
-      for ( int i = 0; i < plcf.length(); i ++ ) {
-        GenericPropertyNode propNode = plcf.getProperty( i );
-        PlexOfField plex = new PlexOfField( propNode.getStart(), propNode.getEnd(), propNode.getBytes() );
-        fields.add( plex );
-      }
+        for ( FieldsDocumentPart part : FieldsDocumentPart.values() )
+        {
+            final PlexOfCps plexOfCps = readPLCF( tableStream, fib, part );
+            _tables.put( part, plexOfCps );
+        }
     }
 
-    return fields;
-  }
+    public ArrayList<PlexOfField> getFieldsPLCF( FieldsDocumentPart part )
+    {
+        return toArrayList( _tables.get( part ) );
+    }
+
+    @Deprecated
+    public ArrayList<PlexOfField> getFieldsPLCF( int partIndex )
+    {
+        return getFieldsPLCF( FieldsDocumentPart.values()[partIndex] );
+    }
+
+    private PlexOfCps readPLCF( byte[] tableStream, FileInformationBlock fib,
+            FieldsDocumentPart documentPart )
+    {
+        int start = fib.getFieldsPlcfOffset( documentPart );
+        int length = fib.getFieldsPlcfLength( documentPart );
+
+        if ( start <= 0 || length <= 0 )
+            return null;
+
+        return new PlexOfCps( tableStream, start, length, FLD_SIZE );
+    }
+
+    private int savePlex( FileInformationBlock fib, FieldsDocumentPart part,
+            PlexOfCps plexOfCps, HWPFOutputStream outputStream )
+            throws IOException
+    {
+        if ( plexOfCps == null || plexOfCps.length() == 0 )
+        {
+            fib.setFieldsPlcfOffset( part, outputStream.getOffset() );
+            fib.setFieldsPlcfLength( part, 0 );
+            return 0;
+        }
+
+        byte[] data = plexOfCps.toByteArray();
+
+        int start = outputStream.getOffset();
+        int length = data.length;
+
+        outputStream.write( data );
+
+        fib.setFieldsPlcfOffset( part, start );
+        fib.setFieldsPlcfLength( part, length );
+
+        return length;
+    }
+
+    public void write( FileInformationBlock fib, HWPFOutputStream tableStream )
+            throws IOException
+    {
+        for ( FieldsDocumentPart part : FieldsDocumentPart.values() )
+        {
+            PlexOfCps plexOfCps = _tables.get( part );
+            savePlex( fib, part, plexOfCps, tableStream );
+        }
+    }
+
 }

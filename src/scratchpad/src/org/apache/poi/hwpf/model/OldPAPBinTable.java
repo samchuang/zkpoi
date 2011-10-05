@@ -17,7 +17,10 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import java.util.Collections;
+
 import org.zkoss.poi.poifs.common.POIFSConstants;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 
 /**
@@ -28,8 +31,10 @@ import org.zkoss.poi.util.LittleEndian;
  * In common with the rest of the old support, it 
  *  is read only
  */
+@Internal
 public final class OldPAPBinTable extends PAPBinTable
 {
+
   public OldPAPBinTable(byte[] documentStream, int offset,
                      int size, int fcMin, TextPieceTable tpt)
   {
@@ -44,16 +49,19 @@ public final class OldPAPBinTable extends PAPBinTable
       int pageOffset = POIFSConstants.SMALLER_BIG_BLOCK_SIZE * pageNum;
 
       PAPFormattedDiskPage pfkp = new PAPFormattedDiskPage(documentStream,
-        documentStream, pageOffset, fcMin, tpt);
+        documentStream, pageOffset, tpt);
 
       int fkpSize = pfkp.size();
 
       for (int y = 0; y < fkpSize; y++)
       {
     	PAPX papx = pfkp.getPAPX(y);
-        _paragraphs.add(papx);
+        if (papx != null) {
+            _paragraphs.add(papx);
+        }
       }
     }
+    Collections.sort( _paragraphs, PropertyNode.StartComparator.instance );
   }
 }
 

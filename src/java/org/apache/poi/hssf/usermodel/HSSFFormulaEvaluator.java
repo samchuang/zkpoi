@@ -17,23 +17,23 @@
 
 package org.zkoss.poi.hssf.usermodel;
 
-import java.util.Iterator;
-
+import org.zkoss.poi.ss.formula.CollaboratingWorkbooksEnvironment;
+import org.zkoss.poi.ss.formula.IStabilityClassifier;
+import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
-import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
 import org.zkoss.poi.ss.formula.eval.NumberEval;
 import org.zkoss.poi.ss.formula.eval.StringEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.ss.formula.udf.UDFFinder;
-import org.zkoss.poi.ss.formula.CollaboratingWorkbooksEnvironment;
-import org.zkoss.poi.ss.formula.IStabilityClassifier;
-import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.usermodel.Cell;
 import org.zkoss.poi.ss.usermodel.CellValue;
 import org.zkoss.poi.ss.usermodel.FormulaEvaluator;
 import org.zkoss.poi.ss.usermodel.Row;
+import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.ss.usermodel.Workbook;
 
+import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
 /**
  * Evaluates formula cells.<p/>
  *
@@ -48,6 +48,7 @@ import org.zkoss.poi.ss.usermodel.Row;
 public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 
 	private WorkbookEvaluator _bookEvaluator;
+	private HSSFWorkbook _book;
 
 	/**
 	 * @deprecated (Sep 2008) HSSFSheet parameter is ignored
@@ -57,9 +58,11 @@ public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 		if (false) {
 			sheet.toString(); // suppress unused parameter compiler warning
 		}
+		this._book = workbook;
 	}
 	public HSSFFormulaEvaluator(HSSFWorkbook workbook) {
 		this(workbook, null);
+      this._book = workbook;
 	}
 	/**
 	 * @param stabilityClassifier used to optimise caching performance. Pass <code>null</code>
@@ -298,21 +301,52 @@ public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 	 *  cells, and calling evaluateFormulaCell on each one.
 	 */
 	public static void evaluateAllFormulaCells(HSSFWorkbook wb) {
-		HSSFFormulaEvaluator evaluator = new HSSFFormulaEvaluator(wb);
-		for(int i=0; i<wb.getNumberOfSheets(); i++) {
-			HSSFSheet sheet = wb.getSheetAt(i);
-
-			for (Iterator<Row> rit = sheet.rowIterator(); rit.hasNext();) {
-				Row r = rit.next();
-
-				for (Iterator<Cell> cit = r.cellIterator(); cit.hasNext();) {
-					Cell c = cit.next();
-					if (c.getCellType() == HSSFCell.CELL_TYPE_FORMULA)
-						evaluator.evaluateFormulaCell(c);
-				}
-			}
-		}
+	   evaluateAllFormulaCells(wb, new HSSFFormulaEvaluator(wb));
 	}
+	
+   /**
+    * Loops over all cells in all sheets of the supplied
+    *  workbook.
+    * For cells that contain formulas, their formulas are
+    *  evaluated, and the results are saved. These cells
+    *  remain as formula cells.
+    * For cells that do not contain formulas, no changes
+    *  are made.
+    * This is a helpful wrapper around looping over all
+    *  cells, and calling evaluateFormulaCell on each one.
+    */
+	public static void evaluateAllFormulaCells(Workbook wb) {
+      FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
+      evaluateAllFormulaCells(wb, evaluator);
+	}
+	private static void evaluateAllFormulaCells(Workbook wb, FormulaEvaluator evaluator) {
+      for(int i=0; i<wb.getNumberOfSheets(); i++) {
+         Sheet sheet = wb.getSheetAt(i);
+
+         for(Row r : sheet) {
+            for (Cell c : r) {
+               if (c.getCellType() == HSSFCell.CELL_TYPE_FORMULA) {
+                  evaluator.evaluateFormulaCell(c);
+               }
+            }
+         }
+      }
+	}
+	
+   /**
+    * Loops over all cells in all sheets of the supplied
+    *  workbook.
+    * For cells that contain formulas, their formulas are
+    *  evaluated, and the results are saved. These cells
+    *  remain as formula cells.
+    * For cells that do not contain formulas, no changes
+    *  are made.
+    * This is a helpful wrapper around looping over all
+    *  cells, and calling evaluateFormulaCell on each one.
+    */
+   public void evaluateAll() {
+      evaluateAllFormulaCells(_book, this);
+   }
 
 	/**
 	 * Returns a CellValue wrapper around the supplied ValueEval instance.

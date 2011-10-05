@@ -1,14 +1,19 @@
-/* XSSFChart.java
+/* ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
 
-	Purpose:
-		
-	Description:
-		
-	History:
-		Oct 18, 2010 12:08:12 PM, Created by henrichen
+       http://www.apache.org/licenses/LICENSE-2.0
 
-Copyright (C) 2010 Potix Corporation. All Rights Reserved.
-*/
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+==================================================================== */
 
 package org.zkoss.poi.xssf.usermodel;
 
@@ -16,758 +21,283 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
+import javax.xml.namespace.QName;
+
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
+import org.zkoss.poi.ss.usermodel.charts.ChartAxisFactory;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFChartDataFactory;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFChartAxis;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFValueAxis;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFManualLayout;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFChartLegend;
+import org.zkoss.poi.ss.usermodel.charts.ChartData;
+import org.zkoss.poi.ss.usermodel.charts.AxisPosition;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTArea3DChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTAreaChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTBar3DChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarSer;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTBoolean;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTBubbleChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTChartSpace;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTDoughnutChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegend;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegendPos;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTLine3DChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineSer;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumData;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumDataSource;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumRef;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumVal;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTOfPieChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPie3DChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPieChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPieSer;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTRadarChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTScatterChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTSerTx;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTStockChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrData;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrRef;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrVal;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurface3DChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurfaceChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTTx;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTView3D;
 import org.openxmlformats.schemas.drawingml.x2006.chart.ChartSpaceDocument;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLayout;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTManualLayout;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTValAx;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPrintSettings;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPageMargins;
+import org.openxmlformats.schemas.drawingml.x2006.chart.STLayoutTarget;
+import org.openxmlformats.schemas.drawingml.x2006.chart.STLayoutMode;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
-import org.zkoss.poi.POIXMLDocumentPart;
-import org.zkoss.poi.ss.formula.SheetNameFormatter;
-import org.zkoss.poi.openxml4j.opc.PackagePart;
-import org.zkoss.poi.openxml4j.opc.PackageRelationship;
-import org.zkoss.poi.ss.usermodel.ChartInfo;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 /**
- * XSSFChart information.
- * @author henrichen
- *
+ * Represents a SpreadsheetML Chart
+ * @author Nick Burch
+ * @author Roman Kashitsyn
  */
-public class XSSFChart extends POIXMLDocumentPart implements ChartInfo {
-	private CTChartSpace _ctChartSpace;
-	private CTChart _ctChart;
+public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartAxisFactory {
 
-    /**
-     * Construct a SpreadsheetML drawing from a package part
-     *
-     * @param part the package part holding the drawing data,
-     * the content type must be <code>application/vnd.openxmlformats-officedocument.drawing+xml</code>
-     * @param rel  the package relationship holding this drawing,
-     * the relationship type must be http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing
-     */
-    protected XSSFChart(PackagePart part, PackageRelationship rel) throws IOException, XmlException {
-        super(part, rel);
-        _ctChartSpace = ChartSpaceDocument.Factory.parse(part.getInputStream()).getChartSpace();
-        _ctChart = _ctChartSpace.getChart();
-    }
-    
-    @Override
-    protected void commit() throws IOException {
-        XmlOptions xmlOptions = new XmlOptions(DEFAULT_XML_OPTIONS);
-
-        /*
-            Saved drawings must have the following namespaces set:
-			<c:chartSpace 
-				xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" 
-				xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
-				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">        
-		*/
-//        if(isNew) xmlOptions.setSaveSyntheticDocumentElement(new QName(CTChartSpace.type.getName().getNamespaceURI(), "chartSpace", "c"));
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("http://schemas.openxmlformats.org/drawingml/2006/main", "a");
-        map.put(STRelationshipId.type.getName().getNamespaceURI(), "r");
-        xmlOptions.setSaveSuggestedPrefixes(map);
-
-        PackagePart part = getPackagePart();
-        OutputStream out = part.getOutputStream();
-        _ctChartSpace.save(out, xmlOptions);
-        out.close();
-    }
-    
-    public String getChartTitle() {
-    	final CTTitle title = _ctChart.getTitle();
-    	if (title != null) {
-    		final CTTx tx = title.getTx();
-	    	if (tx != null) {
-		    	final CTTextParagraph[] paras = tx.getRich().getPArray();
-		    	final CTRegularTextRun[] runs = paras[0].getRArray();
-		    	return runs[0].getT();
-	    	}
-    	}
-    	return null;
-    }
-    
-    public int getLegendPos() {
-    	final CTLegend legend = _ctChart.getLegend();
-    	final CTLegendPos pos = legend.getLegendPos();
-    	return pos.getVal().intValue();
-    }
-    
-    public boolean getChart3D() {
-    	final CTView3D view3D = _ctChart.getView3D();
-    	return view3D != null;
-    }
-    
-    public XSSFChartType getType() {
-    	final XmlObject chartObj = getChartObj();
-    	if (chartObj instanceof CTArea3DChart || chartObj instanceof CTAreaChart) {
-    		return XSSFChartType.Area;
-    	}
-    	
-    	if (chartObj instanceof CTBar3DChart || chartObj instanceof CTBarChart) {
-    		return XSSFChartType.Bar;
-    	}
-
-    	if (chartObj instanceof CTBubbleChart) {
-    		return XSSFChartType.Bubble;
-    	}
-
-    	if (chartObj instanceof CTDoughnutChart) {
-    		return XSSFChartType.Donut;
-    	}
-
-    	if (chartObj instanceof CTLine3DChart || chartObj instanceof CTLineChart) {
-    		return XSSFChartType.Line;
-    	}
-
-    	if (chartObj instanceof CTOfPieChart || chartObj instanceof CTPie3DChart || chartObj instanceof CTPieChart) {
-    		return XSSFChartType.Pie;
-    	}
-
-    	if (chartObj instanceof CTRadarChart) {
-    		return XSSFChartType.Radar;
-    	}
-
-    	if (chartObj instanceof CTScatterChart) {
-    		return XSSFChartType.Scatter;
-    	}
-    	
-    	if (chartObj instanceof CTStockChart) {
-    		return XSSFChartType.Stock;
-    	}
-
-    	if (chartObj instanceof CTSurfaceChart || chartObj instanceof CTSurface3DChart) {
-    		return XSSFChartType.Surface;
-    	}
-    	
-    	return XSSFChartType.Unknown;
-    }
-
-    public boolean isAutoTitleDeleted() {
-    	final CTBoolean b = _ctChart.getAutoTitleDeleted();
-    	return b != null ? b.getVal() : false; 
-    }
-    
-    private XmlObject getChartObj() {
-    	final CTPlotArea plotArea = _ctChart.getPlotArea();
-    	//Area3D
-    	final CTArea3DChart[] area3ds = plotArea.getArea3DChartArray();
-    	if (area3ds != null && area3ds.length > 0) {
-    		return area3ds[0];
-    	}
-    	
-    	//Area
-    	final CTAreaChart[] areas = plotArea.getAreaChartArray();
-    	if (areas != null && areas.length > 0) {
-    		return areas[0];
-    	}
-
-    	//Bar3D
-    	final CTBar3DChart[] bar3ds = plotArea.getBar3DChartArray();
-    	if (bar3ds != null && bar3ds.length > 0) {
-    		return bar3ds[0];
-    	}
-    	
-    	//Bar
-    	final CTBarChart[] bars = plotArea.getBarChartArray();
-    	if (bars != null && bars.length > 0) {
-    		return bars[0];
-    	}
-    	
-    	//Bubble
-    	final CTBubbleChart[] bubbles = plotArea.getBubbleChartArray();
-    	if (bubbles != null && bubbles.length > 0) {
-    		return bubbles[0];
-    	}
-
-    	//Doughnut
-    	final CTDoughnutChart[] donuts = plotArea.getDoughnutChartArray();
-    	if (donuts != null && donuts.length > 0) {
-    		return donuts[0];
-    	}
-    	
-    	//Line3D
-    	final CTLine3DChart[] line3ds = plotArea.getLine3DChartArray();
-    	if (line3ds != null && line3ds.length > 0) {
-    		return line3ds[0];
-    	}
-    	
-    	//Line
-    	final CTLineChart[] lines = plotArea.getLineChartArray();
-    	if (lines != null && lines.length > 0) {
-    		return lines[0];
-    	}
-    	
-    	//OfPie
-    	final CTOfPieChart[] ofpies = plotArea.getOfPieChartArray();
-    	if (ofpies != null && ofpies.length > 0) {
-    		return ofpies[0];
-    	}
-    	
-    	//Pie3D
-    	final CTPie3DChart[] pie3ds = plotArea.getPie3DChartArray();
-    	if (pie3ds != null && pie3ds.length > 0) {
-    		return pie3ds[0];
-    	}
-    	
-    	//Pie
-    	final CTPieChart[] pies = plotArea.getPieChartArray();
-    	if (pies != null && pies.length > 0) {
-    		return pies[0];
-    	}
-
-    	//Radar
-    	final CTRadarChart[] radars = plotArea.getRadarChartArray();
-    	if (radars != null && radars.length > 0) {
-    		return radars[0];
-    	}
-
-    	//Scatter
-    	final CTScatterChart[] scatters = plotArea.getScatterChartArray();
-    	if (scatters != null && scatters.length > 0) {
-    		return scatters[0];
-    	}
-    	
-    	//Stock
-    	final CTStockChart[] stocks = plotArea.getStockChartArray();
-    	if (stocks != null && stocks.length > 0) {
-    		return stocks[0];
-    	}
-
-    	//Surface3D
-    	final CTSurface3DChart[] surface3ds = plotArea.getSurface3DChartArray();
-    	if (surface3ds != null && surface3ds.length > 0) {
-    		return surface3ds[0];
-    	}
-    	
-    	//Surface
-    	final CTSurfaceChart[] surfaces = plotArea.getSurfaceChartArray();
-    	if (surfaces != null && surfaces.length > 0) {
-    		return surfaces[0];
-    	}
-    	
-    	return null;
-    }
-    
-    public XSSFSeries[] getSeries() {
-    	//TODO, more Chart type
-    	final XmlObject chartObj = getChartObj();
-   		if (chartObj instanceof CTBar3DChart) {
-   			final CTBar3DChart chart = (CTBar3DChart) chartObj;
-   			final CTBarSer[] bsers = chart.getSerArray();
-   			return prepareBarSer(bsers);
-    	} else if (chartObj instanceof CTBarChart) {
-   			final CTBarChart chart = (CTBarChart) chartObj;
-   			final CTBarSer[] bsers = chart.getSerArray();
-   			return prepareBarSer(bsers);
-    	} else if (chartObj instanceof CTPieChart) {
-    		final CTPieChart chart = (CTPieChart) chartObj;
-    		final CTPieSer[] psers = chart.getSerArray();
-    		return preparePieSer(psers);
-    	} else if (chartObj instanceof CTPie3DChart) {
-    		final CTPie3DChart chart = (CTPie3DChart) chartObj;
-    		final CTPieSer[] psers = chart.getSerArray();
-    		return preparePieSer(psers);
-    	} else if (chartObj instanceof CTDoughnutChart) {
-    		final CTDoughnutChart chart = (CTDoughnutChart) chartObj;
-    		final CTPieSer[] psers = chart.getSerArray();
-    		return preparePieSer(psers);
-    	} else if (chartObj instanceof CTLineChart) {
-    		final CTLineChart chart = (CTLineChart) chartObj;
-    		final CTLineSer[] lsers = chart.getSerArray();
-    		return prepareLineSer(lsers);
-    	} else if (chartObj instanceof CTLine3DChart) {
-    		final CTLine3DChart chart = (CTLine3DChart) chartObj;
-    		final CTLineSer[] lsers = chart.getSerArray();
-    		return prepareLineSer(lsers);
-/*    	} else if (chartObj instanceof CTAreaChart) {
-    		final CTAreaChart chart = (CTAreaChart) chartObj;
-    		final CTAreaSer[] asers = chart.getSerArray();
-    		return prepareAreaSer(asers);
-    	} else if (chartObj instanceof CTArea3DChart) {
-    		final CTArea3DChart chart = (CTArea3DChart) chartObj;
-    		final CTAreaSer[] asers = chart.getSerArray();
-    		return prepareAreaSer(asers);
- */   	}
-   		return null;
-    }
-    
-    //Bar
-    private XSSFSeries[] prepareBarSer(CTBarSer[] bsers) {
-		final XSSFSeries[] sers = new XSSFSeries[bsers.length];
-		for (int j = 0; j < bsers.length; ++j) {
-			final CTBarSer ser = bsers[j];
-			final int idx = (int) ser.getIdx().getVal();
-			final TitleInfo ti = getTitleInfo(ser);
-			final CategoryInfo ci = getCategoryInfo(ser);
-			final ValueInfo vi = getValueInfo(ser);
-			final String tiref = ti == null ? null : ti.ref;
-			final String tilit = ti == null ? null : ti.lit;
-			final String ciref = ci == null ? null : ci.ref;
-			final String[] cilits = ci == null ? null : ci.lits;
-			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, vi);
-		}
-		return sers;
-    }
-	private TitleInfo getTitleInfo(CTBarSer ser) {
-		if (ser != null) {
-			final CTSerTx tx = ser.getTx();
-			if (tx != null) {
-				final CTStrRef strRef = tx.getStrRef();
-				return new TitleInfo((strRef != null ? strRef.getF() : null), tx.getV());
-			}
-		}
-		return null;
-	}
-	private CategoryInfo getCategoryInfo(CTBarSer ser) {
-		if (ser != null) {
-			final CTAxDataSource cat = ser.getCat();
-			if (cat != null) {
-				final CTStrRef strRef = cat.getStrRef();
-				if (strRef != null) {
-					final CTStrData strData = strRef.getStrCache();
-					final String[] lits = getStrLits(strData);
-					return new CategoryInfo(strRef.getF(), lits);
-				}
-				
-				final CTNumRef numRef = cat.getNumRef();
-				if (numRef != null) {
-					final CTNumData numData = numRef.getNumCache();
-					final String[] lits = getNumLits(numData);
-					return new CategoryInfo(numRef.getF(), lits);
-				}
-				
-				final CTStrData strData = cat.getStrLit();
-				if (strData != null) {
-					final String[] lits = getStrLits(strData);
-					return new CategoryInfo(null, lits);
-				}
-				
-				final CTNumData numData = cat.getNumLit();
-				if (numData != null) {
-					final String[] lits = getNumLits(numData);
-					return new CategoryInfo(null, lits);
-				}
-			}
-		}
-		return null;
-	}
-	private ValueInfo getValueInfo(CTBarSer ser) {
-		if (ser != null) {
-			final CTNumDataSource numDS = ser.getVal();
-			if (numDS != null) {
-				return new ValueInfo(numDS);
-			}
-		}
-		return null;
-	}
-    
-    //Pie
-    private XSSFSeries[] preparePieSer(CTPieSer[] bsers) {
-		final XSSFSeries[] sers = new XSSFSeries[bsers.length];
-		for (int j = 0; j < bsers.length; ++j) {
-			final CTPieSer ser = bsers[j];
-			final int idx = (int) ser.getIdx().getVal();
-			final TitleInfo ti = getTitleInfo(ser);
-			final CategoryInfo ci = getCategoryInfo(ser);
-			final ValueInfo vi = getValueInfo(ser);
-			final String tiref = ti == null ? null : ti.ref;
-			final String tilit = ti == null ? null : ti.lit;
-			final String ciref = ci == null ? null : ci.ref;
-			final String[] cilits = ci == null ? null : ci.lits;
-			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, vi);
-		}
-		return sers;
-    }
-	private TitleInfo getTitleInfo(CTPieSer ser) {
-		if (ser != null) {
-			final CTSerTx tx = ser.getTx();
-			if (tx != null) {
-				final CTStrRef strRef = tx.getStrRef();
-				return new TitleInfo((strRef != null ? strRef.getF() : null), tx.getV());
-			}
-		}
-		return null;
-	}
-	private CategoryInfo getCategoryInfo(CTPieSer ser) {
-		if (ser != null) {
-			final CTAxDataSource cat = ser.getCat();
-			if (cat != null) {
-				final CTStrRef strRef = cat.getStrRef();
-				if (strRef != null) {
-					final CTStrData strData = strRef.getStrCache();
-					final String[] lits = getStrLits(strData);
-					return new CategoryInfo(strRef.getF(), lits);
-				}
-				
-				final CTNumRef numRef = cat.getNumRef();
-				if (numRef != null) {
-					final CTNumData numData = numRef.getNumCache();
-					final String[] lits = getNumLits(numData);
-					return new CategoryInfo(numRef.getF(), lits);
-				}
-				
-				final CTStrData strData = cat.getStrLit();
-				if (strData != null) {
-					final String[] lits = getStrLits(strData);
-					return new CategoryInfo(null, lits);
-				}
-				
-				final CTNumData numData = cat.getNumLit();
-				if (numData != null) {
-					final String[] lits = getNumLits(numData);
-					return new CategoryInfo(null, lits);
-				}
-			}
-		}
-		return null;
-	}
-	private ValueInfo getValueInfo(CTPieSer ser) {
-		if (ser != null) {
-			final CTNumDataSource numDS = ser.getVal();
-			return new ValueInfo(numDS);
-		}
-		return null;
-	}
-
-    //Line
-    private XSSFSeries[] prepareLineSer(CTLineSer[] lsers) {
-		final XSSFSeries[] sers = new XSSFSeries[lsers.length];
-		for (int j = 0; j < lsers.length; ++j) {
-			final CTLineSer ser = lsers[j];
-			final int idx = (int) ser.getIdx().getVal();
-			final TitleInfo ti = getTitleInfo(ser);
-			final CategoryInfo ci = getCategoryInfo(ser);
-			final ValueInfo vi = getValueInfo(ser);
-			final String tiref = ti == null ? null : ti.ref;
-			final String tilit = ti == null ? null : ti.lit;
-			final String ciref = ci == null ? null : ci.ref;
-			final String[] cilits = ci == null ? null : ci.lits;
-			sers[idx] = new XSSFSeries(ser, tiref, tilit, ciref, cilits, vi);
-		}
-		return sers;
-    }
-	private TitleInfo getTitleInfo(CTLineSer ser) {
-		if (ser != null) {
-			final CTSerTx tx = ser.getTx();
-			if (tx != null) {
-				final CTStrRef strRef = tx.getStrRef();
-				return new TitleInfo((strRef != null ? strRef.getF() : null), tx.getV());
-			}
-		}
-		return null;
-	}
-	private CategoryInfo getCategoryInfo(CTLineSer ser) {
-		if (ser != null) {
-			final CTAxDataSource cat = ser.getCat();
-			if (cat != null) {
-				final CTStrRef strRef = cat.getStrRef();
-				if (strRef != null) {
-					final CTStrData strData = strRef.getStrCache();
-					final String[] lits = getStrLits(strData);
-					return new CategoryInfo(strRef.getF(), lits);
-				}
-				
-				final CTNumRef numRef = cat.getNumRef();
-				if (numRef != null) {
-					final CTNumData numData = numRef.getNumCache();
-					final String[] lits = getNumLits(numData);
-					return new CategoryInfo(numRef.getF(), lits);
-				}
-				
-				final CTStrData strData = cat.getStrLit();
-				if (strData != null) {
-					final String[] lits = getStrLits(strData);
-					return new CategoryInfo(null, lits);
-				}
-				
-				final CTNumData numData = cat.getNumLit();
-				if (numData != null) {
-					final String[] lits = getNumLits(numData);
-					return new CategoryInfo(null, lits);
-				}
-			}
-		}
-		return null;
-	}
-	private ValueInfo getValueInfo(CTLineSer ser) {
-		if (ser != null) {
-			final CTNumDataSource numDS = ser.getVal();
-			if (numDS != null) {
-				return new ValueInfo(numDS);
-			}
-		}
-		return null;
-	}
-	private static void setCTNumDataSource(CTNumDataSource numDS, String ref, String[] lits) {
-		if (numDS != null) {
-			CTNumRef numRef = numDS.getNumRef();
-			if (ref != null && numRef == null) {
-				numRef = numDS.addNewNumRef();
-			} else if (ref == null && numRef != null) {
-				numDS.unsetNumRef();
-				numRef = null;
-			}
-			if (numRef != null) {
-				setCTNumRef(numRef, ref, lits);
-			} else {
-				CTNumData numData = numDS.getNumLit();
-				
-				if (lits != null && numData == null) {
-					numData = numDS.addNewNumLit();
-				} else if (lits == null && numData != null) {
-					numDS.unsetNumLit();
-					numData = null;
-				}
-				if (numData != null) {
-					setNumLits(numData, lits);
-				}
-			}
-		}
-	}
-    private static void setCTNumRef(CTNumRef numRef, String ref, String[] lits) {
-		if (numRef != null) {
-			numRef.setF(ref);
-			final CTNumData numData = numRef.getNumCache();
-			setNumLits(numData, lits);
-		}
-    }
-	private static String[] getStrLits(CTStrData strData) {
-		String[] lits = null;
-		if (strData != null) {
-			final CTStrVal[] strVals = strData.getPtArray();
-			lits = new String[strVals.length];
-			for(int j = 0; j < strVals.length; ++j) {
-				lits[j] = strVals[j].getV();
-			}
-		}
-		return lits;
-	}
-	private static void setStrLits(CTStrData strData, String[] lits) {
-		if (strData != null) {
-			final CTStrVal[] strVals = strData.getPtArray();
-			lits = new String[strVals.length];
-			for(int j = 0; j < strVals.length; ++j) {
-				strVals[j].setV(lits[j]); 
-			}
-		}
-	}
-	private static String[] getNumLits(CTNumData numData) {
-		String[] lits = null;
-		if (numData != null) {
-			final CTNumVal[] numVals = numData.getPtArray();
-			lits = new String[numVals.length];
-			for(int j= 0; j < numVals.length; ++j) {
-				lits[j] = numVals[j].getV();
-			}
-		}
-		return lits;
-	}
-	private static void setNumLits(CTNumData numData, String[] lits) {
-		if (numData != null) {
-			final CTNumVal[] numVals = numData.getPtArray();
-			
-			if (numVals.length > lits.length) {
-				for(int len = numVals.length - lits.length; len-- > 0;) {
-					numData.removePt(len);
-				}
-			} else {
-				for(int len = lits.length - numVals.length; len-- > 0;) {
-					numData.addNewPt();
-				}
-			}
-			final CTNumVal[] numVals0 = numData.getPtArray();
-			for(int j= 0; j < lits.length; ++j) {
-				numVals0[j].setV(lits[j]); 
-			}
-		}
-	}
-    private static class TitleInfo {
-    	private final String ref;
-    	private final String lit;
-    	private TitleInfo(String ref, String lit) {
-    		this.ref = ref;
-    		this.lit = lit;
-    	}
-    }
-	private static class CategoryInfo {
-		private final String ref;
-		private final String[] lits;
-		private CategoryInfo(String ref, String[] lits) {
-			this.ref = ref;
-			this.lits = lits;
-		}
-	}
-	private static class ValueInfo {
-		private final CTNumDataSource numDS;
-		private String ref;
-		private String[] lits;
-		private ValueInfo(CTNumDataSource numDS) {
-			this.numDS = numDS;
-			if (numDS == null) {
-				throw new NullPointerException("CTNumDataSource numDS");
-			}
-			init();
-		}
-		private void init() {
-			final CTNumRef numRef = numDS.getNumRef();
-			if (numRef != null) {
-				final CTNumData numData = numRef.getNumCache();
-				final String[] lits = getNumLits(numData);
-				this.ref = numRef.getF();
-				this.lits = lits;
-			} else {
-				final CTNumData numData = numDS.getNumLit();
-				if (numData != null) {
-					this.ref = null;
-					this.lits = getNumLits(numData);
-				} else {
-					this.ref = null;
-					this.lits = null;
-				}
-			}
-		}
-		public void renameSheet(String oldname, String newname) {
-			if (this.ref != null) {
-				final String o = SheetNameFormatter.format(oldname);
-				final String n = SheetNameFormatter.format(newname);
-				final String newref = this.ref.replaceAll(o+"!", n+"!");
-				if (!newref.equals(this.ref)) {
-					setCTNumDataSource(numDS, newref, this.lits);
-					init();
-				}
-			}
-		}
-	}
-    
 	/**
-	 * A series in a chart.
+	 * Parent graphic frame.
 	 */
-	public class XSSFSeries {
-    	//TODO, more Chart type
-		private final XmlObject _ser; //might be CTBarSer, CTPieSer
-		private final String _titleRef; //title reference formula(e.g. B1:B1)
-		private final String _catRef; //category reference formula(e.g. A2:A4)
-		private final String _valRef; //value reference formula(e.g. B2:B4)
-		private final String[] _labels; //literal labels(categories)
-		private final String _title; //literal title
-		private final Number[] _values; //literal values
-		private final ValueInfo _vi;
-		
-		public XSSFSeries(XmlObject ser, String titleRef, String title, String catRef, String[] labels, ValueInfo vi) {
-			_vi = vi;
-			_ser = ser;
-			_titleRef = titleRef;
-			if (catRef != null) {
-				if (catRef.startsWith("(") && catRef.endsWith(")")) {
-					catRef = catRef.substring(1, catRef.length() - 1);
+	private XSSFGraphicFrame frame;
+
+	/**
+	 * Root element of the SpreadsheetML Chart part
+	 */
+	private CTChartSpace chartSpace;
+	/**
+	 * The Chart within that
+	 */
+	private CTChart chart;
+
+	List<XSSFChartAxis> axis;
+
+	/**
+	 * Create a new SpreadsheetML chart
+	 */
+	protected XSSFChart() {
+		super();
+		axis = new ArrayList<XSSFChartAxis>();
+		createChart();
+	}
+
+	/**
+	 * Construct a SpreadsheetML chart from a package part.
+	 *
+	 * @param part the package part holding the chart data,
+	 * the content type must be <code>application/vnd.openxmlformats-officedocument.drawingml.chart+xml</code>
+	 * @param rel  the package relationship holding this chart,
+	 * the relationship type must be http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart
+	 */
+	protected XSSFChart(PackagePart part, PackageRelationship rel) throws IOException, XmlException {
+		super(part, rel);
+
+		chartSpace = ChartSpaceDocument.Factory.parse(part.getInputStream()).getChartSpace(); 
+		chart = chartSpace.getChart();
+	}
+
+	/**
+	 * Construct a new CTChartSpace bean.
+	 * By default, it's just an empty placeholder for chart objects.
+	 *
+	 * @return a new CTChartSpace bean
+	 */
+	private void createChart() {
+		chartSpace = CTChartSpace.Factory.newInstance();
+		chart = chartSpace.addNewChart();
+		CTPlotArea plotArea = chart.addNewPlotArea();
+
+		plotArea.addNewLayout();
+		chart.addNewPlotVisOnly().setVal(true);
+
+		CTPrintSettings printSettings = chartSpace.addNewPrintSettings();
+		printSettings.addNewHeaderFooter();
+
+		CTPageMargins pageMargins = printSettings.addNewPageMargins();
+		pageMargins.setB(0.75);
+		pageMargins.setL(0.70);
+		pageMargins.setR(0.70);
+		pageMargins.setT(0.75);
+		pageMargins.setHeader(0.30);
+		pageMargins.setFooter(0.30);
+		printSettings.addNewPageSetup();
+	}
+
+	/**
+	 * Return the underlying CTChartSpace bean, the root element of the SpreadsheetML Chart part.
+	 *
+	 * @return the underlying CTChartSpace bean
+	 */
+	@Internal
+	public CTChartSpace getCTChartSpace(){
+		return chartSpace;
+	}
+
+	/**
+	 * Return the underlying CTChart bean, within the Chart Space
+	 *
+	 * @return the underlying CTChart bean
+	 */
+	@Internal
+	public CTChart getCTChart(){
+		return chart;
+	}
+
+	@Override
+	protected void commit() throws IOException {
+		XmlOptions xmlOptions = new XmlOptions(DEFAULT_XML_OPTIONS);
+
+		/*
+		   Saved chart space must have the following namespaces set:
+		   <c:chartSpace
+		      xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+		      xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+		      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+		 */
+		xmlOptions.setSaveSyntheticDocumentElement(new QName(CTChartSpace.type.getName().getNamespaceURI(), "chartSpace", "c"));
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(XSSFDrawing.NAMESPACE_A, "a");
+		map.put(XSSFDrawing.NAMESPACE_C, "c");
+		map.put(STRelationshipId.type.getName().getNamespaceURI(), "r");
+		xmlOptions.setSaveSuggestedPrefixes(map);
+
+		PackagePart part = getPackagePart();
+		OutputStream out = part.getOutputStream();
+		chartSpace.save(out, xmlOptions);
+		out.close();
+	}
+
+	/**
+	 * Returns the parent graphic frame.
+	 * @return the graphic frame this chart belongs to
+	 */
+	public XSSFGraphicFrame getGraphicFrame() {
+		return frame;
+	}
+
+	/**
+	 * Sets the parent graphic frame.
+	 */
+	protected void setGraphicFrame(XSSFGraphicFrame frame) {
+		this.frame = frame;
+	}
+
+	public XSSFChartDataFactory getChartDataFactory() {
+		return XSSFChartDataFactory.getInstance();
+	}
+
+	public XSSFChart getChartAxisFactory() {
+		return this;
+	}
+
+	public void plot(ChartData data, ChartAxis... axis) {
+		data.fillChart(this, axis);
+	}
+
+	public XSSFValueAxis createValueAxis(AxisPosition pos) {
+		long id = axis.size() + 1;
+		XSSFValueAxis valueAxis = new XSSFValueAxis(this, id, pos);
+		if (axis.size() == 1) {
+			ChartAxis ax = axis.get(0);
+			ax.crossAxis(valueAxis);
+			valueAxis.crossAxis(ax);
+		}
+		axis.add(valueAxis);
+		return valueAxis;
+	}
+
+	public List<? extends XSSFChartAxis> getAxis() {
+		if (axis.isEmpty() && hasAxis()) {
+			parseAxis();
+		}
+		return axis;
+	}
+
+	public XSSFManualLayout getManualLayout() {
+		return new XSSFManualLayout(this);
+	}
+
+	/**
+	 * @return true if only visible cells will be present on the chart,
+	 *         false otherwise
+	 */
+	public boolean isPlotOnlyVisibleCells() {
+		return chart.getPlotVisOnly().getVal();
+	}
+
+	/**
+	 * @param plotVisOnly a flag specifying if only visible cells should be
+	 *        present on the chart
+	 */
+	public void setPlotOnlyVisibleCells(boolean plotVisOnly) {
+		chart.getPlotVisOnly().setVal(plotVisOnly);
+	}
+
+	/**
+	 * Returns the title, or null if none is set
+	 */
+	public XSSFRichTextString getTitle() {
+		if(! chart.isSetTitle()) {
+			return null;
+		}
+
+		// TODO Do properly
+		CTTitle title = chart.getTitle();
+
+		StringBuffer text = new StringBuffer();
+		XmlObject[] t = title
+			.selectPath("declare namespace a='"+XSSFDrawing.NAMESPACE_A+"' .//a:t");
+		for (int m = 0; m < t.length; m++) {
+			NodeList kids = t[m].getDomNode().getChildNodes();
+			for (int n = 0; n < kids.getLength(); n++) {
+				if (kids.item(n) instanceof Text) {
+					text.append(kids.item(n).getNodeValue());
 				}
 			}
-			_catRef = catRef;
-			String valRef = vi == null ? null : vi.ref;
-			if (valRef != null) {
-				if (valRef.startsWith("(") && valRef.endsWith(")")) {
-					valRef = valRef.substring(1, valRef.length() - 1);
-				}
-			}
-			_valRef = valRef;
-			_title = title;
-			_labels = labels;
-			String[] values = vi == null ? null : vi.lits;
-			Double[] vals = null;
-			if (values != null) {
-				vals = new Double[values.length];
-				for(int j = 0; j < values.length; ++j) {
-					Double db = new Double(0.0);
-					try {
-						db = new Double(values[j]);
-					} catch(NumberFormatException ex) {
-						//ignore
-					}
-					vals[j++] = db; 
-				}
-			}
-			_values = vals;
 		}
-		public String getTitleRef() {
-			return _titleRef;
-		}
- 
-		public String getCategoryRef() {
-			return _catRef;
-		}
-		
-		public String getValueRef() {
-			return _valRef;
-		}
-		
-		public String getTitle() {
-			return _title;
-		}
-		
-		public String[] getLabels() {
-			return _labels;
-		}
-		
-		public Number[] getValues() {
-			return _values;
-		}
-		
-		public void renameSheet(String oldname, String newname) {
-			_vi.renameSheet(oldname, newname);
+
+		return new XSSFRichTextString(text.toString());
+	}
+
+	public XSSFChartLegend getOrCreateLegend() {
+		return new XSSFChartLegend(this);
+	}
+
+	public void deleteLegend() {
+		if (chart.isSetLegend()) {
+			chart.unsetLegend();
 		}
 	}
 
-	public enum XSSFChartType {
-		Area,
-		Bar,
-		Bubble,
-		Donut,
-		Line,
-		Pie,
-		Radar,
-		Scatter,
-		Stock,
-		Surface,
-		Unknown
+	private boolean hasAxis() {
+		CTPlotArea ctPlotArea = chart.getPlotArea();
+		int totalAxisCount =
+			ctPlotArea.sizeOfValAxArray()  +
+			ctPlotArea.sizeOfCatAxArray()  +
+			ctPlotArea.sizeOfDateAxArray() +
+			ctPlotArea.sizeOfSerAxArray();
+		return totalAxisCount > 0;
 	}
+
+	private void parseAxis() {
+		// TODO: add other axis types
+		parseValueAxis();
+	}
+
+	private void parseValueAxis() {
+		for (CTValAx valAx : chart.getPlotArea().getValAxArray()) {
+			axis.add(new XSSFValueAxis(this, valAx));
+		}
+	}
+
 }

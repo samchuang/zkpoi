@@ -21,6 +21,7 @@ package org.zkoss.poi.hdf.model.hdftypes;
  *
  * @author  andy
  */
+@Deprecated
 public interface HDFType {
 
 }

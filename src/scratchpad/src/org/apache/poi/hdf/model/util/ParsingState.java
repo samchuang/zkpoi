@@ -19,6 +19,7 @@ package org.zkoss.poi.hdf.model.util;
 
 import org.zkoss.poi.hdf.model.hdftypes.FormattedDiskPage;
 
+@Deprecated
 public final class ParsingState
 {
 

@@ -17,6 +17,9 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import org.zkoss.poi.util.Internal;
+
+@Internal
 public final class UnhandledDataStructure
 {
   byte[] _buf;

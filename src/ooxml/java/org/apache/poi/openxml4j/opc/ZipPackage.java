@@ -30,6 +30,7 @@ import java.util.zip.ZipOutputStream;
 import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
 import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
 import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
+import org.zkoss.poi.openxml4j.exceptions.OpenXML4JRuntimeException;
 import org.zkoss.poi.openxml4j.opc.internal.ContentTypeManager;
 import org.zkoss.poi.openxml4j.opc.internal.FileHelper;
 import org.zkoss.poi.openxml4j.opc.internal.MemoryPackagePart;
@@ -41,8 +42,8 @@ import org.zkoss.poi.openxml4j.opc.internal.marshallers.ZipPartMarshaller;
 import org.zkoss.poi.openxml4j.util.ZipEntrySource;
 import org.zkoss.poi.openxml4j.util.ZipFileZipEntrySource;
 import org.zkoss.poi.openxml4j.util.ZipInputStreamZipEntrySource;
-import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.util.POILogFactory;
 
 /**
  * Physical zip package.
@@ -384,13 +385,13 @@ public final class ZipPackage extends Package {
 
 			// If the core properties part does not exist in the part list,
 			// we save it as well
-			if (this.getPartsByRelationshipType(
-					PackageRelationshipTypes.CORE_PROPERTIES).size() == 0) {
+			if (this.getPartsByRelationshipType(PackageRelationshipTypes.CORE_PROPERTIES).size() == 0 &&
+                this.getPartsByRelationshipType(PackageRelationshipTypes.CORE_PROPERTIES_ECMA376).size() == 0    ) {
 				logger.log(POILogger.DEBUG,"Save core properties part");
 
 				// We have to save the core properties part ...
 				new ZipPackagePropertiesMarshaller().marshall(
-						this.packageProperties, zos);
+                        this.packageProperties, zos);
 				// ... and to add its relationship ...
 				this.relationships.addRelationship(this.packageProperties
 						.getPartName().getURI(), TargetMode.INTERNAL,
@@ -445,9 +446,9 @@ public final class ZipPackage extends Package {
 			}
 			zos.close();
 		} catch (Exception e) {
-			logger
-					.log(POILogger.ERROR,"Fail to save: an error occurs while saving the package : "
-							+ e.getMessage());
+            throw new OpenXML4JRuntimeException(
+                    "Fail to save: an error occurs while saving the package : "
+							+ e.getMessage(), e);
 		}
 	}
 

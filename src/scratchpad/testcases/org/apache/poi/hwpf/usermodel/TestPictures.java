@@ -108,36 +108,6 @@ public final class TestPictures extends TestCase {
 		}
 	}
 
-	/**
-	 * emf image, with a crazy offset
-	 */
-	public void disabled_testEmfComplexImage() {
-
-		// Commenting out this test case temporarily. The file emf_2003_image does not contain any
-		// pictures. Instead it has an office drawing object. Need to rewrite this test after
-		// revisiting the implementation of office drawing objects.
-
-		HWPFDocument doc = HWPFTestDataSamples.openSampleFile("emf_2003_image.doc");
-		List<Picture> pics = doc.getPicturesTable().getAllPictures();
-
-		assertNotNull(pics);
-		assertEquals(1, pics.size());
-
-		Picture pic = pics.get(0);
-		assertNotNull(pic.suggestFileExtension());
-		assertNotNull(pic.suggestFullFileName());
-
-		// This one's tricky
-		// TODO: Fix once we've sorted bug #41898
-		assertNotNull(pic.getContent());
-		assertNotNull(pic.getRawContent());
-
-		// These are probably some sort of offset, need to figure them out
-		assertEquals(4, pic.getSize());
-		assertEquals(0x80000000l, LittleEndian.getUInt(pic.getContent()));
-		assertEquals(0x80000000l, LittleEndian.getUInt(pic.getRawContent()));
-	}
-
 	public void testPicturesWithTable() {
 		HWPFDocument doc = HWPFTestDataSamples.openSampleFile("Bug44603.doc");
 
@@ -261,7 +231,24 @@ public final class TestPictures extends TestCase {
        assertEquals("10a8", picture.suggestFullFileName());
        assertEquals("image/unknown", picture.getMimeType());
     }
-    
+
+    public void testEquation()
+    {
+        HWPFDocument doc = HWPFTestDataSamples.openSampleFile( "equation.doc" );
+        PicturesTable pictures = doc.getPicturesTable();
+
+        final List<Picture> allPictures = pictures.getAllPictures();
+        assertEquals( 1, allPictures.size() );
+
+        Picture picture = allPictures.get( 0 );
+        assertNotNull( picture );
+        assertEquals( PictureType.EMF, picture.suggestPictureType() );
+        assertEquals( PictureType.EMF.getExtension(),
+                picture.suggestFileExtension() );
+        assertEquals( PictureType.EMF.getMime(), picture.getMimeType() );
+        assertEquals( "0.emf", picture.suggestFullFileName() );
+    }
+
     /**
      * In word you can have floating or fixed pictures.
      * Fixed have a \u0001 in place with an offset to the
@@ -302,4 +289,39 @@ public final class TestPictures extends TestCase {
        assertEquals(4,  escher8s);
        assertEquals(0, plain8s);
     }
+
+    @SuppressWarnings( "deprecation" )
+    public void testCroppedPictures() {
+        HWPFDocument doc = HWPFTestDataSamples.openSampleFile("testCroppedPictures.doc");
+        List<Picture> pics = doc.getPicturesTable().getAllPictures();
+
+        assertNotNull(pics);
+        assertEquals(2, pics.size());
+
+        Picture pic1 = pics.get(0);
+        assertEquals(27, pic1.getAspectRatioX());
+        assertEquals(270, pic1.getHorizontalScalingFactor());
+        assertEquals(27, pic1.getAspectRatioY());
+        assertEquals(271, pic1.getVerticalScalingFactor());
+        assertEquals(12000, pic1.getDxaGoal());       // 21.17 cm / 2.54 cm/inch * 72dpi * 20 = 12000
+        assertEquals(9000, pic1.getDyaGoal());        // 15.88 cm / 2.54 cm/inch * 72dpi * 20 = 9000
+        assertEquals(0, pic1.getDxaCropLeft());
+        assertEquals(0, pic1.getDxaCropRight());
+        assertEquals(0, pic1.getDyaCropTop());
+        assertEquals(0, pic1.getDyaCropBottom());
+
+        Picture pic2 = pics.get(1);
+        System.out.println(pic2.getWidth());
+        assertEquals(76, pic2.getAspectRatioX());
+        assertEquals(764, pic2.getHorizontalScalingFactor());
+        assertEquals(68, pic2.getAspectRatioY());
+        assertEquals(685, pic2.getVerticalScalingFactor());
+        assertEquals(12000, pic2.getDxaGoal());       // 21.17 cm / 2.54 cm/inch * 72dpi * 20 = 12000
+        assertEquals(9000, pic2.getDyaGoal());        // 15.88 cm / 2.54 cm/inch * 72dpi * 20 = 9000
+        assertEquals(0, pic2.getDxaCropLeft());       // TODO YK: The Picture is cropped but HWPF reads the crop parameters all zeros
+        assertEquals(0, pic2.getDxaCropRight());
+        assertEquals(0, pic2.getDyaCropTop());
+        assertEquals(0, pic2.getDyaCropBottom());
+    }
+
 }

@@ -26,7 +26,7 @@ public class DrawingTextBody {
     private final CTTextBody textBody;
 
     public DrawingTextBody(CTTextBody textBody) {
-        this.textBody = textBody;
+       this.textBody = textBody;
     }
 
     public DrawingParagraph[] getParagraphs() {

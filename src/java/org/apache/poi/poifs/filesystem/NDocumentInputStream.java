@@ -61,7 +61,7 @@ public final class NDocumentInputStream extends DocumentInputStream {
 	 */
 	public NDocumentInputStream(DocumentEntry document) throws IOException {
 		if (!(document instanceof DocumentNode)) {
-			throw new IOException("Cannot open internal document storage");
+			throw new IOException("Cannot open internal document storage, " + document + " not a Document Node");
 		}
 		_current_offset = 0;
 		_current_block_count = 0;
@@ -111,7 +111,7 @@ public final class NDocumentInputStream extends DocumentInputStream {
    @Override
 	public void mark(int ignoredReadlimit) {
 		_marked_offset = _current_offset;
-		_marked_offset_count = _current_block_count;
+		_marked_offset_count = Math.max(0, _current_block_count - 1);
 	}
 
    @Override
@@ -184,7 +184,10 @@ public final class NDocumentInputStream extends DocumentInputStream {
          _current_block_count++;
          
    		// Skip to the right place in it
-   		_buffer.position(_marked_offset - _current_offset);
+         // (It should be positioned already at the start of the block,
+         //  we need to move further inside the block)
+         int skipBy = _marked_offset - _current_offset;
+   		_buffer.position(_buffer.position() + skipBy);
       }
 
       // All done
@@ -272,7 +275,10 @@ public final class NDocumentInputStream extends DocumentInputStream {
 
    @Override
    public short readShort() {
-      return (short) readUShort();
+      checkAvaliable(SIZE_SHORT);
+      byte[] data = new byte[SIZE_SHORT];
+      readFully(data, 0, SIZE_SHORT);
+      return LittleEndian.getShort(data);
    }
 
    @Override
@@ -288,7 +294,7 @@ public final class NDocumentInputStream extends DocumentInputStream {
 		checkAvaliable(SIZE_SHORT);
       byte[] data = new byte[SIZE_SHORT];
       readFully(data, 0, SIZE_SHORT);
-      return LittleEndian.getShort(data);
+      return LittleEndian.getUShort(data);
 	}
 
    @Override

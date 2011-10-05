@@ -19,15 +19,27 @@ package org.zkoss.poi.xssf.usermodel;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackagePartName;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.ss.usermodel.Drawing;
+import org.zkoss.poi.util.Internal;
+import org.zkoss.poi.xssf.model.CommentsTable;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTConnector;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTDrawing;
+import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTGraphicalObjectFrame;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTGroupShape;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTPicture;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTShape;
@@ -56,6 +68,10 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      */
     private CTDrawing drawing;
     private boolean isNew;
+    private long numOfGraphicFrames = 0L;
+    
+    protected static final String NAMESPACE_A = "http://schemas.openxmlformats.org/drawingml/2006/main";
+    protected static final String NAMESPACE_C = "http://schemas.openxmlformats.org/drawingml/2006/chart";
 
     /**
      * Create a new SpreadsheetML drawing
@@ -114,7 +130,7 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         */
         if(isNew) xmlOptions.setSaveSyntheticDocumentElement(new QName(CTDrawing.type.getName().getNamespaceURI(), "wsDr", "xdr"));
         Map<String, String> map = new HashMap<String, String>();
-        map.put("http://schemas.openxmlformats.org/drawingml/2006/main", "a");
+        map.put(NAMESPACE_A, "a");
         map.put(STRelationshipId.type.getName().getNamespaceURI(), "r");
         xmlOptions.setSaveSuggestedPrefixes(map);
 
@@ -124,6 +140,11 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         out.close();
     }
 
+	public XSSFClientAnchor createAnchor(int dx1, int dy1, int dx2, int dy2,
+			int col1, int row1, int col2, int row2) {
+		return new XSSFClientAnchor(dx1, dy1, dx2, dy2, col1, row1, col2, row2);
+	}
+
     /**
      * Constructs a textbox under the drawing.
      *
@@ -132,9 +153,11 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      * @return      the newly created textbox.
      */
     public XSSFTextBox createTextbox(XSSFClientAnchor anchor){
+        long shapeId = newShapeId();
         CTTwoCellAnchor ctAnchor = createTwoCellAnchor(anchor);
         CTShape ctShape = ctAnchor.addNewSp();
         ctShape.set(XSSFSimpleShape.prototype());
+        ctShape.getNvSpPr().getCNvPr().setId(shapeId);
         XSSFTextBox shape = new XSSFTextBox(this, ctShape);
         shape.anchor = anchor;
         return shape;
@@ -154,9 +177,12 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
     {
         PackageRelationship rel = addPictureReference(pictureIndex);
 
+        long shapeId = newShapeId();
         CTTwoCellAnchor ctAnchor = createTwoCellAnchor(anchor);
         CTPicture ctShape = ctAnchor.addNewPic();
         ctShape.set(XSSFPicture.prototype());
+
+        ctShape.getNvPicPr().getCNvPr().setId(shapeId);
 
         XSSFPicture shape = new XSSFPicture(this, ctShape);
         shape.anchor = anchor;
@@ -167,6 +193,31 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
     public XSSFPicture createPicture(ClientAnchor anchor, int pictureIndex){
         return createPicture((XSSFClientAnchor)anchor, pictureIndex);
     }
+
+	/**
+	 * Creates a chart.
+	 * @param anchor the client anchor describes how this chart is attached to
+	 *               the sheet.
+	 * @return the newly created chart
+	 * @see org.zkoss.poi.xssf.usermodel.XSSFDrawing#createChart(ClientAnchor)
+	 */
+    public XSSFChart createChart(XSSFClientAnchor anchor) {
+        int chartNumber = getPackagePart().getPackage().
+            getPartsByContentType(XSSFRelation.CHART.getContentType()).size() + 1;
+
+        XSSFChart chart = (XSSFChart) createRelationship(
+                XSSFRelation.CHART, XSSFFactory.getInstance(), chartNumber);
+        String chartRelId = chart.getPackageRelationship().getId();
+
+        XSSFGraphicFrame frame = createGraphicFrame(anchor);
+        frame.setChart(chart, chartRelId);
+
+        return chart;
+    }
+
+	public XSSFChart createChart(ClientAnchor anchor) {
+		return createChart((XSSFClientAnchor)anchor);
+	}
 
     /**
      * Add the indexed picture to this drawing relations
@@ -179,7 +230,7 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         XSSFPictureData data = wb.getAllPictures().get(pictureIndex);
         PackagePartName ppName = data.getPackagePart().getPartName();
         PackageRelationship rel = getPackagePart().addRelationship(ppName, TargetMode.INTERNAL, XSSFRelation.IMAGES.getRelation());
-        addRelation(new XSSFPictureData(data.getPackagePart(), rel));
+        addRelation(rel.getId(),new XSSFPictureData(data.getPackagePart(), rel));
         return rel;
     }
 
@@ -193,9 +244,11 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      */
     public XSSFSimpleShape createSimpleShape(XSSFClientAnchor anchor)
     {
+        long shapeId = newShapeId();
         CTTwoCellAnchor ctAnchor = createTwoCellAnchor(anchor);
         CTShape ctShape = ctAnchor.addNewSp();
         ctShape.set(XSSFSimpleShape.prototype());
+        ctShape.getNvSpPr().getCNvPr().setId(shapeId);
         XSSFSimpleShape shape = new XSSFSimpleShape(this, ctShape);
         shape.anchor = anchor;
         return shape;
@@ -239,13 +292,12 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         return shape;
     }
 
-    /**
-     * Creates a cell comment.
-     *
-     * @param anchor    the client anchor describes how this comment is attached
-     *                  to the sheet.
-     * @return  the newly created comment.
-     */
+	/**
+	 * Creates a comment.
+	 * @param anchor the client anchor describes how this comment is attached
+	 *               to the sheet.
+	 * @return the newly created comment.
+	 */
     public XSSFComment createCellComment(ClientAnchor anchor) {
         XSSFClientAnchor ca = (XSSFClientAnchor)anchor;
         XSSFSheet sheet = (XSSFSheet)getParent();
@@ -264,6 +316,39 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         shape.setColumn(ca.getCol1());
         shape.setRow(ca.getRow1());
         return shape;
+    }
+
+    /**
+     * Creates a new graphic frame.
+     *
+     * @param anchor    the client anchor describes how this frame is attached
+     *                  to the sheet
+     * @return  the newly created graphic frame
+     */
+    private XSSFGraphicFrame createGraphicFrame(XSSFClientAnchor anchor) {
+        CTTwoCellAnchor ctAnchor = createTwoCellAnchor(anchor);
+        CTGraphicalObjectFrame ctGraphicFrame = ctAnchor.addNewGraphicFrame();
+        ctGraphicFrame.set(XSSFGraphicFrame.prototype());
+
+        long frameId = numOfGraphicFrames++;
+        XSSFGraphicFrame graphicFrame = new XSSFGraphicFrame(this, ctGraphicFrame);
+        graphicFrame.setAnchor(anchor);
+        graphicFrame.setId(frameId);
+        graphicFrame.setName("Diagramm" + frameId);
+        return graphicFrame;
+    }
+    
+    /**
+     * Returns all charts in this drawing.
+     */
+    public List<XSSFChart> getCharts() {
+       List<XSSFChart> charts = new ArrayList<XSSFChart>();
+       for(POIXMLDocumentPart part : getRelations()) {
+          if(part instanceof XSSFChart) {
+             charts.add((XSSFChart)part);
+          }
+       }
+       return charts;
     }
 
     /**
@@ -287,5 +372,9 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         }
         ctAnchor.setEditAs(aditAs);
         return ctAnchor;
+    }
+
+    private long newShapeId(){
+        return drawing.sizeOfTwoCellAnchorArray() + 1;
     }
 }

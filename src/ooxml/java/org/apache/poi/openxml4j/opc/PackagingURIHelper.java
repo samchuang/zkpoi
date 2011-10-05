@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.zkoss.poi.openxml4j.exceptions.InvalidFormatException;
 import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * Helper for part and pack URI.
@@ -32,6 +34,7 @@ import org.zkoss.poi.openxml4j.exceptions.InvalidOperationException;
  * @version 0.1
  */
 public final class PackagingURIHelper {
+    private final static POILogger _logger = POILogFactory.getLogger(PackagingURIHelper.class);
 
 	/**
 	 * Package root URI.
@@ -293,7 +296,7 @@ public final class PackagingURIHelper {
                 try {
                     targetURI = new URI(path.substring(1));
                 } catch (Exception e) {
-                    System.err.println(e);
+                    _logger.log(POILogger.WARN, e);
                     return null;
                 }
             }
@@ -331,7 +334,7 @@ public final class PackagingURIHelper {
 			try {
 				return new URI(retVal.toString());
 			} catch (Exception e) {
-				System.err.println(e);
+				_logger.log(POILogger.WARN, e);
 				return null;
 			}
 		}
@@ -339,7 +342,16 @@ public final class PackagingURIHelper {
 		// Special case for where the two are the same
 		if (segmentsTheSame == segmentsSource.length
 				&& segmentsTheSame == segmentsTarget.length) {
-			retVal.append("");
+            if(sourceURI.equals(targetURI)){
+                // if source and target are the same they should be resolved to the last segment,
+                // Example: if a slide references itself, e.g. the source URI is
+                // "/ppt/slides/slide1.xml" and the targetURI is "slide1.xml" then
+                // this it should be relativized as "slide1.xml", i.e. the last segment.
+                retVal.append(segmentsSource[segmentsSource.length - 1]);
+            } else {
+                retVal.append("");
+            }
+
 		} else {
 			// Matched for so long, but no more
 
@@ -373,7 +385,7 @@ public final class PackagingURIHelper {
 		try {
 			return new URI(retVal.toString());
 		} catch (Exception e) {
-			System.err.println(e);
+			_logger.log(POILogger.WARN, e);
 			return null;
 		}
 	}

@@ -17,12 +17,16 @@
 
 package org.apache.poi.xwpf.usermodel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.String;
 
 import junit.framework.TestCase;
 
 import org.apache.poi.xwpf.XWPFTestDataSamples;
+
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
 
 public class TestXWPFStyles extends TestCase {
 
@@ -30,7 +34,7 @@ public class TestXWPFStyles extends TestCase {
 //		super.setUp();
 //	}
 	
-	public void testGetUsedStyles(){
+	public void testGetUsedStyles() throws IOException{
 		XWPFDocument sampleDoc = XWPFTestDataSamples.openSampleDocument("Styles.docx");
 		List<XWPFStyle> testUsedStyleList = new ArrayList<XWPFStyle>();
 		XWPFStyles styles = sampleDoc.getStyles();
@@ -45,6 +49,23 @@ public class TestXWPFStyles extends TestCase {
 		assertEquals(usedStyleList, testUsedStyleList);
 		
 		
+	}
+
+	public void testAddStylesToDocument() throws IOException{
+		XWPFDocument docOut = new XWPFDocument();
+		XWPFStyles styles = docOut.createStyles();
+
+		String strStyleName = "headline1";
+		CTStyle ctStyle = CTStyle.Factory.newInstance();
+
+		ctStyle.setStyleId(strStyleName);
+		XWPFStyle s = new XWPFStyle(ctStyle);
+		styles.addStyle(s);
+
+    	XWPFDocument docIn = XWPFTestDataSamples.writeOutAndReadBack(docOut);
+
+		styles = docIn.getStyles();
+		assertTrue(styles.styleExist(strStyleName));
 	}
 
 //	protected void tearDown() throws Exception {

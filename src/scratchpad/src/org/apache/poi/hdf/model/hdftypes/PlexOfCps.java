@@ -28,6 +28,7 @@ package org.zkoss.poi.hdf.model.hdftypes;
  *
  * @author Ryan Ackley
  */
+@Deprecated
 public final class PlexOfCps
 {
     private int _count;

@@ -35,14 +35,13 @@ import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
 import org.zkoss.poi.xssf.model.CalculationChain;
 import org.zkoss.poi.xssf.model.CommentsTable;
-import org.zkoss.poi.xssf.model.ExternalLink;
 import org.zkoss.poi.xssf.model.MapInfo;
 import org.zkoss.poi.xssf.model.SharedStringsTable;
 import org.zkoss.poi.xssf.model.SingleXmlCells;
 import org.zkoss.poi.xssf.model.StylesTable;
-import org.zkoss.poi.xssf.model.Table;
 import org.zkoss.poi.xssf.model.ThemesTable;
 
+import org.zkoss.poi.xssf.model.ExternalLink;
 /**
  *
  */
@@ -92,12 +91,12 @@ public final class XSSFRelation extends POIXMLRelation {
 			"/xl/worksheets/sheet#.xml",
 			XSSFSheet.class
 	);
-    public static final XSSFRelation CHARTSHEET = new XSSFRelation(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml",
-            "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet",
-            "/xl/chartsheets/sheet#.xml",
-            XSSFChartSheet.class
-    );
+	public static final XSSFRelation CHARTSHEET = new XSSFRelation(
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml",
+			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet",
+			"/xl/chartsheets/sheet#.xml",
+			XSSFChartSheet.class
+	);
 	public static final XSSFRelation SHARED_STRINGS = new XSSFRelation(
 			"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml",
 			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings",
@@ -122,6 +121,12 @@ public final class XSSFRelation extends POIXMLRelation {
 			"/xl/drawings/vmlDrawing#.vml",
 			XSSFVMLDrawing.class
 	);
+   public static final XSSFRelation CHART = new XSSFRelation(
+         "application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
+         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
+         "/xl/charts/chart#.xml",
+         ZssXSSFChart.class
+   );
 
 	public static final XSSFRelation CUSTOM_XML_MAPPINGS = new XSSFRelation(
 			"application/xml",
@@ -133,15 +138,15 @@ public final class XSSFRelation extends POIXMLRelation {
 	public static final XSSFRelation SINGLE_XML_CELLS = new XSSFRelation(
 			"application/vnd.openxmlformats-officedocument.spreadsheetml.tableSingleCells+xml",
 			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableSingleCells",
-			"/tables/tableSingleCells#.xml",
+			"/xl/tables/tableSingleCells#.xml",
 			SingleXmlCells.class
 	);
 
 	public static final XSSFRelation TABLE = new XSSFRelation(
 			"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml",
 			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table",
-			"/tables/table#.xml",
-			Table.class
+			"/xl/tables/table#.xml",
+			XSSFTable.class
 	);
 
     public static final XSSFRelation IMAGES = new XSSFRelation(
@@ -242,6 +247,12 @@ public final class XSSFRelation extends POIXMLRelation {
             "/xl/calcChain.xml",
             CalculationChain.class
     );
+    public static final XSSFRelation PRINTER_SETTINGS = new XSSFRelation(
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings",
+          "http://schemas.openxmlformats.org/officeDocument/2006/relationships/printerSettings",
+          "/xl/printerSettings/printerSettings#.bin",
+          null
+   );
     //20101018, henrichen@zkoss.org
     public static final XSSFRelation EXTERNAL_LINK = new XSSFRelation(
     		"application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml",
@@ -250,13 +261,6 @@ public final class XSSFRelation extends POIXMLRelation {
     		ExternalLink.class
     );
     
-	public static final XSSFRelation CHARTS = new XSSFRelation(
-			"application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
-			"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
-			"/xl/charts/chart#.xml",
-			XSSFChart.class
-	);
-
 	private XSSFRelation(String type, String rel, String defaultName, Class<? extends POIXMLDocumentPart> cls) {
         super(type, rel, defaultName, cls);
 

@@ -23,7 +23,7 @@ package org.zkoss.poi.hdf.extractor;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class CHP implements Cloneable
 {
   boolean _bold;

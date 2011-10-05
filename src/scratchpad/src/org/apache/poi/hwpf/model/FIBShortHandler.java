@@ -17,12 +17,14 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 
 /**
  * Handles the fibRgW / FibRgW97 part of
  *  the FIB (File Information Block)
  */
+@Internal
 public final class FIBShortHandler {
   public final static int MAGICCREATED = 0;
   public final static int MAGICREVISED = 1;

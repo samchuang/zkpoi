@@ -23,10 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.zkoss.lang.Classes;
-import org.zkoss.lang.Library;
-import org.zkoss.poi.hssf.record.AutoFilterInfoRecord;
-import org.zkoss.poi.hssf.record.AutoFilterRecord;
 import org.zkoss.poi.hssf.record.BOFRecord;
 import org.zkoss.poi.hssf.record.CFHeaderRecord;
 import org.zkoss.poi.hssf.record.CalcCountRecord;
@@ -60,10 +56,10 @@ import org.zkoss.poi.hssf.record.RowRecord;
 import org.zkoss.poi.hssf.record.SCLRecord;
 import org.zkoss.poi.hssf.record.SaveRecalcRecord;
 import org.zkoss.poi.hssf.record.SelectionRecord;
+import org.zkoss.poi.hssf.record.TextObjectRecord;
 import org.zkoss.poi.hssf.record.UncalcedRecord;
 import org.zkoss.poi.hssf.record.WSBoolRecord;
 import org.zkoss.poi.hssf.record.WindowTwoRecord;
-import org.zkoss.poi.hssf.record.aggregates.AutoFilterInfoRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.ChartSubstreamRecordAggregate;
 import org.zkoss.poi.hssf.record.aggregates.ColumnInfoRecordsAggregate;
 import org.zkoss.poi.hssf.record.aggregates.ConditionalFormattingTable;
@@ -72,17 +68,21 @@ import org.zkoss.poi.hssf.record.aggregates.DataValidityTable;
 import org.zkoss.poi.hssf.record.aggregates.MergedCellsTable;
 import org.zkoss.poi.hssf.record.aggregates.PageSettingsBlock;
 import org.zkoss.poi.hssf.record.aggregates.RecordAggregate;
-import org.zkoss.poi.hssf.record.aggregates.RowRecordsAggregate;
-import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
 import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.PositionTrackingVisitor;
 import org.zkoss.poi.hssf.record.aggregates.RecordAggregate.RecordVisitor;
-import org.zkoss.poi.ss.formula.FormulaShifter;
+import org.zkoss.poi.hssf.record.aggregates.RowRecordsAggregate;
+import org.zkoss.poi.hssf.record.aggregates.WorksheetProtectionBlock;
 import org.zkoss.poi.hssf.util.PaneInformation;
+import org.zkoss.poi.ss.formula.FormulaShifter;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
 
+import org.zkoss.lang.Classes;
+import org.zkoss.lang.Library;
+import org.zkoss.poi.hssf.record.AutoFilterInfoRecord;
+import org.zkoss.poi.hssf.record.aggregates.AutoFilterInfoRecordAggregate;
 /**
  * Low level model implementation of a Sheet (one workbook contains many sheets)
  * This file contains the low level binary records starting at the sheets BOF and
@@ -117,8 +117,8 @@ public final class InternalSheet {
     protected PrintGridlinesRecord       printGridlines    =     null;
     protected GridsetRecord              gridset           =     null;
     private   GutsRecord                 _gutsRecord;
-    protected DefaultColWidthRecord      defaultcolwidth   =     null;
-    protected DefaultRowHeightRecord     defaultrowheight  =     null;
+    protected DefaultColWidthRecord      defaultcolwidth   =     new DefaultColWidthRecord();
+    protected DefaultRowHeightRecord     defaultrowheight  =     new DefaultRowHeightRecord();
     private PageSettingsBlock _psBlock;
 
     /**
@@ -139,7 +139,7 @@ public final class InternalSheet {
     protected final RowRecordsAggregate  _rowsAggregate;
     private   DataValidityTable          _dataValidityTable=     null;
     private   ConditionalFormattingTable condFormatting;
-    private   AutoFilterInfoRecordAggregate _autofilter;
+    private   AutoFilterInfoRecordAggregate _autofilter; //20111003, henrichen: added by peterkuo?
     
     private   Iterator<RowRecord>        rowRecIterator    =     null;
 
@@ -281,7 +281,7 @@ public final class InternalSheet {
                 records.add(rec);
                 continue;
             }
-            
+
             if (recSid == EOFRecord.sid) {
                 records.add(rec);
                 break;
@@ -379,13 +379,13 @@ public final class InternalSheet {
 
     private static final class RecordCloner implements RecordVisitor {
 
-        private final List<RecordBase> _destList;
+        private final List<Record> _destList;
 
-        public RecordCloner(List<RecordBase> destList) {
+        public RecordCloner(List<Record> destList) {
             _destList = destList;
         }
         public void visitRecord(Record r) {
-            _destList.add((RecordBase)r.clone());
+            _destList.add((Record)r.clone());
         }
     }
 
@@ -397,7 +397,7 @@ public final class InternalSheet {
      * belongs to a sheet.
      */
     public InternalSheet cloneSheet() {
-        List<RecordBase> clonedRecords = new ArrayList<RecordBase>(_records.size());
+        List<Record> clonedRecords = new ArrayList<Record>(_records.size());
         for (int i = 0; i < _records.size(); i++) {
             RecordBase rb = _records.get(i);
             if (rb instanceof RecordAggregate) {
@@ -748,8 +748,8 @@ public final class InternalSheet {
     }
 
     /**
-     * get the NEXT value record (from LOC).  The first record that is a value record
-     * (starting at LOC) will be returned.
+     * Get all the value records (from LOC). Records will be returned from the first
+     *  record (starting at LOC) which is a value record.
      *
      * <P>
      * This method is "loc" sensitive.  Meaning you need to set LOC to where you
@@ -758,8 +758,27 @@ public final class InternalSheet {
      * at what this sets it to.  For this method, set loc to dimsloc to start with,
      * subsequent calls will return values in (physical) sequence or NULL when you get to the end.
      *
-     * @return CellValueRecordInterface representing the next value record or NULL if there are no more
+     * @return Iterator of CellValueRecordInterface representing the value records
      */
+    public Iterator<CellValueRecordInterface> getCellValueIterator(){
+    	return _rowsAggregate.getCellValueIterator();
+    }
+
+    /**
+     * Get all the value records (from LOC). Records will be returned from the first
+     *  record (starting at LOC) which is a value record.
+     *
+     * <P>
+     * This method is "loc" sensitive.  Meaning you need to set LOC to where you
+     * want it to start searching.  If you don't know do this: setLoc(getDimsLoc).
+     * When adding several rows you can just start at the last one by leaving loc
+     * at what this sets it to.  For this method, set loc to dimsloc to start with,
+     * subsequent calls will return values in (physical) sequence or NULL when you get to the end.
+     *
+     * @return Array of CellValueRecordInterface representing the remaining value records
+     * @deprecated use {@link #getCellValueIterator()} instead
+     */
+    @Deprecated
     public CellValueRecordInterface[] getValueRecords() {
         return _rowsAggregate.getValueRecords();
     }
@@ -938,7 +957,7 @@ public final class InternalSheet {
         DefaultRowHeightRecord retval = new DefaultRowHeightRecord();
 
         retval.setOptionFlags(( short ) 0);
-        retval.setRowHeight(( short ) 0xff);
+        retval.setRowHeight(DefaultRowHeightRecord.DEFAULT_ROW_HEIGHT);
         return retval;
     }
 
@@ -959,7 +978,7 @@ public final class InternalSheet {
       */
     private static DefaultColWidthRecord createDefaultColWidth() {
         DefaultColWidthRecord retval = new DefaultColWidthRecord();
-        retval.setColWidth(( short ) 8);
+        retval.setColWidth(DefaultColWidthRecord.DEFAULT_COLUMN_WIDTH);
         return retval;
     }
 
@@ -1338,6 +1357,9 @@ public final class InternalSheet {
 
     /**
      * Creates a split (freezepane). Any existing freezepane or split pane is overwritten.
+     *
+     * <p>If both colSplit and rowSplit are zero then the existing freeze pane is removed</p>
+     *
      * @param colSplit      Horizonatal position of split.
      * @param rowSplit      Vertical position of split.
      * @param topRow        Top row visible in bottom pane
@@ -1347,6 +1369,15 @@ public final class InternalSheet {
         int paneLoc = findFirstRecordLocBySid(PaneRecord.sid);
         if (paneLoc != -1)
             _records.remove(paneLoc);
+
+        // If both colSplit and rowSplit are zero then the existing freeze pane is removed
+        if(colSplit == 0 && rowSplit == 0){
+            windowTwo.setFreezePanes(false);
+            windowTwo.setFreezePanesNoSplit(false);
+            SelectionRecord sel = (SelectionRecord) findFirstRecordBySid(SelectionRecord.sid);
+            sel.setPane(PaneInformation.PANE_UPPER_LEFT);
+            return;
+        }
 
         int loc = findFirstRecordLocBySid(WindowTwoRecord.sid);
         PaneRecord pane = new PaneRecord();
@@ -1358,7 +1389,7 @@ public final class InternalSheet {
             pane.setTopRow((short)0);
             pane.setActivePane((short)1);
         } else if (colSplit == 0) {
-            pane.setLeftColumn((short)64);
+            pane.setLeftColumn((short)0);
             pane.setActivePane((short)2);
         } else {
             pane.setActivePane((short)0);
@@ -1540,9 +1571,11 @@ public final class InternalSheet {
 //20100614, Henri Chen: there is not always an ObjRecord after a DrawingRecord
 /*        while ( loc + 1 < records.size()
                 && records.get( loc ) instanceof DrawingRecord
-                && records.get( loc + 1 ) instanceof ObjRecord )
+                && (records.get( loc + 1 ) instanceof ObjRecord ||
+                    records.get( loc + 1 ) instanceof TextObjectRecord) )
         {
             loc += 2;
+            if (records.get( loc ) instanceof NoteRecord) loc ++;
         }
 */
         boolean drawRecord = true;

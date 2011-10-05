@@ -17,23 +17,21 @@
 
 package org.zkoss.poi.xssf.usermodel;
 
-import java.util.Iterator;
-
+import org.zkoss.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.zkoss.poi.ss.formula.IStabilityClassifier;
+import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
-import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
 import org.zkoss.poi.ss.formula.eval.NumberEval;
 import org.zkoss.poi.ss.formula.eval.StringEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.ss.formula.udf.UDFFinder;
-import org.zkoss.poi.ss.formula.IStabilityClassifier;
-import org.zkoss.poi.ss.formula.WorkbookEvaluator;
 import org.zkoss.poi.ss.usermodel.Cell;
 import org.zkoss.poi.ss.usermodel.CellValue;
 import org.zkoss.poi.ss.usermodel.FormulaEvaluator;
-import org.zkoss.poi.ss.usermodel.Row;
-import org.zkoss.poi.ss.usermodel.Sheet;
+import org.zkoss.poi.ss.usermodel.Workbook;
 
+import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
 /**
  * Evaluates formula cells.<p/>
  *
@@ -47,6 +45,7 @@ import org.zkoss.poi.ss.usermodel.Sheet;
 public class XSSFFormulaEvaluator implements FormulaEvaluator {
 
 	private WorkbookEvaluator _bookEvaluator;
+	private XSSFWorkbook _book;
 
 	public XSSFFormulaEvaluator(XSSFWorkbook workbook) {
 		this(workbook, null, null);
@@ -60,9 +59,11 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
     @Deprecated
     public XSSFFormulaEvaluator(XSSFWorkbook workbook, IStabilityClassifier stabilityClassifier) {
 		_bookEvaluator = new WorkbookEvaluator(XSSFEvaluationWorkbook.create(workbook), stabilityClassifier, null);
+		_book = workbook;
 	}
 	private XSSFFormulaEvaluator(XSSFWorkbook workbook, IStabilityClassifier stabilityClassifier, UDFFinder udfFinder) {
 		_bookEvaluator = new WorkbookEvaluator(XSSFEvaluationWorkbook.create(workbook), stabilityClassifier, udfFinder);
+      _book = workbook;
 	}
 
 	/**
@@ -235,26 +236,32 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 	 *  cells, and calling evaluateFormulaCell on each one.
 	 */
 	public static void evaluateAllFormulaCells(XSSFWorkbook wb) {
-		XSSFFormulaEvaluator evaluator = new XSSFFormulaEvaluator(wb);
-		for(int i=0; i<wb.getNumberOfSheets(); i++) {
-			Sheet sheet = wb.getSheetAt(i);
-
-			for (Iterator<Row> rit = sheet.rowIterator(); rit.hasNext();) {
-				Row r = rit.next();
-
-				for (Iterator cit = r.cellIterator(); cit.hasNext();) {
-					XSSFCell c = (XSSFCell) cit.next();
-					if (c.getCellType() == XSSFCell.CELL_TYPE_FORMULA)
-						evaluator.evaluateFormulaCell(c);
-				}
-			}
-		}
+	   HSSFFormulaEvaluator.evaluateAllFormulaCells((Workbook)wb);
 	}
+   /**
+    * Loops over all cells in all sheets of the supplied
+    *  workbook.
+    * For cells that contain formulas, their formulas are
+    *  evaluated, and the results are saved. These cells
+    *  remain as formula cells.
+    * For cells that do not contain formulas, no changes
+    *  are made.
+    * This is a helpful wrapper around looping over all
+    *  cells, and calling evaluateFormulaCell on each one.
+    */
+   public void evaluateAll() {
+      HSSFFormulaEvaluator.evaluateAllFormulaCells(_book);
+   }
 
 	/**
 	 * Returns a CellValue wrapper around the supplied ValueEval instance.
 	 */
 	private CellValue evaluateFormulaCellValue(Cell cell) {
+        if(!(cell instanceof XSSFCell)){
+            throw new IllegalArgumentException("Unexpected type of cell: " + cell.getClass() + "." +
+                    " Only XSSFCells can be evaluated.");
+        }
+
 		ValueEval eval = _bookEvaluator.evaluate(new XSSFEvaluationCell((XSSFCell) cell));
 		//20100917, henrichen@zkoss.org: handle HYPERLINK function 
 		CellValue cv = null;

@@ -22,8 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-
 import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 import org.zkoss.poi.util.StringUtil;
 
@@ -33,6 +33,7 @@ import org.zkoss.poi.util.StringUtil;
  * 
  * @author Ryan Lauck
  */
+@Internal
 public final class RevisionMarkAuthorTable {
 	/**
 	 * must be 0xFFFF

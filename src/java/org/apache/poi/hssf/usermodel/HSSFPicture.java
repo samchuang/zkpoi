@@ -25,10 +25,12 @@ import org.zkoss.poi.ddf.EscherBSERecord;
 import org.zkoss.poi.ddf.EscherBlipRecord;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.Picture;
-import org.zkoss.poi.ss.usermodel.PictureData;
 import org.zkoss.poi.ss.util.ImageUtils;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
+import org.zkoss.poi.hssf.model.InternalWorkbook;
+
+import org.zkoss.poi.ss.usermodel.PictureData;
 
 /**
  * Represents a escher picture.  Eg. A GIF, JPEG etc...
@@ -59,7 +61,6 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
     private static final int PX_ROW = 15;
 
     private int _pictureIndex;
-    HSSFPatriarch _patriarch;  // TODO make private
 
     /**
      * Constructs a picture object.
@@ -225,7 +226,18 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
         int type = bse.getBlipTypeWin32();
         return ImageUtils.getImageDimension(new ByteArrayInputStream(data), type);
     }
-
+    
+    /**
+     * Return picture data for this shape
+     *
+     * @return picture data for this shape
+     */
+/*    public HSSFPictureData getPictureData(){
+        InternalWorkbook iwb = _patriarch._sheet.getWorkbook().getWorkbook();
+    	EscherBlipRecord blipRecord = iwb.getBSERecord(_pictureIndex).getBlipRecord();
+    	return new HSSFPictureData(blipRecord);
+    }
+*/
     //20101014, henrichen@zkoss.org: picture name and alt
     public PictureData getPictureData() {
 		final int pictureIndex = getPictureIndex();

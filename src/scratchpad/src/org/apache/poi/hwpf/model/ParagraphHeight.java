@@ -17,13 +17,15 @@
 
 package org.zkoss.poi.hwpf.model;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.zkoss.poi.util.BitField;
 import org.zkoss.poi.util.BitFieldFactory;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 
+@Internal
 public final class ParagraphHeight
 {
   private short infoField;

@@ -30,6 +30,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.zkoss.poi.hwpf.model.io.HWPFOutputStream;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
@@ -37,6 +38,7 @@ import org.zkoss.poi.util.POILogger;
 /**
  * @author Ryan Ackley
  */
+@Internal
 public final class ListTables
 {
   private static final int LIST_DATA_SIZE = 28;

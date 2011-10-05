@@ -24,6 +24,7 @@ import org.zkoss.poi.hssf.record.cf.BorderFormatting;
 import org.zkoss.poi.hssf.record.cf.FontFormatting;
 import org.zkoss.poi.hssf.record.cf.PatternFormatting;
 import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.usermodel.ConditionalFormattingRule;
 
 /**
  *
@@ -33,7 +34,7 @@ import org.zkoss.poi.ss.formula.ptg.Ptg;
  *
  * @author Dmitriy Kumshayev
  */
-public final class HSSFConditionalFormattingRule
+public final class HSSFConditionalFormattingRule implements ConditionalFormattingRule
 {
 	private static final byte CELL_COMPARISON = CFRuleRecord.CONDITION_TYPE_CELL_VALUE_IS;
 

@@ -23,7 +23,7 @@ package org.zkoss.poi.hdf.extractor.util;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class ChpxNode extends PropertyNode
 {
 

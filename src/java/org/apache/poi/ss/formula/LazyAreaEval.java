@@ -21,11 +21,11 @@ import org.zkoss.poi.ss.formula.ptg.AreaI;
 import org.zkoss.poi.ss.formula.ptg.AreaI.OffsetArea;
 import org.zkoss.poi.ss.formula.eval.AreaEval;
 import org.zkoss.poi.ss.formula.eval.AreaEvalBase;
-import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;
-import org.zkoss.poi.hssf.util.CellReference;
-import org.zkoss.poi.ss.usermodel.Hyperlink;
+import org.zkoss.poi.ss.util.CellReference;
 
+import org.zkoss.poi.ss.formula.eval.HyperlinkEval;
+import org.zkoss.poi.ss.usermodel.Hyperlink;
 /**
  *
  * @author Josh Micich
@@ -112,6 +112,14 @@ final class LazyAreaEval extends AreaEvalBase implements HyperlinkEval {
 		sb.append("]");
 		return sb.toString();
 	}
+
+    /**
+     * @return  whether cell at rowIndex and columnIndex is a subtotal
+    */
+    public boolean isSubTotal(int rowIndex, int columnIndex){
+        // delegate the query to the sheet evaluator which has access to internal ptgs
+        return _evaluator.isSubTotal(rowIndex, columnIndex);
+    }
 	
 	//20100720, henrichen@zkoss.org: handle HYPERLINK function
 	private Hyperlink _hyperlink;

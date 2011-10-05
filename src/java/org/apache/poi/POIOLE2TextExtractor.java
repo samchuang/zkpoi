@@ -19,6 +19,7 @@ package org.zkoss.poi;
 import org.zkoss.poi.hpsf.DocumentSummaryInformation;
 import org.zkoss.poi.hpsf.SummaryInformation;
 import org.zkoss.poi.hpsf.extractor.HPSFPropertiesExtractor;
+import org.zkoss.poi.poifs.filesystem.DirectoryEntry;
 import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
 
 /**
@@ -26,7 +27,7 @@ import org.zkoss.poi.poifs.filesystem.POIFSFileSystem;
  *  of POI Documents, such as .doc, .xls
  * You will typically find the implementation of
  *  a given format's text extractor under
- *  org.apache.poi.[format].extractor .
+ *  org.zkoss.poi.[format].extractor .
  * @see org.zkoss.poi.hssf.extractor.ExcelExtractor
  * @see org.zkoss.poi.hslf.extractor.PowerPointExtractor
  * @see org.zkoss.poi.hdgf.extractor.VisioTextExtractor
@@ -39,7 +40,7 @@ public abstract class POIOLE2TextExtractor extends POITextExtractor {
 	public POIOLE2TextExtractor(POIDocument document) {
 		super(document);
 	}
-	
+
 	/**
 	 * Returns the document information metadata for the document
 	 */
@@ -52,20 +53,28 @@ public abstract class POIOLE2TextExtractor extends POITextExtractor {
 	public SummaryInformation getSummaryInformation() {
 		return document.getSummaryInformation();
 	}
-	
+
 	/**
-	 * Returns an HPSF powered text extractor for the 
+	 * Returns an HPSF powered text extractor for the
 	 *  document properties metadata, such as title and author.
 	 */
 	public POITextExtractor getMetadataTextExtractor() {
 		return new HPSFPropertiesExtractor(this);
 	}
 
-	/**
-	 * Return the underlying POIFS FileSystem of
-	 *  this document.
-	 */
-	public POIFSFileSystem getFileSystem() {
-		return document.directory.getFileSystem();
-	}
+    public DirectoryEntry getRoot()
+    {
+        return document.directory;
+    }
+
+    /**
+     * Return the underlying POIFS FileSystem of this document.
+     *
+     * @deprecated Use {@link #getRoot()} instead
+     */
+    @Deprecated
+    public POIFSFileSystem getFileSystem()
+    {
+        return document.directory.getFileSystem();
+    }
 }

@@ -18,6 +18,10 @@
 package org.zkoss.poi.ss.formula;
 
 import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.ptg.FuncVarPtg;
+import org.zkoss.poi.ss.formula.ptg.Ptg;
+import org.zkoss.poi.ss.usermodel.Cell;
+
 /**
  *
  *
@@ -30,6 +34,8 @@ final class SheetRefEvaluator {
 	private final EvaluationTracker _tracker;
 	private final int _sheetIndex;
 	private final int _lastSheetIndex;
+	private EvaluationSheet _sheet;
+
 
 	public SheetRefEvaluator(WorkbookEvaluator bookEvaluator, EvaluationTracker tracker, int sheetIndex, int lastSheetIndex) {
 //20101213, henrichen@zkoss.org: handle deleted sheet		
@@ -61,4 +67,34 @@ final class SheetRefEvaluator {
 		final CollaboratingWorkbooksEnvironment env = _bookEvaluator.getEnvironment();
 		return env.getBookName(_bookEvaluator);
 	}
+
+	private EvaluationSheet getSheet() {
+		if (_sheet == null) {
+			_sheet = _bookEvaluator.getSheet(_sheetIndex);
+		}
+		return _sheet;
+	}
+	
+    /**
+     * @return  whether cell at rowIndex and columnIndex is a subtotal
+     * @see org.zkoss.poi.ss.formula.functions.Subtotal
+     */
+    public boolean isSubTotal(int rowIndex, int columnIndex){
+        boolean subtotal = false;
+        EvaluationCell cell = getSheet().getCell(rowIndex, columnIndex);
+        if(cell != null && cell.getCellType() == Cell.CELL_TYPE_FORMULA){
+            EvaluationWorkbook wb = _bookEvaluator.getWorkbook();
+            for(Ptg ptg : wb.getFormulaTokens(cell)){
+                if(ptg instanceof FuncVarPtg){
+                    FuncVarPtg f = (FuncVarPtg)ptg;
+                    if("SUBTOTAL".equals(f.getName())) {
+                        subtotal = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return subtotal;
+    }
+
 }

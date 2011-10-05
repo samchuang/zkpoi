@@ -23,7 +23,7 @@ import org.zkoss.poi.util.LittleEndian;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class FontTable implements HDFType
 {
   String[] fontNames;

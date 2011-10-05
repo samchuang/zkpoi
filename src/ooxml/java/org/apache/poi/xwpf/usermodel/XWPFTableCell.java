@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
@@ -248,16 +250,14 @@ public class XWPFTableCell implements IBody {
 		return null;
 	}
 
-
-
-
-	/**
-	 * get the to which the TableCell belongs 
-	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getPart()
-	 */
-	public IBody getPart() {
-		return tableRow.getTable().getPart();
-	}
+    /**
+     * get the to which the TableCell belongs
+     * 
+     * @see org.zkoss.poi.xwpf.usermodel.IBody#getPart()
+     */
+    public POIXMLDocumentPart getPart() {
+        return tableRow.getTable().getPart();
+    }
 
 
 	/** 

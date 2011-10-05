@@ -17,9 +17,8 @@
 
 package org.zkoss.poi.hwpf.model;
 
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.zkoss.poi.ddf.DefaultEscherRecordFactory;
 import org.zkoss.poi.ddf.EscherBSERecord;
@@ -30,6 +29,7 @@ import org.zkoss.poi.hwpf.HWPFDocument;
 import org.zkoss.poi.hwpf.usermodel.CharacterRun;
 import org.zkoss.poi.hwpf.usermodel.Picture;
 import org.zkoss.poi.hwpf.usermodel.Range;
+import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
 
 /**
@@ -49,6 +49,7 @@ import org.zkoss.poi.util.LittleEndian;
  *
  * @author Dmitry Romanov
  */
+@Internal
 public final class PicturesTable
 {
   static final int TYPE_IMAGE = 0x08;
@@ -62,7 +63,9 @@ public final class PicturesTable
   private HWPFDocument _document;
   private byte[] _dataStream;
   private byte[] _mainStream;
+  @Deprecated
   private FSPATable _fspa;
+  @Deprecated
   private EscherRecordHolder _dgg;
 
   /** @link dependency
@@ -74,6 +77,7 @@ public final class PicturesTable
    * @param _document
    * @param _dataStream
    */
+  @Deprecated
   public PicturesTable(HWPFDocument _document, byte[] _dataStream, byte[] _mainStream, FSPATable fspa, EscherRecordHolder dgg)
   {
     this._document = _document;
@@ -82,6 +86,14 @@ public final class PicturesTable
     this._fspa = fspa;
     this._dgg = dgg;
   }
+
+    public PicturesTable( HWPFDocument _document, byte[] _dataStream,
+            byte[] _mainStream )
+    {
+        this._document = _document;
+        this._dataStream = _dataStream;
+        this._mainStream = _mainStream;
+    }
 
   /**
    * determines whether specified CharacterRun contains reference to a picture

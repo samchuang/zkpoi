@@ -38,10 +38,13 @@ import org.zkoss.poi.util.LittleEndian;
 public class HWPFOldDocument extends HWPFDocumentCore {
     private TextPieceTable tpt;
     
+    private StringBuilder _text;
+    
     public HWPFOldDocument(POIFSFileSystem fs) throws IOException {
         this(fs.getRoot());
     }
 
+    @Deprecated
     public HWPFOldDocument(DirectoryNode directory, POIFSFileSystem fs)
             throws IOException {
        this(directory);
@@ -72,7 +75,7 @@ public class HWPFOldDocument extends HWPFDocumentCore {
             tpt = cft.getTextPieceTable();
             
             for(TextPiece tp : tpt.getTextPieces()) {
-                text.append( tp.getStringBuffer() );
+                text.append( tp.getStringBuilder() );
             }
         } else {
             // TODO Discover if these older documents can ever hold Unicode Strings?
@@ -88,13 +91,15 @@ public class HWPFOldDocument extends HWPFDocumentCore {
             byte[] textData = new byte[_fib.getFcMac()-_fib.getFcMin()];
             System.arraycopy(_mainStream, _fib.getFcMin(), textData, 0, textData.length);
             TextPiece tp = new TextPiece(
-                    0, textData.length, textData, pd, 0
+                    0, textData.length, textData, pd
             );
             tpt.add(tp);
             
-            text.append(tp.getStringBuffer());
+            text.append(tp.getStringBuilder());
         }
         
+        _text = tpt.getText();
+
         // Now we can fetch the character and paragraph properties
         _cbt = new OldCHPBinTable(
                 _mainStream, chpTableOffset, chpTableSize,
@@ -109,17 +114,27 @@ public class HWPFOldDocument extends HWPFDocumentCore {
                 _fib.getFcMin(), tpt
         );
     }
-    
-    public Range getRange() {
+
+    public Range getOverallRange()
+    {
         // Life is easy when we have no footers, headers or unicode!
-        return new Range(
-                0, _fib.getFcMac() - _fib.getFcMin(), this
-        );
+        return new Range( 0, _fib.getFcMac() - _fib.getFcMin(), this );
+    }
+
+    public Range getRange()
+    {
+        return getOverallRange();
     }
 
     public TextPieceTable getTextTable()
     {
       return tpt;
+    }
+
+    @Override
+    public StringBuilder getText()
+    {
+        return _text;
     }
 
     @Override

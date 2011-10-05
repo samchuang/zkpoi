@@ -25,12 +25,14 @@ import org.zkoss.poi.ddf.DefaultEscherRecordFactory;
 import org.zkoss.poi.ddf.EscherContainerRecord;
 import org.zkoss.poi.ddf.EscherRecord;
 import org.zkoss.poi.ddf.EscherRecordFactory;
+import org.zkoss.poi.util.Internal;
 
 /**
  * Based on AbstractEscherRecordHolder from HSSF.
  *
  * @author Squeeself
  */
+@Internal
 public final class EscherRecordHolder {
 	private final ArrayList<EscherRecord> escherRecords;
 
@@ -120,4 +122,83 @@ public final class EscherRecordHolder {
 		// Not found in this lot
 		return null;
 	}
+
+    public List<? extends EscherContainerRecord> getDgContainers()
+    {
+        List<EscherContainerRecord> dgContainers = new ArrayList<EscherContainerRecord>(
+                1 );
+        for ( EscherRecord escherRecord : getEscherRecords() )
+        {
+            if ( escherRecord.getRecordId() == (short) 0xF002 )
+            {
+                dgContainers.add( (EscherContainerRecord) escherRecord );
+            }
+        }
+        return dgContainers;
+    }
+
+    public List<? extends EscherContainerRecord> getDggContainers()
+    {
+        List<EscherContainerRecord> dggContainers = new ArrayList<EscherContainerRecord>(
+                1 );
+        for ( EscherRecord escherRecord : getEscherRecords() )
+        {
+            if ( escherRecord.getRecordId() == (short) 0xF000 )
+            {
+                dggContainers.add( (EscherContainerRecord) escherRecord );
+            }
+        }
+        return dggContainers;
+    }
+
+    public List<? extends EscherContainerRecord> getBStoreContainers()
+    {
+        List<EscherContainerRecord> bStoreContainers = new ArrayList<EscherContainerRecord>(
+                1 );
+        for ( EscherContainerRecord dggContainer : getDggContainers() )
+        {
+            for ( EscherRecord escherRecord : dggContainer.getChildRecords() )
+            {
+                if ( escherRecord.getRecordId() == (short) 0xF001 )
+                {
+                    bStoreContainers.add( (EscherContainerRecord) escherRecord );
+                }
+            }
+        }
+        return bStoreContainers;
+    }
+
+    public List<? extends EscherContainerRecord> getSpgrContainers()
+    {
+        List<EscherContainerRecord> spgrContainers = new ArrayList<EscherContainerRecord>(
+                1 );
+        for ( EscherContainerRecord dgContainer : getDgContainers() )
+        {
+            for ( EscherRecord escherRecord : dgContainer.getChildRecords() )
+            {
+                if ( escherRecord.getRecordId() == (short) 0xF003 )
+                {
+                    spgrContainers.add( (EscherContainerRecord) escherRecord );
+                }
+            }
+        }
+        return spgrContainers;
+    }
+
+    public List<? extends EscherContainerRecord> getSpContainers()
+    {
+        List<EscherContainerRecord> spContainers = new ArrayList<EscherContainerRecord>(
+                1 );
+        for ( EscherContainerRecord spgrContainer : getSpgrContainers() )
+        {
+            for ( EscherRecord escherRecord : spgrContainer.getChildRecords() )
+            {
+                if ( escherRecord.getRecordId() == (short) 0xF004 )
+                {
+                    spContainers.add( (EscherContainerRecord) escherRecord );
+                }
+            }
+        }
+        return spContainers;
+    }
 }

@@ -29,6 +29,7 @@ import org.zkoss.poi.util.BitFieldFactory;
 
  * @author S. Ryan Ackley
  */
+@Deprecated
 public abstract class PAPAbstractType
     implements HDFType
 {

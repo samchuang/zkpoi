@@ -23,6 +23,7 @@ import org.zkoss.poi.hdf.model.hdftypes.ParagraphProperties;
 import org.zkoss.poi.hdf.model.hdftypes.SectionProperties;
 import org.zkoss.poi.hdf.model.hdftypes.TableProperties;
 
+@Deprecated
 public interface HDFParsingListener
 {
   public void document(DocumentProperties dop);

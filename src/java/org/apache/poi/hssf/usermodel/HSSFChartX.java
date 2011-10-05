@@ -14,6 +14,7 @@ package org.zkoss.poi.hssf.usermodel;
 
 import org.zkoss.poi.hssf.usermodel.HSSFChart;
 import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.ZssChart;
 import org.zkoss.poi.ss.usermodel.ChartInfo;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.util.CellRangeAddressBase;
@@ -23,7 +24,7 @@ import org.zkoss.poi.ss.util.CellRangeAddressBase;
  * 
  * @author henrichen
  */
-public class HSSFChartX extends HSSFSimpleShape implements Chart {
+public class HSSFChartX extends HSSFSimpleShape implements ZssChart {
 	private HSSFChart _chart;
 	private String _name;
     HSSFPatriarch _patriarch;  // TODO make private

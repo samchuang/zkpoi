@@ -17,18 +17,36 @@
 
 package org.zkoss.poi.hslf.model;
 
-import org.zkoss.poi.ddf.*;
-import org.zkoss.poi.hslf.exceptions.HSLFException;
-import org.zkoss.poi.hslf.record.*;
-import org.zkoss.poi.hslf.usermodel.RichTextRun;
-import org.zkoss.poi.util.POILogger;
-
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.ddf.EscherSimpleProperty;
+import org.zkoss.poi.ddf.EscherSpRecord;
+import org.zkoss.poi.ddf.EscherTextboxRecord;
+import org.zkoss.poi.hslf.exceptions.HSLFException;
+import org.zkoss.poi.hslf.record.EscherTextboxWrapper;
+import org.zkoss.poi.hslf.record.InteractiveInfo;
+import org.zkoss.poi.hslf.record.InteractiveInfoAtom;
+import org.zkoss.poi.hslf.record.OEPlaceholderAtom;
+import org.zkoss.poi.hslf.record.OutlineTextRefAtom;
+import org.zkoss.poi.hslf.record.PPDrawing;
+import org.zkoss.poi.hslf.record.Record;
+import org.zkoss.poi.hslf.record.RecordTypes;
+import org.zkoss.poi.hslf.record.StyleTextPropAtom;
+import org.zkoss.poi.hslf.record.TextCharsAtom;
+import org.zkoss.poi.hslf.record.TextHeaderAtom;
+import org.zkoss.poi.hslf.record.TxInteractiveInfoAtom;
+import org.zkoss.poi.hslf.usermodel.RichTextRun;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * A common superclass of all shapes that can hold text.
@@ -519,7 +537,8 @@ public abstract class TextShape extends SimpleShape {
                 logger.log(POILogger.WARN, "text run not found for OutlineTextRefAtom.TextIndex=" + idx);
             }
         } else {
-            int shapeId = _escherContainer.getChildById(EscherSpRecord.RECORD_ID).getShapeId();
+            EscherSpRecord escherSpRecord = _escherContainer.getChildById(EscherSpRecord.RECORD_ID);
+            int shapeId = escherSpRecord.getShapeId();
             if(runs != null) for (int i = 0; i < runs.length; i++) {
                 if(runs[i].getShapeId() == shapeId){
                     _txtrun = runs[i];
@@ -557,7 +576,7 @@ public abstract class TextShape extends SimpleShape {
      *
      * Assigns a hyperlink to this text shape
      *
-     * @param linkId    id of the hyperlink, @see org.apache.poi.hslf.usermodel.SlideShow#addHyperlink(Hyperlink)
+     * @param linkId    id of the hyperlink, @see org.zkoss.poi.hslf.usermodel.SlideShow#addHyperlink(Hyperlink)
      * @param      beginIndex   the beginning index, inclusive.
      * @param      endIndex     the ending index, exclusive.
      * @see org.zkoss.poi.hslf.usermodel.SlideShow#addHyperlink(Hyperlink)

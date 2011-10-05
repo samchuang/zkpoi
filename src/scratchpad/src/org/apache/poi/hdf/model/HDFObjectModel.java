@@ -30,6 +30,7 @@ import org.zkoss.poi.hdf.model.hdftypes.TextPiece;
 import org.zkoss.poi.hdf.model.util.BTreeSet;
 
 
+@Deprecated
 public final class HDFObjectModel implements HDFLowLevelParsingListener
 {
 

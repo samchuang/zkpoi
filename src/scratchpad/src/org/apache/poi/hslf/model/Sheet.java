@@ -48,9 +48,9 @@ public abstract class Sheet {
 
     /**
      * Record container that holds sheet data.
-     * For slides it is org.apache.poi.hslf.record.Slide,
-     * for notes it is org.apache.poi.hslf.record.Notes,
-     * for slide masters it is org.apache.poi.hslf.record.SlideMaster, etc.
+     * For slides it is org.zkoss.poi.hslf.record.Slide,
+     * for notes it is org.zkoss.poi.hslf.record.Notes,
+     * for slide masters it is org.zkoss.poi.hslf.record.SlideMaster, etc.
      */
     private SheetContainer _container;
 

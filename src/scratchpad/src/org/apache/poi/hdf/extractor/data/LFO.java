@@ -22,7 +22,7 @@ package org.zkoss.poi.hdf.extractor.data;
  *
  * @author Ryan Ackley
  */
-
+@Deprecated
 public final class LFO
 {
   int _lsid;

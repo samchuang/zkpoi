@@ -17,12 +17,15 @@
 
 package org.zkoss.poi.hwpf.model;
 
+import org.zkoss.poi.util.Internal;
+
 
 /**
  * A single entry in the {@link SavedByTable}.
  *
  * @author Daniel Noll
  */
+@Internal
 public final class SavedByEntry
 {
   private String userName;
