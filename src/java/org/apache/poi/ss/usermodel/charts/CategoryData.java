@@ -17,32 +17,22 @@
 
 package org.zkoss.poi.ss.usermodel.charts;
 
-import org.zkoss.poi.util.Beta;
+import java.util.List;
 
 /**
- * @author Roman Kashitsyn
+ * @author henrichen@zkoss.org
  */
-@Beta
-public interface ValueAxis extends ChartAxis {
+public interface CategoryData extends ChartData {
+	/**
+	 * @param title text source to be used for pie chart serie
+	 * @param categories data source to be used for pie slice categories
+	 * @param values data source to be used for pie slice values
+	 * @return a new pie charts serie
+	 */
+	CategoryDataSerie addSerie(ChartTextSource title, ChartDataSource<?> categories, ChartDataSource<? extends Number> values);
 
 	/**
-	 * @return cross between type
+	 * @return list of all series
 	 */
-	AxisCrossBetween getCrossBetween();
-
-	/**
-	 * @param crossBetween cross between type
-	 */
-	void setCrossBetween(AxisCrossBetween crossBetween);
-
-	//20111012, henrichen@zkoss.org: move from ChartAxis to here
-	/**
-	 * @return axis number format
-	 */
-	String getNumberFormat();
-
-	/**
-	 * @param format axis number format
-	 */
-	void setNumberFormat(String format);
+	List<? extends CategoryDataSerie> getSeries();
 }

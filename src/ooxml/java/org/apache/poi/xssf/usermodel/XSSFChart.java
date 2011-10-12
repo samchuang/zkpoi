@@ -31,21 +31,50 @@ import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxisFactory;
+import org.zkoss.poi.ss.usermodel.charts.ChartType;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFBar3DChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFBarChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartDataFactory;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartAxis;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFDoughnutChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFLine3DChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFLineChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFPie3DChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFPieChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFValueAxis;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFManualLayout;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartLegend;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFView3D;
 import org.zkoss.poi.ss.usermodel.charts.ChartData;
 import org.zkoss.poi.ss.usermodel.charts.AxisPosition;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTArea3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTAreaChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBar3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBoolean;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBubbleChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTChartSpace;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTDoughnutChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLine3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTOfPieChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPie3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPieChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTRadarChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTScatterChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTStockChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurface3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurfaceChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTTx;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTView3D;
 import org.openxmlformats.schemas.drawingml.x2006.chart.ChartSpaceDocument;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLayout;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTManualLayout;
@@ -55,6 +84,8 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTPrintSettings;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPageMargins;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STLayoutTarget;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STLayoutMode;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -300,4 +331,201 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
 		}
 	}
 
+	//20111005, henrichen@zkoss.org: chart title
+    public String getChartTitle() {
+    	final XSSFRichTextString rstr = getTitle();
+    	return rstr == null ? null : rstr.toString();
+    }
+	
+	//20111005, henrichen@zkoss.org: 3D view
+	public XSSFView3D getOrCreateView3D() {
+		return new XSSFView3D(this);
+	}
+	
+	//20111005, henrichen@zkoss.org: 3D view
+	public void deleteView3D() {
+		if (chart.isSetView3D()) {
+			chart.unsetView3D();
+		}
+	}
+
+	//20111005, henrichen@zkoss.org: 3D view
+    public boolean isSetView3D() {
+    	return chart.isSetView3D();
+    }
+
+    //20111006, henrichen@zkoss.org: autoTitleDeleted property
+    public boolean isAutoTitleDeleted() {
+    	final CTBoolean b = chart.getAutoTitleDeleted();
+    	return b != null ? b.getVal() : false; 
+    }
+    
+    //20111007, henrichen@zkoss.org: rename sheet
+    public void renameSheet(String oldname, String newname) {
+    	switch(getChartType()) {
+	    	case Pie:
+	    	{
+	    		XSSFPieChartData data  = new XSSFPieChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Pie3D:
+	    	{
+	    		XSSFPie3DChartData data  = new XSSFPie3DChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Doughnut:
+	    	{
+	    		XSSFDoughnutChartData data  = new XSSFDoughnutChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Bar3D:
+	    	{
+	    		XSSFBar3DChartData data  = new XSSFBar3DChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Bar:
+	    	{
+	    		XSSFBarChartData data  = new XSSFBarChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Line3D:
+	    	{
+	    		XSSFLine3DChartData data  = new XSSFLine3DChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Line:
+	    	{
+	    		XSSFLineChartData data  = new XSSFLineChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	//TODO
+	    	case Area:
+	    	case Area3D:
+	    	case Bubble:
+	    	case OfPie:
+	    	case Radar:
+	    	case Scatter:
+	    	case Stock:
+	    	case Surface:
+	    	case Surface3D:
+    	}
+    }
+    
+    //20111007, henrichen@zkoss.org: rename CategoryDataSerie
+    private void renameSheet(List<? extends CategoryDataSerie> series, String oldname, String newname) {
+		for (CategoryDataSerie serie : series) {
+			serie.getTitle().renameSheet(oldname, newname);
+			serie.getCategories().renameSheet(oldname, newname);
+			serie.getValues().renameSheet(oldname, newname);
+		}
+    }
+    
+    //20111007, henrichen@zkoss.org: get chart type
+    public ChartType getChartType() {
+    	final CTPlotArea plotArea = chart.getPlotArea();
+    	//Area3D
+    	final CTArea3DChart[] area3ds = plotArea.getArea3DChartArray();
+    	if (area3ds != null && area3ds.length > 0) {
+    		return ChartType.Area3D;
+    	}
+    	
+    	//Area
+    	final CTAreaChart[] areas = plotArea.getAreaChartArray();
+    	if (areas != null && areas.length > 0) {
+    		return ChartType.Area;
+    	}
+
+    	//Bar3D
+    	final CTBar3DChart[] bar3ds = plotArea.getBar3DChartArray();
+    	if (bar3ds != null && bar3ds.length > 0) {
+    		return ChartType.Bar3D;
+    	}
+    	
+    	//Bar
+    	final CTBarChart[] bars = plotArea.getBarChartArray();
+    	if (bars != null && bars.length > 0) {
+    		return ChartType.Bar;
+    	}
+    	
+    	//Bubble
+    	final CTBubbleChart[] bubbles = plotArea.getBubbleChartArray();
+    	if (bubbles != null && bubbles.length > 0) {
+    		return ChartType.Bubble;
+    	}
+
+    	//Doughnut
+    	final CTDoughnutChart[] donuts = plotArea.getDoughnutChartArray();
+    	if (donuts != null && donuts.length > 0) {
+    		return ChartType.Doughnut;
+    	}
+    	
+    	//Line3D
+    	final CTLine3DChart[] line3ds = plotArea.getLine3DChartArray();
+    	if (line3ds != null && line3ds.length > 0) {
+    		return ChartType.Line3D;
+    	}
+    	
+    	//Line
+    	final CTLineChart[] lines = plotArea.getLineChartArray();
+    	if (lines != null && lines.length > 0) {
+    		return ChartType.Line;
+    	}
+    	
+    	//OfPie
+    	final CTOfPieChart[] ofpies = plotArea.getOfPieChartArray();
+    	if (ofpies != null && ofpies.length > 0) {
+    		return ChartType.OfPie;
+    	}
+    	
+    	//Pie3D
+    	final CTPie3DChart[] pie3ds = plotArea.getPie3DChartArray();
+    	if (pie3ds != null && pie3ds.length > 0) {
+    		return ChartType.Pie3D;
+    	}
+    	
+    	//Pie
+    	final CTPieChart[] pies = plotArea.getPieChartArray();
+    	if (pies != null && pies.length > 0) {
+    		return ChartType.Pie;
+    	}
+
+    	//Radar
+    	final CTRadarChart[] radars = plotArea.getRadarChartArray();
+    	if (radars != null && radars.length > 0) {
+    		return ChartType.Radar;
+    	}
+
+    	//Scatter
+    	final CTScatterChart[] scatters = plotArea.getScatterChartArray();
+    	if (scatters != null && scatters.length > 0) {
+    		return ChartType.Scatter;
+    	}
+    	
+    	//Stock
+    	final CTStockChart[] stocks = plotArea.getStockChartArray();
+    	if (stocks != null && stocks.length > 0) {
+    		return ChartType.Stock;
+    	}
+
+    	//Surface3D
+    	final CTSurface3DChart[] surface3ds = plotArea.getSurface3DChartArray();
+    	if (surface3ds != null && surface3ds.length > 0) {
+    		return ChartType.Surface3D;
+    	}
+    	
+    	//Surface
+    	final CTSurfaceChart[] surfaces = plotArea.getSurfaceChartArray();
+    	if (surfaces != null && surfaces.length > 0) {
+    		return ChartType.Surface;
+    	}
+    	
+    	return null;
+    }
 }

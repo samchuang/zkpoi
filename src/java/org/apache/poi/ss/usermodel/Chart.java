@@ -65,4 +65,8 @@ public interface Chart extends ManuallyPositionable {
 	 * @param data a data to plot
 	 */
 	void plot(ChartData data, ChartAxis... axis);
+	
+	
+	//20111007, henrichen@zkoss.org: rename sheet could affect the reference
+	void renameSheet(String oldname, String newname);
 }

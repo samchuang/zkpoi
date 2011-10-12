@@ -35,7 +35,7 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.STLegendPos;
 public final class XSSFChartLegend implements ChartLegend {
 
 	/**
-	 * Underlaying CTLagend bean
+	 * Underlying CTLagend bean
 	 */
 	private CTLegend legend;
 

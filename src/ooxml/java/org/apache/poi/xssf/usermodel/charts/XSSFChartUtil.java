@@ -20,6 +20,7 @@
 package org.zkoss.poi.xssf.usermodel.charts;
 
 import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
+import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
 import org.openxmlformats.schemas.drawingml.x2006.chart.*;
 
 /**
@@ -111,5 +112,34 @@ class XSSFChartUtil {
                 ctNumVal.setV(value.toString());
             }
         }
+    }
+    
+    
+    //20111006, henrichen@zkoss.org: handle serie title text
+    /**
+     * Builds CTSerTx object content from POI ChartDataSource.
+     * @param ctSerTx OOXML serie text source to build
+     * @param textSource POI text source to use
+     */
+    public static void buildSerTx(CTSerTx ctSerTx, ChartTextSource textSource) {
+    	final String value = textSource.getFormulaString();
+        if (textSource.isReference()) {
+        	buildStrRef(ctSerTx.addNewStrRef(), textSource);
+        } else {
+            ctSerTx.setV(textSource.getTextString());
+        }
+    }
+    //20111006, henrichen@zkoss.org: handle serie title text
+    private static void buildStrRef(CTStrRef ctStrRef, ChartTextSource textSource) {
+        ctStrRef.setF(textSource.getFormulaString());
+        CTStrData cache = ctStrRef.addNewStrCache();
+        fillStringCache(cache, textSource);
+    }
+    //20111006, henrichen@zkoss.org: handle serie title text
+    private static void fillStringCache(CTStrData cache, ChartTextSource textSource) {
+        cache.addNewPtCount().setVal(1);
+        CTStrVal ctStrVal = cache.addNewPt();
+        ctStrVal.setIdx(0);
+        ctStrVal.setV(textSource.getTextString());
     }
 }

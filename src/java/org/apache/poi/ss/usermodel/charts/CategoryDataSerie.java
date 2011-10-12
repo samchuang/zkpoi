@@ -14,20 +14,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.zkoss.poi.ss.usermodel;
 
-import org.zkoss.poi.ss.util.CellRangeAddressBase;
+package org.zkoss.poi.ss.usermodel.charts;
+
+import org.zkoss.poi.util.Beta;
 
 /**
- * Represents a chart in a SpreadsheetML document
+ * Represents a category data serie.
  *
  * @author henrichen@zkoss.org
  */
-public interface ZssChart {
+@Beta
+public interface CategoryDataSerie {
+    /**
+     * @return text source used for title of this serie
+     */
+    ChartTextSource getTitle();
+	
+    /**
+     * @return data source used for pie slice category labels
+     */
+    ChartDataSource<?> getCategories();
 
-    ClientAnchor getPreferredSize();
+    /**
+     * @return data source used for pie slice values
+     */
+    ChartDataSource<? extends Number> getValues();
 
-    ChartInfo getChartInfo();
-    
-	String getName();
 }

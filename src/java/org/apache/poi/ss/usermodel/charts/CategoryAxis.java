@@ -20,29 +20,30 @@ package org.zkoss.poi.ss.usermodel.charts;
 import org.zkoss.poi.util.Beta;
 
 /**
- * @author Roman Kashitsyn
+ * @author henrichen@zkoss.org
  */
 @Beta
-public interface ValueAxis extends ChartAxis {
+public interface CategoryAxis extends ChartAxis {
 
 	/**
-	 * @return cross between type
+	 * @return label alignment type
 	 */
-	AxisCrossBetween getCrossBetween();
+	AxisLabelAlign getLabelAlign();
 
 	/**
-	 * @param crossBetween cross between type
+	 * @param labelAlign label alignment type
 	 */
-	void setCrossBetween(AxisCrossBetween crossBetween);
-
-	//20111012, henrichen@zkoss.org: move from ChartAxis to here
+	void setLabelAlign(AxisLabelAlign labelAlign);
+	
 	/**
-	 * @return axis number format
+	 * Returns label offset
+	 * @return label offset
 	 */
-	String getNumberFormat();
-
+	int getLabelOffset();
+	
 	/**
-	 * @param format axis number format
+	 * Set label offset
+	 * @param offset label offset
 	 */
-	void setNumberFormat(String format);
+	void setLabelOffset(int offset);
 }

@@ -69,4 +69,7 @@ public interface ChartDataSource<T> {
      *                reference.
      */
     String getFormulaString();
+    
+    //20111007, henrichen@zkoss.org: when sheet name change, the reference has to be adjusted accordingly
+    void renameSheet(String oldname, String newname);
 }

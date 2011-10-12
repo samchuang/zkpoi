@@ -52,6 +52,12 @@ public class DataSources {
             public boolean isNumeric() {
                 return true;
             }
+
+            //20111007, henrichen@zkoss.org: sheet name change will affect reference
+			@Override
+			public void renameSheet(String oldname, String newname) {
+				// TODO Auto-generated method stub
+			}
         };
     }
 
@@ -69,6 +75,12 @@ public class DataSources {
             public boolean isNumeric() {
                 return false;
             }
+            
+            //20111007, henrichen@zkoss.org: sheet name change will affect reference
+			@Override
+			public void renameSheet(String oldname, String newname) {
+				// TODO Auto-generated method stub
+			}
         };
     }
 
@@ -100,6 +112,12 @@ public class DataSources {
         public String getFormulaString() {
             throw new UnsupportedOperationException("Literal data source can not be expressed by reference.");
         }
+        
+        //20111007, henrichen@zkoss.org: sheet name change will affect reference
+		@Override
+		public void renameSheet(String oldname, String newname) {
+			// TODO Auto-generated method stub
+		}
     }
 
     private abstract static class AbstractCellRangeDataSource<T> implements ChartDataSource<T> {

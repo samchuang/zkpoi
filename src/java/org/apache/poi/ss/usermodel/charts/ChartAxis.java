@@ -45,12 +45,12 @@ public interface ChartAxis {
 	/**
 	 * @return axis number format
 	 */
-	String getNumberFormat();
+//	String getNumberFormat(); //moved to ValueAxis
 
 	/**
 	 * @param format axis number format
 	 */
-	void setNumberFormat(String format);
+//	void setNumberFormat(String format); //moved to ValueAxis
 
 	/**
 	 * @return true if log base is defined, false otherwise
@@ -123,4 +123,18 @@ public interface ChartAxis {
 	 * @param axis that this axis should cross
 	 */
 	void crossAxis(ChartAxis axis);
+
+	
+	//20111012, henrichen@zkoss.org: handle tick label position
+	/**
+	 * Returns tick label position.
+	 * @return tick label position.
+	 */
+	AxisTickLabelPosition getTickLabelPosition();
+	
+	/**
+	 * Sets tick label position.
+	 * @param tickLblPos the tick label position
+	 */
+	void setTickLabelPosition(AxisTickLabelPosition tickLblPos);
 }

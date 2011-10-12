@@ -17,6 +17,7 @@
 
 package org.zkoss.poi.xssf.usermodel.charts;
 
+import org.zkoss.poi.ss.usermodel.charts.AxisTickLabelPosition;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ValueAxis;
 import org.zkoss.poi.ss.usermodel.charts.AxisPosition;
@@ -26,6 +27,7 @@ import org.zkoss.poi.ss.usermodel.charts.AxisCrosses;
 
 import org.zkoss.poi.util.Beta;
 import org.zkoss.poi.xssf.usermodel.XSSFChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTTickLblPos;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTValAx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxPos;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumFmt;
@@ -126,5 +128,11 @@ public class XSSFValueAxis extends XSSFChartAxis implements ValueAxis {
 			default:
 				throw new IllegalArgumentException();
 		}
+	}
+
+	//20111012, henrichen@zkoss.org: handle TickLblPos
+	@Override
+	protected CTTickLblPos getTickLblPos() {
+		return ctValAx.getTickLblPos();
 	}
 }

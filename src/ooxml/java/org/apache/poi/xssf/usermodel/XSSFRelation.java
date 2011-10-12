@@ -125,7 +125,7 @@ public final class XSSFRelation extends POIXMLRelation {
          "application/vnd.openxmlformats-officedocument.drawingml.chart+xml",
          "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
          "/xl/charts/chart#.xml",
-         ZssXSSFChart.class
+         XSSFChart.class
    );
 
 	public static final XSSFRelation CUSTOM_XML_MAPPINGS = new XSSFRelation(

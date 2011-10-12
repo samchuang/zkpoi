@@ -14,35 +14,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
+package org.zkoss.poi.ss.usermodel;
 
-package org.zkoss.poi.ss.usermodel.charts;
-
-import org.zkoss.poi.util.Beta;
+import org.zkoss.poi.ss.util.CellRangeAddressBase;
 
 /**
- * @author Roman Kashitsyn
+ * Represents a chart in a SpreadsheetML document
+ *
+ * @author henrichen@zkoss.org
  */
-@Beta
-public interface ValueAxis extends ChartAxis {
+public interface ZssChartX {
 
-	/**
-	 * @return cross between type
-	 */
-	AxisCrossBetween getCrossBetween();
+    ClientAnchor getPreferredSize();
 
-	/**
-	 * @param crossBetween cross between type
-	 */
-	void setCrossBetween(AxisCrossBetween crossBetween);
-
-	//20111012, henrichen@zkoss.org: move from ChartAxis to here
-	/**
-	 * @return axis number format
-	 */
-	String getNumberFormat();
-
-	/**
-	 * @param format axis number format
-	 */
-	void setNumberFormat(String format);
+    ChartInfo getChartInfo();
+    
+    Chart getChart();
+    
+	String getName();
 }
