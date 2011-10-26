@@ -58,6 +58,18 @@ public class XSSFDoughnutChartData implements CategoryData {
     	if (plotCharts != null && plotCharts.length > 0) {
     		ctDoughnutChart = plotCharts[0];
     	}
+    	
+    	if (ctDoughnutChart != null) {
+    		@SuppressWarnings("deprecation")
+			CTPieSer[] bsers = ctDoughnutChart.getSerArray();
+    		for (int j = 0; j < bsers.length; ++j) {
+    			final CTPieSer ser = bsers[j];
+    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
+    			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
+		    	addSerie(title, cats, vals);
+    		}
+	    }
     }
     
     /**
@@ -106,6 +118,7 @@ public class XSSFDoughnutChartData implements CategoryData {
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
 	        ctDoughnutChart = plotArea.addNewDoughnutChart();
         
+	        ctDoughnutChart.addNewVaryColors().setVal(true);
 	        //TODO setup other properties of doughnutChart
 	        //doughnutChart.addNewFirstSliceAng();
 	

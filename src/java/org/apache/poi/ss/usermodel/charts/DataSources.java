@@ -52,12 +52,6 @@ public class DataSources {
             public boolean isNumeric() {
                 return true;
             }
-
-            //20111007, henrichen@zkoss.org: sheet name change will affect reference
-			@Override
-			public void renameSheet(String oldname, String newname) {
-				// TODO Auto-generated method stub
-			}
         };
     }
 
@@ -75,16 +69,10 @@ public class DataSources {
             public boolean isNumeric() {
                 return false;
             }
-            
-            //20111007, henrichen@zkoss.org: sheet name change will affect reference
-			@Override
-			public void renameSheet(String oldname, String newname) {
-				// TODO Auto-generated method stub
-			}
         };
     }
 
-    private static class ArrayDataSource<T> implements ChartDataSource<T> {
+    public static class ArrayDataSource<T> implements ChartDataSource<T> { //20111014, henrichen@zkoss.org: public
 
         private final T[] elements;
 
@@ -116,7 +104,7 @@ public class DataSources {
         //20111007, henrichen@zkoss.org: sheet name change will affect reference
 		@Override
 		public void renameSheet(String oldname, String newname) {
-			// TODO Auto-generated method stub
+			//do nothing, it is not a reference case
 		}
     }
 
@@ -160,5 +148,109 @@ public class DataSources {
             Row row = sheet.getRow(rowIndex);
             return (row == null) ? null : evaluator.evaluate(row.getCell(cellIndex));
         }
+        
+        //20111007, henrichen@zkoss.org: sheet name change will affect reference
+		@Override
+		public void renameSheet(String oldname, String newname) {
+			//Do nothing, sheet is there
+		}
+    }
+    
+    //20111007, henrichen@zkoss.org: CellRange referenced ChartTextSource
+    private static class CellRangeTextSource implements ChartTextSource {
+        private final Sheet sheet;
+        private final CellRangeAddress cellRangeAddress;
+        private final int numOfCells;
+        private FormulaEvaluator evaluator;
+
+        protected CellRangeTextSource(Sheet sheet, CellRangeAddress cellRangeAddress) {
+            this.sheet = sheet;
+            // Make copy since CellRangeAddress is mutable.
+            this.cellRangeAddress = cellRangeAddress.copy();
+            this.numOfCells = this.cellRangeAddress.getNumberOfCells();
+            this.evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
+        }
+
+        public boolean isReference() {
+            return true;
+        }
+
+        public String getFormulaString() {
+            return cellRangeAddress.formatAsString(sheet.getSheetName(), true);
+        }
+
+        protected CellValue getCellValueAt(int index) {
+            if (index < 0 || index >= numOfCells) {
+                throw new IndexOutOfBoundsException("Index must be between 0 and " +
+                        (numOfCells - 1) + " (inclusive), given: " + index);
+            }
+            int firstRow = cellRangeAddress.getFirstRow();
+            int firstCol = cellRangeAddress.getFirstColumn();
+            int lastCol = cellRangeAddress.getLastColumn();
+            int width = lastCol - firstCol + 1;
+            int rowIndex = firstRow + index / width;
+            int cellIndex = firstCol + index % width;
+            Row row = sheet.getRow(rowIndex);
+            return (row == null) ? null : evaluator.evaluate(row.getCell(cellIndex));
+        }
+        
+		@Override
+		public void renameSheet(String oldname, String newname) {
+			//Do nothing, sheet is there
+		}
+
+		@Override
+		public String getTextString() {
+			StringBuilder sb = new StringBuilder();
+			for(int j = 0; j < numOfCells; ++j) {
+	            CellValue cellValue = getCellValueAt(j);
+	            if (cellValue != null) {
+	                sb.append(cellValue.getStringValue());
+	            }
+			}
+			return sb.length() == 0 ? null : sb.toString();
+		}
+    }
+
+    //20111025, henrichen@zkoss: Literal ChartTextSource
+    private static class LiteralTextSource implements ChartTextSource {
+
+        private String element;
+
+        public LiteralTextSource(String element) {
+            this.element = element;
+        }
+
+        public boolean isReference() {
+            return false;
+        }
+
+        public boolean isNumeric() {
+        	return false;
+        }
+
+        public String getFormulaString() {
+            throw new UnsupportedOperationException("Literal data source can not be expressed by reference.");
+        }
+        
+		@Override
+		public void renameSheet(String oldname, String newname) {
+			//do nothing, it is not a reference case
+		}
+
+		@Override
+		public String getTextString() {
+			return element;
+		}
+    }
+    
+    //20111025, henrichen@zkoss: Literal ChartTextSource
+    public static ChartTextSource fromString(String element) {
+        return new LiteralTextSource(element);
+    }
+
+    //20111007, henrichen@zkoss.org: CellRange referenced ChartTextSource
+    public static ChartTextSource fromCellRange(Sheet sheet, CellRangeAddress cellRangeAddress) {
+        return new CellRangeTextSource(sheet, cellRangeAddress);
     }
 }

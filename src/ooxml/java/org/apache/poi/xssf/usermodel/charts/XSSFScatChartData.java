@@ -19,56 +19,60 @@ package org.zkoss.poi.xssf.usermodel.charts;
 
 import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.AbstractXYDataSerie;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
 import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
 import org.zkoss.poi.ss.usermodel.charts.CategoryData;
 import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.XYData;
+import org.zkoss.poi.ss.usermodel.charts.XYDataSerie;
 import org.zkoss.poi.util.Beta;
 import org.zkoss.poi.xssf.usermodel.XSSFChart;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFBarChartData.Serie;
 import org.openxmlformats.schemas.drawingml.x2006.chart.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents DrawingML line 3D chart.
+ * Represents DrawingML line chart.
  *
  * @author henrichen@zkoss.org
  */
 @Beta
-public class XSSFLine3DChartData implements CategoryData {
+public class XSSFScatChartData implements XYData {
 
-	private CTLine3DChart ctLine3DChart;
+	private CTScatterChart ctScatterChart;
     /**
      * List of all data series.
      */
-    private List<CategoryDataSerie> series;
+    private List<XYDataSerie> series;
 
-    public XSSFLine3DChartData() {
-        series = new ArrayList<CategoryDataSerie>();
+    public XSSFScatChartData() {
+        series = new ArrayList<XYDataSerie>();
     }
 
-    public XSSFLine3DChartData(XSSFChart chart) {
+    public XSSFScatChartData(XSSFChart chart) {
     	this();
     	final CTPlotArea plotArea = chart.getCTChart().getPlotArea();
     	
-    	//Line3D
+    	//Line
     	@SuppressWarnings("deprecation")
-		final CTLine3DChart[] plotCharts = plotArea.getLine3DChartArray();
+		final CTScatterChart[] plotCharts = plotArea.getScatterChartArray();
     	if (plotCharts != null && plotCharts.length > 0) {
-    		ctLine3DChart = plotCharts[0];
+    		ctScatterChart = plotCharts[0];
     	}
     	
-    	if (ctLine3DChart != null) {
+    	if (ctScatterChart != null) {
     		@SuppressWarnings("deprecation")
-			CTLineSer[] bsers = ctLine3DChart.getSerArray();
-    		for (int j = 0; j < bsers.length; ++j) {
-    			final CTLineSer ser = bsers[j];
+			CTScatterSer[] sers = ctScatterChart.getSerArray();
+    		for (int j = 0; j < sers.length; ++j) {
+    			final CTScatterSer ser = sers[j];
     			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
-    			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
-    			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
-		    	addSerie(title, cats, vals);
+    			ChartDataSource<Double> xs = new  XSSFChartAxDataSource<Double>(ser.getXVal());
+    			ChartDataSource<Double> ys = new  XSSFChartNumDataSource<Double>(ser.getYVal());
+		    	addSerie(title, xs, ys);
     		}
 	    }
     }
@@ -76,37 +80,26 @@ public class XSSFLine3DChartData implements CategoryData {
     /**
      * Package private PieChartSerie implementation.
      */
-    static class Serie extends AbstractCategoryDataSerie {
+    static class Serie extends AbstractXYDataSerie {
         protected Serie(int id, int order, ChartTextSource title,
-				ChartDataSource<?> cats, ChartDataSource<? extends Number> vals) {
-			super(id, order, title, cats, vals);
+				ChartDataSource<? extends Number> xs, ChartDataSource<? extends Number> ys) {
+			super(id, order, title, xs, ys);
 		}
 
-		protected void addToChart(CTLine3DChart ctLine3DChart) {
-            CTLineSer lineSer = ctLine3DChart.addNewSer();
-            lineSer.addNewIdx().setVal(this.id);
-            lineSer.addNewOrder().setVal(this.order);
+		protected void addToChart(CTScatterChart ctScatterChart) {
+            CTScatterSer scatterSer = ctScatterChart.addNewSer();
+            scatterSer.addNewIdx().setVal(this.id);
+            scatterSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = lineSer.addNewTx();
+            CTSerTx tx = scatterSer.addNewTx();
             XSSFChartUtil.buildSerTx(tx, title);
             
-            CTAxDataSource cats = lineSer.addNewCat();
-            XSSFChartUtil.buildAxDataSource(cats, categories);
+            CTAxDataSource cats = scatterSer.addNewXVal();
+            XSSFChartUtil.buildAxDataSource(cats, this.xs);
 
-            CTNumDataSource vals = lineSer.addNewVal();
-            XSSFChartUtil.buildNumDataSource(vals, values);
+            CTNumDataSource vals = scatterSer.addNewYVal();
+            XSSFChartUtil.buildNumDataSource(vals, this.ys);
         }
-    }
-
-    public CategoryDataSerie addSerie(ChartTextSource title, ChartDataSource<?> cats,
-                                      ChartDataSource<? extends Number> vals) {
-        if (!vals.isNumeric()) {
-            throw new IllegalArgumentException("Pie data source must be numeric.");
-        }
-        int numOfSeries = series.size();
-        Serie newSerie = new Serie(numOfSeries, numOfSeries, title, cats, vals);
-        series.add(newSerie);
-        return newSerie;
     }
 
     public void fillChart(Chart chart, ChartAxis... axis) {
@@ -114,21 +107,37 @@ public class XSSFLine3DChartData implements CategoryData {
             throw new IllegalArgumentException("Chart must be instance of XSSFChart");
         }
 
-        if (ctLine3DChart == null) {
+        if (ctScatterChart == null) {
 	        XSSFChart xssfChart = (XSSFChart) chart;
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
-	        ctLine3DChart = plotArea.addNewLine3DChart();
+	        ctScatterChart = plotArea.addNewScatterChart();
         
-	        ctLine3DChart.addNewVaryColors().setVal(true);
-	        //TODO setup other properties of line3DChart
+	        ctScatterChart.addNewVaryColors().setVal(true);
+	        //TODO setup other properties of scatterChart
 	
-	        for (CategoryDataSerie s : series) {
-	            ((Serie)s).addToChart(ctLine3DChart);
+	        for (XYDataSerie s : series) {
+	            ((Serie)s).addToChart(ctScatterChart);
 	        }
         }
     }
 
-    public List<? extends CategoryDataSerie> getSeries() {
+    public List<? extends XYDataSerie> getSeries() {
         return series;
     }
+
+	@Override
+	public XYDataSerie addSerie(ChartTextSource title,
+			ChartDataSource<? extends Number> xs,
+			ChartDataSource<? extends Number> ys) {
+		if (!xs.isNumeric()) {
+			xs = XSSFChartUtil.buildDefaultNumDataSource(xs);
+		}
+		if (!ys.isNumeric()) {
+			throw new IllegalArgumentException("Y Axis data source must be numeric.");
+		}
+		int numOfSeries = series.size();
+		Serie newSerie = new Serie(numOfSeries, numOfSeries, title, xs, ys);
+		series.add(newSerie);
+		return newSerie;
+	}
 }

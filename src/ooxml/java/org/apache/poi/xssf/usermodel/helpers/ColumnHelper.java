@@ -100,7 +100,11 @@ public class ColumnHelper {
      *  as 1 based.
      */
     public CTCol getColumn1Based(long index1, boolean splitColumns) {
-        CTCols colsArray = worksheet.getColsArray(0);
+    	//20111016, henrichen@zkoss.org: colsArrays sometimes is null; have to check first
+    	CTCols[] colsArrays = worksheet.getColsArray(); //might be null sometimes
+    	if (colsArrays.length == 0) return null;
+    	CTCols colsArray = colsArrays[0];
+//        CTCols colsArray = worksheet.getColsArray(0);
 		for (int i = 0; i < colsArray.sizeOfColArray(); i++) {
             CTCol colArray = colsArray.getColArray(i);
 			if (colArray.getMin() <= index1 && colArray.getMax() >= index1) {

@@ -37,6 +37,7 @@ import org.zkoss.poi.ss.usermodel.charts.ChartAxisFactory;
 import org.zkoss.poi.ss.usermodel.charts.ChartType;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFBar3DChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFBarChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFCategoryAxis;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartDataFactory;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartAxis;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFDoughnutChartData;
@@ -238,6 +239,18 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
 	public XSSFValueAxis createValueAxis(AxisPosition pos) {
 		long id = axis.size() + 1;
 		XSSFValueAxis valueAxis = new XSSFValueAxis(this, id, pos);
+		if (axis.size() == 1) {
+			ChartAxis ax = axis.get(0);
+			ax.crossAxis(valueAxis);
+			valueAxis.crossAxis(ax);
+		}
+		axis.add(valueAxis);
+		return valueAxis;
+	}
+
+	public XSSFCategoryAxis createCategoryAxis(AxisPosition pos) {
+		long id = axis.size() + 1;
+		XSSFCategoryAxis valueAxis = new XSSFCategoryAxis(this, id, pos);
 		if (axis.size() == 1) {
 			ChartAxis ax = axis.get(0);
 			ax.crossAxis(valueAxis);

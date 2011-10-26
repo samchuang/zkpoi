@@ -101,7 +101,7 @@ public class XSSFLineChartData implements CategoryData {
     public CategoryDataSerie addSerie(ChartTextSource title, ChartDataSource<?> cats,
                                       ChartDataSource<? extends Number> vals) {
         if (!vals.isNumeric()) {
-            throw new IllegalArgumentException("Pie data source must be numeric.");
+            throw new IllegalArgumentException("Line data source must be numeric.");
         }
         int numOfSeries = series.size();
         Serie newSerie = new Serie(numOfSeries, numOfSeries, title, cats, vals);
@@ -119,6 +119,7 @@ public class XSSFLineChartData implements CategoryData {
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
 	        ctLineChart = plotArea.addNewLineChart();
         
+	        ctLineChart.addNewVaryColors().setVal(true);
 	        //TODO setup other properties of lineChart
 	
 	        for (CategoryDataSerie s : series) {

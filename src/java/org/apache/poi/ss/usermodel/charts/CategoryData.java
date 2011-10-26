@@ -24,10 +24,10 @@ import java.util.List;
  */
 public interface CategoryData extends ChartData {
 	/**
-	 * @param title text source to be used for pie chart serie
-	 * @param categories data source to be used for pie slice categories
-	 * @param values data source to be used for pie slice values
-	 * @return a new pie charts serie
+	 * @param title text source to be used for serie title
+	 * @param categories category labels to be used for category serie
+	 * @param values data source to be used for category values
+	 * @return a new category serie
 	 */
 	CategoryDataSerie addSerie(ChartTextSource title, ChartDataSource<?> categories, ChartDataSource<? extends Number> values);
 

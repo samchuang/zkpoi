@@ -20,25 +20,38 @@ package org.zkoss.poi.ss.usermodel.charts;
 import org.zkoss.poi.util.Beta;
 
 /**
- * Represents a category data serie.
+ * Represents a xy data serie.
  *
  * @author henrichen@zkoss.org
  */
 @Beta
-public interface CategoryDataSerie {
+public interface StockDataSerie {
     /**
-     * @return text source used for title of this serie
-     */
-    ChartTextSource getTitle();
-	
-    /**
-     * @return data source used for category labels
+     * @return data source used for stock labels
      */
     ChartDataSource<?> getCategories();
 
     /**
-     * @return data source used for category values
+     * @return data source used for volume of the stock
      */
-    ChartDataSource<? extends Number> getValues();
+    ChartDataSource<? extends Number> getVolumes();
+    /**
+     * @return data source used for open price of the stock
+     */
+    ChartDataSource<? extends Number> getOpens();
 
+    /**
+     * @return data source used for highest price of the stock
+     */
+    ChartDataSource<? extends Number> getHighs();
+
+    /**
+     * @return data source used for lowest price of the stock
+     */
+    ChartDataSource<? extends Number> getLows();
+    
+    /**
+     * @return data source used for highest price of the stock
+     */
+    ChartDataSource<? extends Number> getCloses();
 }

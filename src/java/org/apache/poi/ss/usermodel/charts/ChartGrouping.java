@@ -14,16 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.zkoss.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel.charts;
 
 /**
- * High level representation of a drop down list of a filter.
+ * @author henrichen@zkoss.org
  *
- * @author peterkuo@zkoss.org
  */
-
-public interface Combo {
-
-	public ClientAnchor getClientAnchor();
-
+public enum ChartGrouping {
+	STANDARD,
+	STACKED,
+	PERCENT_STACKED,
+	CLUSTERED; //bar only
 }

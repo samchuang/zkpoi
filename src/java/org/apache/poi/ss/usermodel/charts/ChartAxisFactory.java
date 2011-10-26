@@ -33,4 +33,8 @@ public interface ChartAxisFactory {
 	 */
 	ValueAxis createValueAxis(AxisPosition pos);
 
+	/**
+	 * @return new category axis
+	 */
+	CategoryAxis createCategoryAxis(AxisPosition pos);
 }

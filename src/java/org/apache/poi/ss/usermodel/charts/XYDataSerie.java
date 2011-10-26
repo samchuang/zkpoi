@@ -20,25 +20,25 @@ package org.zkoss.poi.ss.usermodel.charts;
 import org.zkoss.poi.util.Beta;
 
 /**
- * Represents a category data serie.
+ * Represents a xy data serie.
  *
  * @author henrichen@zkoss.org
  */
 @Beta
-public interface CategoryDataSerie {
+public interface XYDataSerie {
     /**
      * @return text source used for title of this serie
      */
     ChartTextSource getTitle();
 	
     /**
-     * @return data source used for category labels
+     * @return data source used for x axis values
      */
-    ChartDataSource<?> getCategories();
+    ChartDataSource<? extends Number> getXs();
 
     /**
-     * @return data source used for category values
+     * @return data source used for y axis values
      */
-    ChartDataSource<? extends Number> getValues();
+    ChartDataSource<? extends Number> getYs();
 
 }

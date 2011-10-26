@@ -17,60 +17,74 @@
 
 package org.zkoss.poi.xssf.usermodel.charts;
 
-import org.zkoss.poi.ss.usermodel.Chart;
-import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
-import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
-import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
-import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
-import org.zkoss.poi.ss.usermodel.charts.CategoryData;
-import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
-import org.zkoss.poi.util.Beta;
-import org.zkoss.poi.xssf.usermodel.XSSFChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTArea3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTAreaSer;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumDataSource;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTSerTx;
+import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.CategoryData;
+import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
+import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
+import org.zkoss.poi.ss.usermodel.charts.ChartGrouping;
+import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
+import org.zkoss.poi.util.Beta;
+import org.zkoss.poi.xssf.usermodel.XSSFChart;
+
 /**
- * Represents DrawingML line 3D chart.
+ * Represents DrawingML area 3D chart.
  *
  * @author henrichen@zkoss.org
  */
 @Beta
-public class XSSFLine3DChartData implements CategoryData {
+public class XSSFArea3DChartData implements CategoryData {
 
-	private CTLine3DChart ctLine3DChart;
+	private CTArea3DChart ctArea3DChart;
     /**
      * List of all data series.
      */
     private List<CategoryDataSerie> series;
 
-    public XSSFLine3DChartData() {
+    public XSSFArea3DChartData() {
         series = new ArrayList<CategoryDataSerie>();
     }
 
-    public XSSFLine3DChartData(XSSFChart chart) {
+    public XSSFArea3DChartData(XSSFChart chart) {
     	this();
     	final CTPlotArea plotArea = chart.getCTChart().getPlotArea();
     	
-    	//Line3D
+    	//Area3D
     	@SuppressWarnings("deprecation")
-		final CTLine3DChart[] plotCharts = plotArea.getLine3DChartArray();
+		final CTArea3DChart[] plotCharts = plotArea.getArea3DChartArray();
     	if (plotCharts != null && plotCharts.length > 0) {
-    		ctLine3DChart = plotCharts[0];
+    		ctArea3DChart = plotCharts[0];
     	}
     	
-    	if (ctLine3DChart != null) {
+    	if (ctArea3DChart != null) {
     		@SuppressWarnings("deprecation")
-			CTLineSer[] bsers = ctLine3DChart.getSerArray();
+			CTAreaSer[] bsers = ctArea3DChart.getSerArray();
     		for (int j = 0; j < bsers.length; ++j) {
-    			final CTLineSer ser = bsers[j];
+    			final CTAreaSer ser = bsers[j];
     			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
     			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
     			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
 		    	addSerie(title, cats, vals);
     		}
 	    }
+    }
+    
+    public ChartGrouping getGrouping() {
+    	return XSSFChartUtil.toChartGrouping(ctArea3DChart.getGrouping());
+    }
+    
+    public void setGrouping(ChartGrouping grouping) {
+    	ctArea3DChart.getGrouping().setVal(XSSFChartUtil.fromChartGrouping(grouping));
     }
 
     /**
@@ -82,18 +96,18 @@ public class XSSFLine3DChartData implements CategoryData {
 			super(id, order, title, cats, vals);
 		}
 
-		protected void addToChart(CTLine3DChart ctLine3DChart) {
-            CTLineSer lineSer = ctLine3DChart.addNewSer();
-            lineSer.addNewIdx().setVal(this.id);
-            lineSer.addNewOrder().setVal(this.order);
+		protected void addToChart(CTArea3DChart ctArea3DChart) {
+            CTAreaSer areaSer = ctArea3DChart.addNewSer();
+            areaSer.addNewIdx().setVal(this.id);
+            areaSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = lineSer.addNewTx();
+            CTSerTx tx = areaSer.addNewTx();
             XSSFChartUtil.buildSerTx(tx, title);
             
-            CTAxDataSource cats = lineSer.addNewCat();
+            CTAxDataSource cats = areaSer.addNewCat();
             XSSFChartUtil.buildAxDataSource(cats, categories);
 
-            CTNumDataSource vals = lineSer.addNewVal();
+            CTNumDataSource vals = areaSer.addNewVal();
             XSSFChartUtil.buildNumDataSource(vals, values);
         }
     }
@@ -114,16 +128,16 @@ public class XSSFLine3DChartData implements CategoryData {
             throw new IllegalArgumentException("Chart must be instance of XSSFChart");
         }
 
-        if (ctLine3DChart == null) {
+        if (ctArea3DChart == null) {
 	        XSSFChart xssfChart = (XSSFChart) chart;
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
-	        ctLine3DChart = plotArea.addNewLine3DChart();
+	        ctArea3DChart = plotArea.addNewArea3DChart();
         
-	        ctLine3DChart.addNewVaryColors().setVal(true);
-	        //TODO setup other properties of line3DChart
-	
+	        ctArea3DChart.addNewVaryColors().setVal(true);
+	        //TODO setup other properties of area3DChart
+	        
 	        for (CategoryDataSerie s : series) {
-	            ((Serie)s).addToChart(ctLine3DChart);
+	            ((Serie)s).addToChart(ctArea3DChart);
 	        }
         }
     }

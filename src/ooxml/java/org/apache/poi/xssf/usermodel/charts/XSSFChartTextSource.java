@@ -26,6 +26,7 @@ import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
  */
 public class XSSFChartTextSource implements ChartTextSource {
 	private final CTSerTx tx;
+	
 	public XSSFChartTextSource(CTSerTx tx) {
 		this.tx = tx;
 	}

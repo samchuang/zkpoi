@@ -119,6 +119,7 @@ public class XSSFPie3DChartData implements CategoryData {
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
 	        ctPie3DChart = plotArea.addNewPie3DChart();
         
+	        ctPie3DChart.addNewVaryColors().setVal(true);
 	        //TODO setup other properties of pie3DChart
 	        //ctPie3DChart.addNewVaryColors();
 	

@@ -14,16 +14,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 ==================================================================== */
-package org.zkoss.poi.ss.usermodel;
+package org.zkoss.poi.ss.usermodel.charts;
 
 /**
- * High level representation of a drop down list of a filter.
+ * @author henri
  *
- * @author peterkuo@zkoss.org
  */
+public class AbstractXYZDataSerie extends AbstractXYDataSerie implements XYZDataSerie {
+    protected ChartDataSource<? extends Number> zs;
 
-public interface Combo {
+    protected AbstractXYZDataSerie(int id, int order,
+		ChartTextSource title,
+        ChartDataSource<? extends Number> xs,
+        ChartDataSource<? extends Number> ys,
+        ChartDataSource<? extends Number> zs) {
+    	super(id, order, title, xs, ys);
+    	this.zs = zs; 
+    }
 
-	public ClientAnchor getClientAnchor();
+	@Override
+	public ChartDataSource<? extends Number> getZs() {
+		return this.zs;
+	}
 
 }

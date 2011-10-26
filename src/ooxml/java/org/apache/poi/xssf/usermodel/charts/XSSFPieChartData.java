@@ -27,6 +27,7 @@ import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
 import org.zkoss.poi.util.Beta;
 import org.zkoss.poi.xssf.usermodel.XSSFChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.*;
+import org.openxmlformats.schemas.drawingml.x2006.diagram.STBooleans;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,18 @@ public class XSSFPieChartData implements CategoryData {
     	if (plotCharts != null && plotCharts.length > 0) {
     		ctPieChart = plotCharts[0];
     	}
+
+    	if (ctPieChart != null) {
+    		@SuppressWarnings("deprecation")
+			CTPieSer[] bsers = ctPieChart.getSerArray();
+    		for (int j = 0; j < bsers.length; ++j) {
+    			final CTPieSer ser = bsers[j];
+    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
+    			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
+		    	addSerie(title, cats, vals);
+    		}
+	    }
     }
     
     /**
@@ -106,8 +119,9 @@ public class XSSFPieChartData implements CategoryData {
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
 	        ctPieChart = plotArea.addNewPieChart();
         
+	        ctPieChart.addNewVaryColors().setVal(true);
 	        //TODO setup other properties of pieChart
-	        //pieChart.addNewFirstSliceAng();
+	        //ctPieChart.addNewFirstSliceAng();
 	
 	        for (CategoryDataSerie s : series) {
 	            ((Serie)s).addToChart(ctPieChart);

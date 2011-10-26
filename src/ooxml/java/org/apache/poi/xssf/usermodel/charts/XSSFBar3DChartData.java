@@ -17,19 +17,28 @@
 
 package org.zkoss.poi.xssf.usermodel.charts;
 
-import org.zkoss.poi.ss.usermodel.Chart;
-import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
-import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
-import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
-import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
-import org.zkoss.poi.ss.usermodel.charts.CategoryData;
-import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
-import org.zkoss.poi.util.Beta;
-import org.zkoss.poi.xssf.usermodel.XSSFChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBar3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarGrouping;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarSer;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumDataSource;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTSerTx;
+import org.openxmlformats.schemas.drawingml.x2006.chart.STBarGrouping;
+import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.ChartDirection;
+import org.zkoss.poi.ss.usermodel.charts.CategoryData;
+import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
+import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
+import org.zkoss.poi.ss.usermodel.charts.ChartGrouping;
+import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
+import org.zkoss.poi.util.Beta;
+import org.zkoss.poi.xssf.usermodel.XSSFChart;
 
 /**
  * Represents DrawingML bar 3D chart.
@@ -72,7 +81,23 @@ public class XSSFBar3DChartData implements CategoryData {
     		}
 	    }
     }
+    
+    public ChartGrouping getGrouping() {
+    	return XSSFChartUtil.toChartGroupingForBar(ctBar3DChart.getGrouping());
+    }
+    
+    public void setGrouping(ChartGrouping grouping) {
+    	ctBar3DChart.getGrouping().setVal(XSSFChartUtil.fromChartGroupingForBar(grouping));
+    }
 
+    public ChartDirection getBarDirection() {
+    	return XSSFChartUtil.toBarDirection(ctBar3DChart.getBarDir());
+    }
+    
+    public void setBarDirection(ChartDirection barDir) {
+    	ctBar3DChart.getBarDir().setVal(XSSFChartUtil.fromBarDirection(barDir));
+    }
+    
     /**
      * Package private PieChartSerie implementation.
      */
@@ -119,6 +144,7 @@ public class XSSFBar3DChartData implements CategoryData {
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
 	        ctBar3DChart = plotArea.addNewBar3DChart();
         
+	        ctBar3DChart.addNewVaryColors().setVal(true);
 	        //TODO setup other properties of bar3DChart
 	
 	        for (CategoryDataSerie s : series) {

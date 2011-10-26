@@ -17,28 +17,26 @@
 
 package org.zkoss.poi.ss.usermodel.charts;
 
-import org.zkoss.poi.util.Beta;
+import java.util.List;
 
 /**
- * Represents a category data serie.
- *
  * @author henrichen@zkoss.org
  */
-@Beta
-public interface CategoryDataSerie {
-    /**
-     * @return text source used for title of this serie
-     */
-    ChartTextSource getTitle();
-	
-    /**
-     * @return data source used for category labels
-     */
-    ChartDataSource<?> getCategories();
+public interface XYZData extends ChartData {
+	/**
+	 * @param title text source to be used for chart serie title
+	 * @param xs axis data source to be used for xyz data serie
+	 * @param ys axis data source to be used for xyz data serie
+	 * @param zs axis data source to be used for xyz data serie
+	 * @return a new xyz serie
+	 */
+	XYZDataSerie addSerie(ChartTextSource title, 
+			ChartDataSource<? extends Number> xs, 
+			ChartDataSource<? extends Number> ys, 
+			ChartDataSource<? extends Number> zs);
 
-    /**
-     * @return data source used for category values
-     */
-    ChartDataSource<? extends Number> getValues();
-
+	/**
+	 * @return list of all series
+	 */
+	List<? extends XYZDataSerie> getSeries();
 }

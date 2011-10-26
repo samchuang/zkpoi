@@ -19,9 +19,11 @@ package org.zkoss.poi.xssf.usermodel.charts;
 
 import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
+import org.zkoss.poi.ss.usermodel.charts.ChartDirection;
 import org.zkoss.poi.ss.usermodel.charts.CategoryData;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
+import org.zkoss.poi.ss.usermodel.charts.ChartGrouping;
 import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
 import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
 import org.zkoss.poi.util.Beta;
@@ -58,6 +60,34 @@ public class XSSFBarChartData implements CategoryData {
     	if (plotCharts != null && plotCharts.length > 0) {
     		ctBarChart = plotCharts[0];
     	}
+
+    	if (ctBarChart != null) {
+    		@SuppressWarnings("deprecation")
+			CTBarSer[] bsers = ctBarChart.getSerArray();
+    		for (int j = 0; j < bsers.length; ++j) {
+    			final CTBarSer ser = bsers[j];
+    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
+    			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
+		    	addSerie(title, cats, vals);
+    		}
+	    }
+    }
+    
+    public ChartGrouping getGrouping() {
+    	return XSSFChartUtil.toChartGroupingForBar(ctBarChart.getGrouping());
+    }
+    
+    public void setGrouping(ChartGrouping grouping) {
+    	ctBarChart.getGrouping().setVal(XSSFChartUtil.fromChartGroupingForBar(grouping));
+    }
+    
+    public ChartDirection getBarDirection() {
+    	return XSSFChartUtil.toBarDirection(ctBarChart.getBarDir());
+    }
+    
+    public void setBarDirection(ChartDirection barDir) {
+    	ctBarChart.getBarDir().setVal(XSSFChartUtil.fromBarDirection(barDir));
     }
     
     /**
@@ -106,6 +136,7 @@ public class XSSFBarChartData implements CategoryData {
 	        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
 	        ctBarChart = plotArea.addNewBarChart();
         
+	        ctBarChart.addNewVaryColors().setVal(true);
 	        //TODO setup other properties of barChart
 	
 	        for (CategoryDataSerie s : series) {
