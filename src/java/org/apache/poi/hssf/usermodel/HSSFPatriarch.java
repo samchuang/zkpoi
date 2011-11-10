@@ -31,6 +31,7 @@ import org.zkoss.poi.util.StringUtil;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.ss.usermodel.Drawing;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
+import org.zkoss.poi.ss.usermodel.Picture;
 
 /**
  * The patriarch is the toplevel container for shapes in a sheet.  It does
@@ -325,4 +326,10 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing {
         _shapes.add(shape);
         return shape;
     }
+
+    //20111109, henrichen@zkoss.org: currently support XSSFPicture only
+	@Override
+	public void deletePicture(Picture picture) {
+		// TODO Auto-generated method stub
+	}
 }

@@ -269,4 +269,10 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
 	public ClientAnchor getClientAnchor() {
 		return (ClientAnchor) getAnchor();
 	}
+
+	//20111109, henrichen@zkoss.org: identify the picture widget
+	@Override
+	public String getPictureId() {
+		return ""+getPictureIndex();
+	}
 }

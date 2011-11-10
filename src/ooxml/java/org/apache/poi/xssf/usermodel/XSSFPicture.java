@@ -299,11 +299,16 @@ public final class XSSFPicture extends XSSFShape implements Picture {
      */
     public XSSFPictureData getPictureData() {
         String blipId = ctPicture.getBlipFill().getBlip().getEmbed();
+        //20111109, henrichen@zkoss.org: use getRelationById() is faster!
+        final XSSFPictureData part = (XSSFPictureData) getDrawing().getRelationById(blipId); //20111109,henrichen@zkoss.org
+        if (part != null) return part; //20111109,henrichen@zkoss.org
+        /*
         for (POIXMLDocumentPart part : getDrawing().getRelations()) {
             if(part.getPackageRelationship().getId().equals(blipId)){
                 return (XSSFPictureData)part;
             }
         }
+        */
         logger.log(POILogger.WARN, "Picture data was not found for blipId=" + blipId);
         return null;
     }
@@ -317,11 +322,17 @@ public final class XSSFPicture extends XSSFShape implements Picture {
     	//TODO XSSFPicture#getName()
     	return ctPicture.getNvPicPr().getCNvPr().getName();
     }
+    //20101015, henrichen@zkoss.org
     public String getAlt() {
     	//TODO XSSFPicture#getAlt()
     	return ctPicture.getNvPicPr().getCNvPr().getDescr();
     }
+    //20101015, henrichen@zkoss.org
     public ClientAnchor getClientAnchor() {
     	return (ClientAnchor)getAnchor();
+    }
+    //20111109, henrichen@zkoss.org
+    public String getPictureId() {
+    	return ctPicture.getBlipFill().getBlip().getEmbed() + "_" + ctPicture.getNvPicPr().getCNvPr().getId();
     }
 }

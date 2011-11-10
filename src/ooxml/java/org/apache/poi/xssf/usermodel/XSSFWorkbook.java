@@ -50,6 +50,7 @@ import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.ss.usermodel.Row;
 import org.zkoss.poi.ss.usermodel.Sheet;
 import org.zkoss.poi.ss.usermodel.Workbook;
+import org.zkoss.poi.ss.usermodel.PictureData;
 import org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.zkoss.poi.ss.util.CellReference;
 import org.zkoss.poi.ss.util.WorkbookUtil;
@@ -1715,7 +1716,7 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 		return linkIndexToBookName.get(externalLinkIndex);
 	}
 	
-	//20110818, henrichen: sync CTDefinedName and namedRanges
+	//20110818, henrichen@zkoss.org: sync CTDefinedName and namedRanges
 	private void syncNamedRange() {
         namedRanges = new ArrayList<XSSFName>();
         if(workbook.isSetDefinedNames()) {
@@ -1723,5 +1724,10 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
                 namedRanges.add(new XSSFName(ctName, this));
             }
         }
+	}
+
+	//20111109, henrichen@zkoss.org: reset XSSFPictureData
+	/*package*/ void setPictureData(int pictureIndex, XSSFPictureData img) {
+		pictures.set(pictureIndex, img);
 	}
 }

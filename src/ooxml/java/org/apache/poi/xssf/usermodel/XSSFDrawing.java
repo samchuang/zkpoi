@@ -33,6 +33,7 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.openxml4j.opc.TargetMode;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.Drawing;
+import org.zkoss.poi.ss.usermodel.Picture;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.apache.xmlbeans.XmlException;
@@ -230,7 +231,9 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
         XSSFPictureData data = wb.getAllPictures().get(pictureIndex);
         PackagePartName ppName = data.getPackagePart().getPartName();
         PackageRelationship rel = getPackagePart().addRelationship(ppName, TargetMode.INTERNAL, XSSFRelation.IMAGES.getRelation());
-        addRelation(rel.getId(),new XSSFPictureData(data.getPackagePart(), rel));
+        XSSFPictureData newImg = new XSSFPictureData(data.getPackagePart(), rel); //20111109, henrichen@zkoss.org: picture data with relation
+        wb.setPictureData(pictureIndex, newImg); //20111109, henrichen@zkoss.org: must reset pictures in workbook, or it is not able to be removed
+        addRelation(rel.getId(), newImg);
         return rel;
     }
 
@@ -377,4 +380,18 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
     private long newShapeId(){
         return drawing.sizeOfTwoCellAnchorArray() + 1;
     }
+
+    /*package*/ XSSFPictureData getPictureData(XSSFPicture pic) {
+		final String relId = pic.getCTPicture().getBlipFill().getBlip().getEmbed();
+		return (XSSFPictureData) (relId != null ? getRelationById(relId) : null);
+    }
+    
+    //20111109, henrichen@zkoss.org: remove picture
+	@Override
+	public void deletePicture(Picture picture) {
+		final XSSFPictureData img = getPictureData((XSSFPicture) picture);
+		if (img != null) {
+			removeRelation(img);
+		}
+	}
 }

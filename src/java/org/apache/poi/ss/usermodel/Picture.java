@@ -62,5 +62,6 @@ public interface Picture {
     String getName();
     String getAlt();
     ClientAnchor getClientAnchor();
+    String getPictureId();
 
 }
