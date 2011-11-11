@@ -243,8 +243,7 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
 		final int pictureIndex = getPictureIndex();
 		final EscherBSERecord bseRecord = 
 			_patriarch._sheet.getWorkbook().getWorkbook().getBSERecord(pictureIndex);
-        final EscherBlipRecord blip = bseRecord != null ? bseRecord.getBlipRecord() : null;
-        return blip != null ? new HSSFPictureData(blip) : null;
+        return bseRecord != null ? new HSSFPictureData(bseRecord) : null;
     }
     
 	private String _name;
@@ -274,5 +273,19 @@ public final class HSSFPicture extends HSSFSimpleShape implements Picture {
 	@Override
 	public String getPictureId() {
 		return ""+getPictureIndex();
+	}
+
+	//20111110, henrichen@zkoss.org: update picture anchor
+	@Override
+	public void setClientAnchor(ClientAnchor newanchor) {
+        HSSFClientAnchor anchor = (HSSFClientAnchor)getAnchor();
+    	anchor.setCol1(newanchor.getCol1());
+    	anchor.setCol2(newanchor.getCol2());
+    	anchor.setDx1(newanchor.getDx1());
+    	anchor.setDx2(newanchor.getDx2());
+    	anchor.setDy1(newanchor.getDy1());
+    	anchor.setDy2(newanchor.getDy2());
+    	anchor.setRow1(newanchor.getRow1());
+    	anchor.setRow2(newanchor.getRow2());
 	}
 }

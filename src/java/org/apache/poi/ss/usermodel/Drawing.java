@@ -66,10 +66,13 @@ public interface Drawing {
 	 */
 	ClientAnchor createAnchor(int dx1, int dy1, int dx2, int dy2, int col1, int row1, int col2, int row2);
 
-	//20111109, henrichen@zkoss.org: removePicture
+	//20111109, henrichen@zkoss.org: delete Picture
 	/**
 	 * Remove an existing picture
 	 * @param pic the picture to be removed
 	 */
 	void deletePicture(Picture pic);
+	
+	//20111110, henrichen@zkoss.org: change Picture anchor
+	void movePicture(Picture pic, ClientAnchor anchor);
 }

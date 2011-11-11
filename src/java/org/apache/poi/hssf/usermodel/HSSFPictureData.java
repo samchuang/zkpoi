@@ -18,6 +18,7 @@
 
 package org.zkoss.poi.hssf.usermodel;
 
+import org.zkoss.poi.ddf.EscherBSERecord;
 import org.zkoss.poi.ddf.EscherBitmapBlip;
 import org.zkoss.poi.ddf.EscherBlipRecord;
 import org.zkoss.poi.ddf.EscherMetafileBlip;
@@ -50,11 +51,12 @@ public class HSSFPictureData implements PictureData
      *
      * @param blip the underlying blip record containing the bitmap data.
      */
+/*    
     public HSSFPictureData( EscherBlipRecord blip )
     {
         this.blip = blip;
     }
-
+*/
     /* (non-Javadoc)
      * @see org.apache.poi.hssf.usermodel.PictureData#getData()
      */
@@ -121,4 +123,23 @@ public class HSSFPictureData implements PictureData
                return "image/unknown";
        }
     }
+
+    //20111110, henrichen@zkoss.org: shall hold this information so we have both blif image data and reference count
+    private EscherBSERecord bse; 
+
+    //20111110, henrichen@zkoss.org: constructor for 
+    public HSSFPictureData( EscherBSERecord bse ) {
+    	this.bse = bse;
+    	this.blip = bse.getBlipRecord();
+    }
+
+    //20111110, henrichen@zkoss.org: 
+	@Override
+	public int getRelationCounter() {
+    	return bse.getRef();
+	}
+	
+	/*package*/ EscherBSERecord getBSERecord() {
+		return bse;
+	}
 }

@@ -31,12 +31,14 @@ public class XSSFChartX implements ZssChartX {
 	private XSSFClientAnchor _anchor;
 	private String _name;
 	private XSSFChart _chart;
+	private String _chartId;
 
 	public XSSFChartX(XSSFDrawing patriarch, XSSFClientAnchor anchor, String name, String chartId) {
 		_patriarch = patriarch;
 		_chart = getXSSFChart1(chartId);//getXSSFChart0(chartId);
 		_anchor = anchor;
 		_name = name;
+		_chartId = chartId;
 	}
 
 	@Override
@@ -76,5 +78,8 @@ public class XSSFChartX implements ZssChartX {
 	private void renameSheet1(String oldname, String newname) {
 		_chart.renameSheet(oldname, newname);
 	}
-	
+
+	public String getChartId() {
+		return _chartId;
+	}
 }

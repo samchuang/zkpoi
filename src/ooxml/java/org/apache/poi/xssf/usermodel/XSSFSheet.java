@@ -3338,7 +3338,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		}
 	}
     
-	//20110930, henrichen
+	//20110930, henrichen@zkoss.org: handle filter
     public AutoFilter setAutoFilter(CellRangeAddress range) {
     	if(isAutoFilterMode()){
     		removeAutoFilter();

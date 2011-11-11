@@ -37,4 +37,7 @@ public interface PictureData {
      * Returns the mime type for the image
      */
     String getMimeType();
+    
+    //20111110, henrichen@zkoss.org: reference count to this picture data.
+    int getRelationCounter();
 }

@@ -330,6 +330,15 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing {
     //20111109, henrichen@zkoss.org: currently support XSSFPicture only
 	@Override
 	public void deletePicture(Picture picture) {
-		// TODO Auto-generated method stub
+		int pictureIndex = ((HSSFPicture)picture).getPictureIndex();
+        EscherBSERecord bse = _sheet.getWorkbook().getWorkbook().getBSERecord(pictureIndex);
+        bse.setRef(bse.getRef() - 1);
+        _shapes.remove(picture);
+	}
+
+	//20111110, henrichen@zkoss.org: update picture anchor place
+	@Override
+	public void movePicture(Picture pic, ClientAnchor anchor) {
+		pic.setClientAnchor(anchor);
 	}
 }

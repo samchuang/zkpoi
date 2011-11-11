@@ -57,6 +57,7 @@ import org.zkoss.poi.ss.formula.ptg.Ref3DPtg;
 import org.zkoss.poi.ss.formula.ptg.UnionPtg;
 import org.zkoss.poi.ss.formula.udf.AggregatingUDFFinder;
 import org.zkoss.poi.ss.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.usermodel.PictureData;
 import org.zkoss.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.zkoss.poi.ss.util.WorkbookUtil;
 import org.zkoss.poi.util.POILogFactory;
@@ -1690,6 +1691,10 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
 
             if (escherRecord instanceof EscherBSERecord)
             {
+            	//20111110, henrichen@zkoss.org: shall handle bse record
+                HSSFPictureData picture = new HSSFPictureData((EscherBSERecord) escherRecord);
+				pictures.add(picture);
+/*            	
                 EscherBlipRecord blip = ((EscherBSERecord) escherRecord).getBlipRecord();
                 if (blip != null)
                 {
@@ -1697,8 +1702,7 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
                     HSSFPictureData picture = new HSSFPictureData(blip);
 					pictures.add(picture);
                 }
-                
-                
+*/                
             }
 
             // Recursive call.
@@ -1841,4 +1845,43 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
     protected HSSFSheet createHSSFSheet(HSSFWorkbook workbook) {
     	return new HSSFSheet(workbook);
     }
+    
+    //20111110, henrichen@zkoss.org: remove bse record
+	protected void deletePictureData(PictureData img) {
+		HSSFPictureData data = (HSSFPictureData) img;
+		removeBSERecord(data.getBSERecord());
+	}
+
+	//locate the bse and remove it
+	private void removeBSERecord(EscherBSERecord bse) {
+	    Iterator<Record> recordIter = workbook.getRecords().iterator();
+	    while (recordIter.hasNext())
+	    {
+	        Record r = recordIter.next();
+	        if (r instanceof AbstractEscherHolderRecord)
+	        {
+	            ((AbstractEscherHolderRecord) r).decode();
+	            List<EscherRecord> escherRecords = ((AbstractEscherHolderRecord) r).getEscherRecords();
+	            if (removeBSERecord1(escherRecords, bse)) {
+	            	break;
+	            }
+	        }
+	    }
+	}
+
+	//locate the bse and remove it
+	private boolean removeBSERecord1(List<EscherRecord> escherRecords, EscherBSERecord bse) {
+		for (Iterator<EscherRecord> it = escherRecords.iterator(); it.hasNext();) {
+			final EscherRecord escherRecord = it.next();
+            if (escherRecord.equals(bse)) {
+            	it.remove();
+            	return true;
+            }
+            // Recursive call.
+            if (removeBSERecord1(escherRecord.getChildRecords(), bse)) {
+            	return true;
+            }
+        }
+		return false;
+	}
 }

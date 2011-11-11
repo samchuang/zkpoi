@@ -124,4 +124,10 @@ public class XSSFPictureData extends POIXMLDocumentPart implements PictureData {
     public String getMimeType() {
         return getPackagePart().getContentType();
     }
+    
+    //20111110, henrichen@zkoss.org: reference count
+    @Override
+    public int getRelationCounter() {
+    	return super.getRelationCounter();
+    }
 }

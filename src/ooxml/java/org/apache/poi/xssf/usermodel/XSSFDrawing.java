@@ -386,12 +386,18 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
 		return (XSSFPictureData) (relId != null ? getRelationById(relId) : null);
     }
     
-    //20111109, henrichen@zkoss.org: remove picture
+    //20111109, henrichen@zkoss.org: delete picture
 	@Override
 	public void deletePicture(Picture picture) {
 		final XSSFPictureData img = getPictureData((XSSFPicture) picture);
 		if (img != null) {
 			removeRelation(img);
 		}
+	}
+
+	//20111110, henrichen@zkoss.org: change picture anchor position
+	@Override
+	public void movePicture(Picture pic, ClientAnchor anchor) {
+		pic.setClientAnchor(anchor);
 	}
 }

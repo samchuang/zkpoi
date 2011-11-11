@@ -32,4 +32,6 @@ public interface ZssChartX {
     Chart getChart();
     
 	String getName();
+	
+	String getChartId();
 }

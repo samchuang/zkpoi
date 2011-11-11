@@ -63,4 +63,9 @@ public class HSSFChartX extends HSSFSimpleShape implements ZssChartX {
 	public Chart getChart() {
 		return null; //return _chart;
 	}
+
+	@Override
+	public String getChartId() {
+		return getName();
+	}
 }

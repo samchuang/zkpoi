@@ -78,7 +78,7 @@ public class POIXMLDocumentPart {
         return relationCounter;
     }
 
-    int getRelationCounter() {
+    protected int getRelationCounter() { //20111110, henrichen@zkoss.org: promote protection
         return relationCounter;
     }
 

@@ -418,7 +418,7 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
 	    		renameSheet(data.getSeries(), oldname, newname);
 	    		break;
 	    	}
-	    	//TODO
+	    	//TODO other chart types
 	    	case Area:
 	    	case Area3D:
 	    	case Bubble:
