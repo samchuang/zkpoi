@@ -69,4 +69,13 @@ public interface Chart extends ManuallyPositionable {
 	
 	//20111007, henrichen@zkoss.org: rename sheet could affect the reference
 	void renameSheet(String oldname, String newname);
+	
+	//20111111, henrichen@zkoss.org: chart poistion anchor
+    ClientAnchor getPreferredSize();
+
+	//20111111, henrichen@zkoss.org: chart poistion anchor
+	void setClientAnchor(ClientAnchor anchor);
+
+	//20111111, henrichen@zkoss.org: chart id
+	String getChartId();
 }

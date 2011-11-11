@@ -32,6 +32,7 @@ import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.ss.usermodel.Drawing;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.Picture;
+import org.zkoss.poi.ss.usermodel.ZssChartX;
 
 /**
  * The patriarch is the toplevel container for shapes in a sheet.  It does
@@ -315,7 +316,6 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing {
 		throw new RuntimeException("NotImplemented");
 	}
 
-
     //20101014, henrichen@zkoss.org: handle chart creation
     public HSSFChartX createChart(HSSFAnchor anchor, HSSFChart chart)
     {
@@ -340,5 +340,11 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing {
 	@Override
 	public void movePicture(Picture pic, ClientAnchor anchor) {
 		pic.setClientAnchor(anchor);
+	}
+
+	//20111111, henrichen@zkoss.org: update chart anchor place
+	@Override
+	public void moveChart(ZssChartX chart, ClientAnchor anchor) {
+		chart.setClientAnchor(anchor);
 	}
 }

@@ -68,4 +68,18 @@ public class HSSFChartX extends HSSFSimpleShape implements ZssChartX {
 	public String getChartId() {
 		return getName();
 	}
+
+	//20111110, henrichen@zkoss.org: update chart anchor
+	@Override
+	public void setClientAnchor(ClientAnchor newanchor) {
+        HSSFClientAnchor anchor = (HSSFClientAnchor)getAnchor();
+    	anchor.setCol1(newanchor.getCol1());
+    	anchor.setCol2(newanchor.getCol2());
+    	anchor.setDx1(newanchor.getDx1());
+    	anchor.setDx2(newanchor.getDx2());
+    	anchor.setDy1(newanchor.getDy1());
+    	anchor.setDy2(newanchor.getDy2());
+    	anchor.setRow1(newanchor.getRow1());
+    	anchor.setRow2(newanchor.getRow2());
+	}
 }

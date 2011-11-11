@@ -75,4 +75,7 @@ public interface Drawing {
 	
 	//20111110, henrichen@zkoss.org: change Picture anchor
 	void movePicture(Picture pic, ClientAnchor anchor);
+
+	//20111110, henrichen@zkoss.org: change Picture anchor
+	void moveChart(ZssChartX chart, ClientAnchor anchor);
 }

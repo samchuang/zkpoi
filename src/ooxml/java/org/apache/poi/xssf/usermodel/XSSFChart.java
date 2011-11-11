@@ -31,6 +31,7 @@ import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.ss.usermodel.Chart;
+import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxisFactory;
@@ -541,4 +542,34 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
     	
     	return null;
     }
+
+    //20111111, henrichen@zkoss.org: chart poistion anchor
+    private ClientAnchor _anchor;
+    
+	@Override
+	public ClientAnchor getPreferredSize() {
+		return _anchor;
+	}
+
+    //20111110, henrichen@zkoss.org: update anchor
+    @Override
+	public void setClientAnchor(ClientAnchor newanchor) {
+    	if (_anchor == null) {
+    		_anchor = newanchor;
+    	} else {
+	    	_anchor.setCol1(newanchor.getCol1());
+	    	_anchor.setCol2(newanchor.getCol2());
+	    	_anchor.setDx1(newanchor.getDx1());
+	    	_anchor.setDx2(newanchor.getDx2());
+	    	_anchor.setDy1(newanchor.getDy1());
+	    	_anchor.setDy2(newanchor.getDy2());
+	    	_anchor.setRow1(newanchor.getRow1());
+	    	_anchor.setRow2(newanchor.getRow2());
+    	}
+    }
+
+	@Override
+	public String getChartId() {
+		return this.getPackageRelationship().getId();
+	}
 }

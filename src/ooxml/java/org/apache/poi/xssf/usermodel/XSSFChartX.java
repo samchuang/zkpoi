@@ -28,7 +28,6 @@ import org.zkoss.poi.ss.usermodel.ZssChartX;
  */
 public class XSSFChartX implements ZssChartX {
 	private XSSFDrawing _patriarch;
-	private XSSFClientAnchor _anchor;
 	private String _name;
 	private XSSFChart _chart;
 	private String _chartId;
@@ -36,14 +35,14 @@ public class XSSFChartX implements ZssChartX {
 	public XSSFChartX(XSSFDrawing patriarch, XSSFClientAnchor anchor, String name, String chartId) {
 		_patriarch = patriarch;
 		_chart = getXSSFChart1(chartId);//getXSSFChart0(chartId);
-		_anchor = anchor;
 		_name = name;
 		_chartId = chartId;
+		_chart.setClientAnchor(anchor);
 	}
 
 	@Override
 	public ClientAnchor getPreferredSize() {
-		return _anchor;
+		return _chart.getPreferredSize();
 	}
 	
 	private XSSFChart getXSSFChart1(String chartId) {
@@ -82,4 +81,9 @@ public class XSSFChartX implements ZssChartX {
 	public String getChartId() {
 		return _chartId;
 	}
+
+    @Override
+	public void setClientAnchor(ClientAnchor newanchor) {
+    	_chart.setClientAnchor(newanchor);
+    }
 }

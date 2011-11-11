@@ -31,9 +31,11 @@ import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackagePartName;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.openxml4j.opc.TargetMode;
+import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.Drawing;
 import org.zkoss.poi.ss.usermodel.Picture;
+import org.zkoss.poi.ss.usermodel.ZssChartX;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.apache.xmlbeans.XmlException;
@@ -399,5 +401,10 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
 	@Override
 	public void movePicture(Picture pic, ClientAnchor anchor) {
 		pic.setClientAnchor(anchor);
+	}
+
+	@Override
+	public void moveChart(ZssChartX chartX, ClientAnchor anchor) {
+		chartX.setClientAnchor(anchor);
 	}
 }

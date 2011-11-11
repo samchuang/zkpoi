@@ -16,7 +16,6 @@
 ==================================================================== */
 package org.zkoss.poi.ss.usermodel;
 
-import org.zkoss.poi.ss.util.CellRangeAddressBase;
 
 /**
  * Represents a chart in a SpreadsheetML document
@@ -34,4 +33,6 @@ public interface ZssChartX {
 	String getName();
 	
 	String getChartId();
+	
+	void setClientAnchor(ClientAnchor anchor);
 }
