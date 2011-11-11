@@ -212,46 +212,52 @@ public final class XSSFPicture extends XSSFShape implements Picture {
         Dimension size = getImageDimension(data.getPackagePart(), data.getPictureType());
         double scaledWidth = size.getWidth() * scale;
         double scaledHeight = size.getHeight() * scale;
+        
+        //20111111, henrichen@zkoss.org: Shall consider the dx1 (left offset) to calculate dx2 (right offset)
+        double scaledWidth0 = scaledWidth + Math.round(((double)anchor.getDx1())/EMU_PER_PIXEL);
 
         float w = 0;
         int col2 = anchor.getCol1();
         int dx2 = 0;
 
         for (;;) {
-            w += getColumnWidthInPixels(col2);
-            if(w > scaledWidth) break;
+            w += Math.round(getColumnWidthInPixels(col2));
+            if(w > scaledWidth0) break;
             col2++;
         }
 
-        if(w > scaledWidth) {
-            double cw = getColumnWidthInPixels(col2 );
-            double delta = w - scaledWidth;
-            dx2 = (int)(EMU_PER_PIXEL*(cw-delta));
+        if(w > scaledWidth0) {
+            double cw = Math.round(getColumnWidthInPixels(col2 ));
+            double delta = w - scaledWidth0;
+            dx2 = (int)Math.round(EMU_PER_PIXEL*(cw-delta));
         }
         anchor.setCol2(col2);
         anchor.setDx2(dx2);
+
+        //20111111, henrichen@zkoss.org: Shall consider the dy1 (top offset) to calculate dy2 (bottom offset)
+        double scaledHeight0 = scaledHeight + Math.round(((double)anchor.getDy1())/EMU_PER_PIXEL);
 
         double h = 0;
         int row2 = anchor.getRow1();
         int dy2 = 0;
 
         for (;;) {
-            h += getRowHeightInPixels(row2);
-            if(h > scaledHeight) break;
+            h += Math.round(getRowHeightInPixels(row2));
+            if(h > scaledHeight0) break;
             row2++;
         }
 
-        if(h > scaledHeight) {
-            double ch = getRowHeightInPixels(row2);
-            double delta = h - scaledHeight;
-            dy2 = (int)(EMU_PER_PIXEL*(ch-delta));
+        if(h > scaledHeight0) {
+            double ch = Math.round(getRowHeightInPixels(row2));
+            double delta = h - scaledHeight0;
+            dy2 = (int)Math.round(EMU_PER_PIXEL*(ch-delta));
         }
         anchor.setRow2(row2);
         anchor.setDy2(dy2);
 
         CTPositiveSize2D size2d =  ctPicture.getSpPr().getXfrm().getExt();
-        size2d.setCx((long)(scaledWidth*EMU_PER_PIXEL));
-        size2d.setCy((long)(scaledHeight*EMU_PER_PIXEL));
+        size2d.setCx((long)Math.round(scaledWidth*EMU_PER_PIXEL));
+        size2d.setCy((long)Math.round(scaledHeight*EMU_PER_PIXEL));
 
         return anchor;
     }
@@ -334,5 +340,18 @@ public final class XSSFPicture extends XSSFShape implements Picture {
     //20111109, henrichen@zkoss.org
     public String getPictureId() {
     	return ctPicture.getBlipFill().getBlip().getEmbed() + "_" + ctPicture.getNvPicPr().getCNvPr().getId();
+    }
+    //20111110, henrichen@zkoss.org: update anchor
+    @Override
+	public void setClientAnchor(ClientAnchor newanchor) {
+        XSSFClientAnchor anchor = (XSSFClientAnchor)getAnchor();
+    	anchor.setCol1(newanchor.getCol1());
+    	anchor.setCol2(newanchor.getCol2());
+    	anchor.setDx1(newanchor.getDx1());
+    	anchor.setDx2(newanchor.getDx2());
+    	anchor.setDy1(newanchor.getDy1());
+    	anchor.setDy2(newanchor.getDy2());
+    	anchor.setRow1(newanchor.getRow1());
+    	anchor.setRow2(newanchor.getRow2());
     }
 }
