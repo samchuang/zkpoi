@@ -31,15 +31,16 @@ import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackagePartName;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.openxml4j.opc.TargetMode;
-import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.Drawing;
 import org.zkoss.poi.ss.usermodel.Picture;
 import org.zkoss.poi.ss.usermodel.ZssChartX;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.xssf.model.CommentsTable;
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTGraphicalObjectData;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTConnector;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTDrawing;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTGraphicalObjectFrame;
@@ -50,15 +51,6 @@ import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTTwoCellAn
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.STEditAs;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
-import org.zkoss.poi.POIXMLDocumentPart;
-import org.zkoss.poi.openxml4j.opc.PackagePart;
-import org.zkoss.poi.openxml4j.opc.PackagePartName;
-import org.zkoss.poi.openxml4j.opc.PackageRelationship;
-import org.zkoss.poi.openxml4j.opc.TargetMode;
-import org.zkoss.poi.ss.usermodel.ClientAnchor;
-import org.zkoss.poi.ss.usermodel.Drawing;
-import org.zkoss.poi.util.Internal;
-import org.zkoss.poi.xssf.model.CommentsTable;
 
 /**
  * Represents a SpreadsheetML drawing
@@ -403,8 +395,44 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
 		pic.setClientAnchor(anchor);
 	}
 
+	//20111111, henrichen@zkoss.org: change chart anchor position
 	@Override
 	public void moveChart(ZssChartX chartX, ClientAnchor anchor) {
 		chartX.setClientAnchor(anchor);
+	}
+
+	//20111114, henrichen@zkoss.org: delete chart
+	@Override
+	public void deleteChart(ZssChartX chartX) {
+		final XSSFChart part = (XSSFChart) chartX.getChart();
+		final String relationId = part.getChartId();
+		removeRelation(part);
+		int j = 0;
+		for (CTTwoCellAnchor anchor: drawing.getTwoCellAnchorArray()) {
+			String id = getChartRelationId(anchor.getGraphicFrame());
+			if (relationId.equals(id)) {
+				drawing.removeTwoCellAnchor(j);
+				break;
+			}
+			++j;
+		}
+	}
+	
+	//20111114, henrichen@zkoss.org: get Chart associated relationId in Drawing
+	private String getChartRelationId(CTGraphicalObjectFrame graphicFrame) {
+		CTGraphicalObjectData data  = graphicFrame.getGraphic().getGraphicData();
+		String r_namespaceUri = STRelationshipId.type.getName().getNamespaceURI();
+		XmlCursor cursor = data.newCursor();
+		XmlCursor.TokenType type;
+		while ((type = cursor.toNextToken()) != XmlCursor.TokenType.NONE) {
+			if (type == XmlCursor.TokenType.START) {
+				QName qname = cursor.getName();
+				if (XSSFDrawing.NAMESPACE_C.equals(qname.getNamespaceURI())) { // an <c:chart> element
+					String id = cursor.getAttributeText(new QName(r_namespaceUri, "id", "r")); //an <c:chart r:id=""> attribute
+					return id;
+				}
+			}
+		}
+		return null;
 	}
 }

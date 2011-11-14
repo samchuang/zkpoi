@@ -347,4 +347,13 @@ public final class HSSFPatriarch implements HSSFShapeContainer, Drawing {
 	public void moveChart(ZssChartX chart, ClientAnchor anchor) {
 		chart.setClientAnchor(anchor);
 	}
+
+	@Override
+	public void deleteChart(ZssChartX chartX) {
+		//TODO: remove chart record from sheet
+		//TODO: remove anchor record from sheet
+		//TODO: remove chart record from workbook
+		_shapes.remove(chartX);
+	}
 }
+

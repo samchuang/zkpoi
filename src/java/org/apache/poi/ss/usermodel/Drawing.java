@@ -78,4 +78,11 @@ public interface Drawing {
 
 	//20111110, henrichen@zkoss.org: change Picture anchor
 	void moveChart(ZssChartX chart, ClientAnchor anchor);
+	
+	//20111114, henrichen@zkoss.org: delete Chart
+	/**
+	 * Remove an existing chart
+	 * @param chartX the chart to be removed
+	 */
+	void deleteChart(ZssChartX chartX);
 }
