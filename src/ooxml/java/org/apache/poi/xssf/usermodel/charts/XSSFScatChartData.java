@@ -69,7 +69,8 @@ public class XSSFScatChartData implements XYData {
 			CTScatterSer[] sers = ctScatterChart.getSerArray();
     		for (int j = 0; j < sers.length; ++j) {
     			final CTScatterSer ser = sers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<Double> xs = new  XSSFChartAxDataSource<Double>(ser.getXVal());
     			ChartDataSource<Double> ys = new  XSSFChartNumDataSource<Double>(ser.getYVal());
 		    	addSerie(title, xs, ys);
@@ -91,8 +92,10 @@ public class XSSFScatChartData implements XYData {
             scatterSer.addNewIdx().setVal(this.id);
             scatterSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = scatterSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = scatterSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
             CTAxDataSource cats = scatterSer.addNewXVal();
             XSSFChartUtil.buildAxDataSource(cats, this.xs);

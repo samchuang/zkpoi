@@ -26,6 +26,7 @@ import org.zkoss.poi.ss.usermodel.charts.ManualLayout;
 import org.zkoss.poi.ss.usermodel.charts.ManuallyPositionable;
 import org.zkoss.poi.ss.usermodel.charts.ChartDataFactory;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxisFactory;
+import org.zkoss.poi.ss.usermodel.charts.View3D;
 
 /**
  * High level representation of a chart.
@@ -66,6 +67,16 @@ public interface Chart extends ManuallyPositionable {
 	 */
 	void plot(ChartData data, ChartAxis... axis);
 	
+	/**
+	 * @return chart legend instance
+	 */
+	View3D getOrCreateView3D();
+
+	/**
+	 * Delete current chart legend.
+	 */
+	void deleteView3D();
+
 	
 	//20111007, henrichen@zkoss.org: rename sheet could affect the reference
 	void renameSheet(String oldname, String newname);

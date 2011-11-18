@@ -27,6 +27,8 @@ public enum ChartType {
 	Bar3D,
 	Bar,
 	Bubble,
+	Column,
+	Column3D,
 	Doughnut,
 	Line3D,
 	Line,

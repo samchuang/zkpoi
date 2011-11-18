@@ -64,7 +64,8 @@ public class XSSFDoughnutChartData implements CategoryData {
 			CTPieSer[] bsers = ctDoughnutChart.getSerArray();
     		for (int j = 0; j < bsers.length; ++j) {
     			final CTPieSer ser = bsers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
     			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
 		    	addSerie(title, cats, vals);
@@ -86,11 +87,15 @@ public class XSSFDoughnutChartData implements CategoryData {
             pieSer.addNewIdx().setVal(this.id);
             pieSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = pieSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = pieSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
-            CTAxDataSource cats = pieSer.addNewCat();
-            XSSFChartUtil.buildAxDataSource(cats, categories);
+            if (categories != null && categories.getPointCount() > 0) {
+	            CTAxDataSource cats = pieSer.addNewCat();
+	            XSSFChartUtil.buildAxDataSource(cats, categories);
+            }
 
             CTNumDataSource vals = pieSer.addNewVal();
             XSSFChartUtil.buildNumDataSource(vals, values);

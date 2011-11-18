@@ -22,19 +22,19 @@ import java.util.List;
 
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBar3DChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarDir;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarGrouping;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarSer;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumDataSource;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTSerTx;
-import org.openxmlformats.schemas.drawingml.x2006.chart.STBarGrouping;
 import org.zkoss.poi.ss.usermodel.Chart;
 import org.zkoss.poi.ss.usermodel.charts.AbstractCategoryDataSerie;
-import org.zkoss.poi.ss.usermodel.charts.ChartDirection;
 import org.zkoss.poi.ss.usermodel.charts.CategoryData;
 import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
+import org.zkoss.poi.ss.usermodel.charts.ChartDirection;
 import org.zkoss.poi.ss.usermodel.charts.ChartGrouping;
 import org.zkoss.poi.ss.usermodel.charts.ChartTextSource;
 import org.zkoss.poi.util.Beta;
@@ -47,7 +47,8 @@ import org.zkoss.poi.xssf.usermodel.XSSFChart;
  */
 @Beta
 public class XSSFBar3DChartData implements CategoryData {
-
+	private ChartGrouping _chartGrouping;
+	private ChartDirection _chartDirection;
 	private CTBar3DChart ctBar3DChart;
     /**
      * List of all data series.
@@ -56,6 +57,7 @@ public class XSSFBar3DChartData implements CategoryData {
 
     public XSSFBar3DChartData() {
         series = new ArrayList<CategoryDataSerie>();
+        setBarDirection(ChartDirection.HORIZONTAL);
     }
 
     public XSSFBar3DChartData(XSSFChart chart) {
@@ -74,7 +76,8 @@ public class XSSFBar3DChartData implements CategoryData {
 			CTBarSer[] bsers = ctBar3DChart.getSerArray();
     		for (int j = 0; j < bsers.length; ++j) {
     			final CTBarSer ser = bsers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
     			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
 		    	addSerie(title, cats, vals);
@@ -83,19 +86,39 @@ public class XSSFBar3DChartData implements CategoryData {
     }
     
     public ChartGrouping getGrouping() {
-    	return XSSFChartUtil.toChartGroupingForBar(ctBar3DChart.getGrouping());
+    	if (ctBar3DChart != null) {
+    		_chartGrouping = XSSFChartUtil.toChartGroupingForBar(ctBar3DChart.getGrouping()); 
+    	}
+    	return _chartGrouping;
     }
     
     public void setGrouping(ChartGrouping grouping) {
-    	ctBar3DChart.getGrouping().setVal(XSSFChartUtil.fromChartGroupingForBar(grouping));
+    	_chartGrouping = grouping;
+    	if (ctBar3DChart != null) {
+    		CTBarGrouping ctgr = ctBar3DChart.getGrouping();
+    		if (ctgr == null) {
+    			ctgr = ctBar3DChart.addNewGrouping();
+    		}
+    		ctgr.setVal(XSSFChartUtil.fromChartGroupingForBar(grouping));
+    	}
     }
 
     public ChartDirection getBarDirection() {
-    	return XSSFChartUtil.toBarDirection(ctBar3DChart.getBarDir());
+    	if (ctBar3DChart != null) { 
+    		_chartDirection = XSSFChartUtil.toBarDirection(ctBar3DChart.getBarDir());
+    	}
+    	return _chartDirection;
     }
     
     public void setBarDirection(ChartDirection barDir) {
-    	ctBar3DChart.getBarDir().setVal(XSSFChartUtil.fromBarDirection(barDir));
+    	_chartDirection = barDir;
+    	if (ctBar3DChart != null) {
+	    	CTBarDir dir = ctBar3DChart.getBarDir();
+	    	if (dir == null) {
+	    		dir = ctBar3DChart.addNewBarDir();
+	    	}
+	    	dir.setVal(XSSFChartUtil.fromBarDirection(barDir));
+    	}
     }
     
     /**
@@ -112,11 +135,15 @@ public class XSSFBar3DChartData implements CategoryData {
             barSer.addNewIdx().setVal(this.id);
             barSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = barSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = barSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
-            CTAxDataSource cats = barSer.addNewCat();
-            XSSFChartUtil.buildAxDataSource(cats, categories);
+            if (categories != null && categories.getPointCount() > 0) {
+	            CTAxDataSource cats = barSer.addNewCat();
+	            XSSFChartUtil.buildAxDataSource(cats, categories);
+            }
 
             CTNumDataSource vals = barSer.addNewVal();
             XSSFChartUtil.buildNumDataSource(vals, values);
@@ -145,6 +172,8 @@ public class XSSFBar3DChartData implements CategoryData {
 	        ctBar3DChart = plotArea.addNewBar3DChart();
         
 	        ctBar3DChart.addNewVaryColors().setVal(true);
+	        setBarDirection(_chartDirection);
+	        setGrouping(_chartGrouping);
 	        //TODO setup other properties of bar3DChart
 	
 	        for (CategoryDataSerie s : series) {

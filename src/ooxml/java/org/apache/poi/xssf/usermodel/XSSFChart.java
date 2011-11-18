@@ -35,12 +35,15 @@ import org.zkoss.poi.ss.usermodel.ClientAnchor;
 import org.zkoss.poi.ss.usermodel.charts.CategoryDataSerie;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxis;
 import org.zkoss.poi.ss.usermodel.charts.ChartAxisFactory;
+import org.zkoss.poi.ss.usermodel.charts.ChartDirection;
 import org.zkoss.poi.ss.usermodel.charts.ChartType;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFBar3DChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFBarChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFCategoryAxis;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartDataFactory;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFChartAxis;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFColumn3DChartData;
+import org.zkoss.poi.xssf.usermodel.charts.XSSFColumnChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFDoughnutChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFLine3DChartData;
 import org.zkoss.poi.xssf.usermodel.charts.XSSFLineChartData;
@@ -84,6 +87,7 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTValAx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPrintSettings;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPageMargins;
+import org.openxmlformats.schemas.drawingml.x2006.chart.STBarDir;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STLayoutTarget;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STLayoutMode;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
@@ -401,9 +405,21 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
 	    		renameSheet(data.getSeries(), oldname, newname);
 	    		break;
 	    	}
+	    	case Column3D:
+	    	{
+	    		XSSFBar3DChartData data  = new XSSFColumn3DChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
 	    	case Bar:
 	    	{
 	    		XSSFBarChartData data  = new XSSFBarChartData(this);
+	    		renameSheet(data.getSeries(), oldname, newname);
+	    		break;
+	    	}
+	    	case Column:
+	    	{
+	    		XSSFBarChartData data  = new XSSFColumnChartData(this);
 	    		renameSheet(data.getSeries(), oldname, newname);
 	    		break;
 	    	}
@@ -456,16 +472,24 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
     		return ChartType.Area;
     	}
 
-    	//Bar3D
+    	//Bar3D or Column3D
     	final CTBar3DChart[] bar3ds = plotArea.getBar3DChartArray();
     	if (bar3ds != null && bar3ds.length > 0) {
-    		return ChartType.Bar3D;
+    		switch(bar3ds[0].getBarDir().getVal().intValue()) {
+			case STBarDir.INT_BAR: return ChartType.Bar3D;
+			default:
+			case STBarDir.INT_COL: return ChartType.Column3D;
+    		}
     	}
     	
-    	//Bar
+    	//Bar or Column
     	final CTBarChart[] bars = plotArea.getBarChartArray();
     	if (bars != null && bars.length > 0) {
-    		return ChartType.Bar;
+    		switch(bars[0].getBarDir().getVal().intValue()) {
+			case STBarDir.INT_BAR: return ChartType.Bar;
+			default:
+			case STBarDir.INT_COL: return ChartType.Column;
+    		}
     	}
     	
     	//Bubble
@@ -568,6 +592,7 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
     	}
     }
 
+	//20111111, henrichen@zkoss.org
 	@Override
 	public String getChartId() {
 		return this.getPackageRelationship().getId();

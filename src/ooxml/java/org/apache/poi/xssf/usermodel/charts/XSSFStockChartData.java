@@ -74,7 +74,8 @@ public class XSSFStockChartData implements CategoryData {
 			CTBarSer[] bsers = ctBarChart.getSerArray();
     		for (int j = 0; j < bsers.length; ++j) {
     			final CTBarSer ser = bsers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
     			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
 		    	addBarSerie(title, cats, vals);
@@ -115,11 +116,15 @@ public class XSSFStockChartData implements CategoryData {
             barSer.addNewIdx().setVal(this.id);
             barSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = barSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = barSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
-            CTAxDataSource cats = barSer.addNewCat();
-            XSSFChartUtil.buildAxDataSource(cats, categories);
+            if (categories != null && categories.getPointCount() > 0) {
+	            CTAxDataSource cats = barSer.addNewCat();
+	            XSSFChartUtil.buildAxDataSource(cats, categories);
+            }
 
             CTNumDataSource vals = barSer.addNewVal();
             XSSFChartUtil.buildNumDataSource(vals, values);

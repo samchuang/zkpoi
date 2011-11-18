@@ -16,6 +16,6 @@ package org.zkoss.poi.ss.usermodel.charts;
  *
  */
 public enum ChartDirection {
-	HORIZONTAL, //horizontal
-	VERTICAL; //vertical
+	HORIZONTAL, //horizontal, bar chart
+	VERTICAL; //vertical, column chart
 }

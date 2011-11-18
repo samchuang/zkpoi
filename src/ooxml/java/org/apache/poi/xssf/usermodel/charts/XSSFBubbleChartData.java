@@ -72,7 +72,8 @@ public class XSSFBubbleChartData implements XYZData {
 			CTBubbleSer[] sers = ctBubbleChart.getSerArray();
     		for (int j = 0; j < sers.length; ++j) {
     			final CTBubbleSer ser = sers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<Double> xs = new  XSSFChartAxDataSource<Double>(ser.getXVal());
     			ChartDataSource<Double> ys = new  XSSFChartNumDataSource<Double>(ser.getYVal());
     			ChartDataSource<Double> zs = new  XSSFChartNumDataSource<Double>(ser.getBubbleSize());
@@ -97,8 +98,10 @@ public class XSSFBubbleChartData implements XYZData {
             bubbleSer.addNewIdx().setVal(this.id);
             bubbleSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = bubbleSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = bubbleSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
             CTAxDataSource xs = bubbleSer.addNewXVal();
             XSSFChartUtil.buildAxDataSource(xs, this.xs);

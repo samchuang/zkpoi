@@ -71,7 +71,8 @@ public class XSSFAreaChartData implements CategoryData {
 			CTAreaSer[] bsers = ctAreaChart.getSerArray();
     		for (int j = 0; j < bsers.length; ++j) {
     			final CTAreaSer ser = bsers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
     			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
 		    	addSerie(title, cats, vals);
@@ -101,11 +102,15 @@ public class XSSFAreaChartData implements CategoryData {
             areaSer.addNewIdx().setVal(this.id);
             areaSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = areaSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = areaSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
-            CTAxDataSource cats = areaSer.addNewCat();
-            XSSFChartUtil.buildAxDataSource(cats, categories);
+            if (categories != null && categories.getPointCount() > 0) {
+	            CTAxDataSource cats = areaSer.addNewCat();
+	            XSSFChartUtil.buildAxDataSource(cats, categories);
+            }
 
             CTNumDataSource vals = areaSer.addNewVal();
             XSSFChartUtil.buildNumDataSource(vals, values);

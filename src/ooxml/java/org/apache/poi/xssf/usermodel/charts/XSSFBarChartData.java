@@ -40,7 +40,8 @@ import java.util.List;
  */
 @Beta
 public class XSSFBarChartData implements CategoryData {
-
+	private ChartGrouping _chartGrouping;
+	private ChartDirection _chartDirection;
 	private CTBarChart ctBarChart;
     /**
      * List of all data series.
@@ -49,6 +50,7 @@ public class XSSFBarChartData implements CategoryData {
 
     public XSSFBarChartData() {
         series = new ArrayList<CategoryDataSerie>();
+        setBarDirection(ChartDirection.HORIZONTAL);
     }
 
     public XSSFBarChartData(XSSFChart chart) {
@@ -66,7 +68,8 @@ public class XSSFBarChartData implements CategoryData {
 			CTBarSer[] bsers = ctBarChart.getSerArray();
     		for (int j = 0; j < bsers.length; ++j) {
     			final CTBarSer ser = bsers[j];
-    			ChartTextSource title = new XSSFChartTextSource(ser.getTx());
+    			CTSerTx serTx = ser.getTx();
+    			ChartTextSource title = serTx == null ? null : new XSSFChartTextSource(serTx);
     			ChartDataSource<String> cats = new XSSFChartAxDataSource<String>(ser.getCat());
     			ChartDataSource<Double> vals = new  XSSFChartNumDataSource<Double>(ser.getVal());
 		    	addSerie(title, cats, vals);
@@ -75,19 +78,39 @@ public class XSSFBarChartData implements CategoryData {
     }
     
     public ChartGrouping getGrouping() {
-    	return XSSFChartUtil.toChartGroupingForBar(ctBarChart.getGrouping());
+    	if (ctBarChart != null) {
+    		_chartGrouping = XSSFChartUtil.toChartGroupingForBar(ctBarChart.getGrouping()); 
+    	}
+    	return _chartGrouping;
     }
     
     public void setGrouping(ChartGrouping grouping) {
-    	ctBarChart.getGrouping().setVal(XSSFChartUtil.fromChartGroupingForBar(grouping));
+    	_chartGrouping = grouping;
+    	if (ctBarChart != null) {
+    		CTBarGrouping ctgr = ctBarChart.getGrouping();
+    		if (ctgr == null) {
+    			ctgr = ctBarChart.addNewGrouping();
+    		}
+    		ctgr.setVal(XSSFChartUtil.fromChartGroupingForBar(grouping));
+    	}
     }
-    
+
     public ChartDirection getBarDirection() {
-    	return XSSFChartUtil.toBarDirection(ctBarChart.getBarDir());
+    	if (ctBarChart != null) { 
+    		_chartDirection = XSSFChartUtil.toBarDirection(ctBarChart.getBarDir());
+    	}
+    	return _chartDirection;
     }
     
     public void setBarDirection(ChartDirection barDir) {
-    	ctBarChart.getBarDir().setVal(XSSFChartUtil.fromBarDirection(barDir));
+    	_chartDirection = barDir;
+    	if (ctBarChart != null) {
+	    	CTBarDir dir = ctBarChart.getBarDir();
+	    	if (dir == null) {
+	    		dir = ctBarChart.addNewBarDir();
+	    	}
+	    	dir.setVal(XSSFChartUtil.fromBarDirection(barDir));
+    	}
     }
     
     /**
@@ -104,11 +127,15 @@ public class XSSFBarChartData implements CategoryData {
             barSer.addNewIdx().setVal(this.id);
             barSer.addNewOrder().setVal(this.order);
 
-            CTSerTx tx = barSer.addNewTx();
-            XSSFChartUtil.buildSerTx(tx, title);
+            if (title != null) {
+	            CTSerTx tx = barSer.addNewTx();
+	            XSSFChartUtil.buildSerTx(tx, title);
+            }
             
-            CTAxDataSource cats = barSer.addNewCat();
-            XSSFChartUtil.buildAxDataSource(cats, categories);
+            if (categories != null && categories.getPointCount() > 0) {
+	            CTAxDataSource cats = barSer.addNewCat();
+	            XSSFChartUtil.buildAxDataSource(cats, categories);
+            }
 
             CTNumDataSource vals = barSer.addNewVal();
             XSSFChartUtil.buildNumDataSource(vals, values);
@@ -137,6 +164,8 @@ public class XSSFBarChartData implements CategoryData {
 	        ctBarChart = plotArea.addNewBarChart();
         
 	        ctBarChart.addNewVaryColors().setVal(true);
+	        setBarDirection(_chartDirection);
+	        setGrouping(_chartGrouping);
 	        //TODO setup other properties of barChart
 	
 	        for (CategoryDataSerie s : series) {
