@@ -400,12 +400,12 @@ public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 	//20111124, henrichen@zkoss.org: evaluate with sheet and formula text only.
 	@Override
 	public CellValue evaluateFormula(int sheetIndex, String formula) {
-		ValueEval eval = _bookEvaluator.evaluate(sheetIndex, formula);
+		ValueEval eval = _bookEvaluator.evaluate(sheetIndex, formula, false);
 		return getCellValueByValueEval(eval);
 	}
 	//20111128, henrichen@zkoss.org: evaluate with sheet and formula text and return ValueEval.
 	@Override
-	public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula) {
-		return _bookEvaluator.evaluate(sheetIndex, formula);
+	public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula, boolean ignoreDereference) {
+		return _bookEvaluator.evaluate(sheetIndex, formula, ignoreDereference);
 	}
 }

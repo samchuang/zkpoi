@@ -123,7 +123,7 @@ public interface FormulaEvaluator {
     //20111124, henrichen@zkoss.org: given formula, sheet index, evaluate the formula results
     CellValue evaluateFormula(int sheetIndex, String formula);
     //20111128, henrichen@zkoss.org: given formula, sheet index, evaluate the formula results
-    ValueEval evaluateFormulaValueEval(int sheetIndex, String formula);
+    ValueEval evaluateFormulaValueEval(int sheetIndex, String formula, boolean ignoreDereference);
     //20111128, henrichen@zkoss.org: given ValueEval, return CellValue
 	CellValue getCellValueByValueEval(ValueEval eval);
 }

@@ -308,12 +308,12 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 	//20111124, henrichen@zkoss.org: get left-top cell value 
 	@Override
 	public CellValue evaluateFormula(int sheetIndex, String formula) {
-		ValueEval eval = _bookEvaluator.evaluate(sheetIndex, formula);
+		ValueEval eval = _bookEvaluator.evaluate(sheetIndex, formula, false);
 		return getCellValueByValueEval(eval);
 	}
 	
 	//20111128, henrichen@zkoss.org: return ValueEval
-	public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula) {
-		return _bookEvaluator.evaluate(sheetIndex, formula);
+	public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula, boolean ignoreDereference) {
+		return _bookEvaluator.evaluate(sheetIndex, formula, ignoreDereference);
 	}
 }

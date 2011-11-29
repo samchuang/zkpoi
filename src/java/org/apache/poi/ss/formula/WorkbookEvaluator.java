@@ -298,10 +298,10 @@ public final class WorkbookEvaluator {
 
 				Ptg[] ptgs = _workbook.getFormulaTokens(srcCell);
 				if (evalListener == null) {
-					result = evaluateFormula(ec, ptgs, false);
+					result = evaluateFormula(ec, ptgs, false, false);
 				} else {
 					evalListener.onStartEvaluate(srcCell, cce);
-					result = evaluateFormula(ec, ptgs, false);
+					result = evaluateFormula(ec, ptgs, false, false);
 					evalListener.onEndEvaluate(cce, result);
 				}
 
@@ -386,7 +386,7 @@ public final class WorkbookEvaluator {
 		}
 	}
 	// visibility raised for testing
-	/* package */ ValueEval evaluateFormula(OperationEvaluationContext ec, Ptg[] ptgs, boolean ignoreDependency) {
+	/* package */ ValueEval evaluateFormula(OperationEvaluationContext ec, Ptg[] ptgs, boolean ignoreDependency, boolean ignoreDereference) {
 		if (!ignoreDependency)
 			addDependency(ec, ptgs); //20110324, henrichen@zkoss.org: construct the dependency DAG per this formula (bug#290)
 		
@@ -512,7 +512,7 @@ public final class WorkbookEvaluator {
 			throw new IllegalStateException("evaluation stack not empty");
 		}
 		value = postProcessValueEval(ec, value, true); //20101115, henrichen@zkoss.org: might be simple one operand formula
-		return dereferenceResult(value, ec.getRowIndex(), ec.getColumnIndex());
+		return ignoreDereference ? value : dereferenceResult(value, ec.getRowIndex(), ec.getColumnIndex());
 	}
 	/**
 	 * Calculates the number of tokens that the evaluator should skip upon reaching a tAttrSkip.
@@ -685,8 +685,8 @@ public final class WorkbookEvaluator {
 	}
 
 	//20111124, henrichen@zkoss.org: given sheet index, formula text, return evaluated results
-	public ValueEval evaluate(int sheetIndex, String formula) {
-		return evaluateAny(formula, sheetIndex, 0, 0, new EvaluationTracker(_cache));
+	public ValueEval evaluate(int sheetIndex, String formula, boolean ignoreDereference) {
+		return evaluateAny(formula, sheetIndex, 0, 0, new EvaluationTracker(_cache), ignoreDereference);
 	}
 
 	//20111124, henrichen@zkoss.org: given sheet index
@@ -694,7 +694,7 @@ public final class WorkbookEvaluator {
 	 * @return never <code>null</code>, never {@link BlankEval}
 	 */
 	private ValueEval evaluateAny(String formula, int sheetIndex,
-				int rowIndex, int columnIndex, EvaluationTracker tracker) {
+				int rowIndex, int columnIndex, EvaluationTracker tracker, boolean ignoreDeference) {
 		final EvaluationCell virtualCell = new EvaluationCell() { //virtual EvaluationCell, it is used as a key only
 			@Override
 			public Object getIdentityKey() {
@@ -759,7 +759,7 @@ public final class WorkbookEvaluator {
 			OperationEvaluationContext ec = new OperationEvaluationContext(this, _workbook, sheetIndex, rowIndex, columnIndex, tracker);
 			try {
 				Ptg[] ptgs = _workbook.getFormulaTokens(sheetIndex, formula);
-				result = evaluateFormula(ec, ptgs, true);
+				result = evaluateFormula(ec, ptgs, true, ignoreDeference);
 				tracker.updateCacheResult(result);
 			} catch (NotImplementedException e) {
 				throw addExceptionInfo(e, sheetIndex, rowIndex, columnIndex);
