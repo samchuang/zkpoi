@@ -97,4 +97,7 @@ public interface EvaluationWorkbook {
 			return _ix;
 		}
 	}
+
+	//20111124, henrichen@zkoss.org
+	Ptg[] getFormulaTokens(int sheetIndex, String formula);
 }

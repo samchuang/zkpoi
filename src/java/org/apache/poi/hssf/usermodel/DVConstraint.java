@@ -462,18 +462,4 @@ public class DVConstraint implements DataValidationConstraint {
 			|| (s1 != null && s1.equals(s2))
 			|| (s2 != null && s2.equals(s1));
 	}
-
-	//20110511,peterkuo@potix.com
-	@Override
-	public String getRefRange() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	//20110511,peterkuo@potix.com
-	@Override
-	public boolean isRefRange() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

@@ -90,4 +90,7 @@ public interface AreaEval extends TwoDEval {
      * of this area
      */
     AreaEval offset(int relFirstRowIx, int relLastRowIx, int relFirstColIx, int relLastColIx);
+    
+    //20111125, henrichen@zkoss.org: return the sheet depth
+    int getDepth();
 }

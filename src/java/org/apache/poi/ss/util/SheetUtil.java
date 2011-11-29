@@ -18,6 +18,7 @@
 package org.zkoss.poi.ss.util;
 
 import org.zkoss.poi.ss.formula.WorkbookEvaluator;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.ss.usermodel.*;
 
 import java.text.AttributedString;
@@ -67,9 +68,10 @@ public class SheetUtil {
         public int evaluateFormulaCell(Cell cell) {
             return cell.getCachedFormulaResultType();
         }
-		public WorkbookEvaluator getWorkbookEvaluator() {
-			return null;
-		}
+		public WorkbookEvaluator getWorkbookEvaluator() {return null;}
+		public CellValue evaluateFormula(int sheetIndex, String formula) {return null;} //20111124, henrichen@zkoss.org
+		public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula) {return null;} //20111128, henrichen@zkoss.org
+		public CellValue getCellValueByValueEval(ValueEval eval) {return null;} //20111128, henrichen@zkoss.org
     };
 
     /**

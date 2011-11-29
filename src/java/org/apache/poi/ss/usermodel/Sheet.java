@@ -18,6 +18,7 @@
 package org.zkoss.poi.ss.usermodel;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.zkoss.poi.hssf.util.PaneInformation;
 import org.zkoss.poi.ss.util.CellRangeAddress;
@@ -949,4 +950,10 @@ public interface Sheet extends Iterable<Row> {
 
     //20110511, peterkuo@potix.com
     public void removeValidationData(DataValidation dataValidation);
+    
+    //20111122, henrichen@zkoss.org: returns data validation of this sheet
+    public List<DataValidation> getDataValidations();
+
+	//20111124, henrichen@zkoss.org: returns data validation of the specified row,col
+	public DataValidation getDataValidation(int row, int col);
 }

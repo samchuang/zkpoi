@@ -20,6 +20,7 @@ package org.zkoss.poi.hssf.usermodel;
 import org.zkoss.poi.ss.formula.CollaboratingWorkbooksEnvironment;
 import org.zkoss.poi.ss.formula.IStabilityClassifier;
 import org.zkoss.poi.ss.formula.WorkbookEvaluator;
+import org.zkoss.poi.ss.formula.eval.ArrayEval;
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.formula.eval.NumberEval;
@@ -354,8 +355,22 @@ public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 	 */
 	private CellValue evaluateFormulaCellValue(Cell cell) {
 		ValueEval eval = _bookEvaluator.evaluate(new HSSFEvaluationCell((HSSFCell)cell));
+		return getCellValueByValueEval(eval);
+	}
+	
+	@Override
+	public WorkbookEvaluator getWorkbookEvaluator() {
+		return _bookEvaluator;
+	}
+
+	//20111124, henrichen@zkoss.org: give ValueEval, evaluate to CellValue
+	@Override
+	public CellValue getCellValueByValueEval(ValueEval eval) {
 		//20100720, henrichen@zkoss.org: handle HYPERLINK function 
 		CellValue cv = null;
+		if (eval instanceof ArrayEval) {
+			return getCellValueByValueEval(((ArrayEval)eval).getValue(0, 0)); //recursive and get the 1st cell
+		}
 		if (eval instanceof NumberEval) {
 			NumberEval ne = (NumberEval) eval;
 			cv = new CellValue(ne.getNumberValue());
@@ -382,8 +397,15 @@ public class HSSFFormulaEvaluator implements FormulaEvaluator  {
 		throw new RuntimeException("Unexpected eval class (" + eval.getClass().getName() + ")");
 	}
 	
+	//20111124, henrichen@zkoss.org: evaluate with sheet and formula text only.
 	@Override
-	public WorkbookEvaluator getWorkbookEvaluator() {
-		return _bookEvaluator;
+	public CellValue evaluateFormula(int sheetIndex, String formula) {
+		ValueEval eval = _bookEvaluator.evaluate(sheetIndex, formula);
+		return getCellValueByValueEval(eval);
+	}
+	//20111128, henrichen@zkoss.org: evaluate with sheet and formula text and return ValueEval.
+	@Override
+	public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula) {
+		return _bookEvaluator.evaluate(sheetIndex, formula);
 	}
 }

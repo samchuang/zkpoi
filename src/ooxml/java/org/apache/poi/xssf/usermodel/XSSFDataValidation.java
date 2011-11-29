@@ -254,28 +254,4 @@ public class XSSFDataValidation implements DataValidation {
 		constraint = new XSSFDataValidationConstraint(validationType,operatorType, formula1,formula2);
     	return constraint;
     }
-
-    //20110511, peterkuo@potix.com
-	@Override
-	public boolean getShowErrorMessage() {
-		return ctDdataValidation.getShowErrorMessage(); 
-	}
-
-    //20110511, peterkuo@potix.com
-	@Override
-	public boolean getShowInputMessage() {
-		return ctDdataValidation.getShowInputMessage();
-	}
-
-    //20110511, peterkuo@potix.com
-	@Override
-	public void setShowErrorMessage(boolean showErrorMessage) {
-		ctDdataValidation.setShowErrorMessage(showErrorMessage);
-	}
-
-    //20110511, peterkuo@potix.com
-	@Override
-	public void setShowInputMessage(boolean showInputMessage) {
-		ctDdataValidation.setShowInputMessage(showInputMessage);
-	}
 }

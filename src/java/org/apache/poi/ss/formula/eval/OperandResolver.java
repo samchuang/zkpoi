@@ -19,6 +19,7 @@ package org.zkoss.poi.ss.formula.eval;
 
 import java.util.regex.Pattern;
 
+
 /**
  * Provides functionality for evaluating arguments to functions and operators.
  *
@@ -348,5 +349,54 @@ public final class OperandResolver {
 		// Note - the standard java type conversion from double to int truncates toward zero.
 		// but Math.floor() truncates toward negative infinity
 		return (long)Math.floor(d);
+	}
+
+	//20111125, henrichen@zkoss.org: will return ArrayEval if necessary
+	public static ValueEval chooseMultipleElementsFromArea(AreaEval ae,
+			int srcCellRow, int srcCellCol) throws EvaluationException {
+		ValueEval result = ae.getWidth() == 1 && ae.getHeight() == 1 ? 
+				chooseSingleElementFromAreaInternal(ae, srcCellRow, srcCellCol):
+				chooseMultipleElementsFromAreaInternal(ae, srcCellRow, srcCellCol);
+		if (result instanceof ErrorEval) {
+			throw new EvaluationException((ErrorEval) result);
+		}
+		return result;
+	}
+
+	//20111125, henrichen@zkoss.org: will return ArrayEval if necessary
+	private static ValueEval chooseMultipleElementsFromAreaInternal(AreaEval ae,
+			int srcCellRow, int srcCellCol) throws EvaluationException {
+		int w = ae.getWidth();
+		int h = ae.getHeight();
+		
+		ValueEval[][] values = new ValueEval[h][];
+		for (int r = 0; r < h; ++r) {
+			values[r] = new ValueEval[w];
+			for(int c = 0; c < w; ++c) {
+				values[r][c] = ae.getRelativeValue(r, c);
+			}
+		}
+		return new ArrayEval(values, ae.getFirstRow(), ae.getFirstColumn(), ae.getLastRow(), ae.getLastColumn());
+	}
+	
+	//20111125, henrichen@zkoss.org: will return ArrayEval if necessary
+	public static ValueEval getMultipleValue(ValueEval arg, int srcCellRow, int srcCellCol)
+	throws EvaluationException {
+		ValueEval result;
+		if (arg instanceof RefEval) {
+			result = ((RefEval) arg).getInnerValueEval();
+		} else if (arg instanceof AreaEval) {
+			result = chooseMultipleElementsFromArea((AreaEval) arg, srcCellRow, srcCellCol);
+		} else {
+			result = arg;
+		}
+		//20100720, henrichen@zkoss.org: HYPERLINK function
+		if (arg instanceof HyperlinkEval && result instanceof HyperlinkEval) { 
+			((HyperlinkEval)result).setHyperlink(((HyperlinkEval)arg).getHyperlink());
+		}
+		if (result instanceof ErrorEval) {
+			throw new EvaluationException((ErrorEval) result);
+		}
+		return result;
 	}
 }

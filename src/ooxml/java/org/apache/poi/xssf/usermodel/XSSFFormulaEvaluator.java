@@ -20,6 +20,7 @@ package org.zkoss.poi.xssf.usermodel;
 import org.zkoss.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.zkoss.poi.ss.formula.IStabilityClassifier;
 import org.zkoss.poi.ss.formula.WorkbookEvaluator;
+import org.zkoss.poi.ss.formula.eval.ArrayEval;
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.formula.eval.NumberEval;
@@ -263,8 +264,21 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
         }
 
 		ValueEval eval = _bookEvaluator.evaluate(new XSSFEvaluationCell((XSSFCell) cell));
+		return getCellValueByValueEval(eval);
+	}
+	
+	@Override
+	public WorkbookEvaluator getWorkbookEvaluator() {
+		return _bookEvaluator;
+	}
+
+	//20111124, henrichen@zkoss.org: given eval, return CellValue
+	public CellValue getCellValueByValueEval(ValueEval eval) {
 		//20100917, henrichen@zkoss.org: handle HYPERLINK function 
 		CellValue cv = null;
+		if (eval instanceof ArrayEval) {
+			return getCellValueByValueEval(((ArrayEval)eval).getValue(0, 0)); //recursive
+		}
 		if (eval instanceof NumberEval) {
 			NumberEval ne = (NumberEval) eval;
 			cv = new CellValue(ne.getNumberValue());
@@ -291,8 +305,15 @@ public class XSSFFormulaEvaluator implements FormulaEvaluator {
 		throw new RuntimeException("Unexpected eval class (" + eval.getClass().getName() + ")");
 	}
 	
+	//20111124, henrichen@zkoss.org: get left-top cell value 
 	@Override
-	public WorkbookEvaluator getWorkbookEvaluator() {
-		return _bookEvaluator;
+	public CellValue evaluateFormula(int sheetIndex, String formula) {
+		ValueEval eval = _bookEvaluator.evaluate(sheetIndex, formula);
+		return getCellValueByValueEval(eval);
+	}
+	
+	//20111128, henrichen@zkoss.org: return ValueEval
+	public ValueEval evaluateFormulaValueEval(int sheetIndex, String formula) {
+		return _bookEvaluator.evaluate(sheetIndex, formula);
 	}
 }

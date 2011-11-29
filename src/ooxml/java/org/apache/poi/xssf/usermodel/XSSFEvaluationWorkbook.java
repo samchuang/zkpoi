@@ -31,6 +31,7 @@ import org.zkoss.poi.ss.formula.FormulaParsingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaRenderingWorkbook;
 import org.zkoss.poi.ss.formula.FormulaType;
 import org.zkoss.poi.ss.formula.udf.UDFFinder;
+import org.zkoss.poi.ss.usermodel.Sheet;
 import org.zkoss.poi.xssf.model.IndexedUDFFinder;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDefinedName;
 
@@ -242,5 +243,12 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 			return new Name(nm, _uBook.getNumberOfNames() - 1, this);
 		}
 		return getOrCreateName(name, -1); //recursive
+	}
+	
+	//20111124, henrichen@zkoss.org: get formula tokens per the formula string
+	public Ptg[] getFormulaTokens(int sheetIndex, String formula) {
+		XSSFEvaluationWorkbook frBook = XSSFEvaluationWorkbook.create(_uBook);
+		String formulaText = cleanXSSFFormulaText(formula);
+		return FormulaParser.parse(formulaText, frBook, FormulaType.CELL, sheetIndex);
 	}
 }

@@ -19,6 +19,7 @@ package org.zkoss.poi.xssf.streaming;
 
 import java.io.*;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.Map;
 
@@ -1527,24 +1528,40 @@ public class SXSSFSheet implements Sheet, Cloneable
             }
         }
     }
+    //20111124, henrichen@zkoss.org
 	@Override
 	public boolean isAutoFilterMode() {
 		// TODO Auto-generated method stub
 		return false;
 	}
+    //20111124, henrichen@zkoss.org
 	@Override
 	public CellRangeAddress removeAutoFilter() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+    //20111124, henrichen@zkoss.org
 	@Override
 	public AutoFilter getAutoFilter() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+    //20111124, henrichen@zkoss.org
 	@Override
 	public void removeValidationData(DataValidation dataValidation) {
 		// TODO Auto-generated method stub
 		
+	}
+    //20111124, henrichen@zkoss.org
+	@Override
+	public List<DataValidation> getDataValidations() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+    //20111124, henrichen@zkoss.org
+	@Override
+	public DataValidation getDataValidation(int row, int col) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

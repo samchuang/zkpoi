@@ -126,8 +126,14 @@ final class LazyAreaEval extends AreaEvalBase implements HyperlinkEval {
 	public void setHyperlink(Hyperlink hyperlink) {
 		_hyperlink = hyperlink;
 	}
-	
+	//20100720, henrichen@zkoss.org: handle HYPERLINK function
 	public Hyperlink getHyperlink() {
 		return _hyperlink;
+	}
+
+	//20111125, henrichen@zkoss.org: sheet depth
+	@Override
+	public int getDepth() {
+		return _evaluator.getSheetCount();
 	}
 }

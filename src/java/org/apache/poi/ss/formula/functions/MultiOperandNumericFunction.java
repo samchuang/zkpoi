@@ -17,6 +17,7 @@
 
 package org.zkoss.poi.ss.formula.functions;
 
+import org.zkoss.poi.ss.formula.eval.ArrayEval;
 import org.zkoss.poi.ss.formula.eval.BlankEval;
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
@@ -205,6 +206,18 @@ public abstract class MultiOperandNumericFunction implements Function {
 			ValueEval[] ves = ((ValuesEval) ve).getValueEvals();
 			for(ValueEval xve : ves) {
 				collectValue(xve, isViaReference, temp); //recursive
+			}
+			return;
+		}
+		//20111128, henrichen@zkoss.org: handle 2d evaluation
+		if (ve instanceof ArrayEval) {
+			ArrayEval ae = (ArrayEval) ve;
+			final int rows = ae.getHeight();
+			final int cols = ae.getWidth();
+			for (int r = 0; r < rows; ++r) {
+				for (int c = 0; c < cols; ++c) {
+					collectValue(ae.getValue(r, c), isViaReference, temp); //recursive
+				}
 			}
 			return;
 		}

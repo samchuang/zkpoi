@@ -3118,8 +3118,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 	}
     
     @SuppressWarnings("deprecation") //YK: getXYZArray() array accessors are deprecated in xmlbeans with JDK 1.5 support
-    public List<XSSFDataValidation> getDataValidations() {
-    	List<XSSFDataValidation> xssfValidations = new ArrayList<XSSFDataValidation>();
+    @Override
+    public List<DataValidation> getDataValidations() { //20111122, henrichen@zkoss.org: XSSFDataValidation -> DataValidation
+    	List<DataValidation> xssfValidations = new ArrayList<DataValidation>(); 
     	CTDataValidations dataValidations = this.worksheet.getDataValidations();
     	if( dataValidations!=null && dataValidations.getCount() > 0 ) {
     		for (CTDataValidation ctDataValidation : dataValidations.getDataValidationArray()) {
@@ -3396,5 +3397,22 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 		}
 		
         return autoFilter; 
+    }
+    
+    //20111124, henrichen@zkoss.org:
+    public DataValidation getDataValidation(int row, int col) {
+    	List<DataValidation> dvs = getDataValidations();
+    	if (dvs != null) {
+    		for(DataValidation dv : dvs) {
+    			CellRangeAddressList addrList = dv.getRegions();
+    			for (int j = 0, len = addrList.getSize(); j < len; ++j) {
+    				CellRangeAddress addr = addrList.getCellRangeAddress(j);
+    				if (addr.isInRange(row, col)) {
+    					return dv;
+    				}
+    			}
+    		}
+    	}
+    	return null;
     }
 }

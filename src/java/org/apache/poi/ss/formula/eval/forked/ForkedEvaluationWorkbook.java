@@ -160,4 +160,10 @@ final class ForkedEvaluationWorkbook implements EvaluationWorkbook {
 			return _index - o._index;
 		}
 	}
+
+	//20111124, henrichen@zkoss.org: evaluate formula only
+	@Override
+	public Ptg[] getFormulaTokens(int sheetIndex, String formula) {
+		return _masterBook.getFormulaTokens(sheetIndex, formula);
+	}
 }

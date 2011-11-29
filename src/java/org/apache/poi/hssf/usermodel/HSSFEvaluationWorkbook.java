@@ -219,4 +219,9 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 		}
 		return getOrCreateName(name, -1); //recursive
 	}
+
+	@Override
+	public Ptg[] getFormulaTokens(int sheetIndex, String formula) {
+		return HSSFFormulaParser.parse(formula, _uBook, FormulaType.CELL, sheetIndex);
+	}
 }

@@ -50,6 +50,7 @@ import org.zkoss.poi.ss.formula.ptg.StringPtg;
 import org.zkoss.poi.ss.formula.ptg.UnionPtg;
 import org.zkoss.poi.ss.formula.ptg.UnknownPtg;
 import org.zkoss.poi.ss.formula.eval.AreaEval;
+import org.zkoss.poi.ss.formula.eval.ArrayEval;
 import org.zkoss.poi.ss.formula.eval.BlankEval;
 import org.zkoss.poi.ss.formula.eval.BoolEval;
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
@@ -73,6 +74,7 @@ import org.zkoss.poi.hssf.util.CellReference;
 import org.zkoss.poi.ss.formula.CollaboratingWorkbooksEnvironment.WorkbookNotFoundException;
 import org.zkoss.poi.ss.formula.eval.NotImplementedException;
 import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.Sheet;
 
 /**
  * Evaluates formula cells.<p/>
@@ -296,10 +298,10 @@ public final class WorkbookEvaluator {
 
 				Ptg[] ptgs = _workbook.getFormulaTokens(srcCell);
 				if (evalListener == null) {
-					result = evaluateFormula(ec, ptgs);
+					result = evaluateFormula(ec, ptgs, false);
 				} else {
 					evalListener.onStartEvaluate(srcCell, cce);
-					result = evaluateFormula(ec, ptgs);
+					result = evaluateFormula(ec, ptgs, false);
 					evalListener.onEndEvaluate(cce, result);
 				}
 
@@ -384,8 +386,9 @@ public final class WorkbookEvaluator {
 		}
 	}
 	// visibility raised for testing
-	/* package */ ValueEval evaluateFormula(OperationEvaluationContext ec, Ptg[] ptgs) {
-		addDependency(ec, ptgs); //20110324, henrichen@zkoss.org: construct the dependency DAG per this formula (bug#290)
+	/* package */ ValueEval evaluateFormula(OperationEvaluationContext ec, Ptg[] ptgs, boolean ignoreDependency) {
+		if (!ignoreDependency)
+			addDependency(ec, ptgs); //20110324, henrichen@zkoss.org: construct the dependency DAG per this formula (bug#290)
 		
 		Stack<ValueEval> stack = new Stack<ValueEval>();
 		for (int i = 0, iSize = ptgs.length; i < iSize; i++) {
@@ -545,7 +548,8 @@ public final class WorkbookEvaluator {
 	public static ValueEval dereferenceResult(ValueEval evaluationResult, int srcRowNum, int srcColNum) {
 		ValueEval value;
 		try {
-			value = OperandResolver.getSingleValue(evaluationResult, srcRowNum, srcColNum);
+			value = OperandResolver.getMultipleValue(evaluationResult, srcRowNum, srcColNum); //20111125, henrichen@zkoss.org: handle array value  
+				//OperandResolver.getSingleValue(evaluationResult, srcRowNum, srcColNum);
 		} catch (EvaluationException e) {
 			return e.getErrorEval();
 		}
@@ -678,5 +682,103 @@ public final class WorkbookEvaluator {
 	
 	public FreeRefFunction findUserDefinedFunction(String functionName) {
 		return _udfFinder.findFunction(functionName);
+	}
+
+	//20111124, henrichen@zkoss.org: given sheet index, formula text, return evaluated results
+	public ValueEval evaluate(int sheetIndex, String formula) {
+		return evaluateAny(formula, sheetIndex, 0, 0, new EvaluationTracker(_cache));
+	}
+
+	//20111124, henrichen@zkoss.org: given sheet index
+	/**
+	 * @return never <code>null</code>, never {@link BlankEval}
+	 */
+	private ValueEval evaluateAny(String formula, int sheetIndex,
+				int rowIndex, int columnIndex, EvaluationTracker tracker) {
+		final EvaluationCell virtualCell = new EvaluationCell() { //virtual EvaluationCell, it is used as a key only
+			@Override
+			public Object getIdentityKey() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public EvaluationSheet getSheet() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public int getRowIndex() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public int getColumnIndex() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public int getCellType() {
+				return Cell.CELL_TYPE_FORMULA;
+			}
+
+			@Override
+			public double getNumericCellValue() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public String getStringCellValue() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public boolean getBooleanCellValue() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public int getErrorCellValue() {
+				// TODO Auto-generated method stub
+				return 0;
+			} //virtual cell
+			
+		};
+		FormulaCellCacheEntry cce = _cache.getOrCreateFormulaCellEntry(virtualCell);
+		ValueEval result;
+		if (cce.getValue() == null) {
+			if (!tracker.startEvaluate(cce)) {
+				return ErrorEval.CIRCULAR_REF_ERROR;
+			}
+			OperationEvaluationContext ec = new OperationEvaluationContext(this, _workbook, sheetIndex, rowIndex, columnIndex, tracker);
+			try {
+				Ptg[] ptgs = _workbook.getFormulaTokens(sheetIndex, formula);
+				result = evaluateFormula(ec, ptgs, true);
+				tracker.updateCacheResult(result);
+			} catch (NotImplementedException e) {
+				throw addExceptionInfo(e, sheetIndex, rowIndex, columnIndex);
+			} finally {
+				tracker.endEvaluate(cce);
+				_cache.notifyDeleteCell(0, sheetIndex, virtualCell); //clear the cache since it is for temporary use only
+			}
+		} else {
+			return cce.getValue();
+		}
+		if (isDebugLogEnabled()) {
+			String sheetName = getSheetName(sheetIndex);
+			CellReference cr = new CellReference(rowIndex, columnIndex);
+			logDebug("Evaluated " + sheetName + "!" + cr.formatAsString() + " to " + result.toString());
+		}
+		// Usually (result === cce.getValue())
+		// But sometimes: (result==ErrorEval.CIRCULAR_REF_ERROR, cce.getValue()==null)
+		// When circular references are detected, the cache entry is only updated for
+		// the top evaluation frame
+		return result;
 	}
 }

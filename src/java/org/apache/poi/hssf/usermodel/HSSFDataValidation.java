@@ -205,30 +205,4 @@ public final class HSSFDataValidation implements DataValidation {
 				fp.getFormula1(), fp.getFormula2(),
 				_regions);
 	}
-
-	//20110511, peterkuo@potix.com
-	//TODO: not yet implemented
-	@Override
-	public boolean getShowErrorMessage() {
-		return false;
-	}
-
-	//20110511, peterkuo@potix.com
-	//TODO: not yet implemented
-	@Override
-	public boolean getShowInputMessage() {
-		return false;
-	}
-
-	//20110511, peterkuo@potix.com
-	//TODO: not yet implemented
-	@Override
-	public void setShowErrorMessage(boolean showErrorMessage) {
-	}
-
-	//20110511, peterkuo@potix.com
-	//TODO: not yet implemented
-	@Override
-	public void setShowInputMessage(boolean showInputMessage) {
-	}
 }

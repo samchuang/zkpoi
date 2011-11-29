@@ -97,4 +97,13 @@ final class SheetRefEvaluator {
         return subtotal;
     }
 
+    //20111125, henrichen@zkoss.org: return number of sheet of this SheetReference
+    public int getSheetCount() {
+    	if (_sheetIndex > 0 && _lastSheetIndex > 0) {
+    		return _lastSheetIndex  - _sheetIndex + 1;
+    	} else if (_sheetIndex < 0 && _lastSheetIndex < 0) {
+    		return 0;
+    	}
+    	return 1;
+    }
 }
