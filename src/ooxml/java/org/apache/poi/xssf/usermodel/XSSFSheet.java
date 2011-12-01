@@ -3405,7 +3405,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
     	if (dvs != null) {
     		for(DataValidation dv : dvs) {
     			CellRangeAddressList addrList = dv.getRegions();
-    			for (int j = 0, len = addrList.getSize(); j < len; ++j) {
+    			for (int j = 0, len = addrList.countRanges(); j < len; ++j) {
     				CellRangeAddress addr = addrList.getCellRangeAddress(j);
     				if (addr.isInRange(row, col)) {
     					return dv;
