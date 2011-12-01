@@ -87,7 +87,10 @@ public class XSSFDataValidation implements DataValidation {
 		this.validationConstraint = getConstraint(ctDataValidation);
 		this.ctDdataValidation = ctDataValidation;
 		this.regions = regions;
-		this.ctDdataValidation.setErrorStyle(STDataValidationErrorStyle.STOP);
+		//20111130, henrichen@zkoss.org: stop == 1, warning == 2, information == 3
+		final STDataValidationErrorStyle.Enum style = this.ctDdataValidation.getErrorStyle();
+		if (style == null) 
+			this.ctDdataValidation.setErrorStyle(STDataValidationErrorStyle.STOP);
 		this.ctDdataValidation.setAllowBlank(true);
 	}	
 
@@ -96,7 +99,10 @@ public class XSSFDataValidation implements DataValidation {
 		this.validationConstraint = constraint;
 		this.ctDdataValidation = ctDataValidation;
 		this.regions = regions;
-		this.ctDdataValidation.setErrorStyle(STDataValidationErrorStyle.STOP);
+		//20111130, henrichen@zkoss.org: stop == 1, warning == 2, information == 3
+		final STDataValidationErrorStyle.Enum style = this.ctDdataValidation.getErrorStyle();
+		if (style == null) 
+			this.ctDdataValidation.setErrorStyle(STDataValidationErrorStyle.STOP);
 		this.ctDdataValidation.setAllowBlank(true);
 	}
  
@@ -147,7 +153,8 @@ public class XSSFDataValidation implements DataValidation {
 	 * @see org.apache.poi.ss.usermodel.DataValidation#getErrorStyle()
 	 */
 	public int getErrorStyle() {
-		return ctDdataValidation.getErrorStyle().intValue();
+		//20111130, henrichen@zkoss.org
+		return reverseErrorStyleMappings.get(ctDdataValidation.getErrorStyle()); 
 	}
 
 	/* (non-Javadoc)
@@ -253,5 +260,13 @@ public class XSSFDataValidation implements DataValidation {
 		Integer operatorType = XSSFDataValidation.operatorTypeReverseMappings.get(operator);
 		constraint = new XSSFDataValidationConstraint(validationType,operatorType, formula1,formula2);
     	return constraint;
+    }
+
+    //20111130, henrichen@zkoss.org: reverse mapping of DataValidation.ErrorStyle -> STDataValidationErrorStyle
+    static Map<STDataValidationErrorStyle.Enum, Integer> reverseErrorStyleMappings = new HashMap<STDataValidationErrorStyle.Enum, Integer>();
+    static {
+		reverseErrorStyleMappings.put(STDataValidationErrorStyle.INFORMATION, DataValidation.ErrorStyle.INFO);
+		reverseErrorStyleMappings.put(STDataValidationErrorStyle.STOP, DataValidation.ErrorStyle.STOP);
+		reverseErrorStyleMappings.put(STDataValidationErrorStyle.WARNING, DataValidation.ErrorStyle.WARNING);
     }
 }
