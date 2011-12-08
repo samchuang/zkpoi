@@ -444,8 +444,9 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
     private void renameSheet(List<? extends CategoryDataSerie> series, String oldname, String newname) {
 		for (CategoryDataSerie serie : series) {
 			ChartTextSource title = serie.getTitle();
-			if (title != null)
+			if (title != null) {
 				title.renameSheet(oldname, newname);
+			}
 			serie.getCategories().renameSheet(oldname, newname);
 			serie.getValues().renameSheet(oldname, newname);
 		}
