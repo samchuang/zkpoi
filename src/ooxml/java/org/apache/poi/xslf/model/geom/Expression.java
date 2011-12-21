@@ -17,7 +17,7 @@
  * ====================================================================
  */
 
-package org.apache.poi.xslf.model.geom;
+package org.zkoss.poi.xslf.model.geom;
 
 /**
  * Date: 10/24/11

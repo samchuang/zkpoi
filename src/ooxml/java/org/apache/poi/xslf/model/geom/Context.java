@@ -17,7 +17,7 @@
  * ====================================================================
  */
 
-package org.apache.poi.xslf.model.geom;
+package org.zkoss.poi.xslf.model.geom;
 
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;

@@ -17,7 +17,7 @@
  * ====================================================================
  */
 
-package org.apache.poi.xslf.model.geom;
+package org.zkoss.poi.xslf.model.geom;
 
 import java.util.regex.Matcher;
 

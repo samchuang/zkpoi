@@ -17,7 +17,7 @@
  * ====================================================================
  */
 
-package org.apache.poi.xslf.model.geom;
+package org.zkoss.poi.xslf.model.geom;
 
 import org.openxmlformats.schemas.drawingml.x2006.main.CTGeomGuide;
 
