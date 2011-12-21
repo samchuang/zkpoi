@@ -16,35 +16,24 @@
  *    limitations under the License.
  * ====================================================================
  */
+
 package org.zkoss.poi.xslf.usermodel;
 
 /**
- * Specified a list of text alignment types
+ * Manages fonts when rendering slides.
  *
- * @author Yegor Kozlov
+ * Use this class to handle unknown / missing fonts or to substitute fonts
  */
-public enum TextAlign {
-    /**
-     * Align text to the left margin.
-     */
-    LEFT,
-    /**
-     * Align text in the center.
-     */
-    CENTER,
+public interface XSLFFontManager {
 
     /**
-     * Align text to the right margin.
+     * select a font to be used to paint text
+     *
+     * @param typeface the font family as defined in the .pptx file.
+     * This can be unknown or missing in the graphic environment.
+     *
+     * @return the font to be used to paint text
      */
-    RIGHT,
 
-    /**
-     * Align text so that it is justified across the whole line. It
-     * is smart in the sense that it will not justify sentences
-     * which are short
-     */
-    JUSTIFY,
-    JUSTIFY_LOW,
-    DIST,
-    THAI_DIST
+    String getRendererableFont(String typeface, int pitchFamily);
 }

@@ -22,24 +22,32 @@ import org.zkoss.poi.openxml4j.opc.PackageRelationship;
 import org.zkoss.poi.util.Beta;
 import org.zkoss.poi.util.Internal;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideLayout;
-import org.openxmlformats.schemas.presentationml.x2006.main.SldLayoutDocument;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideMaster;
-import org.openxmlformats.schemas.drawingml.x2006.main.ThemeDocument;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTBaseStyles;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTColor;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTColorMapping;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTColorScheme;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTOfficeStyleSheet;
-import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraphProperties;
+import org.openxmlformats.schemas.drawingml.x2006.main.ThemeDocument;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * A shared style sheet in a .pptx slide show
+ *
+ * @author Yegor Kozlov
+ */
 @Beta
 public class XSLFTheme extends POIXMLDocumentPart {
     private CTOfficeStyleSheet _theme;
-
+    private Map<String, CTColor> _schemeColors;
+    
     XSLFTheme() {
         super();
         _theme = CTOfficeStyleSheet.Factory.newInstance();
@@ -50,18 +58,60 @@ public class XSLFTheme extends POIXMLDocumentPart {
         ThemeDocument doc =
             ThemeDocument.Factory.parse(getPackagePart().getInputStream());
         _theme = doc.getTheme();
+        initialize();
     }
 
+    private void initialize(){
+    	CTBaseStyles elems = _theme.getThemeElements();
+    	CTColorScheme scheme = elems.getClrScheme();
+    	// The color scheme is responsible for defining a list of twelve colors. 
+    	_schemeColors = new HashMap<String, CTColor>(12);
+    	for(XmlObject o : scheme.selectPath("*")){
+    		CTColor c = (CTColor)o;
+    		String name = c.getDomNode().getLocalName();
+    		_schemeColors.put(name, c);
+    	}
+     }
 
+    /**
+     * re-map colors
+     *
+     * @param cmap color map defined in the master slide referencing this theme
+     */
+    void initColorMap(CTColorMapping cmap) {
+        _schemeColors.put("bg1", _schemeColors.get(cmap.getBg1().toString()));
+        _schemeColors.put("bg2", _schemeColors.get(cmap.getBg2().toString()));
+        _schemeColors.put("tx1", _schemeColors.get(cmap.getTx1().toString()));
+        _schemeColors.put("tx2", _schemeColors.get(cmap.getTx2().toString()));
+    }
+
+    /**
+     *
+     * @return name of this theme, e.g. "Office Theme"
+     */
     public String getName(){
         return _theme.getName();
     }
 
+    /**
+     * Set name of this theme
+     *
+     * @param name name of this theme
+     */
     public void setName(String name){
         _theme.setName(name);
     }
 
     /**
+     * Get a color from the theme's color scheme by name
+     * 
+     * @return a theme color or <code>null</code> if not found
+     */
+    CTColor getCTColor(String name){
+    	return _schemeColors.get(name);
+    }
+    
+     /**
      * While developing only!
      */
     @Internal
@@ -82,6 +132,36 @@ public class XSLFTheme extends POIXMLDocumentPart {
         OutputStream out = part.getOutputStream();
         getXmlObject().save(out, xmlOptions);
         out.close();
+    }
+
+    /**
+     * @return typeface of the major font to use in a document.
+     * Typically the major font is used for heading areas of a document.
+     *
+     */
+    public String getMajorFont(){
+        return _theme.getThemeElements().getFontScheme().getMajorFont().getLatin().getTypeface();
+    }
+
+    /**
+     * @return typeface of the minor font to use in a document.
+     * Typically the monor font is used for normal text or paragraph areas.
+     *
+     */
+    public String getMinorFont(){
+        return _theme.getThemeElements().getFontScheme().getMinorFont().getLatin().getTypeface();
+    }
+
+
+    CTTextParagraphProperties getDefaultParagraphStyle(){
+        XmlObject[] o = _theme.selectPath(
+                "declare namespace p='http://schemas.openxmlformats.org/presentationml/2006/main' " +
+                "declare namespace a='http://schemas.openxmlformats.org/drawingml/2006/main' " +
+                ".//a:objectDefaults/a:spDef/a:lstStyle/a:defPPr");
+        if(o.length == 1){
+            return (CTTextParagraphProperties)o[0];
+        }
+        return null;
     }
 
 }

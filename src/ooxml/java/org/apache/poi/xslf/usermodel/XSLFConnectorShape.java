@@ -20,28 +20,39 @@
 package org.zkoss.poi.xslf.usermodel;
 
 import org.zkoss.poi.util.Beta;
+import org.zkoss.poi.xslf.model.geom.Outline;
+import org.zkoss.poi.xslf.model.geom.Path;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTLineEndProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTLineProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTPresetGeometry2D;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
-import org.openxmlformats.schemas.drawingml.x2006.main.STShapeType;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTLineEndProperties;
+import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndLength;
 import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndType;
 import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndWidth;
-import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndLength;
+import org.openxmlformats.schemas.drawingml.x2006.main.STShapeType;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTConnector;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTConnectorNonVisual;
 
+import java.awt.Shape;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
- * Specifies a connection shape. 
+ * Specifies a connection shape.
  *
  * @author Yegor Kozlov
  */
 @Beta
 public class XSLFConnectorShape extends XSLFSimpleShape {
 
-    /*package*/ XSLFConnectorShape(CTConnector shape, XSLFSheet sheet){
+    /*package*/ XSLFConnectorShape(CTConnector shape, XSLFSheet sheet) {
         super(shape, sheet);
     }
 
@@ -64,132 +75,13 @@ public class XSLFConnectorShape extends XSLFSimpleShape {
         return ct;
     }
 
-    /**
-     * Specifies the line end decoration, such as a triangle or arrowhead.
-     */
-    public void setLineHeadDecoration(LineDecoration style){
-        CTLineProperties ln = getSpPr().getLn();
-        CTLineEndProperties lnEnd = ln.isSetHeadEnd() ? ln.getHeadEnd() : ln.addNewHeadEnd();
-        if(style == null){
-            if(lnEnd.isSetType()) lnEnd.unsetType();
-        } else {
-            lnEnd.setType(STLineEndType.Enum.forInt(style.ordinal() + 1));
-        }
-    }
-
-    public LineDecoration getLineHeadDecoration(){
-        CTLineProperties ln = getSpPr().getLn();
-        if(!ln.isSetHeadEnd()) return LineDecoration.NONE;
-
-        STLineEndType.Enum end = ln.getHeadEnd().getType();
-        return end == null ? LineDecoration.NONE : LineDecoration.values()[end.intValue() - 1];
-    }
 
     /**
-     * specifies decorations which can be added to the head of a line.
+     * YK: shadows of lines are suppressed for now.
      */
-    public void setLineHeadWidth(LineEndWidth style){
-        CTLineProperties ln = getSpPr().getLn();
-        CTLineEndProperties lnEnd = ln.isSetHeadEnd() ? ln.getHeadEnd() : ln.addNewHeadEnd();
-        if(style == null){
-            if(lnEnd.isSetW()) lnEnd.unsetW();
-        } else {
-            lnEnd.setW(STLineEndWidth.Enum.forInt(style.ordinal() + 1));
-        }
-    }
-
-    public LineEndWidth getLineHeadWidth(){
-        CTLineProperties ln = getSpPr().getLn();
-        if(!ln.isSetHeadEnd()) return null;
-
-        STLineEndWidth.Enum w = ln.getHeadEnd().getW();
-        return w == null ? null : LineEndWidth.values()[w.intValue() - 1];
-    }
-
-    /**
-     * Specifies the line end width in relation to the line width.
-     */
-    public void setLineHeadLength(LineEndLength style){
-        CTLineProperties ln = getSpPr().getLn();
-        CTLineEndProperties lnEnd = ln.isSetHeadEnd() ? ln.getHeadEnd() : ln.addNewHeadEnd();
-
-        if(style == null){
-            if(lnEnd.isSetLen()) lnEnd.unsetLen();
-        } else {
-            lnEnd.setLen(STLineEndLength.Enum.forInt(style.ordinal() + 1));
-        }
-    }
-
-    public LineEndLength getLineHeadLength(){
-        CTLineProperties ln = getSpPr().getLn();
-        if(!ln.isSetHeadEnd()) return null;
-
-        STLineEndLength.Enum len = ln.getHeadEnd().getLen();
-        return len == null ? null : LineEndLength.values()[len.intValue() - 1];
-    }
-
-    /**
-     * Specifies the line end decoration, such as a triangle or arrowhead.
-     */
-    public void setLineTailDecoration(LineDecoration style){
-        CTLineProperties ln = getSpPr().getLn();
-        CTLineEndProperties lnEnd = ln.isSetTailEnd() ? ln.getTailEnd() : ln.addNewTailEnd();
-        if(style == null){
-            if(lnEnd.isSetType()) lnEnd.unsetType();
-        } else {
-            lnEnd.setType(STLineEndType.Enum.forInt(style.ordinal() + 1));
-        }
-    }
-
-    public LineDecoration getLineTailDecoration(){
-        CTLineProperties ln = getSpPr().getLn();
-        if(!ln.isSetTailEnd()) return LineDecoration.NONE;
-
-        STLineEndType.Enum end = ln.getTailEnd().getType();
-        return end == null ? LineDecoration.NONE : LineDecoration.values()[end.intValue() - 1];
-    }
-
-    /**
-     * specifies decorations which can be added to the tail of a line.
-     */
-    public void setLineTailWidth(LineEndWidth style){
-        CTLineProperties ln = getSpPr().getLn();
-        CTLineEndProperties lnEnd = ln.isSetTailEnd() ? ln.getTailEnd() : ln.addNewTailEnd();
-        if(style == null){
-            if(lnEnd.isSetW()) lnEnd.unsetW();
-        } else {
-            lnEnd.setW(STLineEndWidth.Enum.forInt(style.ordinal() + 1));
-        }
-    }
-
-    public LineEndWidth getLineTailWidth(){
-        CTLineProperties ln = getSpPr().getLn();
-        if(!ln.isSetTailEnd()) return null;
-
-        STLineEndWidth.Enum w = ln.getTailEnd().getW();
-        return w == null ? null : LineEndWidth.values()[w.intValue() - 1];
-    }
-
-    /**
-     * Specifies the line end width in relation to the line width.
-     */
-    public void setLineTailLength(LineEndLength style){
-        CTLineProperties ln = getSpPr().getLn();
-        CTLineEndProperties lnEnd = ln.isSetTailEnd() ? ln.getTailEnd() : ln.addNewTailEnd();
-
-        if(style == null){
-            if(lnEnd.isSetLen()) lnEnd.unsetLen();
-        } else {
-            lnEnd.setLen(STLineEndLength.Enum.forInt(style.ordinal() + 1));
-        }
-    }
-
-    public LineEndLength getLineTailLength(){
-        CTLineProperties ln = getSpPr().getLn();
-        if(!ln.isSetTailEnd()) return null;
-
-        STLineEndLength.Enum len = ln.getTailEnd().getLen();
-        return len == null ? null : LineEndLength.values()[len.intValue() - 1];
+    @Override
+    public XSLFShadow getShadow() {
+        return null;
     }
 
 }

@@ -16,17 +16,17 @@
 ==================================================================== */
 package org.zkoss.poi.xslf.usermodel;
 
-import org.zkoss.poi.sl.usermodel.ShapeContainer;
 import org.zkoss.poi.util.Beta;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTConnector;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTGraphicalObjectFrame;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTGroupShape;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTPicture;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTGraphicalObjectFrame;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 
 
 /**

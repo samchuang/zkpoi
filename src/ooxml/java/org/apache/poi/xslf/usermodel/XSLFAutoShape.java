@@ -20,30 +20,17 @@
 package org.zkoss.poi.xslf.usermodel;
 
 import org.zkoss.poi.util.Beta;
-import org.zkoss.poi.util.Units;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTPresetGeometry2D;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTSRgbColor;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTSolidColorFillProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBody;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBodyProperties;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
 import org.openxmlformats.schemas.drawingml.x2006.main.STShapeType;
-import org.openxmlformats.schemas.drawingml.x2006.main.STTextAnchoringType;
-import org.openxmlformats.schemas.drawingml.x2006.main.STTextWrappingType;
-import org.openxmlformats.schemas.drawingml.x2006.main.STTextVerticalType;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShapeNonVisual;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTPlaceholder;
-import org.openxmlformats.schemas.presentationml.x2006.main.STPlaceholderType;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Represents a preset geometric shape. 
+ * Represents a shape with a preset geometry.
  *
  * @author Yegor Kozlov
  */
@@ -83,44 +70,6 @@ public class XSLFAutoShape extends XSLFTextShape {
         return ct;
     }
 
-    /**
-     * Specifies a solid color fill. The shape is filled entirely with the specified color.
-     *
-     * @param color the solid color fill.
-     * The value of <code>null</code> unsets the solidFIll attribute from the underlying xml
-     */
-    public void setFillColor(Color color) {
-        CTShapeProperties spPr = getSpPr();
-        if (color == null) {
-            if(spPr.isSetSolidFill()) spPr.unsetSolidFill();
-        }
-        else {
-            CTSolidColorFillProperties fill = spPr.isSetSolidFill() ? spPr.getSolidFill() : spPr.addNewSolidFill();
-
-            CTSRgbColor rgb = CTSRgbColor.Factory.newInstance();
-            rgb.setVal(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
-
-            fill.setSrgbClr(rgb);
-        }
-    }
-
-    /**
-     *
-     * @return solid fill color of null if not set
-     */
-    public Color getFillColor(){
-        CTShapeProperties spPr = getSpPr();
-        if(!spPr.isSetSolidFill() ) return null;
-
-        CTSolidColorFillProperties fill = spPr.getSolidFill();
-        if(!fill.isSetSrgbClr()) {
-            // TODO for now return null for all colors except explicit RGB
-            return null;
-        }
-        byte[] val = fill.getSrgbClr().getVal();
-        return new Color(0xFF & val[0], 0xFF & val[1], 0xFF & val[2]);
-    }
-
     protected CTTextBody getTextBody(boolean create){
         CTShape shape = (CTShape) getXmlObject();
         CTTextBody txBody = shape.getTxBody();
@@ -132,4 +81,8 @@ public class XSLFAutoShape extends XSLFTextShape {
         return txBody;
     }
 
+    @Override
+    public String toString(){
+        return "[" + getClass().getSimpleName() + "] " + getShapeName();
+    }
 }

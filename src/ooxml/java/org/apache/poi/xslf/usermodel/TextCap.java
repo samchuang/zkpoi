@@ -16,35 +16,18 @@
  *    limitations under the License.
  * ====================================================================
  */
+
 package org.zkoss.poi.xslf.usermodel;
 
 /**
- * Specified a list of text alignment types
- *
- * @author Yegor Kozlov
+ * Created by IntelliJ IDEA.
+ * User: yegor
+ * Date: 11/3/11
+ * Time: 5:07 PM
+ * To change this template use File | Settings | File Templates.
  */
-public enum TextAlign {
-    /**
-     * Align text to the left margin.
-     */
-    LEFT,
-    /**
-     * Align text in the center.
-     */
-    CENTER,
-
-    /**
-     * Align text to the right margin.
-     */
-    RIGHT,
-
-    /**
-     * Align text so that it is justified across the whole line. It
-     * is smart in the sense that it will not justify sentences
-     * which are short
-     */
-    JUSTIFY,
-    JUSTIFY_LOW,
-    DIST,
-    THAI_DIST
+public enum TextCap {
+    NONE,
+    SMALL,
+    ALL
 }

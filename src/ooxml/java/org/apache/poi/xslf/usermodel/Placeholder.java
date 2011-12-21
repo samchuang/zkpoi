@@ -30,7 +30,12 @@ public enum Placeholder {
     SLIDE_NUMBER,
     FOOTER,
     HEADER,
-    OBJECT,
+    CONTENT,
     CHART,
-    TABLE
+    TABLE,
+    CLIP_ART,
+    DGM,
+    MEDIA,
+    SLIDE_IMAGE,
+    PICTURE
 }

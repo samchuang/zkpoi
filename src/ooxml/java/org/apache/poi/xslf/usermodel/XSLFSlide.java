@@ -16,8 +16,6 @@
 ==================================================================== */
 package org.zkoss.poi.xslf.usermodel;
 
-import java.io.IOException;
-
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
@@ -28,15 +26,16 @@ import org.openxmlformats.schemas.drawingml.x2006.main.CTGroupTransform2D;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTPoint2D;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTPositiveSize2D;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTBlip;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTCommonSlideData;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTGroupShape;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTGroupShapeNonVisual;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlide;
 import org.openxmlformats.schemas.presentationml.x2006.main.SldDocument;
-import org.zkoss.poi.sl.usermodel.Notes;
-import org.zkoss.poi.sl.usermodel.Slide;
-import org.zkoss.poi.sl.usermodel.SlideShow;
-import org.zkoss.poi.util.Internal;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTBackground;
+
+import java.awt.Graphics2D;
+import java.io.IOException;
 
 @Beta
 public final class XSLFSlide extends XSLFSheet {
@@ -112,8 +111,9 @@ public final class XSLFSlide extends XSLFSheet {
         return "sld";        
     }
 
-    public XSLFSlideMaster getMasterSheet(){
-        return getSlideLayout().getSlideMaster();
+    @Override
+    public XSLFSlideLayout getMasterSheet(){
+        return getSlideLayout();
     }
 
     public XSLFSlideLayout getSlideLayout(){
@@ -129,7 +129,11 @@ public final class XSLFSlide extends XSLFSheet {
         }
         return _layout;
     }
-    
+
+    public XSLFSlideMaster getSlideMaster(){
+        return getSlideLayout().getSlideMaster();
+    }
+
     public XSLFComments getComments() {
        if(_comments == null) {
           for (POIXMLDocumentPart p : getRelations()) {
@@ -156,17 +160,82 @@ public final class XSLFSlide extends XSLFSheet {
        }
        if(_notes == null) {
           // This slide lacks notes
-          // Not al have them, sorry...
+          // Not all have them, sorry...
           return null;
        }
        return _notes;
     }
 
-    public void setFollowMasterBackground(boolean value){
-        _slide.setShowMasterSp(value);    
+    /**
+     *
+     * @return title of this slide or empty string if title is not set
+     */
+    public String getTitle(){
+        XSLFTextShape txt = getTextShapeByType(Placeholder.TITLE);
+        return txt == null ? "" : txt.getText();
+    }
+    
+    @Override
+    public XSLFTheme getTheme(){
+    	return getSlideLayout().getSlideMaster().getTheme();
     }
 
-    public boolean getFollowMasterBackground(){
-        return !_slide.isSetShowMasterSp() || _slide.getShowMasterSp();    
+    /**
+     *
+     * @return the information about background appearance of this slide
+     */
+    @Override
+    public XSLFBackground getBackground() {
+        CTBackground bg = _slide.getCSld().getBg();
+        if(bg != null) {
+            return new XSLFBackground(bg, this);
+        } else {
+            return getMasterSheet().getBackground();
+        }
     }
+
+    /**
+     *
+     * @return whether shapes on the master slide should be shown  or not.
+     */
+    public boolean getFollowMasterGraphics(){
+        return !_slide.isSetShowMasterSp() || _slide.getShowMasterSp();
+    }
+
+    /**
+     *
+     * @param value whether shapes on the master slide should be shown or not.
+     */
+    public void setFollowMasterGraphics(boolean value){
+        _slide.setShowMasterSp(value);
+    }
+
+
+    @Override
+    public void draw(Graphics2D graphics){
+
+        XSLFBackground bg = getBackground();
+        if(bg != null) bg.draw(graphics);
+
+        super.draw(graphics);
+    }
+
+
+    @Override
+    public XSLFSlide importContent(XSLFSheet src){
+        super.importContent(src);
+
+        CTBackground bg = ((CTSlide)src.getXmlObject()).getCSld().getBg();
+        if(bg != null) {
+            if(bg.isSetBgPr() && bg.getBgPr().isSetBlipFill()){
+                CTBlip blip = bg.getBgPr().getBlipFill().getBlip();
+                String blipId = blip.getEmbed();
+
+                String relId = importBlip(blipId, src.getPackagePart());
+                blip.setEmbed(relId);
+            }
+        }
+        return this;
+    }
+
 }

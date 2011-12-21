@@ -19,21 +19,28 @@
 
 package org.zkoss.poi.xslf.usermodel;
 
+import org.zkoss.poi.POIXMLException;
 import org.zkoss.poi.util.Beta;
 import org.zkoss.poi.util.Units;
+import org.zkoss.poi.xslf.model.PropertyFetcher;
+import org.zkoss.poi.xslf.model.TextBodyPropertyFetcher;
 import org.apache.xmlbeans.XmlObject;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTSRgbColor;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTSolidColorFillProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBody;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBodyProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraph;
 import org.openxmlformats.schemas.drawingml.x2006.main.STTextAnchoringType;
 import org.openxmlformats.schemas.drawingml.x2006.main.STTextVerticalType;
 import org.openxmlformats.schemas.drawingml.x2006.main.STTextWrappingType;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTApplicationNonVisualDrawingProps;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTPlaceholder;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
+import org.openxmlformats.schemas.presentationml.x2006.main.STPlaceholderType;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -42,8 +49,13 @@ import java.util.List;
  * @author Yegor Kozlov
  */
 @Beta
-public abstract class XSLFTextShape extends XSLFSimpleShape {
+public abstract class XSLFTextShape extends XSLFSimpleShape implements Iterable<XSLFTextParagraph>{
     private final List<XSLFTextParagraph> _paragraphs;
+
+    /**
+     * whether the text was broken into lines.
+     */
+    private boolean _isTextBroken;
 
     /*package*/ XSLFTextShape(XmlObject shape, XSLFSheet sheet) {
         super(shape, sheet);
@@ -57,7 +69,14 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
         }
     }
 
-    // textual properties
+    public Iterator<XSLFTextParagraph> iterator(){
+        return _paragraphs.iterator();
+    }
+
+    /**
+     *
+     * @return  text contained within this shape or empty string
+     */
     public String getText() {
         StringBuilder out = new StringBuilder();
         for (XSLFTextParagraph p : _paragraphs) {
@@ -67,10 +86,34 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
         return out.toString();
     }
 
+    /**
+     * unset text from this shape
+     */
+    public void clearText(){
+        _paragraphs.clear();
+        CTTextBody txBody = getTextBody(true);
+        txBody.setPArray(null); // remove any existing paragraphs
+    }
+
+    public void setText(String text){
+        clearText();
+
+        addNewTextParagraph().addNewTextRun().setText(text);
+    }
+
+    /**
+     *
+     * @return text paragraphs in this shape
+     */
     public List<XSLFTextParagraph> getTextParagraphs() {
         return _paragraphs;
     }
 
+    /**
+     * add a new paragraph run to this shape
+     *
+     * @return created paragraph run
+     */
     public XSLFTextParagraph addNewTextParagraph() {
         CTTextBody txBody = getTextBody(true);
         CTTextParagraph p = txBody.addNewP();
@@ -79,49 +122,12 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
         return paragraph;
     }
 
-    /**
-     * Specifies a solid color fill. The shape is filled entirely with the specified color.
-     *
-     * @param color the solid color fill.
-     * The value of <code>null</code> unsets the solidFIll attribute from the underlying xml
-     */
-    public void setFillColor(Color color) {
-        CTShapeProperties spPr = getSpPr();
-        if (color == null) {
-            if(spPr.isSetSolidFill()) spPr.unsetSolidFill();
-        }
-        else {
-            CTSolidColorFillProperties fill = spPr.isSetSolidFill() ? spPr.getSolidFill() : spPr.addNewSolidFill();
-
-            CTSRgbColor rgb = CTSRgbColor.Factory.newInstance();
-            rgb.setVal(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
-
-            fill.setSrgbClr(rgb);
-        }
-    }
-
-    /**
-     *
-     * @return solid fill color of null if not set
-     */
-    public Color getFillColor(){
-        CTShapeProperties spPr = getSpPr();
-        if(!spPr.isSetSolidFill() ) return null;
-
-        CTSolidColorFillProperties fill = spPr.getSolidFill();
-        if(!fill.isSetSrgbClr()) {
-            // TODO for now return null for all colors except explicit RGB
-            return null;
-        }
-        byte[] val = fill.getSrgbClr().getVal();
-        return new Color(0xFF & val[0], 0xFF & val[1], 0xFF & val[2]);
-    }
 
     /**
      * Sets the type of vertical alignment for the text.
-     * One of the <code>Anchor*</code> constants defined in this class.
      *
-     * @param anchor - the type of alignment. Default is {@link org.zkoss.poi.xslf.usermodel.VerticalAlignment#TOP}
+     * @param anchor - the type of alignment.
+     * A <code>null</code> values unsets this property.
      */
     public void setVerticalAlignment(VerticalAlignment anchor){
         CTTextBodyProperties bodyPr = getTextBodyPr();
@@ -137,17 +143,21 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
     /**
      * Returns the type of vertical alignment for the text.
      *
-     * @return the type of alignment
+     * @return the type of vertical alignment
      */
     public VerticalAlignment getVerticalAlignment(){
-        CTTextBodyProperties bodyPr = getTextBodyPr();
-        if (bodyPr != null) {
-            STTextAnchoringType.Enum val = bodyPr.getAnchor();
-            if(val != null){
-                return VerticalAlignment.values()[val.intValue() - 1];
+        PropertyFetcher<VerticalAlignment> fetcher = new TextBodyPropertyFetcher<VerticalAlignment>(){
+            public boolean fetch(CTTextBodyProperties props){
+                if(props.isSetAnchor()){
+                    int val = props.getAnchor().intValue();
+                    setValue(VerticalAlignment.values()[val - 1]);
+                    return true;
+                }
+                return false;
             }
-        }
-        return VerticalAlignment.TOP;
+        };
+        fetchShapeProperty(fetcher);
+        return fetcher.getValue() == null ? VerticalAlignment.TOP : fetcher.getValue();
     }
 
     /**
@@ -178,18 +188,28 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
         }
         return TextDirection.HORIZONTAL;
     }
+
+
     /**
      * Returns the distance (in points) between the bottom of the text frame
      * and the bottom of the inscribed rectangle of the shape that contains the text.
      *
-     * @return the bottom margin or -1 if not set
+     * @return the bottom inset in points
      */
-    public double getMarginBottom(){
-        CTTextBodyProperties bodyPr = getTextBodyPr();
-        if (bodyPr != null) {
-            return bodyPr.isSetBIns() ? Units.toPoints(bodyPr.getBIns()) : -1;
-        }
-        return -1;
+    public double getBottomInset(){
+        PropertyFetcher<Double> fetcher = new TextBodyPropertyFetcher<Double>(){
+            public boolean fetch(CTTextBodyProperties props){
+                if(props.isSetBIns()){
+                    double val = Units.toPoints(props.getBIns());
+                    setValue(val);
+                    return true;
+                }
+                return false;
+            }
+        };
+        fetchShapeProperty(fetcher);
+        // If this attribute is omitted, then a value of 0.05 inches is implied
+        return fetcher.getValue() == null ? 3.6 : fetcher.getValue();
     }
 
     /**
@@ -197,14 +217,22 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
      *  and the left edge of the inscribed rectangle of the shape that contains
      *  the text.
      *
-     * @return the left margin
+     * @return the left inset in points
      */
-    public double getMarginLeft(){
-        CTTextBodyProperties bodyPr = getTextBodyPr();
-        if (bodyPr != null) {
-            return bodyPr.isSetLIns() ? Units.toPoints(bodyPr.getLIns()) : -1;
-        }
-        return -1;
+    public double getLeftInset(){
+        PropertyFetcher<Double> fetcher = new TextBodyPropertyFetcher<Double>(){
+            public boolean fetch(CTTextBodyProperties props){
+                if(props.isSetLIns()){
+                    double val = Units.toPoints(props.getLIns());
+                    setValue(val);
+                    return true;
+                }
+                return false;
+            }
+        };
+        fetchShapeProperty(fetcher);
+        // If this attribute is omitted, then a value of 0.1 inches is implied
+        return fetcher.getValue() == null ? 7.2 : fetcher.getValue();
     }
 
     /**
@@ -212,37 +240,53 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
      *  text frame and the right edge of the inscribed rectangle of the shape
      *  that contains the text.
      *
-     * @return the right margin
+     * @return the right inset in points
      */
-    public double getMarginRight(){
-        CTTextBodyProperties bodyPr = getTextBodyPr();
-        if (bodyPr != null) {
-            return bodyPr.isSetRIns() ? Units.toPoints(bodyPr.getRIns()) : -1;
-        }
-        return -1;
+    public double getRightInset(){
+        PropertyFetcher<Double> fetcher = new TextBodyPropertyFetcher<Double>(){
+            public boolean fetch(CTTextBodyProperties props){
+                if(props.isSetRIns()){
+                    double val = Units.toPoints(props.getRIns());
+                    setValue(val);
+                    return true;
+                }
+                return false;
+            }
+        };
+        fetchShapeProperty(fetcher);
+        // If this attribute is omitted, then a value of 0.1 inches is implied
+        return fetcher.getValue() == null ? 7.2 : fetcher.getValue();
     }
 
     /**
      *  Returns the distance (in points) between the top of the text frame
      *  and the top of the inscribed rectangle of the shape that contains the text.
      *
-     * @return the top margin
+     * @return the top inset in points
      */
-    public double getMarginTop(){
-        CTTextBodyProperties bodyPr = getTextBodyPr();
-        if (bodyPr != null) {
-            return bodyPr.isSetTIns() ? Units.toPoints(bodyPr.getTIns()) : -1;
-        }
-        return -1;
+    public double getTopInset(){
+        PropertyFetcher<Double> fetcher = new TextBodyPropertyFetcher<Double>(){
+            public boolean fetch(CTTextBodyProperties props){
+                if(props.isSetTIns()){
+                    double val = Units.toPoints(props.getTIns());
+                    setValue(val);
+                    return true;
+                }
+                return false;
+            }
+        };
+        fetchShapeProperty(fetcher);
+        // If this attribute is omitted, then a value of 0.05 inches is implied
+        return fetcher.getValue() == null ? 3.6 : fetcher.getValue();
     }
 
     /**
      * Sets the botom margin.
-     * @see #getMarginBottom()
+     * @see #getBottomInset()
      *
      * @param margin    the bottom margin
      */
-    public void setMarginBottom(double margin){
+    public void setBottomInset(double margin){
         CTTextBodyProperties bodyPr = getTextBodyPr();
         if (bodyPr != null) {
             if(margin == -1) bodyPr.unsetBIns();
@@ -252,11 +296,11 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
 
     /**
      * Sets the left margin.
-     * @see #getMarginLeft()
+     * @see #getLeftInset()
      *
      * @param margin    the left margin
      */
-    public void setMarginLeft(double margin){
+    public void setLeftInset(double margin){
         CTTextBodyProperties bodyPr = getTextBodyPr();
         if (bodyPr != null) {
             if(margin == -1) bodyPr.unsetLIns();
@@ -266,11 +310,11 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
 
     /**
      * Sets the right margin.
-     * @see #getMarginRight()
+     * @see #getRightInset()
      *
      * @param margin    the right margin
      */
-    public void setMarginRight(double margin){
+    public void setRightInset(double margin){
         CTTextBodyProperties bodyPr = getTextBodyPr();
         if (bodyPr != null) {
             if(margin == -1) bodyPr.unsetRIns();
@@ -280,11 +324,11 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
 
     /**
      * Sets the top margin.
-     * @see #getMarginTop()
+     * @see #getTopInset()
      *
      * @param margin    the top margin
      */
-    public void setMarginTop(double margin){
+    public void setTopInset(double margin){
         CTTextBodyProperties bodyPr = getTextBodyPr();
         if (bodyPr != null) {
             if(margin == -1) bodyPr.unsetTIns();
@@ -294,23 +338,25 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
 
 
     /**
-     * Returns the value indicating word wrap.
-     * One of the <code>Wrap*</code> constants defined in this class.
-     *
-     * @return the value indicating word wrap
+     * @return whether to wrap words within the bounding rectangle
      */
     public boolean getWordWrap(){
-        CTTextBodyProperties bodyPr = getTextBodyPr();
-        if (bodyPr != null) {
-            return bodyPr.getWrap() == STTextWrappingType.SQUARE;
-        }
-        return false;
+        PropertyFetcher<Boolean> fetcher = new TextBodyPropertyFetcher<Boolean>(){
+            public boolean fetch(CTTextBodyProperties props){
+               if(props.isSetWrap()){
+                    setValue(props.getWrap() == STTextWrappingType.SQUARE);
+                    return true;
+                }
+                return false;
+            }
+        };
+        fetchShapeProperty(fetcher);
+        return fetcher.getValue() == null ? true : fetcher.getValue();
     }
 
     /**
-     *  Specifies how the text should be wrapped
      *
-     * @param wrap  the value indicating how the text should be wrapped
+     * @param wrap  whether to wrap words within the bounding rectangle
      */
     public void setWordWrap(boolean wrap){
         CTTextBodyProperties bodyPr = getTextBodyPr();
@@ -362,4 +408,194 @@ public abstract class XSLFTextShape extends XSLFSimpleShape {
 
 
     protected abstract CTTextBody getTextBody(boolean create);
+
+
+    public Placeholder getTextType(){
+        CTPlaceholder ph;
+        XmlObject[] obj = getXmlObject().selectPath(
+                "declare namespace p='http://schemas.openxmlformats.org/presentationml/2006/main' .//*/p:nvPr/p:ph");
+        if(obj.length == 1){
+            ph = (CTPlaceholder)obj[0];
+            int val = ph.getType().intValue();
+            return Placeholder.values()[val - 1];
+        }
+        else {
+            return null;
+        }
+    }
+
+
+    /**
+     * Specifies that the corresponding shape should be represented by the generating application
+     * as a placeholder. When a shape is considered a placeholder by the generating application
+     * it can have special properties to alert the user that they may enter content into the shape.
+     * Different types of placeholders are allowed and can be specified by using the placeholder
+     * type attribute for this element
+     *
+     * @param placeholder
+     */
+    public void setPlaceholder(Placeholder placeholder){
+        CTShape sh =  (CTShape)getXmlObject();
+        CTApplicationNonVisualDrawingProps nv = sh.getNvSpPr().getNvPr();
+        if(placeholder == null) {
+            if(nv.isSetPh()) nv.unsetPh();
+        } else {
+            nv.addNewPh().setType(STPlaceholderType.Enum.forInt(placeholder.ordinal() + 1));
+        }
+    }
+
+    /**
+     * Compute the cumulative height occupied by the text
+     */
+    public double getTextHeight(){
+        // dry-run in a 1x1 image and return the vertical advance
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = img.createGraphics();
+        breakText(graphics);
+        return drawParagraphs(graphics, 0, 0);
+    }
+
+    /**
+     * Adjust the size of the shape so it encompasses the text inside it.
+     *
+     * @return a <code>Rectangle2D</code> that is the bounds of this shape.
+     */
+    public Rectangle2D resizeToFitText(){
+        Rectangle2D anchor = getAnchor();
+        if(anchor.getWidth() == 0.)  throw new POIXMLException(
+                "Anchor of the shape was not set.");
+        double height = getTextHeight(); 
+        height += 1; // add a pixel to compensate rounding errors
+        
+        anchor.setRect(anchor.getX(), anchor.getY(), anchor.getWidth(), height);
+        setAnchor(anchor);
+        
+        return anchor;
+    }   
+    
+    /**
+     * break the contained text into lines
+    */
+    private void breakText(Graphics2D graphics){
+        if(!_isTextBroken) {
+            for(XSLFTextParagraph p : _paragraphs) p.breakText(graphics);
+
+            _isTextBroken = true;
+        }
+    }
+
+    @Override
+    public void drawContent(Graphics2D graphics) {
+        breakText(graphics);
+
+        RenderableShape rShape = new RenderableShape(this);
+        Rectangle2D anchor = rShape.getAnchor(graphics);
+        double x = anchor.getX() + getLeftInset();
+        double y = anchor.getY();
+
+        // first dry-run to calculate the total height of the text
+        double textHeight = getTextHeight();
+
+        switch (getVerticalAlignment()){
+            case TOP:
+                y += getTopInset();
+                break;
+            case BOTTOM:
+                y += anchor.getHeight() - textHeight - getBottomInset();
+                break;
+            default:
+            case MIDDLE:
+                double delta = anchor.getHeight() - textHeight -
+                        getTopInset() - getBottomInset();
+                y += getTopInset()  + delta/2;
+                break;
+        }
+
+        drawParagraphs(graphics, x, y);
+    }
+
+
+    /**
+     * pain the paragraphs starting from top left (x,y)
+     *
+     * @return  the vertical advance, i.e. the cumulative space occupied by the text
+     */
+    private double drawParagraphs(Graphics2D graphics,  double x, double y) {
+        double y0 = y;
+        for(int i = 0; i < _paragraphs.size(); i++){
+            XSLFTextParagraph p = _paragraphs.get(i);
+            List<TextFragment> lines = p.getTextLines();
+
+            if(i > 0 && lines.size() > 0) {
+                // the amount of vertical white space before the paragraph
+                double spaceBefore = p.getSpaceBefore();
+                if(spaceBefore > 0) {
+                    // positive value means percentage spacing of the height of the first line, e.g.
+                    // the higher the first line, the bigger the space before the paragraph
+                    y += spaceBefore*0.01*lines.get(0).getHeight();
+                } else {
+                    // negative value means the absolute spacing in points
+                    y += -spaceBefore;
+                }
+            }
+
+            y += p.draw(graphics, x, y);
+
+            if(i < _paragraphs.size() - 1) {
+                double spaceAfter = p.getSpaceAfter();
+                if(spaceAfter > 0) {
+                    // positive value means percentage spacing of the height of the last line, e.g.
+                    // the higher the last line, the bigger the space after the paragraph
+                    y += spaceAfter*0.01*lines.get(lines.size() - 1).getHeight();
+                } else {
+                    // negative value means the absolute spacing in points
+                    y += -spaceAfter;
+                }
+            }
+        }
+        return y - y0;
+    }
+
+    @Override
+    void copy(XSLFShape sh){
+        super.copy(sh);
+
+        XSLFTextShape tsh = (XSLFTextShape)sh;
+
+        boolean srcWordWrap = tsh.getWordWrap();
+        if(srcWordWrap != getWordWrap()){
+            setWordWrap(srcWordWrap);
+        }
+
+        double leftInset = tsh.getLeftInset();
+        if(leftInset != getLeftInset()) {
+            setLeftInset(leftInset);
+        }
+        double rightInset = tsh.getRightInset();
+        if(rightInset != getRightInset()) {
+            setRightInset(rightInset);
+        }
+        double topInset = tsh.getTopInset();
+        if(topInset != getTopInset()) {
+            setTopInset(topInset);
+        }
+        double bottomInset = tsh.getBottomInset();
+        if(bottomInset != getBottomInset()) {
+            setBottomInset(bottomInset);
+        }
+
+        VerticalAlignment vAlign = tsh.getVerticalAlignment();
+        if(vAlign != getVerticalAlignment()) {
+            setVerticalAlignment(vAlign);
+        }
+
+        List<XSLFTextParagraph> srcP = tsh.getTextParagraphs();
+        List<XSLFTextParagraph> tgtP = getTextParagraphs();
+        for(int i = 0; i < srcP.size(); i++){
+            XSLFTextParagraph p1 = srcP.get(i);
+            XSLFTextParagraph p2 = tgtP.get(i);
+            p2.copy(p1);
+        }
+
+    }
 }

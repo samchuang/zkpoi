@@ -19,18 +19,18 @@
 
 package org.zkoss.poi.xslf.usermodel;
 
+import org.zkoss.poi.POIXMLException;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.Units;
 import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.impl.values.XmlAnyTypeImpl;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTDTable;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTGraphicalObjectData;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTable;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTableRow;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTGroupTransform2D;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTPoint2D;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTPositiveSize2D;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTTransform2D;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTGraphicalObjectFrame;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTGraphicalObjectFrameNonVisual;
 
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.awt.geom.Rectangle2D;
 
 /**
  * Represents a table in a .pptx presentation
@@ -55,13 +54,23 @@ public class XSLFTable extends XSLFGraphicFrame implements Iterable<XSLFTableRow
     /*package*/ XSLFTable(CTGraphicalObjectFrame shape, XSLFSheet sheet){
         super(shape, sheet);
 
-        for(XmlObject obj : shape.getGraphic().getGraphicData().selectPath("*")){
-            if(obj instanceof CTTable){
-                _table = (CTTable)obj;
+        XmlObject[] rs = shape.getGraphic().getGraphicData()
+                .selectPath("declare namespace a='http://schemas.openxmlformats.org/drawingml/2006/main' ./a:tbl");
+        if (rs.length == 0) {
+            throw new IllegalStateException("a:tbl element was not found in\n " + shape.getGraphic().getGraphicData());
+        }
+
+        // Pesky XmlBeans bug - see Bugzilla #49934
+        // it never happens when using the full ooxml-schemas jar but may happen with the abridged poi-ooxml-schemas
+        if(rs[0] instanceof XmlAnyTypeImpl){
+            try {
+                rs[0] = CTTable.Factory.parse(rs[0].toString());
+            }catch (XmlException e){
+                throw new POIXMLException(e);
             }
         }
-        if(_table == null) throw new IllegalStateException("CTTable element was not found");
 
+        _table = (CTTable) rs[0];
         _rows = new ArrayList<XSLFTableRow>(_table.sizeOfTrArray());
         for(CTTableRow row : _table.getTrList()) _rows.add(new XSLFTableRow(row, this));
     }
@@ -126,32 +135,4 @@ public class XSLFTable extends XSLFGraphicFrame implements Iterable<XSLFTableRow
         gr.setUri(TABLE_URI);
         return frame;
     }
-
-    public Rectangle2D getAnchor(){
-        CTTransform2D xfrm = getXmlObject().getXfrm();
-        CTPoint2D off = xfrm.getOff();
-        long x = off.getX();
-        long y = off.getY();
-        CTPositiveSize2D ext = xfrm.getExt();
-        long cx = ext.getCx();
-        long cy = ext.getCy();
-        return new Rectangle2D.Double(
-                Units.toPoints(x), Units.toPoints(y),
-                Units.toPoints(cx), Units.toPoints(cy));
-    }
-
-    public void setAnchor(Rectangle2D anchor){
-        CTTransform2D xfrm = getXmlObject().getXfrm();
-        CTPoint2D off = xfrm.isSetOff() ? xfrm.getOff() : xfrm.addNewOff();
-        long x = Units.toEMU(anchor.getX());
-        long y = Units.toEMU(anchor.getY());
-        off.setX(x);
-        off.setY(y);
-        CTPositiveSize2D ext = xfrm.isSetExt() ? xfrm.getExt() : xfrm.addNewExt();
-        long cx = Units.toEMU(anchor.getWidth());
-        long cy = Units.toEMU(anchor.getHeight());
-        ext.setCx(cx);
-        ext.setCy(cy);
-    }
-    
 }

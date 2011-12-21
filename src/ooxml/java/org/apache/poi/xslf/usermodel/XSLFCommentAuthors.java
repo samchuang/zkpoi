@@ -17,8 +17,6 @@
 
 package org.zkoss.poi.xslf.usermodel;
 
-import java.io.IOException;
-
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;
@@ -27,6 +25,8 @@ import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTCommentAuthor;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTCommentAuthorList;
 import org.openxmlformats.schemas.presentationml.x2006.main.CmAuthorLstDocument;
+
+import java.io.IOException;
 
 @Beta
 public class XSLFCommentAuthors extends POIXMLDocumentPart {
