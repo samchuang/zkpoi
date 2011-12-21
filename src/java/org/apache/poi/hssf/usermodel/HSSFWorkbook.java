@@ -552,9 +552,8 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
      * @param sheetIx number (0 based)
      * @throws IllegalArgumentException if the name is null or invalid
      *  or workbook already contains a sheet with this name
-     * @see {@link #createSheet(String)}
-     * @see {@link org.zkoss.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
-     *      for a safe way to create valid names
+     * @see #createSheet(String)
+     * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      */
     public void setSheetName(int sheetIx, String name) {
         if (name == null) {
@@ -788,8 +787,7 @@ public class HSSFWorkbook extends POIDocument implements org.zkoss.poi.ss.usermo
      * @return Sheet representing the new sheet.
      * @throws IllegalArgumentException if the name is null or invalid
      *  or workbook already contains a sheet with this name
-     * @see {@link org.zkoss.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
-     *      for a safe way to create valid names
+     * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      */
     public HSSFSheet createSheet(String sheetname)
     {

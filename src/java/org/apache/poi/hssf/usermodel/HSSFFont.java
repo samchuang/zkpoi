@@ -18,6 +18,7 @@
 package org.zkoss.poi.hssf.usermodel;
 
 import org.zkoss.poi.hssf.record.FontRecord;
+import org.zkoss.poi.hssf.util.HSSFColor;
 import org.zkoss.poi.ss.usermodel.Font;
 
 /**
@@ -191,6 +192,15 @@ public final class HSSFFont implements Font {
     {
         return font.getColorPaletteIndex();
     }
+    
+    /**
+     * get the color value for the font
+     */
+    public HSSFColor getHSSFColor(HSSFWorkbook wb)
+    {
+       HSSFPalette pallette = wb.getCustomPalette();
+       return pallette.getColor( getColor() );
+    }
 
     /**
      * set the boldness to use
@@ -318,7 +328,7 @@ public final class HSSFFont implements Font {
 
     public String toString()
     {
-        return "org.apache.poi.hssf.usermodel.HSSFFont{" +
+        return "org.zkoss.poi.hssf.usermodel.HSSFFont{" +
                  font +
                 "}";
     }
