@@ -17,8 +17,6 @@
 
 package org.zkoss.poi.hwpf.model;
 
-import java.util.Collections;
-
 import org.zkoss.poi.poifs.common.POIFSConstants;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.LittleEndian;
@@ -45,23 +43,17 @@ public final class OldPAPBinTable extends PAPBinTable
     {
       GenericPropertyNode node = binTable.getProperty(x);
 
-      int pageNum = LittleEndian.getShort(node.getBytes());
+      int pageNum = LittleEndian.getUShort(node.getBytes());
       int pageOffset = POIFSConstants.SMALLER_BIG_BLOCK_SIZE * pageNum;
 
       PAPFormattedDiskPage pfkp = new PAPFormattedDiskPage(documentStream,
         documentStream, pageOffset, tpt);
 
-      int fkpSize = pfkp.size();
-
-      for (int y = 0; y < fkpSize; y++)
-      {
-    	PAPX papx = pfkp.getPAPX(y);
-        if (papx != null) {
-            _paragraphs.add(papx);
-        }
-      }
+            for ( PAPX papx : pfkp.getPAPXs() )
+            {
+                if ( papx != null )
+                    _paragraphs.add( papx );
+            }
     }
-    Collections.sort( _paragraphs, PropertyNode.StartComparator.instance );
   }
 }
-

@@ -17,6 +17,7 @@
 package org.apache.poi.hwpf.usermodel;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,9 +26,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-
 import junit.framework.TestCase;
+
+import org.apache.poi.hwpf.converter.WordToTextConverter;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.poi.POIDataSamples;
@@ -41,8 +42,11 @@ import org.apache.poi.hwpf.model.FileInformationBlock;
 import org.apache.poi.hwpf.model.PlexOfField;
 import org.apache.poi.hwpf.model.SubdocumentType;
 import org.apache.poi.hwpf.model.io.HWPFOutputStream;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
 
 /**
  * Test different problems reported in Apache Bugzilla
@@ -52,6 +56,8 @@ import org.apache.poi.util.LittleEndian;
  */
 public class TestBugs extends TestCase
 {
+    private static final POILogger logger = POILogFactory
+            .getLogger( TestBugs.class );
 
     public static void assertEquals( String expected, String actual )
     {
@@ -187,11 +193,6 @@ public class TestBugs extends TestCase
 
         assertNotNull( pic.getContent() );
         assertNotNull( pic.getRawContent() );
-
-        // These are probably some sort of offset, need to figure them out
-        assertEquals( 4, pic.getSize() );
-        assertEquals( 0x80000000l, LittleEndian.getUInt( pic.getContent() ) );
-        assertEquals( 0x80000000l, LittleEndian.getUInt( pic.getRawContent() ) );
 
         /*
          * This is a file with empty EMF image, but present Office Drawing
@@ -464,23 +465,12 @@ public class TestBugs extends TestCase
     }
 
     /**
-     * [FAILING] Bug 47958 - Exception during Escher walk of pictures
+     * Bug 47958 - Exception during Escher walk of pictures
      */
     public void test47958()
     {
         HWPFDocument doc = HWPFTestDataSamples.openSampleFile( "Bug47958.doc" );
-        try
-        {
-            for ( Picture pic : doc.getPicturesTable().getAllPictures() )
-            {
-                System.out.println( pic.suggestFullFileName() );
-            }
-            fixed( "47958" );
-        }
-        catch ( Exception e )
-        {
-            // expected exception
-        }
+        doc.getPicturesTable().getAllPictures();
     }
 
     /**
@@ -514,11 +504,33 @@ public class TestBugs extends TestCase
     }
 
     /**
-     * Bug 50936 - HWPF fails to read a file
+     * Bug 50936 - Exception parsing MS Word 8.0 file
      */
-    public void test50936()
+    public void test50936_1()
     {
-        HWPFTestDataSamples.openSampleFile( "Bug50936.doc" );
+        HWPFDocument hwpfDocument = HWPFTestDataSamples
+                .openSampleFile( "Bug50936_1.doc" );
+        hwpfDocument.getPicturesTable().getAllPictures();
+    }
+
+    /**
+     * Bug 50936 - Exception parsing MS Word 8.0 file
+     */
+    public void test50936_2()
+    {
+        HWPFDocument hwpfDocument = HWPFTestDataSamples
+                .openSampleFile( "Bug50936_2.doc" );
+        hwpfDocument.getPicturesTable().getAllPictures();
+    }
+
+    /**
+     * Bug 50936 - Exception parsing MS Word 8.0 file
+     */
+    public void test50936_3()
+    {
+        HWPFDocument hwpfDocument = HWPFTestDataSamples
+                .openSampleFile( "Bug50936_3.doc" );
+        hwpfDocument.getPicturesTable().getAllPictures();
     }
 
     /**
@@ -688,6 +700,72 @@ public class TestBugs extends TestCase
             WordExtractor wordExtractor = new WordExtractor( hwpfDocument );
             wordExtractor.getText();
         }
+    }
 
+    /**
+     * [FIXED] Bug 51902 - Picture.fillRawImageContent -
+     * ArrayIndexOutOfBoundsException
+     */
+    public void testBug51890()
+    {
+        HWPFDocument doc = HWPFTestDataSamples.openSampleFile( "Bug51890.doc" );
+        for ( Picture picture : doc.getPicturesTable().getAllPictures() )
+        {
+            PictureType pictureType = picture.suggestPictureType();
+            logger.log( POILogger.DEBUG,
+                    "Picture at offset " + picture.getStartOffset()
+                            + " has type " + pictureType );
+        }
+    }
+
+    /**
+     * [RESOLVED FIXED] Bug 51834 - Opening and Writing .doc file results in
+     * corrupt document
+     */
+    public void testBug51834() throws Exception
+    {
+        /*
+         * we don't have Java test for this file - it should be checked using
+         * Microsoft BFF Validator. But check read-write-read anyway. -- sergey
+         */
+        HWPFTestDataSamples.openSampleFile( "Bug51834.doc" );
+        HWPFTestDataSamples.writeOutAndReadBack( HWPFTestDataSamples
+                .openSampleFile( "Bug51834.doc" ) );
+    }
+
+    /**
+     * Bug 51944 - PAPFormattedDiskPage.getPAPX - IndexOutOfBounds
+     */
+    public void testBug51944() throws Exception
+    {
+        HWPFOldDocument doc = HWPFTestDataSamples.openOldSampleFile( "Bug51944.doc" );
+        WordToTextConverter.getText( doc );
+    }
+
+    /**
+     * Bug 52032 - [BUG] & [partial-PATCH] HWPF - ArrayIndexOutofBoundsException
+     * with no stack trace (broken after revision 1178063)
+     */
+    public void testBug52032_1() throws Exception
+    {
+        HWPFTestDataSamples.openSampleFile( "Bug52032_1.doc" );
+    }
+
+    /**
+     * Bug 52032 - [BUG] & [partial-PATCH] HWPF - ArrayIndexOutofBoundsException
+     * with no stack trace (broken after revision 1178063)
+     */
+    public void testBug52032_2() throws Exception
+    {
+        HWPFTestDataSamples.openSampleFile( "Bug52032_2.doc" );
+    }
+
+    /**
+     * Bug 52032 - [BUG] & [partial-PATCH] HWPF - ArrayIndexOutofBoundsException
+     * with no stack trace (broken after revision 1178063)
+     */
+    public void testBug52032_3() throws Exception
+    {
+        HWPFTestDataSamples.openSampleFile( "Bug52032_3.doc" );
     }
 }

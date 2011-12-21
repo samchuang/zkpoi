@@ -17,6 +17,7 @@
 package org.apache.poi.xslf.usermodel;
 
 import junit.framework.TestCase;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextCharacterProperties;
 
 /**
  * @author Yegor Kozlov
@@ -28,10 +29,51 @@ public class TestXSLFTextBox extends TestCase {
         XSLFSlide slide = ppt.createSlide();
 
         XSLFTextBox shape = slide.createTextBox();
-        assertNull(shape.getPlaceholder());
+        assertNull(shape.getTextType());
         shape.setPlaceholder(Placeholder.TITLE);
-        assertEquals(Placeholder.TITLE, shape.getPlaceholder());
+        assertEquals(Placeholder.TITLE, shape.getTextType());
         shape.setPlaceholder(null);
-        assertNull(shape.getPlaceholder());
+        assertNull(shape.getTextType());
+        shape.setText("Apache POI");
+    }
+
+    /**
+     * text box inherits default text proeprties from presentation.xml
+     */
+    public void testDefaultTextStyle() {
+        XMLSlideShow ppt = new XMLSlideShow();
+        XSLFSlide slide = ppt.createSlide();
+
+        // default character properties for paragraphs with level=1
+        CTTextCharacterProperties pPr = ppt.getCTPresentation().getDefaultTextStyle().getLvl1PPr().getDefRPr();
+
+        XSLFTextBox shape = slide.createTextBox();
+        shape.setText("Apache POI");
+        assertEquals(1, shape.getTextParagraphs().size());
+        assertEquals(1, shape.getTextParagraphs().get(0).getTextRuns().size());
+
+        XSLFTextRun r = shape.getTextParagraphs().get(0).getTextRuns().get(0);
+
+        assertEquals(1800, pPr.getSz());
+        assertEquals(18.0, r.getFontSize());
+        assertEquals("Calibri", r.getFontFamily());
+
+        pPr.setSz(900);
+        pPr.getLatin().setTypeface("Arial");
+        assertEquals(9.0, r.getFontSize());
+        assertEquals("Arial", r.getFontFamily());
+
+        // unset font size in presentation.xml. The value should be taken from master slide
+        // from /p:sldMaster/p:txStyles/p:otherStyle/a:lvl1pPr/a:defRPr
+        ppt.getCTPresentation().getDefaultTextStyle().getLvl1PPr().getDefRPr().unsetSz();
+        pPr = slide.getSlideMaster().getXmlObject().getTxStyles().getOtherStyle().getLvl1PPr().getDefRPr();
+        assertEquals(1800, pPr.getSz());
+        assertEquals(18.0, r.getFontSize());
+        pPr.setSz(2000);
+        assertEquals(20.0, r.getFontSize());
+
+        pPr.unsetSz();  // Should never be
+        assertEquals(-1.0, r.getFontSize());
+
     }
 }

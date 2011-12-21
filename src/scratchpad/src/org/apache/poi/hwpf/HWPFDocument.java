@@ -28,7 +28,6 @@ import org.zkoss.poi.hpsf.DocumentSummaryInformation;
 import org.zkoss.poi.hpsf.SummaryInformation;
 import org.zkoss.poi.hwpf.model.BookmarksTables;
 import org.zkoss.poi.hwpf.model.CHPBinTable;
-import org.zkoss.poi.hwpf.model.CPSplitCalculator;
 import org.zkoss.poi.hwpf.model.ComplexFileTable;
 import org.zkoss.poi.hwpf.model.DocumentProperties;
 import org.zkoss.poi.hwpf.model.EscherRecordHolder;
@@ -81,16 +80,12 @@ import org.zkoss.poi.util.Internal;
  */
 public final class HWPFDocument extends HWPFDocumentCore
 {
-    private static final String PROPERTY_PRESERVE_BIN_TABLES = "org.zkoss.poi.hwpf.preserveBinTables";
+    static final String PROPERTY_PRESERVE_BIN_TABLES = "org.zkoss.poi.hwpf.preserveBinTables";
     private static final String PROPERTY_PRESERVE_TEXT_TABLE = "org.zkoss.poi.hwpf.preserveTextTable";
 
     private static final String STREAM_DATA = "Data";
     private static final String STREAM_TABLE_0 = "0Table";
     private static final String STREAM_TABLE_1 = "1Table";
-
-  /** And for making sense of CP lengths in the FIB */
-  @Deprecated
-  protected CPSplitCalculator _cpSplit;
 
   /** table stream buffer*/
   protected byte[] _tableStream;
@@ -222,17 +217,14 @@ public final class HWPFDocument extends HWPFDocumentCore
     // Also handles HPSF bits
     super(directory);
 
-    // Do the CP Split
-    _cpSplit = new CPSplitCalculator(_fib);
-    
     // Is this document too old for us?
-    if(_fib.getNFib() < 106) {
+    if(_fib.getFibBase().getNFib() < 106) {
         throw new OldWordFileFormatException("The document is too old - Word 95 or older. Try HWPFOldDocument instead?");
     }
 
     // use the fib to determine the name of the table stream.
     String name = STREAM_TABLE_0;
-    if (_fib.isFWhichTblStm())
+    if (_fib.getFibBase().isFWhichTblStm())
     {
       name = STREAM_TABLE_1;
     }
@@ -350,7 +342,7 @@ public final class HWPFDocument extends HWPFDocumentCore
     _officeDrawingsHeaders = new OfficeDrawingsImpl( _fspaHeaders, _escherRecordHolder, _mainStream );
     _officeDrawingsMain = new OfficeDrawingsImpl( _fspaMain , _escherRecordHolder, _mainStream);
 
-    _st = new SectionTable(_mainStream, _tableStream, _fib.getFcPlcfsed(), _fib.getLcbPlcfsed(), fcMin, _tpt, _cpSplit);
+    _st = new SectionTable(_mainStream, _tableStream, _fib.getFcPlcfsed(), _fib.getLcbPlcfsed(), fcMin, _tpt, _fib.getSubdocumentTextStreamLength( SubdocumentType.MAIN));
     _ss = new StyleSheet(_tableStream, _fib.getFcStshf());
     _ft = new FontTable(_tableStream, _fib.getFcSttbfffn(), _fib.getLcbSttbfffn());
 
@@ -399,12 +391,6 @@ public final class HWPFDocument extends HWPFDocumentCore
     {
         return _text;
     }
-
-  @Deprecated
-  public CPSplitCalculator getCPSplitCalculator()
-  {
-    return _cpSplit;
-  }
 
   public DocumentProperties getDocProperties()
   {
@@ -815,46 +801,40 @@ public final class HWPFDocument extends HWPFDocumentCore
     _fib.setLcbPlcfsed(tableStream.getOffset() - tableOffset);
     tableOffset = tableStream.getOffset();
 
-        /*
-         * plcflst (list formats) Written immediately after the end of the
-         * previously recorded, if there are any lists defined in the document.
-         * This begins with a short count of LSTF structures followed by those
-         * LSTF structures. This is immediately followed by the allocated data
-         * hanging off the LSTFs. This data consists of the array of LVLs for
-         * each LSTF. (Each LVL consists of an LVLF followed by two grpprls and
-         * an XST.)
-         * 
-         * Microsoft Office Word 97-2007 Binary File Format (.doc)
-         * Specification; Page 25 of 210
-         */
+        // write out the list tables
+        if ( _lt != null )
+        {
+            /*
+             * plcflst (list formats) Written immediately after the end of the
+             * previously recorded, if there are any lists defined in the
+             * document. This begins with a short count of LSTF structures
+             * followed by those LSTF structures. This is immediately followed
+             * by the allocated data hanging off the LSTFs. This data consists
+             * of the array of LVLs for each LSTF. (Each LVL consists of an LVLF
+             * followed by two grpprls and an XST.)
+             * 
+             * Microsoft Office Word 97-2007 Binary File Format (.doc)
+             * Specification; Page 25 of 210
+             */
+            _lt.writeListDataTo( _fib, tableStream );
+            tableOffset = tableStream.getOffset();
 
-    // write out the list tables
-    if (_lt != null)
-    {
-      _fib.setFcPlcfLst(tableOffset);
-      _lt.writeListDataTo(tableStream);
-      _fib.setLcbPlcfLst(tableStream.getOffset() - tableOffset);
-    }
-
-    /*
-     * plflfo (more list formats) Written immediately after the end of the
-     * plcflst and its accompanying data, if there are any lists defined in
-     * the document. This consists first of a PL of LFO records, followed by
-     * the allocated data (if any) hanging off the LFOs. The allocated data
-     * consists of the array of LFOLVLFs for each LFO (and each LFOLVLF is
-     * immediately followed by some LVLs).
-     * 
-     * Microsoft Office Word 97-2007 Binary File Format (.doc)
-     * Specification; Page 26 of 210
-     */
-
-    if (_lt != null)
-    {
-      _fib.setFcPlfLfo(tableStream.getOffset());
-      _lt.writeListOverridesTo(tableStream);
-      _fib.setLcbPlfLfo(tableStream.getOffset() - tableOffset);
-      tableOffset = tableStream.getOffset();
-    }
+            /*
+             * plflfo (more list formats) Written immediately after the end of
+             * the plcflst and its accompanying data, if there are any lists
+             * defined in the document. This consists first of a PL of LFO
+             * records, followed by the allocated data (if any) hanging off the
+             * LFOs. The allocated data consists of the array of LFOLVLFs for
+             * each LFO (and each LFOLVLF is immediately followed by some LVLs).
+             * 
+             * Microsoft Office Word 97-2007 Binary File Format (.doc)
+             * Specification; Page 26 of 210
+             */
+            _fib.setFcPlfLfo( tableStream.getOffset() );
+            _lt.writeListOverridesTo( tableStream );
+            _fib.setLcbPlfLfo( tableStream.getOffset() - tableOffset );
+            tableOffset = tableStream.getOffset();
+        }
 
         /*
          * sttbfBkmk (table of bookmark name strings) Written immediately after
@@ -904,8 +884,8 @@ public final class HWPFDocument extends HWPFDocumentCore
     tableOffset = tableStream.getOffset();
 
     // set some variables in the FileInformationBlock.
-    _fib.setFcMin(fcMin);
-    _fib.setFcMac(fcMac);
+    _fib.getFibBase().setFcMin(fcMin);
+    _fib.getFibBase().setFcMac(fcMac);
     _fib.setCbMac(wordDocumentStream.getOffset());
 
     // make sure that the table, doc and data streams use big blocks.
@@ -918,7 +898,7 @@ public final class HWPFDocument extends HWPFDocumentCore
     }
 
         // Table1 stream will be used
-        _fib.setFWhichTblStm( true );
+        _fib.getFibBase().setFWhichTblStm( true );
 
     // write out the FileInformationBlock.
     //_fib.serialize(mainBuf, 0);

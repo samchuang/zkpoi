@@ -23,7 +23,7 @@ import org.zkoss.poi.util.LittleEndian;
 /**
  * Section Descriptor (SED)
  * 
- * @see page 186 for details
+ * See page 186 for details.
  */
 @Internal
 public final class SectionDescriptor

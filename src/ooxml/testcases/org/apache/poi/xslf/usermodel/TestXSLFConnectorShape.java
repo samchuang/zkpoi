@@ -17,17 +17,9 @@
 package org.apache.poi.xslf.usermodel;
 
 import junit.framework.TestCase;
-
-import org.apache.poi.util.Units;
-import org.apache.poi.xslf.usermodel.LineCap;
-import org.apache.poi.xslf.usermodel.LineDash;
-import org.openxmlformats.schemas.drawingml.x2006.main.STLineCap;
-import org.openxmlformats.schemas.drawingml.x2006.main.STPresetLineDashVal;
+import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndLength;
 import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndType;
 import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndWidth;
-import org.openxmlformats.schemas.drawingml.x2006.main.STLineEndLength;
-
-import java.awt.*;
 
 /**
  * @author Yegor Kozlov
@@ -69,12 +61,12 @@ public class TestXSLFConnectorShape extends TestCase {
         assertEquals(STLineEndType.ARROW, shape.getSpPr().getLn().getTailEnd().getType());
 
         // line end width
-        assertEquals(null, shape.getLineHeadWidth());
-        assertEquals(null, shape.getLineTailWidth());
+        assertEquals(LineEndWidth.MEDIUM, shape.getLineHeadWidth());
+        assertEquals(LineEndWidth.MEDIUM, shape.getLineTailWidth());
         shape.setLineHeadWidth(null);
         shape.setLineHeadWidth(null);
-        assertEquals(null, shape.getLineHeadWidth());
-        assertEquals(null, shape.getLineTailWidth());
+        assertEquals(LineEndWidth.MEDIUM, shape.getLineHeadWidth());
+        assertEquals(LineEndWidth.MEDIUM, shape.getLineTailWidth());
         assertFalse(shape.getSpPr().getLn().getHeadEnd().isSetW());
         assertFalse(shape.getSpPr().getLn().getTailEnd().isSetW());
         shape.setLineHeadWidth(LineEndWidth.LARGE);
@@ -91,12 +83,12 @@ public class TestXSLFConnectorShape extends TestCase {
         assertEquals(STLineEndWidth.LG, shape.getSpPr().getLn().getTailEnd().getW());
 
         // line end length
-        assertEquals(null, shape.getLineHeadLength());
-        assertEquals(null, shape.getLineTailLength());
+        assertEquals(LineEndLength.MEDIUM, shape.getLineHeadLength());
+        assertEquals(LineEndLength.MEDIUM, shape.getLineTailLength());
         shape.setLineHeadLength(null);
         shape.setLineTailLength(null);
-        assertEquals(null, shape.getLineHeadLength());
-        assertEquals(null, shape.getLineTailLength());
+        assertEquals(LineEndLength.MEDIUM, shape.getLineHeadLength());
+        assertEquals(LineEndLength.MEDIUM, shape.getLineTailLength());
         assertFalse(shape.getSpPr().getLn().getHeadEnd().isSetLen());
         assertFalse(shape.getSpPr().getLn().getTailEnd().isSetLen());
         shape.setLineHeadLength(LineEndLength.LARGE);
