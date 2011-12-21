@@ -25,6 +25,11 @@
 
     <xsl:output method="text"/>
 
+    <xsl:template name="outputClassName">
+        <xsl:value-of select="/record/@name"/>
+        <xsl:value-of select="/record/suffix"/>
+    </xsl:template>
+
 <xsl:template match="record">
 
 <xsl:if test="@package">
@@ -45,11 +50,16 @@ import org.apache.poi.util.*;
 <xsl:apply-templates select="author"/><xsl:text>
  */
 @Internal
-public abstract class </xsl:text><xsl:value-of select="@name"/><xsl:text>AbstractType
+public abstract class </xsl:text><xsl:call-template name="outputClassName"/><xsl:text>
 {
 
 </xsl:text>
     <xsl:for-each select="//fields/field">
+        <xsl:if test="@deprecated='true'">
+            <xsl:call-template name="indent"/>
+            <xsl:text>@Deprecated</xsl:text>
+            <xsl:call-template name="linebreak"/>
+        </xsl:if>
         <xsl:call-template name="indent"/>
         <xsl:text>protected </xsl:text>
         <xsl:value-of select="@type"/>
@@ -191,6 +201,151 @@ public abstract class </xsl:text><xsl:value-of select="@name"/><xsl:text>Abstrac
     <xsl:call-template name="linebreak"/>
 </xsl:if>
 
+    <!-- equals() -->
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>@Override</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>public boolean equals( Object obj )
+    {
+        if ( this == obj )
+            return true;
+        if ( obj == null )
+            return false;
+        if ( getClass() != obj.getClass() )
+            return false;
+</xsl:text>
+    <xsl:call-template name="indent"/>
+    <xsl:call-template name="indent"/>
+    <xsl:call-template name="outputClassName"/>
+    <xsl:text> other = (</xsl:text>
+    <xsl:call-template name="outputClassName"/>
+    <xsl:text>) obj;</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:for-each select="//fields/field">
+        <xsl:variable name="fieldName" select="recutil:getFieldName(position(),@name,0)"/>
+        <xsl:call-template name="indent"/>
+        <xsl:call-template name="indent"/>
+        <xsl:choose>
+            <xsl:when test="substring(@type, string-length(@type)-1)='[]'">
+                <xsl:text>if ( </xsl:text>
+                <xsl:text>!Arrays.equals( </xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text>, other.</xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text> )</xsl:text>
+                <xsl:text> )</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>return false;</xsl:text>
+                <xsl:call-template name="linebreak"/>
+            </xsl:when>
+            <xsl:when test="@type='Grfhic'">
+                <xsl:text>if ( </xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text> == null )</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>{</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>if ( other.</xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text> != null )</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>return false;</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>}</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>else if ( !</xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text>.equals( other.</xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text> ) )</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>return false;</xsl:text>
+                <xsl:call-template name="linebreak"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>if ( </xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text> != other.</xsl:text>
+                <xsl:value-of select="$fieldName"/>
+                <xsl:text> )</xsl:text>
+                <xsl:call-template name="linebreak"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:call-template name="indent"/>
+                <xsl:text>return false;</xsl:text>
+                <xsl:call-template name="linebreak"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:for-each>
+    <xsl:call-template name="indent"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>return true;</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>}</xsl:text>
+    <xsl:call-template name="linebreak"/>
+
+    <!-- hashCode() -->
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>@Override</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+</xsl:text>
+    <xsl:for-each select="//fields/field">
+        <xsl:call-template name="indent"/>
+        <xsl:call-template name="indent"/>
+        <xsl:text>result = prime * result + </xsl:text>
+        <xsl:choose>
+            <xsl:when test="substring(@type, string-length(@type)-1)='[]'">
+                <xsl:text>Arrays.hashCode( </xsl:text>
+                <xsl:value-of select="recutil:getFieldName(position(),@name,0)"/>
+                <xsl:text> )</xsl:text>
+            </xsl:when>
+            <xsl:when test="@type='Grfhic'">
+                <xsl:value-of select="recutil:getFieldName(position(),@name,0)"/>
+                <xsl:text>.hashCode()</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="recutil:getFieldName(position(),@name,0)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>;</xsl:text>
+        <xsl:call-template name="linebreak"/>
+    </xsl:for-each>
+    <xsl:call-template name="indent"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>return result;</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>}</xsl:text>
+    <xsl:call-template name="linebreak"/>
+
     <xsl:call-template name="linebreak"/>
     <xsl:call-template name="indent"/>
     <xsl:text>public String toString()
@@ -236,10 +391,26 @@ public abstract class </xsl:text><xsl:value-of select="@name"/><xsl:text>Abstrac
 
     /**
      * <xsl:value-of select="@description"/>
-     * @return  the <xsl:value-of select="@name"/> field value.
-     */
-    @Internal
-    public <xsl:value-of select="recutil:getBitFieldFunction(@name,@mask,../@type, 'true')"/>()
+     * @return  the <xsl:value-of select="@name"/><xsl:text> field value.</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:if test="@deprecated='true'">
+        <xsl:call-template name="indent"/>
+        <xsl:text> * @deprecated This field should not be used according to specification</xsl:text>
+        <xsl:call-template name="linebreak"/>
+    </xsl:if>
+    <xsl:call-template name="indent"/>
+    <xsl:text> */</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:call-template name="indent"/>
+    <xsl:text>@Internal</xsl:text>
+    <xsl:call-template name="linebreak"/>
+    <xsl:if test="@deprecated='true'">
+        <xsl:call-template name="indent"/>
+        <xsl:text>@Deprecated</xsl:text>
+        <xsl:call-template name="linebreak"/>
+    </xsl:if>
+    <xsl:call-template name="indent"/>
+    <xsl:text>public </xsl:text><xsl:value-of select="recutil:getBitFieldFunction(@name,@mask,../@type, 'true')"/><xsl:text>()</xsl:text>
     {
         return <xsl:value-of select="recutil:getBitFieldGet(@name, @mask,../@type, recutil:getFieldName($fieldNum,../@name,0))"/>
     }

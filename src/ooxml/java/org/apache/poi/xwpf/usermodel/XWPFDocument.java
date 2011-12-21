@@ -351,15 +351,20 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     }
 
     public XWPFFootnote getFootnoteByID(int id) {
-        return footnotes.getFootnoteById(id);
+       if(footnotes == null) return null;
+       return footnotes.getFootnoteById(id);
     }
 
     public XWPFFootnote getEndnoteByID(int id) {
-        return endnotes.get(id);
+       if(endnotes == null) return null;
+       return endnotes.get(id);
     }
 
     public List<XWPFFootnote> getFootnotes() {
-		return footnotes.getFootnotesList();
+       if(footnotes == null) {
+          return Collections.emptyList();
+       }
+       return footnotes.getFootnotesList();
     }
 
     public XWPFHyperlink[] getHyperlinks() {
@@ -500,9 +505,10 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 
     /**
      * Add a new paragraph at position of the cursor. The cursor must be on the
-     * {@link TokenType#START} tag of an subelement of the documents body. When
-     * this method is done, the cursor passed as parameter points to the
-     * {@link TokenType#END} of the newly inserted paragraph.
+     * {@link org.apache.xmlbeans.XmlCursor.TokenType#START} tag of an subelement
+     * of the documents body. When this method is done, the cursor passed as
+     * parameter points to the {@link org.apache.xmlbeans.XmlCursor.TokenType#END}
+     * of the newly inserted paragraph.
      * 
      * @param cursor
      * @return the {@link XWPFParagraph} object representing the newly inserted

@@ -19,7 +19,6 @@
 
 package org.apache.poi.xslf.usermodel;
 
-import org.apache.poi.sl.usermodel.ShapeContainer;
 import org.apache.poi.util.Beta;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTPresetGeometry2D;
@@ -27,7 +26,6 @@ import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBody;
 import org.openxmlformats.schemas.drawingml.x2006.main.STShapeType;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTApplicationNonVisualDrawingProps;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTPlaceholder;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShapeNonVisual;
 import org.openxmlformats.schemas.presentationml.x2006.main.STPlaceholderType;
@@ -64,34 +62,5 @@ public class XSLFTextBox extends XSLFAutoShape {
         txBody.addNewLstStyle();
 
         return ct;
-    }
-
-    /**
-     * Specifies that the corresponding shape should be represented by the generating application
-     * as a placeholder. When a shape is considered a placeholder by the generating application
-     * it can have special properties to alert the user that they may enter content into the shape.
-     * Different types of placeholders are allowed and can be specified by using the placeholder
-     * type attribute for this element
-     *
-     * @param placeholder
-     */
-    public void setPlaceholder(Placeholder placeholder){
-        CTShape sh =  (CTShape)getXmlObject();
-        CTApplicationNonVisualDrawingProps nv = sh.getNvSpPr().getNvPr();
-        if(placeholder == null) {
-            if(nv.isSetPh()) nv.unsetPh();
-        } else {
-            nv.addNewPh().setType(STPlaceholderType.Enum.forInt(placeholder.ordinal() + 1));
-        }
-    }
-
-    public Placeholder getPlaceholder(){
-        CTShape sh =  (CTShape)getXmlObject();
-        CTPlaceholder ph = sh.getNvSpPr().getNvPr().getPh();
-        if(ph == null) return null;
-        else {
-            int val = ph.getType().intValue();
-            return Placeholder.values()[val - 1];
-        }
     }
 }

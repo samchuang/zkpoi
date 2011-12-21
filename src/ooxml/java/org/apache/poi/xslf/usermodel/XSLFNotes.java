@@ -16,8 +16,7 @@
 ==================================================================== */
 package org.apache.poi.xslf.usermodel;
 
-import java.io.IOException;
-
+import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.util.Beta;
@@ -25,6 +24,8 @@ import org.apache.xmlbeans.XmlException;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTCommonSlideData;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTNotesSlide;
 import org.openxmlformats.schemas.presentationml.x2006.main.NotesDocument;
+
+import java.io.IOException;
 
 @Beta
 public final class XSLFNotes extends XSLFSheet {
@@ -74,5 +75,15 @@ public final class XSLFNotes extends XSLFSheet {
     @Override
     protected String getRootElementName(){
         return "notes";        
+    }
+
+    @Override
+    public XSLFNotesMaster getMasterSheet() {
+        for (POIXMLDocumentPart p : getRelations()) {
+           if (p instanceof XSLFNotesMaster){
+              return (XSLFNotesMaster)p;
+           }
+        }
+        return null;
     }
 }

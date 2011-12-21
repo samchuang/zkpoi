@@ -16,8 +16,6 @@
 ==================================================================== */
 package org.apache.poi.hwpf.model;
 
-import java.util.Arrays;
-
 import org.apache.poi.hwpf.model.types.LVLFAbstractType;
 import org.apache.poi.util.Internal;
 
@@ -40,57 +38,6 @@ class LVLF extends LVLFAbstractType
     public LVLF( byte[] std, int offset )
     {
         fillFields( std, offset );
-    }
-
-    @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-            return true;
-        if ( obj == null )
-            return false;
-        if ( getClass() != obj.getClass() )
-            return false;
-        LVLF other = (LVLF) obj;
-        if ( field_10_grfhic != other.field_10_grfhic )
-            return false;
-        if ( field_1_iStartAt != other.field_1_iStartAt )
-            return false;
-        if ( field_2_info2 != other.field_2_info2 )
-            return false;
-        if ( !Arrays.equals( field_3_rgbxchNums, other.field_3_rgbxchNums ) )
-            return false;
-        if ( field_4_ixchFollow != other.field_4_ixchFollow )
-            return false;
-        if ( field_5_dxaIndentSav != other.field_5_dxaIndentSav )
-            return false;
-        if ( field_6_unused2 != other.field_6_unused2 )
-            return false;
-        if ( field_7_cbGrpprlChpx != other.field_7_cbGrpprlChpx )
-            return false;
-        if ( field_8_cbGrpprlPapx != other.field_8_cbGrpprlPapx )
-            return false;
-        if ( field_9_ilvlRestartLim != other.field_9_ilvlRestartLim )
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + field_10_grfhic;
-        result = prime * result + field_1_iStartAt;
-        result = prime * result + field_2_info2;
-        result = prime * result + Arrays.hashCode( field_3_rgbxchNums );
-        result = prime * result + field_4_ixchFollow;
-        result = prime * result + field_5_dxaIndentSav;
-        result = prime * result + field_6_unused2;
-        result = prime * result + field_7_cbGrpprlChpx;
-        result = prime * result + field_8_cbGrpprlPapx;
-        result = prime * result + field_9_ilvlRestartLim;
-        return result;
     }
 
 }

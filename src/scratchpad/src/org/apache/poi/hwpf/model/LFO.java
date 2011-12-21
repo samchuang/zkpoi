@@ -31,7 +31,6 @@ import org.apache.poi.hwpf.model.types.LFOAbstractType;
 @Internal
 class LFO extends LFOAbstractType
 {
-
     public LFO()
     {
     }
@@ -39,47 +38,5 @@ class LFO extends LFOAbstractType
     public LFO( byte[] std, int offset )
     {
         fillFields( std, offset );
-    }
-
-    @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-            return true;
-        if ( obj == null )
-            return false;
-        if ( getClass() != obj.getClass() )
-            return false;
-        LFO other = (LFO) obj;
-        if ( field_1_lsid != other.field_1_lsid )
-            return false;
-        if ( field_2_reserved1 != other.field_2_reserved1 )
-            return false;
-        if ( field_3_reserved2 != other.field_3_reserved2 )
-            return false;
-        if ( field_4_clfolvl != other.field_4_clfolvl )
-            return false;
-        if ( field_5_ibstFltAutoNum != other.field_5_ibstFltAutoNum )
-            return false;
-        if ( field_6_grfhic != other.field_6_grfhic )
-            return false;
-        if ( field_7_reserved3 != other.field_7_reserved3 )
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + field_1_lsid;
-        result = prime * result + field_2_reserved1;
-        result = prime * result + field_3_reserved2;
-        result = prime * result + field_4_clfolvl;
-        result = prime * result + field_5_ibstFltAutoNum;
-        result = prime * result + field_6_grfhic;
-        result = prime * result + field_7_reserved3;
-        return result;
     }
 }

@@ -170,6 +170,11 @@ public class WordToTextConverter extends AbstractWordConverter
         this.textDocumentFacade = new TextDocumentFacade( document );
     }
 
+    public WordToTextConverter( TextDocumentFacade textDocumentFacade )
+    {
+        this.textDocumentFacade = textDocumentFacade;
+    }
+
     @Override
     protected void afterProcess()
     {
@@ -244,8 +249,7 @@ public class WordToTextConverter extends AbstractWordConverter
     }
 
     @Override
-    public void processDocumentPart( HWPFDocumentCore wordDocument,
-            Range range )
+    public void processDocumentPart( HWPFDocumentCore wordDocument, Range range )
     {
         super.processDocumentPart( wordDocument, range );
         afterProcess();
@@ -291,6 +295,20 @@ public class WordToTextConverter extends AbstractWordConverter
     @Override
     protected void processImage( Element currentBlock, boolean inlined,
             Picture picture )
+    {
+        // ignore
+    }
+
+    @Override
+    protected void processImage( Element currentBlock, boolean inlined,
+            Picture picture, String url )
+    {
+        // ignore
+    }
+
+    @Override
+    protected void processImageWithoutPicturesManager( Element currentBlock,
+            boolean inlined, Picture picture )
     {
         // ignore
     }

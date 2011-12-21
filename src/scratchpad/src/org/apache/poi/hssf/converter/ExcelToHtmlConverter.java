@@ -125,7 +125,13 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
 
     private String cssClassContainerDiv = null;
 
-    private final String cssClassTable;
+    private String cssClassPrefixCell = "c";
+
+    private String cssClassPrefixDiv = "d";
+
+    private String cssClassPrefixRow = "r";
+
+    private String cssClassPrefixTable = "t";
 
     private Map<Short, String> excelStyleToClass = new LinkedHashMap<Short, String>();
 
@@ -136,14 +142,18 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
     public ExcelToHtmlConverter( Document doc )
     {
         htmlDocumentFacade = new HtmlDocumentFacade( doc );
-        cssClassTable = htmlDocumentFacade.getOrCreateCssClass( "t", "border-collapse:collapse;border-spacing:0;" );
+    }
+
+    public ExcelToHtmlConverter( HtmlDocumentFacade htmlDocumentFacade )
+    {
+        this.htmlDocumentFacade = htmlDocumentFacade;
     }
 
     protected String buildStyle( HSSFWorkbook workbook, HSSFCellStyle cellStyle )
     {
         StringBuilder style = new StringBuilder();
 
-        style.append( "white-space: pre-wrap; " );
+        style.append( "white-space:pre-wrap;" );
         ExcelToHtmlUtils.appendAlign( style, cellStyle.getAlignment() );
 
         if ( cellStyle.getFillPattern() == 0 )
@@ -155,16 +165,16 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
             final HSSFColor foregroundColor = cellStyle
                     .getFillForegroundColorColor();
             if ( foregroundColor != null )
-                style.append( "background-color: "
-                        + ExcelToHtmlUtils.getColor( foregroundColor ) + "; " );
+                style.append( "background-color:"
+                        + ExcelToHtmlUtils.getColor( foregroundColor ) + ";" );
         }
         else
         {
             final HSSFColor backgroundColor = cellStyle
                     .getFillBackgroundColorColor();
             if ( backgroundColor != null )
-                style.append( "background-color: "
-                        + ExcelToHtmlUtils.getColor( backgroundColor ) + "; " );
+                style.append( "background-color:"
+                        + ExcelToHtmlUtils.getColor( backgroundColor ) + ";" );
         }
 
         buildStyle_border( workbook, style, "top", cellStyle.getBorderTop(),
@@ -201,7 +211,7 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
             borderStyle.append( ExcelToHtmlUtils.getColor( color ) );
         }
 
-        style.append( "border-" + type + ": " + borderStyle + "; " );
+        style.append( "border-" + type + ":" + borderStyle + ";" );
     }
 
     void buildStyle_font( HSSFWorkbook workbook, StringBuilder style,
@@ -210,7 +220,7 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
         switch ( font.getBoldweight() )
         {
         case HSSFFont.BOLDWEIGHT_BOLD:
-            style.append( "font-weight: bold; " );
+            style.append( "font-weight:bold;" );
             break;
         case HSSFFont.BOLDWEIGHT_NORMAL:
             // by default, not not increase HTML size
@@ -225,12 +235,32 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
                     + "; " );
 
         if ( font.getFontHeightInPoints() != 0 )
-            style.append( "font-size: " + font.getFontHeightInPoints() + "pt; " );
+            style.append( "font-size:" + font.getFontHeightInPoints() + "pt;" );
 
         if ( font.getItalic() )
         {
-            style.append( "font-style: italic; " );
+            style.append( "font-style:italic;" );
         }
+    }
+
+    public String getCssClassPrefixCell()
+    {
+        return cssClassPrefixCell;
+    }
+
+    public String getCssClassPrefixDiv()
+    {
+        return cssClassPrefixDiv;
+    }
+
+    public String getCssClassPrefixRow()
+    {
+        return cssClassPrefixRow;
+    }
+
+    public String getCssClassPrefixTable()
+    {
+        return cssClassPrefixTable;
     }
 
     public Document getDocument()
@@ -248,7 +278,8 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
             return knownClass;
 
         String cssStyle = buildStyle( workbook, cellStyle );
-        String cssClass = htmlDocumentFacade.getOrCreateCssClass( "c", cssStyle );
+        String cssClass = htmlDocumentFacade.getOrCreateCssClass(
+                cssClassPrefixCell, cssStyle );
         excelStyleToClass.put( cellStyleKey, cssClass );
         return cssClass;
     }
@@ -399,7 +430,7 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
             innerDivStyle.append( "pt;white-space:nowrap;" );
             ExcelToHtmlUtils.appendAlign( innerDivStyle,
                     cellStyle.getAlignment() );
-            htmlDocumentFacade.addStyleClass( outerDiv, "d",
+            htmlDocumentFacade.addStyleClass( outerDiv, cssClassPrefixDiv,
                     innerDivStyle.toString() );
 
             innerDiv.appendChild( text );
@@ -612,7 +643,8 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
             return;
 
         Element table = htmlDocumentFacade.createTable();
-        table.setAttribute( "class", cssClassTable );
+        htmlDocumentFacade.addStyleClass( table, cssClassPrefixTable,
+                "border-collapse:collapse;border-spacing:0;" );
 
         Element tableBody = htmlDocumentFacade.createTableBody();
 
@@ -622,7 +654,7 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
         final List<Element> emptyRowElements = new ArrayList<Element>(
                 physicalNumberOfRows );
         int maxSheetColumns = 1;
-        for ( int r = 0; r < physicalNumberOfRows; r++ )
+        for ( int r = sheet.getFirstRowNum(); r <= sheet.getLastRowNum(); r++ )
         {
             HSSFRow row = sheet.getRow( r );
 
@@ -633,8 +665,9 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
                 continue;
 
             Element tableRowElement = htmlDocumentFacade.createTableRow();
-            htmlDocumentFacade.addStyleClass( tableRowElement, "r", "height:"
-                    + ( row.getHeight() / 20f ) + "pt;" );
+            htmlDocumentFacade.addStyleClass( tableRowElement,
+                    cssClassPrefixRow, "height:" + ( row.getHeight() / 20f )
+                            + "pt;" );
 
             int maxRowColumnNumber = processRow( mergedRanges, row,
                     tableRowElement );
@@ -691,9 +724,10 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
         {
             // prepare CSS classes for later usage
             this.cssClassContainerCell = htmlDocumentFacade
-                    .getOrCreateCssClass( "c", "padding:0;margin:0;align:left;vertical-align:top;" );
+                    .getOrCreateCssClass( cssClassPrefixCell,
+                            "padding:0;margin:0;align:left;vertical-align:top;" );
             this.cssClassContainerDiv = htmlDocumentFacade.getOrCreateCssClass(
-                    "d", "position:relative;" );
+                    cssClassPrefixDiv, "position:relative;" );
         }
 
         for ( int s = 0; s < workbook.getNumberOfSheets(); s++ )
@@ -703,6 +737,26 @@ public class ExcelToHtmlConverter extends AbstractExcelConverter
         }
 
         htmlDocumentFacade.updateStylesheet();
+    }
+
+    public void setCssClassPrefixCell( String cssClassPrefixCell )
+    {
+        this.cssClassPrefixCell = cssClassPrefixCell;
+    }
+
+    public void setCssClassPrefixDiv( String cssClassPrefixDiv )
+    {
+        this.cssClassPrefixDiv = cssClassPrefixDiv;
+    }
+
+    public void setCssClassPrefixRow( String cssClassPrefixRow )
+    {
+        this.cssClassPrefixRow = cssClassPrefixRow;
+    }
+
+    public void setCssClassPrefixTable( String cssClassPrefixTable )
+    {
+        this.cssClassPrefixTable = cssClassPrefixTable;
     }
 
     /**

@@ -16,17 +16,6 @@
 ==================================================================== */
 package org.apache.poi.xslf.usermodel;
 
-import java.awt.Dimension;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.POIXMLDocumentPart;
 import org.apache.poi.POIXMLException;
@@ -43,13 +32,26 @@ import org.apache.poi.util.PackageHelper;
 import org.apache.poi.util.Units;
 import org.apache.poi.xslf.XSLFSlideShow;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextParagraphProperties;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTPresentation;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdList;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdListEntry;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideSize;
 import org.openxmlformats.schemas.presentationml.x2006.main.PresentationDocument;
+
+import java.awt.Dimension;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * High level representation of a ooxml slideshow.
@@ -190,7 +192,13 @@ public class XMLSlideShow  extends POIXMLDocument {
         return Collections.unmodifiableList(_pictures);
     }
 
-    public XSLFSlide createSlide() {
+    /**
+     * Create a slide and initialize it from the specified layout.
+     *
+     * @param layout
+     * @return created slide
+     */
+    public XSLFSlide createSlide(XSLFSlideLayout layout) {
         int slideNumber = 256, cnt = 1;
         CTSlideIdList slideList;
         if (!_presentation.isSetSldIdLst()) slideList = _presentation.addNewSldIdLst();
@@ -209,12 +217,7 @@ public class XMLSlideShow  extends POIXMLDocument {
         slideId.setId(slideNumber);
         slideId.setId2(slide.getPackageRelationship().getId());
 
-        String masterId = _presentation.getSldMasterIdLst().getSldMasterIdArray(0).getId2();
-        XSLFSlideMaster master = _masters.get(masterId);
-
-        XSLFSlideLayout layout = master.getLayout("blank");
-        if(layout == null) throw new IllegalArgumentException("Blank layout was not found");
-
+        layout.copyLayout(slide);
         slide.addRelation(layout.getPackageRelationship().getId(), layout);
 
         PackagePartName ppName = layout.getPackagePart().getPartName();
@@ -224,7 +227,20 @@ public class XMLSlideShow  extends POIXMLDocument {
         _slides.add(slide);
         return slide;
     }
-    
+
+    /**
+     * Create a blank slide.
+     */
+    public XSLFSlide createSlide() {
+        String masterId = _presentation.getSldMasterIdLst().getSldMasterIdArray(0).getId2();
+        XSLFSlideMaster master = _masters.get(masterId);
+
+        XSLFSlideLayout layout = master.getLayout(SlideLayout.BLANK);
+        if(layout == null) throw new IllegalArgumentException("Blank layout was not found");
+
+        return createSlide(layout);
+    }
+
     /**
      * Return the Notes Master, if there is one.
      * (May not be present if no notes exist)  
@@ -324,7 +340,7 @@ public class XMLSlideShow  extends POIXMLDocument {
     public int addPicture(byte[] pictureData, int format) {
         getAllPictures();
         
-        int imageNumber = getPackage().getPartsByName(Pattern.compile("/ppt/media/.*?")).size() + 1;
+        int imageNumber = _pictures.size() + 1;
         XSLFPictureData img = (XSLFPictureData) createRelationship(
                 XSLFPictureData.RELATIONS[format], XSLFFactory.getInstance(), imageNumber, true);
         _pictures.add(img);
@@ -339,6 +355,17 @@ public class XMLSlideShow  extends POIXMLDocument {
     }
     public XSLFTableStyles getTableStyles(){
         return _tableStyles;
+    }
+
+    CTTextParagraphProperties getDefaultParagraphStyle(int level) {
+        XmlObject[] o = _presentation.selectPath(
+                "declare namespace p='http://schemas.openxmlformats.org/presentationml/2006/main' " +
+                "declare namespace a='http://schemas.openxmlformats.org/drawingml/2006/main' " +
+                ".//p:defaultTextStyle/a:lvl" +(level+1)+ "pPr");
+        if(o.length == 1){
+            return (CTTextParagraphProperties)o[0];
+        }
+        return null;
     }
 
 }

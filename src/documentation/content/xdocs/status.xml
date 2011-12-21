@@ -33,7 +33,46 @@
     </developers>
 
     <changes>
-        <release version="3.8-beta5" date="2011-??-??">
+        <release version="3.8-beta6" date="2012-??-??">
+           <action dev="poi-developers" type="add">52349 - Merge the logic between the TEXT function and DataFormatter</action>
+           <action dev="poi-developers" type="fix">52349 - Correctly support excel style date format strings in the TEXT function</action>
+           <action dev="poi-developers" type="fix">52369 - XSSFExcelExtractor should format numeric cells based on the format strings applied to them</action>
+           <action dev="poi-developers" type="fix">52369 - Event based XSSF parsing should handle formatting of formula values in XSSFSheetXMLHandler</action>
+           <action dev="poi-developers" type="fix">52348 - Avoid exception when creating cell style in a workbook that has an empty xf table</action>
+           <action dev="poi-developers" type="fix">52219 - fixed XSSFSimpleShape to set rich text attributes from XSSFRichtextString</action>
+           <action dev="poi-developers" type="fix">52314 - enhanced SheetUtil.getColumnWidth</action>
+        </release>
+        <release version="3.8-beta5" date="2011-12-17">
+           <action dev="poi-developers" type="fix">52204 - Deprecated XSSFWorkbook(String path) constructor because it does not close underlying .zip file</action>
+           <action dev="poi-developers" type="fix">46288 - fixed refcount of Fill pictures in HSLF </action>
+           <action dev="poi-developers" type="add">51961 - support compression of temp files in SXSSF </action>
+           <action dev="poi-developers" type="add">52268 - support cloning sheets with drawings in XSSF </action>
+           <action dev="poi-developers" type="add">52285 - Support XWPF smart tags text in Paragraphs</action>
+           <action dev="poi-developers" type="fix">51875 - More XSSF new-line in formula support</action>
+           <action dev="poi-developers" type="add">POIFS EntryUtils.copyNodes(POFS,POIFS) now uses FilteringDirectoryNode, so can exclude from copying nodes not just directly under the root</action>
+           <action dev="poi-developers" type="add">POIFS Helper FilteringDirectoryNode, which wraps a DirectoryEntry and allows certain parts to be ignored</action>
+           <action dev="poi-developers" type="fix">52209 - fixed inserting multiple pictures in XSLF </action>
+           <action dev="poi-developers" type="fix">51803 - fixed HSLF TextExtractor to extract content from master slide </action>
+           <action dev="poi-developers" type="fix">52190 - null check on XWPF setFontFamily</action>
+           <action dev="poi-developers" type="fix">52062 - ensure that temporary files in SXSSF are deleted</action>
+           <action dev="poi-developers" type="fix">50936 - Exception parsing MS Word 8.0 file (as duplicate of 47958)</action>
+           <action dev="poi-developers" type="fix">47958 - ArrayIndexOutOfBoundsException from PicturesTable.getAllPictures() during Escher tree walk</action>
+           <action dev="poi-developers" type="fix">51944 - PAPFormattedDiskPage.getPAPX - IndexOutOfBounds</action>
+           <action dev="poi-developers" type="fix">52032 - HWPF - ArrayIndexOutofBoundsException with no stack trace (broken after revision 1178063)</action>
+           <action dev="poi-developers" type="add">support for converting pptx files into images with a PPTX2PNG tool</action>
+           <action dev="poi-developers" type="add">52050 - Support for the Excel RATE function</action>
+           <action dev="poi-developers" type="fix">51566 - HSLF fix for finishing parsing the picture stream on the first non-valid type</action>
+           <action dev="poi-developers" type="fix">51974 - Avoid HWPF issue when identifying the picture type</action>
+           <action dev="poi-developers" type="fix">52035 - Fix signed issue with very large word 6 files</action>
+           <action dev="poi-developers" type="fix">51949 - Avoid NPE on double close of ZipFileZipEntrySource</action>
+           <action dev="poi-developers" type="fix">51950 - XWPF fix for footnotes not always being present in a document</action>
+           <action dev="poi-developers" type="fix">51963 - Correct AreaReference handling of references containing a sheet name which includes a comma</action>
+           <action dev="poi-developers" type="fix">51955 - XSSFReader supplied StylesTables need to have the theme data available</action>
+           <action dev="poi-developers" type="fix">51716 - Removed incorrect assert in SXSSFSheet#getSXSSFSheet</action>
+           <action dev="poi-developers" type="fix">51834 - Opening and Writing .doc file results in corrupt document</action>
+           <action dev="poi-developers" type="fix">51902 - Picture.fillRawImageContent - ArrayIndexOutOfBoundsException (duplicate)</action>
+           <action dev="poi-developers" type="fix">51890 - ArrayIndexOutOfBounds ExceptionPicture.fillRawImageContent</action>
+           <action dev="poi-developers" type="add">Allow the passing of a File object to WorkbookFactory.create, which permits lower memory processing than the InputStream version</action>
            <action dev="poi-developers" type="fix">51873 - update HSMF to ignore Outlook 2002 Olk10SideProp entries, which don't behave like normal chunks</action>
            <action dev="poi-developers" type="fix">51850 - support creating comments in XSSF on an earlier slide when later ones already have them</action>
            <action dev="poi-developers" type="add">51804 - optionally include Master Slide text in XSLF text extraction, as HSLF already offers</action>

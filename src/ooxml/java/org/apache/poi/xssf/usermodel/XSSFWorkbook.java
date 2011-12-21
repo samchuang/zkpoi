@@ -184,8 +184,41 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
     /**
      * Constructs a XSSFWorkbook object given a file name.
      *
+     * <p>
+     *  This constructor is deprecated since POI-3.8 because it does not close
+     *  the underlying .zip file stream. In short, there are two ways to open a OPC package:
+     * </p>
+     * <ol>
+     *     <li>
+     *      from file which leads to invoking java.util.zip.ZipFile(File file)
+     *      deep in POI internals.
+     *     </li>
+     *     <li>
+     *     from input stream in which case we first read everything into memory and
+     *     then pass the data to ZipInputStream.
+     *     </li>
+     * <ol>
+     * <p>    
+     *     It should be noted, that (2) uses quite a bit more memory than (1), which
+     *      doesn't need to hold the whole zip file in memory, and can take advantage
+     *      of native methods.
+     * </p>
+     * <p>
+     *   To construct a workbook from file use the
+     *   {@link #XSSFWorkbook(org.apache.poi.openxml4j.opc.OPCPackage)}  constructor:
+     *   <pre><code>
+     *       OPCPackage pkg = OPCPackage.open(path);
+     *       XSSFWorkbook wb = new XSSFWorkbook(pkg);
+     *       // work with the wb object
+     *       ......
+     *       pkg.close(); // gracefully closes the underlying zip file
+     *   </code></pre>     
+     * </p>
+     * 
      * @param      path   the file name.
+     * @deprecated
      */
+    @Deprecated
     public XSSFWorkbook(String path) throws IOException {
         this(openPackage(path));
     }
@@ -375,25 +408,56 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
             throw new POIXMLException("Failed to clone sheet", e);
         }
         CTWorksheet ct = clonedSheet.getCTWorksheet();
-        if(ct.isSetDrawing()) {
-            logger.log(POILogger.WARN, "Cloning sheets with drawings is not yet supported.");
-            ct.unsetDrawing();
-        }
         if(ct.isSetLegacyDrawing()) {
             logger.log(POILogger.WARN, "Cloning sheets with comments is not yet supported.");
             ct.unsetLegacyDrawing();
+        }
+        if (ct.isSetPageSetup()) {
+            logger.log(POILogger.WARN, "Cloning sheets with page setup is not yet supported.");
+            ct.unsetPageSetup();
         }
 
         clonedSheet.setSelected(false);
 
         // copy sheet's relations
         List<POIXMLDocumentPart> rels = srcSheet.getRelations();
+        // if the sheet being cloned has a drawing then rememebr it and re-create tpoo
+        XSSFDrawing dg = null;
         for(POIXMLDocumentPart r : rels) {
+            // do not copy the drawing relationship, it will be re-created
+            if(r instanceof XSSFDrawing) {
+                dg = (XSSFDrawing)r;
+                continue;
+            }
+
             PackageRelationship rel = r.getPackageRelationship();
-            clonedSheet.getPackagePart().addRelationship(rel.getTargetURI(), rel.getTargetMode(),rel.getRelationshipType());
+            clonedSheet.getPackagePart().addRelationship(
+                    rel.getTargetURI(), rel.getTargetMode(),rel.getRelationshipType());
             clonedSheet.addRelation(rel.getId(), r);
         }
 
+        // clone the sheet drawing alongs with its relationships
+        if (dg != null) {
+            if(ct.isSetDrawing()) {
+                // unset the existing reference to the drawing,
+                // so that subsequent call of clonedSheet.createDrawingPatriarch() will create a new one
+                ct.unsetDrawing();
+            }
+            XSSFDrawing clonedDg = clonedSheet.createDrawingPatriarch();
+            // copy drawing contents
+            clonedDg.getCTDrawing().set(dg.getCTDrawing());
+
+            // Clone drawing relations
+            List<POIXMLDocumentPart> srcRels = srcSheet.createDrawingPatriarch().getRelations();
+            for (POIXMLDocumentPart rel : srcRels) {
+                PackageRelationship relation = rel.getPackageRelationship();
+                clonedSheet
+                        .createDrawingPatriarch()
+                        .getPackagePart()
+                        .addRelationship(relation.getTargetURI(), relation.getTargetMode(),
+                                relation.getRelationshipType(), relation.getId());
+            }
+        }
         return clonedSheet;
     }
 
@@ -527,12 +591,15 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * The string MUST NOT begin or end with the single quote (') character.
      * </p>
      *
+     * <p>
+     * See {@link org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
+     *      for a safe way to create valid names
+     * </p>
      * @param sheetname  sheetname to set for the sheet.
      * @return Sheet representing the new sheet.
      * @throws IllegalArgumentException if the name is null or invalid
      *  or workbook already contains a sheet with this name
-     * @see {@link org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
-     *      for a safe way to create valid names
+     * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      */
     public XSSFSheet createSheet(String sheetname) {
         if (sheetname == null) {
@@ -1159,9 +1226,8 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
      * @param sheetname  the new sheet name
      * @throws IllegalArgumentException if the name is null or invalid
      *  or workbook already contains a sheet with this name
-     * @see {@link #createSheet(String)}
-     * @see {@link org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)}
-     *      for a safe way to create valid names
+     * @see #createSheet(String)
+     * @see org.apache.poi.ss.util.WorkbookUtil#createSafeSheetName(String nameProposal)
      */
     public void setSheetName(int sheetIndex, String sheetname) {
         validateSheetIndex(sheetIndex);

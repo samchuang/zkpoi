@@ -137,6 +137,11 @@ public class ExcelToFoConverter extends AbstractExcelConverter
         this.foDocumentFacade = new FoDocumentFacade( document );
     }
 
+    public ExcelToFoConverter( FoDocumentFacade foDocumentFacade )
+    {
+        this.foDocumentFacade = foDocumentFacade;
+    }
+
     protected String createPageMaster( float tableWidthIn, String pageMasterName )
     {
         final float paperHeightIn;
@@ -328,6 +333,7 @@ public class ExcelToFoConverter extends AbstractExcelConverter
             block.setAttribute( "overflow", "hidden" );
             block.setAttribute( "height", normalHeightPt + "pt" );
             block.setAttribute( "keep-together.within-line", "always" );
+            block.setAttribute( "wrap-option", "no-wrap" );
         }
 
         processCellStyle( workbook, cell.getCellStyle(), tableCellElement,
@@ -684,7 +690,7 @@ public class ExcelToFoConverter extends AbstractExcelConverter
         final List<Element> emptyRowElements = new ArrayList<Element>(
                 physicalNumberOfRows );
         int maxSheetColumns = 1;
-        for ( int r = 0; r < physicalNumberOfRows; r++ )
+        for ( int r = sheet.getFirstRowNum(); r <= sheet.getLastRowNum(); r++ )
         {
             HSSFRow row = sheet.getRow( r );
 

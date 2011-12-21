@@ -19,54 +19,42 @@ package org.apache.poi.hwpf.model;
 
 import java.util.Arrays;
 
-import org.apache.poi.hwpf.model.types.LVLFAbstractType;
-
-import org.apache.poi.util.BitField;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
 
 /**
- * "List LeVeL (on File) (LVLF)"
- * 
- * See page 170 for details.
+ * "The LVL structure contains formatting information about a specific level in
+ * a list. When a paragraph is formatted as part of this level, each placeholder
+ * in xst is replaced with the inherited level number of the most recent or
+ * current paragraph in the same list that is in the zero-based level specified
+ * by that placeholder. The level number that replaces a placeholder is
+ * formatted according to the lvlf.nfc of the LVL structure that corresponds to
+ * the level that the placeholder specifies, unless the lvlf.fLegal of this LVL
+ * structure is nonzero." -- Page 388 of 621 -- [MS-DOC] -- v20110315 Word
+ * (.doc) Binary File Format
  */
 @Internal
 public final class ListLevel
 {
+    private static final POILogger logger = POILogFactory
+            .getLogger( ListLevel.class );
+
     private byte[] _grpprlChpx;
     private byte[] _grpprlPapx;
     private LVLF _lvlf;
-    private char[] _numberText = null;
+    private char[] _xst = {};
 
-    public ListLevel( final byte[] buf, final int originalOffset )
+    ListLevel()
     {
-        int offset = originalOffset;
 
-        _lvlf = new LVLF( buf, offset );
-        offset += LVLF.getSize();
+    }
 
-        _grpprlPapx = new byte[_lvlf.getCbGrpprlPapx()];
-        System.arraycopy( buf, offset, _grpprlPapx, 0, _lvlf.getCbGrpprlPapx() );
-        offset += _lvlf.getCbGrpprlPapx();
-
-        _grpprlChpx = new byte[_lvlf.getCbGrpprlChpx()];
-        System.arraycopy( buf, offset, _grpprlChpx, 0, _lvlf.getCbGrpprlChpx() );
-        offset += _lvlf.getCbGrpprlChpx();
-
-        int numberTextLength = LittleEndian.getShort( buf, offset );
-        /* sometimes numberTextLength<0 */
-        /* by derjohng */
-        if ( numberTextLength > 0 )
-        {
-            _numberText = new char[numberTextLength];
-            offset += LittleEndian.SHORT_SIZE;
-            for ( int x = 0; x < numberTextLength; x++ )
-            {
-                _numberText[x] = (char) LittleEndian.getShort( buf, offset );
-                offset += LittleEndian.SHORT_SIZE;
-            }
-        }
-
+    @Deprecated
+    public ListLevel( final byte[] buf, final int startOffset )
+    {
+        read( buf, startOffset );
     }
 
     public ListLevel( int level, boolean numbered )
@@ -75,16 +63,15 @@ public final class ListLevel
         setStartAt( 1 );
         _grpprlPapx = new byte[0];
         _grpprlChpx = new byte[0];
-        _numberText = new char[0];
 
         if ( numbered )
         {
             _lvlf.getRgbxchNums()[0] = 1;
-            _numberText = new char[] { (char) level, '.' };
+            _xst = new char[] { (char) level, '.' };
         }
         else
         {
-            _numberText = new char[] { '\u2022' };
+            _xst = new char[] { '\u2022' };
         }
     }
 
@@ -93,11 +80,11 @@ public final class ListLevel
     {
         _lvlf = new LVLF();
         setStartAt( startAt );
-        _lvlf.setNfc( (short) numberFormatCode );
+        _lvlf.setNfc( (byte) numberFormatCode );
         _lvlf.setJc( (byte) alignment );
         _grpprlChpx = numberProperties;
         _grpprlPapx = entryProperties;
-        _numberText = numberText.toCharArray();
+        _xst = numberText.toCharArray();
     }
 
     public boolean equals( Object obj )
@@ -109,7 +96,7 @@ public final class ListLevel
         return lvl._lvlf.equals( this._lvlf )
                 && Arrays.equals( lvl._grpprlChpx, _grpprlChpx )
                 && Arrays.equals( lvl._grpprlPapx, _grpprlPapx )
-                && Arrays.equals( lvl._numberText, _numberText );
+                && Arrays.equals( lvl._xst, _xst );
     }
 
     /**
@@ -145,21 +132,17 @@ public final class ListLevel
 
     public String getNumberText()
     {
-        if ( _numberText == null )
+        if ( _xst.length < 2 )
             return null;
 
-        return new String( _numberText );
+        return new String( _xst, 0, _xst.length - 1 );
     }
 
     public int getSizeInBytes()
     {
-        int result = LVLF.getSize() + _lvlf.getCbGrpprlChpx()
-                + _lvlf.getCbGrpprlPapx() + 2; // numberText length
-        if ( _numberText != null )
-        {
-            result += _numberText.length * LittleEndian.SHORT_SIZE;
-        }
-        return result;
+        return LVLF.getSize() + _lvlf.getCbGrpprlChpx()
+                + _lvlf.getCbGrpprlPapx() + LittleEndian.SHORT_SIZE
+                + _xst.length * LittleEndian.SHORT_SIZE;
     }
 
     public int getStartAt()
@@ -175,6 +158,74 @@ public final class ListLevel
         return _lvlf.getIxchFollow();
     }
 
+    int read( final byte[] data, final int startOffset )
+    {
+        int offset = startOffset;
+
+        _lvlf = new LVLF( data, offset );
+        offset += LVLF.getSize();
+
+        _grpprlPapx = new byte[_lvlf.getCbGrpprlPapx()];
+        System.arraycopy( data, offset, _grpprlPapx, 0, _lvlf.getCbGrpprlPapx() );
+        offset += _lvlf.getCbGrpprlPapx();
+
+        _grpprlChpx = new byte[_lvlf.getCbGrpprlChpx()];
+        System.arraycopy( data, offset, _grpprlChpx, 0, _lvlf.getCbGrpprlChpx() );
+        offset += _lvlf.getCbGrpprlChpx();
+
+        /*
+         * "If this level uses bullets (see lvlf.nfc), the cch field of this Xst
+         * MUST be equal to 0x0001, and this MUST NOT contain any placeholders."
+         * -- page 389 of 621 -- [MS-DOC] -- v20110315 Word (.doc) Binary File
+         * Format
+         */
+        if ( _lvlf.getNfc() == 0x17 )
+        {
+            int cch = LittleEndian.getUShort( data, offset );
+            offset += LittleEndian.SHORT_SIZE;
+
+            if ( cch != 1 )
+            {
+                logger.log( POILogger.WARN, "LVL at offset ",
+                        Integer.valueOf( startOffset ),
+                        " has nfc == 0x17 (bullets), but cch != 1 (",
+                        Integer.valueOf( cch ), ")" );
+            }
+
+            _xst = new char[cch];
+            for ( int x = 0; x < cch; x++ )
+            {
+                _xst[x] = (char) LittleEndian.getShort( data, offset );
+                offset += LittleEndian.SHORT_SIZE;
+            }
+        }
+        else
+        {
+            int cch = LittleEndian.getUShort( data, offset );
+            offset += LittleEndian.SHORT_SIZE;
+
+            if ( cch > 0 )
+            {
+                _xst = new char[cch];
+                for ( int x = 0; x < cch; x++ )
+                {
+                    _xst[x] = (char) LittleEndian.getShort( data, offset );
+                    offset += LittleEndian.SHORT_SIZE;
+                }
+            }
+            else
+            {
+                logger.log( POILogger.WARN, "LVL.xst.cch <= 0: ",
+                        Integer.valueOf( cch ) );
+                /* sometimes numberTextLength<0 */
+                /* by derjohng */
+                _xst = new char[] {};
+            }
+        }
+
+        return offset - startOffset;
+    }
+
     public void setAlignment( int alignment )
     {
         _lvlf.setJc( (byte) alignment );
@@ -187,13 +238,12 @@ public final class ListLevel
 
     public void setNumberFormat( int numberFormatCode )
     {
-        _lvlf.setNfc( (short) numberFormatCode );
+        _lvlf.setNfc( (byte) numberFormatCode );
     }
 
     public void setNumberProperties( byte[] grpprl )
     {
         _grpprlChpx = grpprl;
-
     }
 
     public void setStartAt( int startAt )
@@ -221,30 +271,35 @@ public final class ListLevel
         System.arraycopy( _grpprlChpx, 0, buf, offset, _grpprlChpx.length );
         offset += _grpprlChpx.length;
 
-        if ( _numberText == null )
+        if ( _lvlf.getNfc() == 0x17 )
         {
-            // TODO - write junit to test this flow
-            LittleEndian.putUShort( buf, offset, 0 );
+            LittleEndian.putUShort( buf, offset, 1 );
+            offset += LittleEndian.SHORT_SIZE;
+
+            LittleEndian.putUShort( buf, offset, _xst[0] );
+            offset += LittleEndian.SHORT_SIZE;
         }
         else
         {
-            LittleEndian.putUShort( buf, offset, _numberText.length );
+            LittleEndian.putUShort( buf, offset, _xst.length );
             offset += LittleEndian.SHORT_SIZE;
-            for ( int x = 0; x < _numberText.length; x++ )
+            for ( char c : _xst )
             {
-                LittleEndian.putUShort( buf, offset, _numberText[x] );
+                LittleEndian.putUShort( buf, offset, c );
                 offset += LittleEndian.SHORT_SIZE;
             }
         }
+
         return buf;
     }
 
     @Override
     public String toString()
     {
-        return "ListLevel: " + ( "\n" + _lvlf ).replaceAll( "\n", "\n    " )
+        return "LVL: " + ( "\n" + _lvlf ).replaceAll( "\n", "\n    " )
                 + "\n"
                 + ( "PAPX's grpprl: " + Arrays.toString( _grpprlPapx ) + "\n" )
-                + ( "CHPX's grpprl: " + Arrays.toString( _grpprlChpx ) + "\n" );
+                + ( "CHPX's grpprl: " + Arrays.toString( _grpprlChpx ) + "\n" )
+                + ( "xst: " + Arrays.toString( _xst ) + "\n" );
     }
 }

@@ -22,9 +22,6 @@ package org.apache.poi.xslf.usermodel;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.sl.usermodel.Shape;
-import org.apache.poi.sl.usermodel.ShapeContainer;
-import org.apache.poi.sl.usermodel.ShapeGroup;
 import org.apache.poi.util.Beta;
 import org.apache.poi.util.Units;
 import org.apache.xmlbeans.XmlObject;
@@ -38,6 +35,8 @@ import org.openxmlformats.schemas.presentationml.x2006.main.CTGroupShape;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTGroupShapeNonVisual;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -63,10 +62,12 @@ public class XSLFGroupShape extends XSLFShape {
         _spPr = shape.getGrpSpPr();
     }
 
+    @Override
     public CTGroupShape getXmlObject(){
         return _shape;
     }
 
+    @Override
     public Rectangle2D getAnchor(){
         CTGroupTransform2D xfrm = _spPr.getXfrm();
         CTPoint2D off = xfrm.getOff();
@@ -80,6 +81,7 @@ public class XSLFGroupShape extends XSLFShape {
                 Units.toPoints(cx), Units.toPoints(cy));
     }
 
+    @Override
     public void setAnchor(Rectangle2D anchor){
         CTGroupTransform2D xfrm = _spPr.isSetXfrm() ? _spPr.getXfrm() : _spPr.addNewXfrm();
         CTPoint2D off = xfrm.isSetOff() ? xfrm.getOff() : xfrm.addNewOff();
@@ -94,6 +96,12 @@ public class XSLFGroupShape extends XSLFShape {
         ext.setCy(cy);
     }
 
+    /**
+     *
+     * @return the coordinates of the child extents rectangle
+     * used for calculations of grouping, scaling, and rotation
+     * behavior of shapes placed within a group.
+     */
     public Rectangle2D getInteriorAnchor(){
         CTGroupTransform2D xfrm = _spPr.getXfrm();
         CTPoint2D off = xfrm.getChOff();
@@ -107,6 +115,12 @@ public class XSLFGroupShape extends XSLFShape {
                 Units.toPoints(cx), Units.toPoints(cy));
     }
 
+    /**
+     *
+     * @param anchor the coordinates of the child extents rectangle
+     * used for calculations of grouping, scaling, and rotation
+     * behavior of shapes placed within a group.
+     */
     public void setInteriorAnchor(Rectangle2D anchor){
         CTGroupTransform2D xfrm = _spPr.isSetXfrm() ? _spPr.getXfrm() : _spPr.addNewXfrm();
         CTPoint2D off = xfrm.isSetChOff() ? xfrm.getChOff() : xfrm.addNewChOff();
@@ -121,10 +135,17 @@ public class XSLFGroupShape extends XSLFShape {
         ext.setCy(cy);
     }
 
+    /**
+     *
+     * @return child shapes contained witin this group
+     */
     public XSLFShape[] getShapes(){
         return _shapes.toArray(new XSLFShape[_shapes.size()]);
     }
 
+    /**
+     * Remove the specified shape from this group
+     */
     public boolean removeShape(XSLFShape xShape) {
         XmlObject obj = xShape.getXmlObject();
         if(obj instanceof CTShape){
@@ -139,10 +160,12 @@ public class XSLFGroupShape extends XSLFShape {
         return _shapes.remove(xShape);
     }
 
+    @Override
     public String getShapeName(){
         return _shape.getNvGrpSpPr().getCNvPr().getName();
     }
 
+    @Override
     public int getShapeId(){
         return (int)_shape.getNvGrpSpPr().getCNvPr().getId();
     }
@@ -204,9 +227,13 @@ public class XSLFGroupShape extends XSLFShape {
     public XSLFPictureShape createPicture(int pictureIndex){
 
         List<PackagePart>  pics = _sheet.getPackagePart().getPackage()
-                .getPartsByName(Pattern.compile("/ppt/media/.*?"));
+                .getPartsByName(Pattern.compile("/ppt/media/image" + (pictureIndex + 1) + ".*?"));
 
-        PackagePart pic = pics.get(pictureIndex);
+        if(pics.size() == 0) {
+            throw new IllegalArgumentException("Picture with index=" + pictureIndex + " was not found");
+        }
+
+        PackagePart pic = pics.get(0);
 
         PackageRelationship rel = _sheet.getPackagePart().addRelationship(
                 pic.getPartName(), TargetMode.INTERNAL, XSLFRelation.IMAGES.getRelation());
@@ -215,6 +242,71 @@ public class XSLFGroupShape extends XSLFShape {
         sh.resize();
         _shapes.add(sh);
         return sh;
+    }
+
+    @Override
+    public void setFlipHorizontal(boolean flip){
+        _spPr.getXfrm().setFlipH(flip);
+    }
+
+    @Override
+    public void setFlipVertical(boolean flip){
+        _spPr.getXfrm().setFlipV(flip);
+    }
+
+    @Override
+    public boolean getFlipHorizontal(){
+         return _spPr.getXfrm().getFlipH();
+    }
+
+    @Override
+    public boolean getFlipVertical(){
+         return _spPr.getXfrm().getFlipV();
+    }
+
+    @Override
+    public void setRotation(double theta){
+        _spPr.getXfrm().setRot((int)(theta*60000));
+    }
+
+    @Override
+    public double getRotation(){
+        return (double)_spPr.getXfrm().getRot()/60000;
+    }
+
+    @Override
+    public void draw(Graphics2D graphics){
+
+    	// the coordinate system of this group of shape
+        Rectangle2D interior = getInteriorAnchor();
+        // anchor of this group relative to the parent shape
+        Rectangle2D exterior = getAnchor();
+
+        AffineTransform tx = (AffineTransform)graphics.getRenderingHint(XSLFRenderingHint.GROUP_TRANSFORM);
+        AffineTransform tx0 = new AffineTransform(tx);
+
+        double scaleX = interior.getWidth() == 0. ? 1.0 : exterior.getWidth() / interior.getWidth();
+        double scaleY = interior.getHeight() == 0. ? 1.0 : exterior.getHeight() / interior.getHeight();
+
+        tx.translate(exterior.getX(), exterior.getY());
+        tx.scale(scaleX, scaleY);
+        tx.translate(-interior.getX(), -interior.getY());
+
+        for (XSLFShape shape : getShapes()) {
+        	// remember the initial transform and restore it after we are done with the drawing
+        	AffineTransform at = graphics.getTransform();
+            graphics.setRenderingHint(XSLFRenderingHint.GSAVE, true);
+
+            shape.applyTransform(graphics);
+        	shape.draw(graphics);
+
+            // restore the coordinate system
+            graphics.setTransform(at);
+            graphics.setRenderingHint(XSLFRenderingHint.GRESTORE, true);
+        }
+
+        graphics.setRenderingHint(XSLFRenderingHint.GROUP_TRANSFORM, tx0);
+        
     }
 
 }

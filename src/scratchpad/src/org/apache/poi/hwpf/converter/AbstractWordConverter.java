@@ -49,6 +49,7 @@ import org.apache.poi.hwpf.usermodel.TableCell;
 import org.apache.poi.hwpf.usermodel.TableRow;
 import org.apache.poi.poifs.filesystem.Entry;
 import org.apache.poi.util.Beta;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 import org.w3c.dom.Document;
@@ -57,6 +58,21 @@ import org.w3c.dom.Element;
 @Beta
 public abstract class AbstractWordConverter
 {
+    private static class DeadFieldBoundaries
+    {
+        final int beginMark;
+        final int endMark;
+        final int separatorMark;
+
+        public DeadFieldBoundaries( int beginMark, int separatorMark,
+                int endMark )
+        {
+            this.beginMark = beginMark;
+            this.separatorMark = separatorMark;
+            this.endMark = endMark;
+        }
+    }
+
     private static final class Structure implements Comparable<Structure>
     {
         final int end;
@@ -68,6 +84,13 @@ public abstract class AbstractWordConverter
             this.start = bookmark.getStart();
             this.end = bookmark.getEnd();
             this.structure = bookmark;
+        }
+
+        Structure( DeadFieldBoundaries deadFieldBoundaries, int start, int end )
+        {
+            this.start = start;
+            this.end = end;
+            this.structure = deadFieldBoundaries;
         }
 
         Structure( Field field )
@@ -100,6 +123,15 @@ public abstract class AbstractWordConverter
 
     private static final POILogger logger = POILogFactory
             .getLogger( AbstractWordConverter.class );
+
+    private static final Pattern PATTERN_HYPERLINK_EXTERNAL = Pattern
+            .compile( "^[ \\t\\r\\n]*HYPERLINK \"(.*)\".*$" );
+
+    private static final Pattern PATTERN_HYPERLINK_LOCAL = Pattern
+            .compile( "^[ \\t\\r\\n]*HYPERLINK \\\\l \"(.*)\"[ ](.*)$" );
+
+    private static final Pattern PATTERN_PAGEREF = Pattern
+            .compile( "^[ \\t\\r\\n]*PAGEREF ([^ ]*)[ \\t\\r\\n]*\\\\h.*$" );
 
     private static final byte SPECCHAR_AUTONUMBERED_FOOTNOTE_REFERENCE = 2;
 
@@ -290,17 +322,42 @@ public abstract class AbstractWordConverter
             }
 
             // TODO: dead fields?
+            int skipUntil = -1;
             for ( int c = 0; c < range.numCharacterRuns(); c++ )
             {
                 CharacterRun characterRun = range.getCharacterRun( c );
                 if ( characterRun == null )
                     throw new AssertionError();
+                if ( characterRun.getStartOffset() < skipUntil )
+                    continue;
+                String text = characterRun.text();
+                if ( text == null || text.length() == 0
+                        || text.charAt( 0 ) != FIELD_BEGIN_MARK )
+                    continue;
+
                 Field aliveField = ( (HWPFDocument) wordDocument ).getFields()
                         .getFieldByStartOffset( FieldsDocumentPart.MAIN,
                                 characterRun.getStartOffset() );
                 if ( aliveField != null )
                 {
                     addToStructures( structures, new Structure( aliveField ) );
+                }
+                else
+                {
+                    int[] separatorEnd = tryDeadField_lookupFieldSeparatorEnd(
+                            wordDocument, range, c );
+                    if ( separatorEnd != null )
+                    {
+                        addToStructures(
+                                structures,
+                                new Structure( new DeadFieldBoundaries( c,
+                                        separatorEnd[0], separatorEnd[1] ),
+                                        characterRun.getStartOffset(), range
+                                                .getCharacterRun(
+                                                        separatorEnd[1] )
+                                                .getEndOffset() ) );
+                        c = separatorEnd[1];
+                    }
                 }
             }
         }
@@ -368,6 +425,13 @@ public abstract class AbstractWordConverter
                 Field field = (Field) structure.structure;
                 processField( (HWPFDocument) wordDocument, range,
                         currentTableLevel, field, block );
+            }
+            else if ( structure.structure instanceof DeadFieldBoundaries )
+            {
+                DeadFieldBoundaries boundaries = (DeadFieldBoundaries) structure.structure;
+                processDeadField( wordDocument, block, range,
+                        currentTableLevel, boundaries.beginMark,
+                        boundaries.separatorMark, boundaries.endMark );
             }
             else
             {
@@ -561,6 +625,39 @@ public abstract class AbstractWordConverter
             Element currentBlock, Range range, int currentTableLevel,
             int beginMark, int separatorMark, int endMark )
     {
+        if ( beginMark + 1 < separatorMark && separatorMark + 1 < endMark )
+        {
+            Range formulaRange = new Range( range.getCharacterRun(
+                    beginMark + 1 ).getStartOffset(), range.getCharacterRun(
+                    separatorMark - 1 ).getEndOffset(), range )
+            {
+                @Override
+                public String toString()
+                {
+                    return "Dead field formula subrange: " + super.toString();
+                }
+            };
+            Range valueRange = new Range( range.getCharacterRun(
+                    separatorMark + 1 ).getStartOffset(), range
+                    .getCharacterRun( endMark - 1 ).getEndOffset(), range )
+            {
+                @Override
+                public String toString()
+                {
+                    return "Dead field value subrange: " + super.toString();
+                }
+            };
+            String formula = formulaRange.text();
+            final Matcher matcher = PATTERN_HYPERLINK_LOCAL.matcher( formula );
+            if ( matcher.matches() )
+            {
+                String localref = matcher.group( 1 );
+                processPageref( wordDocument, currentBlock, valueRange,
+                        currentTableLevel, localref );
+                return;
+            }
+        }
+
         StringBuilder debug = new StringBuilder( "Unsupported field type: \n" );
         for ( int i = beginMark; i <= endMark; i++ )
         {
@@ -587,25 +684,6 @@ public abstract class AbstractWordConverter
                     deadFieldValueSubrage, currentBlock );
 
         return;
-    }
-
-    protected Field processDeadField( HWPFDocumentCore wordDocument,
-            Range charactersRange, int currentTableLevel, int startOffset,
-            Element currentBlock )
-    {
-        if ( !( wordDocument instanceof HWPFDocument ) )
-            return null;
-
-        HWPFDocument hwpfDocument = (HWPFDocument) wordDocument;
-        Field field = hwpfDocument.getFields().getFieldByStartOffset(
-                FieldsDocumentPart.MAIN, startOffset );
-        if ( field == null )
-            return null;
-
-        processField( hwpfDocument, charactersRange, currentTableLevel, field,
-                currentBlock );
-
-        return field;
     }
 
     public void processDocument( HWPFDocumentCore wordDocument )
@@ -672,9 +750,16 @@ public abstract class AbstractWordConverter
             // usual shape?
             return;
 
+        float width = ( officeDrawing.getRectangleRight() - officeDrawing
+                .getRectangleLeft() ) / AbstractWordUtils.TWIPS_PER_INCH;
+        float height = ( officeDrawing.getRectangleBottom() - officeDrawing
+                .getRectangleTop() ) / AbstractWordUtils.TWIPS_PER_INCH;
+
         final PictureType type = PictureType.findMatchingType( pictureData );
-        String path = getPicturesManager().savePicture( pictureData, type,
-                "s" + characterRun.getStartOffset() + "." + type );
+        String path = getPicturesManager()
+                .savePicture( pictureData, type,
+                        "s" + characterRun.getStartOffset() + "." + type,
+                        width, height );
 
         processDrawnObject( doc, characterRun, officeDrawing, path, block );
     }
@@ -698,9 +783,7 @@ public abstract class AbstractWordConverter
             if ( firstSubrange != null )
             {
                 String formula = firstSubrange.text();
-                Pattern pagerefPattern = Pattern
-                        .compile( "[ \\t\\r\\n]*PAGEREF ([^ ]*)[ \\t\\r\\n]*\\\\h[ \\t\\r\\n]*" );
-                Matcher matcher = pagerefPattern.matcher( formula );
+                Matcher matcher = PATTERN_PAGEREF.matcher( formula );
                 if ( matcher.find() )
                 {
                     String pageref = matcher.group( 1 );
@@ -748,14 +831,36 @@ public abstract class AbstractWordConverter
             if ( firstSubrange != null )
             {
                 String formula = firstSubrange.text();
-                Pattern hyperlinkPattern = Pattern
-                        .compile( "[ \\t\\r\\n]*HYPERLINK \"(.*)\"[ \\t\\r\\n]*" );
-                Matcher matcher = hyperlinkPattern.matcher( formula );
-                if ( matcher.find() )
+                Matcher matcher = PATTERN_HYPERLINK_EXTERNAL.matcher( formula );
+                if ( matcher.matches() )
                 {
                     String hyperlink = matcher.group( 1 );
                     processHyperlink( wordDocument, currentBlock,
                             field.secondSubrange( parentRange ),
+                            currentTableLevel, hyperlink );
+                    return;
+                }
+                matcher.usePattern( PATTERN_HYPERLINK_LOCAL );
+                if ( matcher.matches() )
+                {
+                    String hyperlink = matcher.group( 1 );
+                    Range textRange = null;
+                    String text = matcher.group( 2 );
+                    if ( AbstractWordUtils.isNotEmpty( text ) )
+                    {
+                        textRange = new Range( firstSubrange.getStartOffset()
+                                + matcher.start( 2 ),
+                                firstSubrange.getStartOffset()
+                                        + matcher.end( 2 ), firstSubrange )
+                        {
+                            @Override
+                            public String toString()
+                            {
+                                return "Local hyperlink text";
+                            }
+                        };
+                    }
+                    processPageref( wordDocument, currentBlock, textRange,
                             currentTableLevel, hyperlink );
                     return;
                 }
@@ -778,8 +883,43 @@ public abstract class AbstractWordConverter
             Element currentBlock, Range textRange, int currentTableLevel,
             String hyperlink );
 
+    protected void processImage( Element currentBlock, boolean inlined,
+            Picture picture )
+    {
+        PicturesManager fileManager = getPicturesManager();
+        if ( fileManager != null )
+        {
+            final int aspectRatioX = picture.getHorizontalScalingFactor();
+            final int aspectRatioY = picture.getVerticalScalingFactor();
+
+            final float imageWidth = aspectRatioX > 0 ? picture.getDxaGoal()
+                    * aspectRatioX / 1000 / AbstractWordUtils.TWIPS_PER_INCH
+                    : picture.getDxaGoal() / AbstractWordUtils.TWIPS_PER_INCH;
+            final float imageHeight = aspectRatioY > 0 ? picture.getDyaGoal()
+                    * aspectRatioY / 1000 / AbstractWordUtils.TWIPS_PER_INCH
+                    : picture.getDyaGoal() / AbstractWordUtils.TWIPS_PER_INCH;
+
+            String url = fileManager.savePicture( picture.getContent(),
+                    picture.suggestPictureType(),
+                    picture.suggestFullFileName(), imageWidth, imageHeight );
+
+            if ( WordToFoUtils.isNotEmpty( url ) )
+            {
+                processImage( currentBlock, inlined, picture, url );
+                return;
+            }
+        }
+
+        processImageWithoutPicturesManager( currentBlock, inlined, picture );
+
+    }
+
     protected abstract void processImage( Element currentBlock,
-            boolean inlined, Picture picture );
+            boolean inlined, Picture picture, String url );
+
+    @Internal
+    protected abstract void processImageWithoutPicturesManager(
+            Element currentBlock, boolean inlined, Picture picture );
 
     protected abstract void processLineBreak( Element block,
             CharacterRun characterRun );
@@ -979,6 +1119,20 @@ public abstract class AbstractWordConverter
     protected int tryDeadField( HWPFDocumentCore wordDocument, Range range,
             int currentTableLevel, int beginMark, Element currentBlock )
     {
+        int[] separatorEnd = tryDeadField_lookupFieldSeparatorEnd(
+                wordDocument, range, beginMark );
+        if ( separatorEnd == null )
+            return beginMark;
+
+        processDeadField( wordDocument, currentBlock, range, currentTableLevel,
+                beginMark, separatorEnd[0], separatorEnd[1] );
+
+        return separatorEnd[1];
+    }
+
+    private int[] tryDeadField_lookupFieldSeparatorEnd(
+            HWPFDocumentCore wordDocument, Range range, int beginMark )
+    {
         int separatorMark = -1;
         int endMark = -1;
         for ( int c = beginMark + 1; c < range.numCharacterRuns(); c++ )
@@ -989,28 +1143,24 @@ public abstract class AbstractWordConverter
             if ( text.getBytes().length == 0 )
                 continue;
 
-            if ( text.getBytes()[0] == FIELD_BEGIN_MARK )
+            final byte firstByte = text.getBytes()[0];
+            if ( firstByte == FIELD_BEGIN_MARK )
             {
-                // nested?
-                Field possibleField = processDeadField( wordDocument, range,
-                        currentTableLevel, characterRun.getStartOffset(),
-                        currentBlock );
-                if ( possibleField != null )
+                int[] nested = tryDeadField_lookupFieldSeparatorEnd(
+                        wordDocument, range, c );
+                if ( nested != null )
                 {
-                    c = possibleField.getFieldEndOffset();
+                    c = nested[1];
                 }
-                else
-                {
-                    continue;
-                }
+                continue;
             }
 
-            if ( text.getBytes()[0] == FIELD_SEPARATOR_MARK )
+            if ( firstByte == FIELD_SEPARATOR_MARK )
             {
                 if ( separatorMark != -1 )
                 {
-                    // double;
-                    return beginMark;
+                    // double; incorrect format
+                    return null;
                 }
 
                 separatorMark = c;
@@ -1022,22 +1172,18 @@ public abstract class AbstractWordConverter
                 if ( endMark != -1 )
                 {
                     // double;
-                    return beginMark;
+                    return null;
                 }
 
                 endMark = c;
                 break;
             }
-
         }
 
         if ( separatorMark == -1 || endMark == -1 )
-            return beginMark;
+            return null;
 
-        processDeadField( wordDocument, currentBlock, range, currentTableLevel,
-                beginMark, separatorMark, endMark );
-
-        return endMark;
+        return new int[] { separatorMark, endMark };
     }
 
 }

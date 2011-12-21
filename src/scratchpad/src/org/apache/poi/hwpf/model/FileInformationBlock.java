@@ -22,47 +22,201 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
+import org.apache.poi.EncryptedDocumentException;
+
 import org.apache.poi.hwpf.model.io.HWPFOutputStream;
-import org.apache.poi.hwpf.model.types.FIBAbstractType;
 import org.apache.poi.util.Internal;
+import org.apache.poi.util.LittleEndian;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
 
 /**
  * The File Information Block (FIB). Holds pointers
  *  to various bits of the file, and lots of flags which
  *  specify properties of the document.
  *
- * The parent class, {@link FIBAbstractType}, holds the
- *  first 32 bytes, which make up the FibBase.
+ * The {@link FibBase} class, holds the
+ *  first 32 bytes.
  * The next part, the fibRgW / FibRgW97, is handled
- *  by {@link FIBShortHandler}.
+ *  by {@link FibRgW97}.
  * The next part, the fibRgLw / The FibRgLw97, is
- *  handled by the {@link FIBLongHandler}.
+ *  handled by the {@link FibRgLw}.
  * Finally, the rest of the fields are handled by
  *  the {@link FIBFieldHandler}.
  *
  * @author  andy
  */
 @Internal
-public final class FileInformationBlock extends FIBAbstractType
-  implements Cloneable
+public final class FileInformationBlock implements Cloneable
 {
+    public static final POILogger logger = POILogFactory
+            .getLogger( FileInformationBlock.class );
 
-    FIBLongHandler _longHandler;
-    FIBShortHandler _shortHandler;
-    FIBFieldHandler _fieldHandler;
+    private FibBase _fibBase;
+    private int _csw;
+    private FibRgW97 _fibRgW;
+    private int _cslw;
+    private FibRgLw _fibRgLw;
+    private int _cbRgFcLcb;
+    private FIBFieldHandler _fieldHandler;
+    private int _cswNew;
+    private int _nFibNew;
+    private byte[] _fibRgCswNew;
 
     /** Creates a new instance of FileInformationBlock */
-    public FileInformationBlock(byte[] mainDocument)
+    public FileInformationBlock( byte[] mainDocument )
     {
-        fillFields(mainDocument, 0);
+        int offset = 0;
+
+        _fibBase = new FibBase( mainDocument, offset );
+        offset = FibBase.getSize();
+        assert offset == 32;
+
+        if ( _fibBase.isFEncrypted() )
+        {
+            throw new EncryptedDocumentException(
+                    "Cannot process encrypted word file" );
+        }
+
+        _csw = LittleEndian.getUShort( mainDocument, offset );
+        offset += LittleEndian.SHORT_SIZE;
+        assert offset == 34;
+
+        _fibRgW = new FibRgW97( mainDocument, offset );
+        offset += FibRgW97.getSize();
+        assert offset == 62;
+
+        _cslw = LittleEndian.getUShort( mainDocument, offset );
+        offset += LittleEndian.SHORT_SIZE;
+        assert offset == 64;
+
+        if ( _fibBase.getNFib() < 105 )
+        {
+            _fibRgLw = new FibRgLw95( mainDocument, offset );
+            offset += FibRgLw97.getSize();
+
+            // magic number, run tests after changes
+            _cbRgFcLcb = 74;
+
+            // skip fibRgFcLcbBlob (read later at fillVariableFields)
+            offset += _cbRgFcLcb * LittleEndian.INT_SIZE * 2;
+
+            _cswNew = LittleEndian.getUShort( mainDocument, offset );
+            offset += LittleEndian.SHORT_SIZE;
+
+            _cswNew = 0;
+            _nFibNew = -1;
+            _fibRgCswNew = new byte[0];
+
+            return;
+        }
+
+        _fibRgLw = new FibRgLw97( mainDocument, offset );
+        offset += FibRgLw97.getSize();
+        assert offset == 152;
+
+        _cbRgFcLcb = LittleEndian.getUShort( mainDocument, offset );
+        offset += LittleEndian.SHORT_SIZE;
+        assert offset == 154;
+
+        // skip fibRgFcLcbBlob (read later at fillVariableFields)
+        offset += _cbRgFcLcb * LittleEndian.INT_SIZE * 2;
+
+        _cswNew = LittleEndian.getUShort( mainDocument, offset );
+        offset += LittleEndian.SHORT_SIZE;
+
+        if ( _cswNew != 0 )
+        {
+            _nFibNew = LittleEndian.getUShort( mainDocument, offset );
+            offset += LittleEndian.SHORT_SIZE;
+
+            // first short is already read as _nFibNew
+            final int fibRgCswNewLength = ( _cswNew - 1 )
+                    * LittleEndian.SHORT_SIZE;
+            _fibRgCswNew = new byte[fibRgCswNewLength];
+            LittleEndian.getByteArray( mainDocument, offset, fibRgCswNewLength );
+            offset += fibRgCswNewLength;
+        }
+        else
+        {
+            _nFibNew = -1;
+            _fibRgCswNew = new byte[0];
+        }
+
+        assertCbRgFcLcb();
+        assertCswNew();
+    }
+
+    private void assertCbRgFcLcb()
+    {
+        switch ( getNFib() )
+        {
+        case 0x00C1:
+            assertCbRgFcLcb( "0x00C1", 0x005D, "0x005D", _cbRgFcLcb );
+            break;
+        case 0x00D9:
+            assertCbRgFcLcb( "0x00D9", 0x006C, "0x006C", _cbRgFcLcb );
+            break;
+        case 0x0101:
+            assertCbRgFcLcb( "0x0101", 0x0088, "0x0088", _cbRgFcLcb );
+            break;
+        case 0x010C:
+            assertCbRgFcLcb( "0x010C", 0x00A4, "0x00A4", _cbRgFcLcb );
+            break;
+        case 0x0112:
+            assertCbRgFcLcb( "0x0112", 0x00B7, "0x00B7", _cbRgFcLcb );
+            break;
+        }
+    }
+
+    private static void assertCbRgFcLcb( final String strNFib,
+            final int expectedCbRgFcLcb, final String strCbRgFcLcb,
+            final int cbRgFcLcb )
+    {
+        if ( cbRgFcLcb == expectedCbRgFcLcb )
+            return;
+
+        logger.log( POILogger.WARN, "Since FIB.nFib == ", strNFib,
+                " value of FIB.cbRgFcLcb MUST be ", strCbRgFcLcb + ", not 0x",
+                Integer.toHexString( cbRgFcLcb ) );
+    }
+
+    private void assertCswNew()
+    {
+        switch ( getNFib() )
+        {
+        case 0x00C1:
+            assertCswNew( "0x00C1", 0x0000, "0x0000", _cswNew );
+            break;
+        case 0x00D9:
+            assertCswNew( "0x00D9", 0x0002, "0x0002", _cswNew );
+            break;
+        case 0x0101:
+            assertCswNew( "0x0101", 0x0002, "0x0002", _cswNew );
+            break;
+        case 0x010C:
+            assertCswNew( "0x010C", 0x0002, "0x0002", _cswNew );
+            break;
+        case 0x0112:
+            assertCswNew( "0x0112", 0x0005, "0x0005", _cswNew );
+            break;
+        }
+    }
+
+    private static void assertCswNew( final String strNFib,
+            final int expectedCswNew, final String strExpectedCswNew,
+            final int cswNew )
+    {
+        if ( cswNew == expectedCswNew )
+            return;
+
+        logger.log( POILogger.WARN, "Since FIB.nFib == ", strNFib,
+                " value of FIB.cswNew MUST be ",
+                strExpectedCswNew + ", not 0x", Integer.toHexString( cswNew ) );
     }
 
     public void fillVariableFields( byte[] mainDocument, byte[] tableStream )
     {
-        _shortHandler = new FIBShortHandler( mainDocument );
-        _longHandler = new FIBLongHandler( mainDocument, FIBShortHandler.START
-                + _shortHandler.sizeInBytes() );
-
         /*
          * Listed fields won't be treat as UnhandledDataStructure. For all other
          * fields FIBFieldHandler will load it content into
@@ -101,16 +255,15 @@ public final class FileInformationBlock extends FIBAbstractType
         knownFieldSet.add( Integer.valueOf( FIBFieldHandler.STTBSAVEDBY ) );
         knownFieldSet.add( Integer.valueOf( FIBFieldHandler.MODIFIED ) );
 
-        _fieldHandler = new FIBFieldHandler( mainDocument,
-                FIBShortHandler.START + _shortHandler.sizeInBytes()
-                        + _longHandler.sizeInBytes(), tableStream,
-                knownFieldSet, true );
+        _fieldHandler = new FIBFieldHandler( mainDocument, 154, _cbRgFcLcb,
+                tableStream, knownFieldSet, true );
     }
 
     @Override
     public String toString()
     {
-        StringBuilder stringBuilder = new StringBuilder( super.toString() );
+        StringBuilder stringBuilder = new StringBuilder(  );
+        stringBuilder.append( _fibBase );
         stringBuilder.append( "[FIB2]\n" );
         stringBuilder.append( "\tSubdocuments info:\n" );
         for ( SubdocumentType type : SubdocumentType.values() )
@@ -174,6 +327,14 @@ public final class FileInformationBlock extends FIBAbstractType
         }
         stringBuilder.append( "[/FIB2]\n" );
         return stringBuilder.toString();
+    }
+
+    public int getNFib()
+    {
+        if ( _cswNew == 0 )
+            return _fibBase.getNFib();
+
+        return _nFibNew;
     }
 
     public int getFcDop()
@@ -523,16 +684,18 @@ public final class FileInformationBlock extends FIBAbstractType
     /**
      * How many bytes of the main stream contain real data.
      */
-    public int getCbMac() {
-       return _longHandler.getLong(FIBLongHandler.CBMAC);
+    public int getCbMac()
+    {
+        return _fibRgLw.getCbMac();
     }
 
     /**
      * Updates the count of the number of bytes in the
      * main stream which contain real data
      */
-    public void setCbMac(int cbMac) {
-       _longHandler.setLong(FIBLongHandler.CBMAC, cbMac);
+    public void setCbMac( int cbMac )
+    {
+        _fibRgLw.setCbMac( cbMac );
     }
 
     /**
@@ -543,7 +706,7 @@ public final class FileInformationBlock extends FIBAbstractType
         if ( type == null )
             throw new IllegalArgumentException( "argument 'type' is null" );
 
-        return _longHandler.getLong( type.getFibLongFieldIndex() );
+        return _fibRgLw.getSubdocumentTextStreamLength( type );
     }
 
     public void setSubdocumentTextStreamLength( SubdocumentType type, int length )
@@ -556,119 +719,8 @@ public final class FileInformationBlock extends FIBAbstractType
                             + length + "). " + "If there is no subdocument "
                             + "length must be set to zero." );
 
-        _longHandler.setLong( type.getFibLongFieldIndex(), length );
+        _fibRgLw.setSubdocumentTextStreamLength( type, length );
     }
-
-    /**
-     * The count of CPs in the main document
-     */
-    @Deprecated
-    public int getCcpText() {
-       return _longHandler.getLong(FIBLongHandler.CCPTEXT);
-    }
-    /**
-     * Updates the count of CPs in the main document
-     */
-    @Deprecated
-    public void setCcpText(int ccpText) {
-       _longHandler.setLong(FIBLongHandler.CCPTEXT, ccpText);
-    }
-
-    /**
-     * The count of CPs in the footnote subdocument
-     */
-    @Deprecated
-    public int getCcpFtn() {
-       return _longHandler.getLong(FIBLongHandler.CCPFTN);
-    }
-    /**
-     * Updates the count of CPs in the footnote subdocument
-     */
-    @Deprecated
-    public void setCcpFtn(int ccpFtn) {
-       _longHandler.setLong(FIBLongHandler.CCPFTN, ccpFtn);
-    }
-
-    /**
-     * The count of CPs in the header story subdocument
-     */
-    @Deprecated
-    public int getCcpHdd() {
-       return _longHandler.getLong(FIBLongHandler.CCPHDD);
-    }
-    /**
-     * Updates the count of CPs in the header story subdocument
-     */
-    @Deprecated
-    public void setCcpHdd(int ccpHdd) {
-       _longHandler.setLong(FIBLongHandler.CCPHDD, ccpHdd);
-    }
-
-    /**
-     * The count of CPs in the comments (atn) subdocument
-     */
-    @Deprecated
-    public int getCcpAtn() {
-       return _longHandler.getLong(FIBLongHandler.CCPATN);
-    }
-
-    @Deprecated
-    public int getCcpCommentAtn() {
-       return getCcpAtn();
-    }
-    /**
-     * Updates the count of CPs in the comments (atn) story subdocument
-     */
-    @Deprecated
-    public void setCcpAtn(int ccpAtn) {
-       _longHandler.setLong(FIBLongHandler.CCPATN, ccpAtn);
-    }
-
-    /**
-     * The count of CPs in the end note subdocument
-     */
-    @Deprecated
-    public int getCcpEdn() {
-       return _longHandler.getLong(FIBLongHandler.CCPEDN);
-    }
-    /**
-     * Updates the count of CPs in the end note subdocument
-     */
-    @Deprecated
-    public void setCcpEdn(int ccpEdn) {
-       _longHandler.setLong(FIBLongHandler.CCPEDN, ccpEdn);
-    }
-
-    /**
-     * The count of CPs in the main document textboxes
-     */
-    @Deprecated
-    public int getCcpTxtBx() {
-       return _longHandler.getLong(FIBLongHandler.CCPTXBX);
-    }
-    /**
-     * Updates the count of CPs in the main document textboxes
-     */
-    @Deprecated
-    public void setCcpTxtBx(int ccpTxtBx) {
-       _longHandler.setLong(FIBLongHandler.CCPTXBX, ccpTxtBx);
-    }
-
-    /**
-     * The count of CPs in the header textboxes
-     */
-    @Deprecated
-    public int getCcpHdrTxtBx() {
-       return _longHandler.getLong(FIBLongHandler.CCPHDRTXBX);
-    }
-    /**
-     * Updates the count of CPs in the header textboxes
-     */
-    @Deprecated
-    public void setCcpHdrTxtBx(int ccpTxtBx) {
-       _longHandler.setLong(FIBLongHandler.CCPHDRTXBX, ccpTxtBx);
-    }
-
 
     public void clearOffsetsSizes()
     {
@@ -954,38 +1006,54 @@ public final class FileInformationBlock extends FIBAbstractType
                 offset );
     }
 
-    public void writeTo( byte[] mainStream, HWPFOutputStream tableStream)
-      throws IOException
+    public void writeTo( byte[] mainStream, HWPFOutputStream tableStream )
+            throws IOException
     {
-      //HWPFOutputStream mainDocument = sys.getStream("WordDocument");
-      //HWPFOutputStream tableStream = sys.getStream("1Table");
+        _cbRgFcLcb = _fieldHandler.getFieldsCount();
 
-      super.serialize(mainStream, 0);
+        _fibBase.serialize( mainStream, 0 );
+        int offset = FibBase.getSize();
 
-      int size = super.getSize();
-      _shortHandler.serialize(mainStream);
-      _longHandler.serialize(mainStream, size + _shortHandler.sizeInBytes());
-      _fieldHandler.writeTo(mainStream,
-        super.getSize() + _shortHandler.sizeInBytes() + _longHandler.sizeInBytes(), tableStream);
+        LittleEndian.putUShort( mainStream, offset, _csw );
+        offset += LittleEndian.SHORT_SIZE;
 
+        _fibRgW.serialize( mainStream, offset );
+        offset += FibRgW97.getSize();
+
+        LittleEndian.putUShort( mainStream, offset, _cslw );
+        offset += LittleEndian.SHORT_SIZE;
+
+        ( (FibRgLw97) _fibRgLw ).serialize( mainStream, offset );
+        offset += FibRgLw97.getSize();
+
+        LittleEndian.putUShort( mainStream, offset, _cbRgFcLcb );
+        offset += LittleEndian.SHORT_SIZE;
+
+        _fieldHandler.writeTo( mainStream, offset, tableStream );
+        offset += _cbRgFcLcb * LittleEndian.INT_SIZE * 2;
+
+        LittleEndian.putUShort( mainStream, offset, _cswNew );
+        offset += LittleEndian.SHORT_SIZE;
+        if ( _cswNew != 0 )
+        {
+            LittleEndian.putUShort( mainStream, offset, _nFibNew );
+            offset += LittleEndian.SHORT_SIZE;
+
+            System.arraycopy( _fibRgCswNew, 0, mainStream, offset,
+                    _fibRgCswNew.length );
+            offset += _fibRgCswNew.length;
+        }
     }
 
     public int getSize()
     {
-      return super.getSize() + _shortHandler.sizeInBytes() +
-        _longHandler.sizeInBytes() + _fieldHandler.sizeInBytes();
+        return FibBase.getSize() + LittleEndian.SHORT_SIZE + FibRgW97.getSize()
+                + LittleEndian.SHORT_SIZE + FibRgLw97.getSize()
+                + LittleEndian.SHORT_SIZE + _fieldHandler.sizeInBytes();
     }
-//    public Object clone()
-//    {
-//      try
-//      {
-//        return super.clone();
-//      }
-//      catch (CloneNotSupportedException e)
-//      {
-//        e.printStackTrace();
-//        return null;
-//      }
-//    }
 
+    public FibBase getFibBase()
+    {
+        return _fibBase;
+    }
 }
