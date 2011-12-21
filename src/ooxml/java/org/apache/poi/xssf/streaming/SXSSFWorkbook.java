@@ -67,6 +67,11 @@ public class SXSSFWorkbook implements Workbook
     private int _randomAccessWindowSize = DEFAULT_WINDOW_SIZE;
 
     /**
+     * whetehr temp files should be compressed.
+     */
+    private boolean _compressTmpFiles = false;
+
+    /**
      * Construct a new workbook
      */
     public SXSSFWorkbook(){
@@ -99,7 +104,33 @@ public class SXSSFWorkbook implements Workbook
      * @param rowAccessWindowSize
      */
     public SXSSFWorkbook(XSSFWorkbook workbook, int rowAccessWindowSize){
+    	this(workbook,rowAccessWindowSize, false);
+    }
+
+    /**
+     * Constructs an workbook from an existing workbook.
+     * <p>
+     * When a new node is created via createRow() and the total number
+     * of unflushed records would exceed the specified value, then the
+     * row with the lowest index value is flushed and cannot be accessed
+     * via getRow() anymore.
+     * </p>
+     * <p>
+     * A value of -1 indicates unlimited access. In this case all
+     * records that have not been flushed by a call to flush() are available
+     * for random access.
+     * <p>
+     * <p></p>
+     * A value of 0 is not allowed because it would flush any newly created row
+     * without having a chance to specify any cells.
+     * </p>
+     *
+     * @param rowAccessWindowSize
+     * @param compressTmpFiles whether to use gzip compression for temporary files
+     */
+    public SXSSFWorkbook(XSSFWorkbook workbook, int rowAccessWindowSize, boolean compressTmpFiles){
     	setRandomAccessWindowSize(rowAccessWindowSize);
+    	setCompressTempFiles(compressTmpFiles);
     	if (workbook == null)
     	{
     		_wb=new XSSFWorkbook();
@@ -114,7 +145,6 @@ public class SXSSFWorkbook implements Workbook
             }
     	}
     }
-
     /**
      * Construct an empty workbook and specify the window for row access.
      * <p>
@@ -151,6 +181,31 @@ public class SXSSFWorkbook implements Workbook
         _randomAccessWindowSize = rowAccessWindowSize;
     }
 
+    /**
+     * Set whether temp files should be compressed.
+     * <p>
+     *   SXSSF writes sheet data in temporary files (a temp file per-sheet)
+     *   and the size of these temp files can grow to to a very large size,
+     *   e.g. for a 20 MB csv data the size of the temp xml file become few GB large.
+     *   If the "compress" flag is set to <code>true</code> then the temporary XML is gzipped.
+     * </p>
+     * <p>
+     *     Please note the the "compress" option may cause performance penalty.
+     * </p>
+     * @param compress whether to compress temp files
+     */
+    public void setCompressTempFiles(boolean compress){
+        _compressTmpFiles = compress;
+    }
+
+    SheetDataWriter createSheetDataWriter() throws IOException {
+        if(_compressTmpFiles) {
+            return new GZIPSheetDataWriter();
+        } else {
+            return new SheetDataWriter();
+        }
+    }
+
     XSSFSheet getXSSFSheet(SXSSFSheet sheet)
     {
         XSSFSheet result=_sxFromXHash.get(sheet);
@@ -161,7 +216,6 @@ public class SXSSFWorkbook implements Workbook
     SXSSFSheet getSXSSFSheet(XSSFSheet sheet)
     {
         SXSSFSheet result=_xFromSxHash.get(sheet);
-        assert result!=null;
         return result;
     }
 
@@ -187,30 +241,48 @@ public class SXSSFWorkbook implements Workbook
     private void injectData(File zipfile, OutputStream out) throws IOException 
     {
         ZipFile zip = new ZipFile(zipfile);
-
-        ZipOutputStream zos = new ZipOutputStream(out);
-
-        @SuppressWarnings("unchecked")
-        Enumeration<ZipEntry> en = (Enumeration<ZipEntry>) zip.entries();
-        while (en.hasMoreElements()) 
+        try
         {
-            ZipEntry ze = en.nextElement();
-            zos.putNextEntry(new ZipEntry(ze.getName()));
-            InputStream is = zip.getInputStream(ze);
-            XSSFSheet xSheet=getSheetFromZipEntryName(ze.getName());
-            if(xSheet!=null)
+            ZipOutputStream zos = new ZipOutputStream(out);
+            try
             {
-                SXSSFSheet sxSheet=getSXSSFSheet(xSheet);
-                copyStreamAndInjectWorksheet(is,zos,sxSheet.getWorksheetXMLInputStream());
+                @SuppressWarnings("unchecked")
+                Enumeration<ZipEntry> en = (Enumeration<ZipEntry>) zip.entries();
+                while (en.hasMoreElements()) 
+                {
+                    ZipEntry ze = en.nextElement();
+                    zos.putNextEntry(new ZipEntry(ze.getName()));
+                    InputStream is = zip.getInputStream(ze);
+                    XSSFSheet xSheet=getSheetFromZipEntryName(ze.getName());
+                    if(xSheet!=null)
+                    {
+                        SXSSFSheet sxSheet=getSXSSFSheet(xSheet);
+                        InputStream xis = sxSheet.getWorksheetXMLInputStream();
+                        try
+                        {
+                            copyStreamAndInjectWorksheet(is,zos,xis);
+                        }
+                        finally
+                        {
+                            xis.close();
+                        }
+                    }
+                    else
+                    {
+                        copyStream(is, zos);
+                    }
+                    is.close();
+                }
             }
-            else
+            finally
             {
-                copyStream(is, zos);
+                zos.close();
             }
-            is.close();
         }
-
-        zos.close();
+        finally
+        {
+            zip.close();
+        }
     }
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
         byte[] chunk = new byte[1024];
@@ -650,7 +722,7 @@ public class SXSSFWorkbook implements Workbook
     	}
     	
         //Save the template
-        File tmplFile = File.createTempFile("poi-sxxsf-template", ".xlsx");
+        File tmplFile = File.createTempFile("poi-sxssf-template", ".xlsx");
         tmplFile.deleteOnExit();
         FileOutputStream os = new FileOutputStream(tmplFile);
         _wb.write(os);

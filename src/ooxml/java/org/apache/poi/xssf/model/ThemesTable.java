@@ -16,6 +16,13 @@
 ==================================================================== */
 package org.zkoss.poi.xssf.model;
 
+import java.io.IOException;
+
+import org.zkoss.poi.POIXMLDocumentPart;
+import org.zkoss.poi.openxml4j.opc.PackagePart;
+import org.zkoss.poi.openxml4j.opc.PackageRelationship;
+import org.zkoss.poi.xssf.usermodel.XSSFColor;
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTColorScheme;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTSRgbColor;
@@ -37,9 +44,14 @@ import org.zkoss.poi.xssf.usermodel.XSSFColor;
 public class ThemesTable extends POIXMLDocumentPart {
     private ThemeDocument theme;
 
-    public ThemesTable(PackagePart part, PackageRelationship rel) throws Exception {
+    public ThemesTable(PackagePart part, PackageRelationship rel) throws IOException {
         super(part, rel);
-        theme = ThemeDocument.Factory.parse(part.getInputStream());
+        
+        try {
+           theme = ThemeDocument.Factory.parse(part.getInputStream());
+        } catch(XmlException e) {
+           throw new IOException(e.getLocalizedMessage());
+        }
     }
 
     public ThemesTable(ThemeDocument theme) {

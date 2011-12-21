@@ -35,8 +35,6 @@ import org.zkoss.poi.ss.usermodel.Sheet;
 import org.zkoss.poi.xssf.model.IndexedUDFFinder;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDefinedName;
 
-import java.util.HashMap;
-
 /**
  * Internal POI use only
  *
@@ -157,26 +155,12 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	public Ptg[] getFormulaTokens(EvaluationCell evalCell) {
 		XSSFCell cell = ((XSSFEvaluationCell)evalCell).getXSSFCell();
 		XSSFEvaluationWorkbook frBook = XSSFEvaluationWorkbook.create(_uBook);
-		String formulaText = cleanXSSFFormulaText(cell.getCellFormula());
-		return FormulaParser.parse(formulaText, frBook, FormulaType.CELL, _uBook.getSheetIndex(cell.getSheet()));
+		return FormulaParser.parse(cell.getCellFormula(), frBook, FormulaType.CELL, _uBook.getSheetIndex(cell.getSheet()));
 	}
 
     public UDFFinder getUDFFinder(){
         return _uBook.getUDFFinder();
     }
-    
-   /**
-    * XSSF allows certain extra textual characters in the formula that
-    *  HSSF does not. As these can't be composed down to HSSF-compatible
-    *  Ptgs, this method strips them out for us.
-    */
-   private String cleanXSSFFormulaText(String text) {
-      // Newlines are allowed in XSSF
-      text = text.replaceAll("\\n", "").replaceAll("\\r", "");
-      
-      // All done with cleaning
-      return text;
-   }
 
 	private static final class Name implements EvaluationName {
 
@@ -248,7 +232,6 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	//20111124, henrichen@zkoss.org: get formula tokens per the formula string
 	public Ptg[] getFormulaTokens(int sheetIndex, String formula) {
 		XSSFEvaluationWorkbook frBook = XSSFEvaluationWorkbook.create(_uBook);
-		String formulaText = cleanXSSFFormulaText(formula);
-		return FormulaParser.parse(formulaText, frBook, FormulaType.CELL, sheetIndex);
+		return FormulaParser.parse(formula, frBook, FormulaType.CELL, sheetIndex);
 	}
 }

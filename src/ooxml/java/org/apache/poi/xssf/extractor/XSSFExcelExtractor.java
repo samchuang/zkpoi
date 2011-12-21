@@ -18,20 +18,23 @@ package org.zkoss.poi.xssf.extractor;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 
-import org.apache.xmlbeans.XmlException;
 import org.zkoss.poi.POIXMLTextExtractor;
 import org.zkoss.poi.hssf.extractor.ExcelExtractor;
 import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
 import org.zkoss.poi.openxml4j.opc.OPCPackage;
 import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.poi.ss.usermodel.CellStyle;
 import org.zkoss.poi.ss.usermodel.Comment;
+import org.zkoss.poi.ss.usermodel.DataFormatter;
 import org.zkoss.poi.ss.usermodel.HeaderFooter;
 import org.zkoss.poi.ss.usermodel.Row;
 import org.zkoss.poi.xssf.usermodel.XSSFCell;
 import org.zkoss.poi.xssf.usermodel.XSSFRelation;
 import org.zkoss.poi.xssf.usermodel.XSSFSheet;
 import org.zkoss.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.XmlException;
 
 /**
  * Helper class to extract text from an OOXML Excel file
@@ -43,6 +46,7 @@ public class XSSFExcelExtractor extends POIXMLTextExtractor implements org.zkoss
       XSSFRelation.MACROS_WORKBOOK
    };
    
+   private Locale locale;
 	private XSSFWorkbook workbook;
 	private boolean includeSheetNames = true;
 	private boolean formulasNotResults = false;
@@ -96,14 +100,28 @@ public class XSSFExcelExtractor extends POIXMLTextExtractor implements org.zkoss
     public void setIncludeHeadersFooters(boolean includeHeadersFooters) {
         this.includeHeadersFooters = includeHeadersFooters;
     }
+    /**
+     * What Locale should be used for formatting numbers (based
+     *  on the styles applied to the cells)
+     */
+    public void setLocale(Locale locale) {
+       this.locale = locale;
+    }
+    
 
-	/**
-	 * Retreives the text contents of the file
-	 */
-	public String getText() {
-		StringBuffer text = new StringBuffer();
-
-		for(int i=0; i<workbook.getNumberOfSheets(); i++) {
+   /**
+    * Retreives the text contents of the file
+    */
+   public String getText() {
+      DataFormatter formatter;
+      if(locale == null) {
+         formatter = new DataFormatter();
+      } else  {
+         formatter = new DataFormatter(locale);
+      }
+      
+      StringBuffer text = new StringBuffer();
+      for(int i=0; i<workbook.getNumberOfSheets(); i++) {
 			XSSFSheet sheet = workbook.getSheetAt(i);
 			if(includeSheetNames) {
 				text.append(workbook.getSheetName(i)).append("\n");
@@ -129,13 +147,20 @@ public class XSSFExcelExtractor extends POIXMLTextExtractor implements org.zkoss
 					Cell cell = ri.next();
 
 					// Is it a formula one?
-					if(cell.getCellType() == Cell.CELL_TYPE_FORMULA && formulasNotResults) {
-						text.append(cell.getCellFormula());
+					if(cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+					   if (formulasNotResults) {
+					      text.append(cell.getCellFormula());
+					   } else {
+					      if (cell.getCachedFormulaResultType() == Cell.CELL_TYPE_STRING) {
+					         handleStringCell(text, cell);
+					      } else {
+					         handleNonStringCell(text, cell, formatter);
+					      }
+					   }
 					} else if(cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						text.append(cell.getRichStringCellValue().getString());
+                  handleStringCell(text, cell);
 					} else {
-						XSSFCell xc = (XSSFCell)cell;
-						text.append(xc.getRawValue());
+                  handleNonStringCell(text, cell, formatter);
 					}
 
 					// Output the comment, if requested and exists
@@ -169,6 +194,31 @@ public class XSSFExcelExtractor extends POIXMLTextExtractor implements org.zkoss
 
 		return text.toString();
 	}
+	
+   private void handleStringCell(StringBuffer text, Cell cell) {
+      text.append(cell.getRichStringCellValue().getString());
+   }
+   private void handleNonStringCell(StringBuffer text, Cell cell, DataFormatter formatter) {
+      int type = cell.getCellType();
+      if (type == Cell.CELL_TYPE_FORMULA) {
+         type = cell.getCachedFormulaResultType();
+      }
+
+      if (type == Cell.CELL_TYPE_NUMERIC) {
+         CellStyle cs = cell.getCellStyle();
+
+         if (cs.getDataFormatString() != null) {
+            text.append(formatter.formatRawCellContents(
+                  cell.getNumericCellValue(), cs.getDataFormat(), cs.getDataFormatString()
+            ));
+            return;
+         }
+      }
+
+      // No supported styling applies to this cell
+      XSSFCell xcell = (XSSFCell)cell;
+      text.append( xcell.getRawValue() );
+   }
 
 	private String extractHeaderFooter(HeaderFooter hf) {
 		return ExcelExtractor._extractHeaderFooter(hf);

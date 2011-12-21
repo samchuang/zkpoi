@@ -39,17 +39,11 @@ import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.xssf.model.CommentsTable;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTGraphicalObjectData;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTConnector;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTDrawing;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTGraphicalObjectFrame;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTGroupShape;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTPicture;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTShape;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTTwoCellAnchor;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.STEditAs;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.WsDrDocument;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
+import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.*;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 
 /**
@@ -62,7 +56,6 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      * Root element of the SpreadsheetML Drawing part
      */
     private CTDrawing drawing;
-    private boolean isNew;
     private long numOfGraphicFrames = 0L;
     
     protected static final String NAMESPACE_A = "http://schemas.openxmlformats.org/drawingml/2006/main";
@@ -76,7 +69,6 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
     protected XSSFDrawing() {
         super();
         drawing = newDrawing();
-        isNew = true;
     }
 
     /**
@@ -89,6 +81,11 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
      */
     protected XSSFDrawing(PackagePart part, PackageRelationship rel) throws IOException, XmlException {
         super(part, rel);
+        XmlOptions options  = new XmlOptions(DEFAULT_XML_OPTIONS);
+        //Removing root element
+        //options.setLoadReplaceDocumentElement(null);
+        //drawing = CTDrawing.Factory.parse(part.getInputStream(),options);
+    
         //20101018, henrichen@zkoss.org: will not create all associated CTxxx XmlObject will NOT parse from XxxDocument
         //drawing = CTDrawing.Factory.parse(part.getInputStream());
         drawing = WsDrDocument.Factory.parse(part.getInputStream()).getWsDr();
@@ -123,7 +120,9 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
                 xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
                 xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing">
         */
-        if(isNew) xmlOptions.setSaveSyntheticDocumentElement(new QName(CTDrawing.type.getName().getNamespaceURI(), "wsDr", "xdr"));
+        xmlOptions.setSaveSyntheticDocumentElement(
+                new QName(CTDrawing.type.getName().getNamespaceURI(), "wsDr", "xdr")
+        );
         Map<String, String> map = new HashMap<String, String>();
         map.put(NAMESPACE_A, "a");
         map.put(STRelationshipId.type.getName().getNamespaceURI(), "r");
@@ -373,6 +372,22 @@ public final class XSSFDrawing extends POIXMLDocumentPart implements Drawing {
 
     private long newShapeId(){
         return drawing.sizeOfTwoCellAnchorArray() + 1;
+    }
+
+    /**
+     *
+     * @return list of shapes in this drawing
+     */
+    public List<XSSFShape>  getShapes(){
+        List<XSSFShape> lst = new ArrayList<XSSFShape>();
+        for(XmlObject obj : drawing.selectPath("./*/*")) {
+            if(obj instanceof CTPicture) lst.add(new XSSFPicture(this, (CTPicture)obj)) ;
+            else if(obj instanceof CTConnector) lst.add(new XSSFConnector(this, (CTConnector)obj)) ;
+            else if(obj instanceof CTShape) lst.add(new XSSFSimpleShape(this, (CTShape)obj)) ;
+            else if(obj instanceof CTGraphicalObjectFrame) lst.add(new XSSFGraphicFrame(this, (CTGraphicalObjectFrame)obj)) ;
+            else if(obj instanceof CTGroupShape) lst.add(new XSSFShapeGroup(this, (CTGroupShape)obj)) ;
+        }
+        return lst;
     }
 
     /*package*/ XSSFPictureData getPictureData(XSSFPicture pic) {
