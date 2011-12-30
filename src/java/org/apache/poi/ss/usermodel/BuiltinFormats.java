@@ -16,10 +16,20 @@
 ==================================================================== */
 package org.zkoss.poi.ss.usermodel;
 
+import java.text.AttributedCharacterIterator;
+import java.text.CharacterIterator;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+
+import org.zkoss.util.CacheMap;
+import org.zkoss.util.Pair;
 
 /**
  * Utility to identify built-in formats.  The following is a list of the formats as
@@ -115,7 +125,7 @@ public final class BuiltinFormats {
 		putFormat(m, 0xb, "0.00E+00");
 		putFormat(m, 0xc, "# ?/?");
 		putFormat(m, 0xd, "# ??/??");
-		putFormat(m, 0xe, "m/d/yy");
+		putFormat(m, 0xe, "m/d/yyyy"); //20111229, henrichen@zkoss.org: ZSS-68
 		putFormat(m, 0xf, "d-mmm-yy");
 		putFormat(m, 0x10, "d-mmm");
 		putFormat(m, 0x11, "mmm-yy");
@@ -123,7 +133,7 @@ public final class BuiltinFormats {
 		putFormat(m, 0x13, "h:mm:ss AM/PM");
 		putFormat(m, 0x14, "h:mm");
 		putFormat(m, 0x15, "h:mm:ss");
-		putFormat(m, 0x16, "m/d/yy h:mm");
+		putFormat(m, 0x16, "m/d/yyyy h:mm"); //20111229, henrichen@zkoss.org: ZSS-68
 
 		// 0x17 - 0x24 reserved for international and undocumented
 		for (int i=0x17; i<=0x24; i++) {
@@ -209,5 +219,224 @@ public final class BuiltinFormats {
 			}
 		}
 		return -1;
+	}
+	
+	//20111229, henrichen@zkoss.org: ZSS-68
+	public static String getBuiltinFormat(int index, Locale locale) {
+		String fmt = getBuiltinFormat(index);
+		if (fmt == null && index != 0x100) {
+			return null;
+		}
+		if (Locale.US.equals(locale)) { //US locale, let go
+			return fmt;
+		}
+		//per locale @see DateInputMask
+		switch(index) {
+		case 0xf: //d-mmm-yy
+		case 0x10: //d-mmm
+		case 0x11: //mmm-yy
+			fmt = getNameMonthFormat(index, locale);
+			break;
+		case 0xe: //m/d/yyyy
+		case 0x13: //h:mm:ss AM/PM
+		case 0x16: //m/d/yyyy hh:mm
+		case 0x100: //special date time for input edit text
+			fmt = getNumMonthFormat(index, locale);
+			break;
+		}
+		return fmt;
+	}
+	
+	//20111229, henrichen@zkoss.org: ZSS-68
+	private static final CacheMap _dateFormat;
+	static {
+		_dateFormat = new CacheMap(8);
+		_dateFormat.setLifetime(24*60*60*1000);
+	}
+
+	//20111229, henrichen@zkoss.org: support locale
+	private static String getNameMonthFormat(int formatType, Locale locale) {
+		final Pair key = new Pair(locale, Integer.valueOf(formatType));
+		final String result = (String) _dateFormat.get(key);
+		if (result != null) { //already cached
+			return result;
+		}
+		
+		boolean noyear = false;
+		boolean noday = false;
+		switch(formatType) {
+		case 0xf: //d-mmm-yy
+			//with date and year 
+			break;
+		case 0x10: //d-mmm
+			noyear = true;
+			break;
+		case 0x11: //mmm-yy
+			noday = true;
+			break;
+		}
+		DateFormat format = DateFormat.getDateInstance(DateFormat.LONG, locale);
+		final TimeZone gmt = TimeZone.getTimeZone("GMT");
+		format.setTimeZone(gmt);
+		final Calendar cal = Calendar.getInstance(gmt);
+		cal.set(65, 6, 18);
+		final AttributedCharacterIterator iter 
+			= format.formatToCharacterIterator(cal.getTime());
+		final StringBuilder sb = new StringBuilder();
+		int dcount = 0;
+		int mcount = 0;
+		int ycount = 0;
+		int cindex = -2;
+		for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) {
+			final Map attrs = iter.getAttributes();
+			if (attrs.isEmpty()) {
+				if (mcount > 0 || dcount > 0 || ycount > 0) {
+					if (cindex < 0)
+						cindex = sb.length();
+					sb.append(c);
+				}
+			} else {
+				for(DateFormat.Field field : (Set<DateFormat.Field>) attrs.keySet()) {
+					switch(field.getCalendarField()) {
+					case Calendar.DAY_OF_MONTH:
+						if (!noday) {
+							sb.append('d');
+							++dcount;
+						} else if (cindex >= 0){
+							sb.delete(cindex, sb.length());
+						}
+						cindex = -2;
+						break;
+					case Calendar.YEAR:
+						if (!noyear) {
+							if (ycount < 2) {
+								sb.append('y');
+								++ycount;
+							}
+						} else if (cindex >= 0) {
+							sb.delete(cindex, sb.length());
+						}
+						cindex = -2;
+						break;
+					case Calendar.MONTH:
+						if (mcount < 3) {
+							sb.append('m');
+							++mcount;
+						}
+						cindex = -2;
+						break;
+					}
+				}
+			}
+		}
+		
+		if ((noday || noyear) && cindex > 0) {
+			sb.delete(cindex, sb.length());
+		}
+		
+		//cache it
+		final String formatString = sb.toString(); 
+		_dateFormat.put(key, formatString);
+		return formatString;
+	}
+	
+	//20111229, henrichen@zkoss.org: support locale
+	private static String getNumMonthFormat(int formatType, Locale locale) {
+		final Pair key = new Pair(locale, Integer.valueOf(formatType));
+		final String result = (String) _dateFormat.get(key);
+		if (result != null) { //already cached
+			return result;
+		}
+		
+		final TimeZone gmt = TimeZone.getTimeZone("GMT");
+		DateFormat format = null;
+		switch(formatType) {
+		case 0x13: //TIME
+			//return "hh:mm:ss AM/PM" in US locale
+			format = DateFormat.getTimeInstance(DateFormat.MEDIUM, locale);
+			break;
+		case 0xe: //DATE
+			//return "m/d/yyyy" in US locale;
+			format = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
+			break;
+		case 0x16: //DATE_TIME (for text)
+			//return "m/d/yyyy hh:mm" in US locale
+			format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, locale);
+			break;
+		case 0x100: //DATE_TIME (for edit text)
+			//return "m/d/yyyy hh:mm:ss AM/PM" in US locale
+			format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
+			break;
+		}
+		format.setTimeZone(gmt);
+		final Calendar cal = Calendar.getInstance(gmt);
+		cal.set(1234, 5, 6, 7, 8, 9);
+		final AttributedCharacterIterator iter 
+			= format.formatToCharacterIterator(cal.getTime());
+		final StringBuilder sb = new StringBuilder();
+		int ycount = 0;
+		int yindex = -1;
+		int mcount = 0;
+		boolean alreadyAMPM = false;
+		for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) {
+			final Map attrs = iter.getAttributes();
+			if (attrs.isEmpty()) {
+				sb.append(c);
+			} else {
+				for(DateFormat.Field field : (Set<DateFormat.Field>) attrs.keySet()) {
+					switch(field.getCalendarField()) {
+					case Calendar.DAY_OF_MONTH:
+						sb.append('d');
+						break;
+					case Calendar.YEAR:
+						yindex = sb.length();
+						sb.append('y');
+						++ycount;
+						break;
+					case Calendar.HOUR_OF_DAY:
+					case Calendar.HOUR:
+						sb.append('h');
+						break;
+					case Calendar.MONTH: //
+						if (mcount < 2) {
+							sb.append('m');
+							++mcount;
+						}
+						break;
+					case Calendar.MINUTE:
+						sb.append('m');
+						break;
+					case Calendar.SECOND:
+						sb.append('s');
+						break;
+					case Calendar.AM:
+					case Calendar.AM_PM:
+						if (!alreadyAMPM) {
+							sb.append("AM/PM");
+							alreadyAMPM = true;
+						}
+						break;
+					default: //neither cases
+						if (DateFormat.Field.HOUR1.equals(field)
+							|| DateFormat.Field.HOUR_OF_DAY1.equals(field)
+							|| DateFormat.Field.HOUR0.equals(field)
+							|| DateFormat.Field.HOUR_OF_DAY0.equals(field)) {
+							sb.append('h');
+						}
+						break;
+					}
+				}
+			}
+		}
+		if (yindex >= 0) { //add year to 4
+			for(int k = ycount; k < 4; ++k) {
+				sb.insert(yindex, 'y');
+			}
+		}
+		
+		//cache it
+		final String formatString = sb.toString(); 
+		_dateFormat.put(key, formatString);
+		return formatString;
 	}
 }

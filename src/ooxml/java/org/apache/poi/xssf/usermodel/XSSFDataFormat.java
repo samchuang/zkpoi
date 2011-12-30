@@ -18,6 +18,7 @@ package org.zkoss.poi.xssf.usermodel;
 
 import org.zkoss.poi.ss.usermodel.BuiltinFormats;
 import org.zkoss.poi.ss.usermodel.DataFormat;
+import org.zkoss.poi.ss.usermodel.ZssContext;
 import org.zkoss.poi.xssf.model.StylesTable;
 
 /**
@@ -52,7 +53,7 @@ public class XSSFDataFormat implements DataFormat {
      */
     public String getFormat(short index) {
         String fmt = stylesSource.getNumberFormatAt(index);
-        if(fmt == null) fmt = BuiltinFormats.getBuiltinFormat(index);
+        if(fmt == null) fmt = BuiltinFormats.getBuiltinFormat(index, ZssContext.getCurrent().getLocale()); //20111229, henrichen@zkoss.org: ZSS-68
         return fmt;
     }
 }

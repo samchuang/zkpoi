@@ -33,6 +33,7 @@ import org.zkoss.poi.hssf.model.InternalWorkbook;
 import org.zkoss.poi.hssf.record.FormatRecord;
 import org.zkoss.poi.ss.usermodel.BuiltinFormats;
 import org.zkoss.poi.ss.usermodel.DataFormat;
+import org.zkoss.poi.ss.usermodel.ZssContext;
 
 /**
  * Identifies both built-in and user defined formats within a workbook.<p/>
@@ -169,7 +170,7 @@ public final class HSSFDataFormat implements DataFormat {
 	 * @return string represented at index of format or null if there is not a builtin format at that index
 	 */
 	public static String getBuiltinFormat(short index) {
-		return BuiltinFormats.getBuiltinFormat(index);
+		return BuiltinFormats.getBuiltinFormat(index, ZssContext.getCurrent().getLocale()); //20111229, henrichen@zkoss.org: ZSS-68
 	}
 
 	/**

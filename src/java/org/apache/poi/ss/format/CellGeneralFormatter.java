@@ -17,6 +17,7 @@
 package org.zkoss.poi.ss.format;
 
 import java.util.Formatter;
+import java.util.Locale;
 
 /**
  * A formatter for the default "General" cell format.
@@ -25,8 +26,8 @@ import java.util.Formatter;
  */
 public class CellGeneralFormatter extends CellFormatter {
     /** Creates a new general formatter. */
-    public CellGeneralFormatter() {
-        super("General");
+    public CellGeneralFormatter(Locale locale) { //20111229, henrichen@zkoss.org: ZSS-68
+        super("General", locale);
     }
 
     /**
@@ -56,8 +57,9 @@ public class CellGeneralFormatter extends CellFormatter {
                 stripZeros = false;
             }
 
-            Formatter formatter = new Formatter(toAppendTo);
-            formatter.format(LOCALE, fmt, value);
+            Formatter formatter = new Formatter(toAppendTo, locale);
+            //formatter.format(LOCALE, fmt, value);
+            formatter.format(locale, fmt, value); //20111229, henrichen@zkoss.org: ZSS-68
             if (stripZeros) {
                 // strip off trailing zeros
                 int removeFrom;

@@ -19,11 +19,14 @@ package org.zkoss.poi.ss.format;
 
 import org.zkoss.poi.ss.formula.eval.ErrorEval;
 import org.zkoss.poi.ss.usermodel.Cell;
+import org.zkoss.util.CacheMap;
+import org.zkoss.util.Pair;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -81,11 +84,32 @@ public class CellFormat {
     private static final CellFormatPart DEFAULT_TEXT_FORMAT =
             new CellFormatPart("@");
 
+    //20111229, henrichen@zkoss.org: ZSS-68
+	public static final CellFormat getGeneralFormat(final Locale locale) {
+		return new CellFormat("General") {
+	        @Override
+	        public CellFormatResult apply(Object value) {
+	            String text;
+	            if (value == null) {
+	                text = "";
+	            } else if (value instanceof Byte){ //20100616, Henri Chen
+	            	text = ErrorEval.getText(((Byte)value).intValue());
+	            } else if (value instanceof Number) {
+	                text = CellNumberFormatter.getFormatter(CellNumberFormatter.FormatterType.SIMPLE_NUMBER, locale).format(value);
+	            } else if (value instanceof Boolean) { //20100616, Henri Chen
+	            	text = ((Boolean)value).booleanValue() ? "TRUE" : "FALSE";
+	            } else {
+	                text = value.toString();
+	            }
+	            return new CellFormatResult(true, text, null);
+	        }
+	    };
+	}
     /**
      * Format a value as it would be were no format specified.  This is also
      * used when the format specified is <tt>General</tt>.
      */
-    public static final CellFormat GENERAL_FORMAT = new CellFormat("General") {
+/*    public static final CellFormat GENERAL_FORMAT = new CellFormat("General") {
         @Override
         public CellFormatResult apply(Object value) {
             String text;
@@ -103,10 +127,10 @@ public class CellFormat {
             return new CellFormatResult(true, text, null);
         }
     };
-
+*/
     /** Maps a format string to its parsed version for efficiencies sake. */
-    private static final Map<String, CellFormat> formatCache =
-            new WeakHashMap<String, CellFormat>();
+    private static final Map<Object, CellFormat> formatCache = //ZSS-68
+            new WeakHashMap<Object, CellFormat>();
 
     /**
      * Returns a {@link CellFormat} that applies the given format.  Two calls
@@ -116,14 +140,15 @@ public class CellFormat {
      *
      * @return A {@link CellFormat} that applies the given format.
      */
-    public static CellFormat getInstance(String format) {
-        CellFormat fmt = formatCache.get(format);
+    public static CellFormat getInstance(String format, Locale locale) { //20111229, henrichen@zkoss.org: ZSS-68
+    	final Pair key = new Pair(format, locale);
+        CellFormat fmt = formatCache.get(key);
         if (fmt == null) {
             if (format.equals("General"))
-                fmt = GENERAL_FORMAT;
+                fmt = getGeneralFormat(locale);
             else
                 fmt = new CellFormat(format);
-            formatCache.put(format, fmt);
+            formatCache.put(key, fmt);
         }
         return fmt;
     }

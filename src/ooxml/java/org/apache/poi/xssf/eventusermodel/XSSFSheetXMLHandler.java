@@ -18,6 +18,7 @@ package org.zkoss.poi.xssf.eventusermodel;
 
 import org.zkoss.poi.ss.usermodel.BuiltinFormats;
 import org.zkoss.poi.ss.usermodel.DataFormatter;
+import org.zkoss.poi.ss.usermodel.ZssContext;
 import org.zkoss.poi.xssf.model.StylesTable;
 import org.zkoss.poi.xssf.usermodel.XSSFCellStyle;
 import org.zkoss.poi.xssf.usermodel.XSSFRichTextString;
@@ -112,7 +113,7 @@ public class XSSFSheetXMLHandler extends DefaultHandler {
            ReadOnlySharedStringsTable strings,
            SheetContentsHandler sheetContentsHandler,
            boolean formulasNotResults) {
-       this(styles, strings, sheetContentsHandler, new DataFormatter(), formulasNotResults);
+       this(styles, strings, sheetContentsHandler, new DataFormatter(ZssContext.getCurrent().getLocale(), false), formulasNotResults); //20111227, henrichen@zkoss.org: ZSS-68
    }
 
    private boolean isTextTag(String name) {

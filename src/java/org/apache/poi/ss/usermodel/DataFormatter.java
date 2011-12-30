@@ -161,6 +161,7 @@ public class DataFormatter {
     private final Map<String,Format> formats;
 
     private boolean emulateCsv = false;
+    private Locale locale = Locale.getDefault();
 
     /**
      * Creates a formatter using the {@link Locale#getDefault() default locale}.
@@ -193,6 +194,7 @@ public class DataFormatter {
      * Creates a formatter using the given locale.
      */
     public DataFormatter(Locale locale) {
+    	this.locale= locale; //20111229, henrichen@zkoss.org: ZSS-68
         dateSymbols = new DateFormatSymbols(locale);
         decimalSymbols = new DecimalFormatSymbols(locale);
         generalWholeNumFormat = new DecimalFormat("#", decimalSymbols);
@@ -350,7 +352,8 @@ public class DataFormatter {
         
         // Excel supports fractions in format strings, which Java doesn't
         if (formatStr.indexOf("/") == formatStr.lastIndexOf("/") && 
-              formatStr.indexOf("/") >= 0 && !formatStr.contains("-")) {
+              formatStr.indexOf("/") >= 0 && !formatStr.contains("-") &&
+              !formatStr.contains("AM/PM") && !formatStr.contains("am/pm") ) {
             return new FractionFormat(formatStr);
         }
         
@@ -480,7 +483,11 @@ public class DataFormatter {
         formatStr = sb.toString();
 
         try {
-            return new ExcelStyleDateFormatter(formatStr, dateSymbols);
+        	//20111229, henrichen@zkoss.org: ZSS-68
+            //return new ExcelStyleDateFormatter(formatStr, dateSymbols);
+        	ExcelStyleDateFormatter dateFormat = new ExcelStyleDateFormatter(formatStr, locale);
+        	dateFormat.setDateFormatSymbols(dateSymbols);
+        	return dateFormat;
         } catch(IllegalArgumentException iae) {
 
             // the pattern could not be parsed correctly,
@@ -1077,7 +1084,7 @@ public class DataFormatter {
     }
     
     //20110330, henrichen@zkoss.org:
-    public static final Format getJavaFormat(Cell cell) {
-    	return new DataFormatter().getFormat(cell);
+    public static final Format getJavaFormat(Cell cell, Locale locale) { //ZSS-68
+    	return new DataFormatter(locale, false).getFormat(cell);
     }
 }

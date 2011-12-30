@@ -20,6 +20,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Formatter;
 import java.util.Locale;
 
+import org.zkoss.poi.ss.usermodel.ZssContext;
 import org.zkoss.util.Locales;
 
 /**
@@ -28,16 +29,15 @@ import org.zkoss.util.Locales;
  *
  */
 public class Formatters {
-	public static void format(Formatter formatter, String format, Object... args) {
-		formatter.format(Locales.getCurrent(), format, args);
+	public static void format(Locale locale, Formatter formatter, String format, Object... args) { //ZSS-68
+		formatter.format(locale, format, args);
 	}
 	
 	/**
 	 * Returns the GroupingSeparator character of the current locale.
 	 * @return the GroupingSeparator character of the current locale.
 	 */
-	public static char getGroupingSeparator() {
-		Locale locale = Locales.getCurrent();
+	public static char getGroupingSeparator(Locale locale) { //ZSS-68
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
 		return symbols.getGroupingSeparator();
 	}
@@ -46,8 +46,7 @@ public class Formatters {
 	 * Returns the getDecimalSeparator character of the current locale.
 	 * @return the getDecimalSeparator character of the current locale.
 	 */
-	public static char getDecimalSeparator() {
-		Locale locale = Locales.getCurrent();
+	public static char getDecimalSeparator(Locale locale) { //ZSS-68
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
 		return symbols.getDecimalSeparator();
 	}

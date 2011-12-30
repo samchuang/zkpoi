@@ -203,7 +203,7 @@ public class SheetUtil {
         TextLayout layout;
 
         Workbook wb = sheet.getWorkbook();
-        DataFormatter formatter = new DataFormatter();
+        DataFormatter formatter = new DataFormatter(ZssContext.getCurrent().getLocale(), false); //20111227, henrichen@zkoss.org
         Font defaultFont = wb.getFontAt((short) 0);
 
         str = new AttributedString(String.valueOf(defaultChar));
@@ -240,7 +240,7 @@ public class SheetUtil {
         TextLayout layout;
 
         Workbook wb = sheet.getWorkbook();
-        DataFormatter formatter = new DataFormatter();
+        DataFormatter formatter = new DataFormatter(ZssContext.getCurrent().getLocale(), false); //20111227, henrichen@zkoss.org: ZSS-68
         Font defaultFont = wb.getFontAt((short) 0);
 
         str = new AttributedString(String.valueOf(defaultChar));

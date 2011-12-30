@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -129,8 +130,8 @@ public class CellElapsedFormatter extends CellFormatter {
      *
      * @param pattern The pattern to parse.
      */
-    public CellElapsedFormatter(String pattern) {
-        super(pattern);
+    public CellElapsedFormatter(String pattern, Locale locale) { //20111230, henrichen@zkoss.org: ZSS-68
+        super(pattern, locale);
 
         specs = new ArrayList<TimeSpec>();
 
@@ -201,7 +202,7 @@ public class CellElapsedFormatter extends CellFormatter {
             parts[i] = specs.get(i).valueFor(elapsed);
         }
 
-        Formatter formatter = new Formatter(toAppendTo);
+        Formatter formatter = new Formatter(toAppendTo, locale); //ZSS-68
         formatter.format(printfFmt, parts);
     }
 

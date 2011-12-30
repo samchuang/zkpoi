@@ -17,6 +17,8 @@
 package org.zkoss.poi.ss.format;
 
 import org.zkoss.poi.hssf.util.HSSFColor;
+import org.zkoss.poi.ss.usermodel.ZssContext;
+import org.zkoss.util.Locales;
 
 import javax.swing.*;
 import java.awt.*;
@@ -178,7 +180,11 @@ public class CellFormatPart {
             throw new IllegalArgumentException("Unrecognized format: " + quote(
                     desc));
         }
-        locale = getLocale(m); //20100616, Henri Chen
+        Locale locale0 = getLocale(m); //20100616, Henri Chen
+        if (locale0 == null) { //ZSS-68
+        	locale0 = ZssContext.getCurrent().getLocale();
+        }
+        locale = locale0;
         color = getColor(m);
         condition = getCondition(m);
         format = getFormatter(m);
@@ -298,7 +304,7 @@ public class CellFormatPart {
     private CellFormatter getFormatter(Matcher matcher) {
         String fdesc = matcher.group(SPECIFICATION_GROUP);
         type = formatType(fdesc);
-        return type.formatter(fdesc);
+        return type.formatter(fdesc, locale); //ZSS-68
     }
  
     //20100615, Henri Chen

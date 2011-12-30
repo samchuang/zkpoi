@@ -23,7 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.Locale;
 import java.util.regex.Matcher;
+
+import org.zkoss.poi.ss.format.CellNumberFormatter.FormatterType;
+import org.zkoss.util.Pair;
 
 /**
  * Formats a date value.
@@ -40,9 +44,26 @@ public class CellDateFormatter extends CellFormatter {
     private static final long EXCEL_EPOCH_TIME;
     private static final Date EXCEL_EPOCH_DATE;
 
-    private static final CellFormatter SIMPLE_DATE = new CellDateFormatter(
-            "mm/d/y");
-
+    //20111229, henrichen@zkoss.org: ZSS-68
+	/*package*/ enum FormatterType {
+		SIMPLE_DATE;
+	}
+    //20111229, henrichen@zkoss.org: ZSS-68
+	static CellFormatter getFormatter(FormatterType ft, final Locale locale) {
+		final Pair key = new Pair(ft, locale);
+		CellFormatter formatter = (CellFormatter) _formatters.get(key);
+		if (formatter != null) { //in cache, use it
+			return formatter;
+		}
+		switch(ft) {
+		case SIMPLE_DATE:
+			formatter = new CellDateFormatter("mm/d/y", locale);
+			break;
+		}
+		_formatters.put(key, formatter); //cache
+		return formatter;	
+	}
+	
     static {
         Calendar c = Calendar.getInstance();
         c.set(1904, 0, 1, 0, 0, 0);
@@ -150,13 +171,13 @@ public class CellDateFormatter extends CellFormatter {
      *
      * @param format The format.
      */
-    public CellDateFormatter(String format) {
-        super(format);
+    public CellDateFormatter(String format, Locale locale) { //20111229, henrichen@zkoss.org: ZSS-68
+        super(format, locale);
         DatePartHandler partHandler = new DatePartHandler();
         StringBuffer descBuf = CellFormatPart.parseFormat(format,
                 CellFormatType.DATE, partHandler);
         partHandler.finish(descBuf);
-        dateFmt = new SimpleDateFormat(descBuf.toString());
+        dateFmt = new SimpleDateFormat(descBuf.toString(), locale); //ZSS-68
     }
 
     /** {@inheritDoc} */
@@ -185,9 +206,9 @@ public class CellDateFormatter extends CellFormatter {
                 if (!doneMillis) {
                     Date dateObj = (Date) value;
                     int pos = toAppendTo.length();
-                    Formatter formatter = new Formatter(toAppendTo);
+                    Formatter formatter = new Formatter(toAppendTo, locale); //ZSS-68
                     long msecs = dateObj.getTime() % 1000;
-                    formatter.format(LOCALE, sFmt, msecs / 1000.0);
+                    formatter.format(locale, sFmt, msecs / 1000.0); //ZSS-68
                     toAppendTo.delete(pos, pos + 2);
                     doneMillis = true;
                 }
@@ -218,6 +239,6 @@ public class CellDateFormatter extends CellFormatter {
      * For a date, this is <tt>"mm/d/y"</tt>.
      */
     public void simpleValue(StringBuffer toAppendTo, Object value) {
-        SIMPLE_DATE.formatValue(toAppendTo, value);
+        getFormatter(FormatterType.SIMPLE_DATE, locale).formatValue(toAppendTo, value); //ZSS-68
     }
 }

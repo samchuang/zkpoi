@@ -25,6 +25,7 @@ import org.zkoss.poi.ss.formula.eval.OperandResolver;
 import org.zkoss.poi.ss.formula.eval.StringEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.ss.usermodel.DataFormatter;
+import org.zkoss.poi.ss.usermodel.ZssContext;
 
 /**
  * @author Amol S. Deshmukh &lt; amolweb at ya hoo dot com &gt;
@@ -32,7 +33,7 @@ import org.zkoss.poi.ss.usermodel.DataFormatter;
  * @author Stephen Wolke (smwolke at geistig.com)
  */
 public abstract class TextFunction implements Function {
-	protected static final DataFormatter formatter = new DataFormatter();
+//	protected static final DataFormatter formatter = new DataFormatter(); //20111227, henrichen@zkoss.org. Locale related, must use instance
    protected static final String EMPTY_STRING = "";
 
 	protected static final String evaluateStringArg(ValueEval eval, int srcRow, int srcCol) throws EvaluationException {
@@ -295,6 +296,7 @@ public abstract class TextFunction implements Function {
 			
 			try {
             // Ask DataFormatter to handle the String for us
+				final DataFormatter formatter = new DataFormatter(ZssContext.getCurrent().getLocale(), false); //20111227, henrichen@zkoss.org: ZSS-68
 			   String formattedStr = formatter.formatRawCellContents(s0, -1, s1);
 				return new StringEval(formattedStr);
 			} catch (Exception e) {

@@ -19,6 +19,8 @@ package org.zkoss.poi.ss.format;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import org.zkoss.util.CacheMap;
+
 /**
  * This is the abstract supertype for the various cell formatters.
  *
@@ -27,20 +29,28 @@ import java.util.logging.Logger;
 public abstract class CellFormatter {
     /** The original specified format. */
     protected final String format;
+    protected final Locale locale;
+    //ZSS-68
+	protected static final CacheMap _formatters;
+	static {
+		_formatters = new CacheMap(8);
+		_formatters.setLifetime(24*60*60*1000);
+	}
 
     /**
      * This is the locale used to get a consistent format result from which to
      * work.
      */
-    public static final Locale LOCALE = Locale.US;
+//    public static final Locale LOCALE = Locale.US;
 
     /**
      * Creates a new formatter object, storing the format in {@link #format}.
      *
      * @param format The format.
      */
-    public CellFormatter(String format) {
+    public CellFormatter(String format, Locale locale) { //ZSS-68
         this.format = format;
+        this.locale= locale;
     }
 
     /** The logger to use in the formatting code. */

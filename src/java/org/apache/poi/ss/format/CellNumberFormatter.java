@@ -18,6 +18,8 @@ package org.zkoss.poi.ss.format;
 
 import org.zkoss.poi.ss.format.CellFormatPart.PartHandler;
 import org.zkoss.poi.ss.util.NumberToTextConverter;
+import org.zkoss.util.CacheMap;
+import org.zkoss.util.Pair;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -29,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -63,7 +66,54 @@ public class CellNumberFormatter extends CellFormatter {
     private DecimalFormat decimalFmt;
     private boolean fixDenominator;
 
-    static final CellFormatter SIMPLE_NUMBER = new CellFormatter("General") {
+    //20111229, henrichen@zkoss.org: ZSS-68
+	/*package*/ enum FormatterType {
+		SIMPLE_NUMBER,
+		SIMPLE_INT,
+		SIMPLE_FLOAT;
+	}
+    //20111229, henrichen@zkoss.org: respect given locale
+	static CellFormatter getFormatter(FormatterType ft, final Locale locale) {
+		final Pair key = new Pair(ft, locale);
+		CellFormatter formatter = (CellFormatter) _formatters.get(key);
+		if (formatter != null) { //in cache, use it
+			return formatter;
+		}
+		switch(ft) {
+		case SIMPLE_NUMBER:
+			formatter = new CellFormatter("General", locale) {
+		        public void formatValue(StringBuffer toAppendTo, Object value) {
+		            if (value == null)
+		                return;
+		            if (value instanceof Number) {
+		                Number num = (Number) value;
+		                if (num.doubleValue() % 1.0 == 0)
+		                	CellNumberFormatter.getFormatter(FormatterType.SIMPLE_INT, locale).formatValue(toAppendTo, value);
+		                else
+		                	//20110328, henrichen@zkoss.org: shall consider the Excel 15 digits limit(bug# 311)
+		                    //SIMPLE_FLOAT.formatValue(toAppendTo, value);
+		                	toAppendTo.append(NumberToTextConverter.toText(((Number)value).doubleValue(), locale));
+		            } else {
+		                CellTextFormatter.getFormatter(CellTextFormatter.FormatterType.SIMPLE_TEXT, locale).formatValue(toAppendTo, value);
+		            }
+		        }
+		
+		        public void simpleValue(StringBuffer toAppendTo, Object value) {
+		            formatValue(toAppendTo, value);
+		        }
+		    };
+		    break;
+		case SIMPLE_INT:
+			formatter = new CellNumberFormatter("#", locale);
+		    break;
+		case SIMPLE_FLOAT:
+			formatter = new CellNumberFormatter("#.###############", locale); //20100616, Henri Chen
+		}
+		_formatters.put(key, formatter); //cache
+		return formatter;
+	}
+
+/*    static final CellFormatter SIMPLE_NUMBER = new CellFormatter("General") {
         public void formatValue(StringBuffer toAppendTo, Object value) {
             if (value == null)
                 return;
@@ -89,7 +139,7 @@ public class CellNumberFormatter extends CellFormatter {
             "#");
     private static final CellFormatter SIMPLE_FLOAT = new CellNumberFormatter(
             "#.###############"); //20100616, Henri Chen
-
+*/
     /**
      * This class is used to mark where the special characters in the format
      * are, as opposed to the other characters that are simply printed.
@@ -258,8 +308,8 @@ public class CellNumberFormatter extends CellFormatter {
      *
      * @param format The format to parse.
      */
-    public CellNumberFormatter(String format) {
-        super(format);
+    public CellNumberFormatter(String format, Locale locale) { //20111229, henrichen@zkoss.org: ZSS-68
+        super(format, locale);
 
         scale = 1;
 
@@ -649,8 +699,8 @@ public class CellNumberFormatter extends CellFormatter {
             writeFraction(value, null, fractional, output, mods);
         } else {
             StringBuffer result = new StringBuffer();
-            Formatter f = new Formatter(result);
-            f.format(LOCALE, printfFmt, value);
+            Formatter f = new Formatter(result, locale); //ZSS-68
+            f.format(locale, printfFmt, value); //ZSS-68
 
             if (numerator == null) {
                 writeFractional(result, output);
@@ -667,7 +717,7 @@ public class CellNumberFormatter extends CellFormatter {
         StringMod nextChange = (changes.hasNext() ? changes.next() : null);
         int adjust = 0;
         BitSet deletedChars = new BitSet(); // records chars already deleted
-        final String groupSeparator = ""+Formatters.getGroupingSeparator();
+        final String groupSeparator = ""+Formatters.getGroupingSeparator(locale); //ZSS-68
         while (it.hasNext()) {
             Special s = it.next();
             int adjustedPos = s.pos + adjust;
@@ -925,8 +975,9 @@ public class CellNumberFormatter extends CellFormatter {
             List<Special> numSpecials, Set<StringMod> mods) {
 
         StringBuffer sb = new StringBuffer();
-        Formatter formatter = new Formatter(sb);
-        formatter.format(LOCALE, fmt, num);
+        Formatter formatter = new Formatter(sb, locale); //ZSS-68
+        //formatter.format(LOCALE, fmt, num);
+        formatter.format(locale, fmt, num); //20111229, henrichen@zkoss.org: ZSS-68
         writeInteger(sb, output, numSpecials, mods, false, true);
     }
 
@@ -934,8 +985,10 @@ public class CellNumberFormatter extends CellFormatter {
             List<Special> numSpecials, Set<StringMod> mods,
             boolean showCommas, boolean fraction) {//20100924, henrichen@zkoss.org: fraction has special treatment about zero
     	//20100914, henrichen@zkoss.org: repect the current locale
-    	final String comma = "" + Formatters.getGroupingSeparator();
-        int pos = result.indexOf(".") - 1;
+    	final char comma = Formatters.getGroupingSeparator(locale);
+    	final String commaStr = "" + comma;
+    	final String dot = "" + Formatters.getDecimalSeparator(locale);
+        int pos = result.indexOf(dot) - 1;
         if (pos < 0) {
             if (exponent != null && numSpecials == integerSpecials)
                 pos = result.indexOf("E") - 1;
@@ -946,12 +999,12 @@ public class CellNumberFormatter extends CellFormatter {
         int strip;
         for (strip = 0; strip < pos; strip++) {
             char resultCh = result.charAt(strip);
-            if (resultCh != '0' && resultCh != ',')
+            if (resultCh != '0' && resultCh != comma)
                 break;
         }
         //20100924, henrichen@zkoss.org: handle all zero case
         final char posCh = !fraction && strip == pos && pos >= 0 ? result.charAt(pos) : '\000';
-        final boolean allZeros = posCh == '0' || posCh == ',';
+        final boolean allZeros = posCh == '0' || posCh == comma;
         
         ListIterator<Special> it = numSpecials.listIterator(numSpecials.size());
         boolean followWithComma = false;
@@ -976,7 +1029,7 @@ public class CellNumberFormatter extends CellFormatter {
             if (followWithComma) {
             	//20100914, henrichen@zkoss.org: repect the current locale
                 //mods.add(insertMod(s, zeroStrip ? " " : ",", StringMod.AFTER));
-            	mods.add(insertMod(s, zeroStrip ? " " : comma, StringMod.AFTER));
+            	mods.add(insertMod(s, zeroStrip ? " " : commaStr, StringMod.AFTER));
                 followWithComma = false;
             }
             digit++;
@@ -1007,11 +1060,11 @@ public class CellNumberFormatter extends CellFormatter {
         int strip;
         ListIterator<Special> it;
         if (fractionalSpecials.size() > 0) {
-            //20100914, henrichen@zkoss.org: respect current Locale
-            final char dot = Formatters.getDecimalSeparator();
+            //20100914, henrichen@zkoss.org: respect given Locale
+            final char dot = Formatters.getDecimalSeparator(locale);
             output.setCharAt(decimalPoint.pos, dot);
 
-            digit = result.indexOf(".") + 1;
+            digit = result.indexOf(""+dot) + 1;
             if (exponent != null)
                 strip = result.indexOf("e") - 1;
             else
@@ -1040,7 +1093,7 @@ public class CellNumberFormatter extends CellFormatter {
      * for floating-point values.
      */
     public void simpleValue(StringBuffer toAppendTo, Object value) {
-        SIMPLE_NUMBER.formatValue(toAppendTo, value);
+        CellNumberFormatter.getFormatter(FormatterType.SIMPLE_NUMBER, locale).formatValue(toAppendTo, value); //ZSS-68
     }
 
     /**
