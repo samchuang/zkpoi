@@ -458,6 +458,7 @@ public final class HSSFRow implements Row {
     public void setHeight(short height)
     {
         if(height == -1){
+            row.setBadFontHeight(false); //20120103, henrichen@zkoss.org: default height, custom height shall be set to false
             row.setHeight((short)(0xFF | 0x8000));
         } else {
             row.setBadFontHeight(true);
@@ -813,5 +814,15 @@ public final class HSSFRow implements Row {
         }
     }
 
+    //20120103, henrichen@zkoss.org: return whether the row height is set by the user, compare to wrap text setting
+	@Override
+	public boolean isCustomHeight() {
+		return row.getBadFontHeight();
+	}
 
+    //20120103, henrichen@zkoss.org: return whether the row height is set by the user, compare to wrap text setting
+	@Override
+	public void setCustomHeight(boolean b) {
+		row.setBadFontHeight(b);
+	}
 }

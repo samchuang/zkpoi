@@ -225,4 +225,10 @@ public interface Row extends Iterable<Cell> {
     public static final MissingCellPolicy RETURN_BLANK_AS_NULL = new MissingCellPolicy();
     /** A new, blank cell is created for missing cells. Blank cells are returned as normal */
     public static final MissingCellPolicy CREATE_NULL_AS_BLANK = new MissingCellPolicy();
+    
+    //20120103, henrichen@zkoss.org: whether the height is set by the user
+    public boolean isCustomHeight();
+    
+    //20120103, henrichen@zkoss.org: whether the height is set by the user
+    public void setCustomHeight(boolean b);
 }

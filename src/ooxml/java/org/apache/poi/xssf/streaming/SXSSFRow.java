@@ -447,5 +447,12 @@ public class SXSSFRow implements Row
             throw new UnsupportedOperationException();
         }
     }
+	@Override
+	public boolean isCustomHeight() {
+		return false;
+	}
+	@Override
+	public void setCustomHeight(boolean b) {
+	}
 }
 

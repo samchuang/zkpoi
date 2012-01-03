@@ -519,4 +519,16 @@ public class XSSFRow implements Row, Comparable<XSSFRow> {
     public TreeMap<Integer, XSSFCell> getCells() {
     	return _cells;
     }
+
+    //20120103, henrichen@zkoss.org: return whether the row height is set by the user, compare to wrap text setting
+	@Override
+	public boolean isCustomHeight() {
+		return _row.isSetCustomHeight();
+	}
+
+    //20120103, henrichen@zkoss.org: return whether the row height is set by the user, compare to wrap text setting
+	@Override
+	public void setCustomHeight(boolean b) {
+		_row.setCustomHeight(b);
+	}
 }
