@@ -181,9 +181,6 @@ public class CellFormatPart {
                     desc));
         }
         Locale locale0 = getLocale(m); //20100616, Henri Chen
-        if (locale0 == null) { //ZSS-68
-        	locale0 = ZssContext.getCurrent().getLocale();
-        }
         locale = locale0;
         color = getColor(m);
         condition = getCondition(m);
@@ -247,8 +244,6 @@ public class CellFormatPart {
      */
     private static Locale getLocale(Matcher m) {
     	String ldesc = m.group(LOCALE_GROUP);
-    	if (ldesc == null || ldesc.length() == 0)
-    		return null;
    		logger.finer("format locale: "+ldesc);
     	Locale l = getLocale(ldesc);
     	if (l == null)
@@ -257,7 +252,11 @@ public class CellFormatPart {
     }
     
     private static Locale getLocale(String ldesc) {
-    	return Locale.US;
+    	//ZSS-68
+    	//TODO based on ldesc to return the locale; e.g. [$-409] => en_US
+    	//currently, we always return current locale no matter the format
+    	//return Locale.US;
+        return ZssContext.getCurrent().getLocale();
     }
     /**
      * Returns the color specification from the matcher, or <tt>null</tt> if
