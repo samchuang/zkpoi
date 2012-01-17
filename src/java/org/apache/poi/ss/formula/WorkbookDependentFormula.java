@@ -27,4 +27,5 @@ package org.zkoss.poi.ss.formula;
  */
 public interface WorkbookDependentFormula {
 	String toFormulaString(FormulaRenderingWorkbook book);
+	String toInternalFormulaString(FormulaRenderingWorkbook book); //20120117, henrichen@zkoss.org: ZSS-81
 }

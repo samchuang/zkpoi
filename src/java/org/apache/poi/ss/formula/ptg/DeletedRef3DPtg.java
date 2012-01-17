@@ -65,4 +65,11 @@ public final class DeletedRef3DPtg extends OperandPtg implements WorkbookDepende
 		out.writeShort(field_1_index_extern_sheet);
 		out.writeInt(unused1);
 	}
+	//20120117, henrichen@zkoss.org: return extern book in book index
+	//ZSS-81 Cannot input formula with proper external book name
+	@Override
+	public String toInternalFormulaString(FormulaRenderingWorkbook book) {
+		return ExternSheetNameResolver.prependInternalSheetName(book, field_1_index_extern_sheet, 
+				ErrorConstants.getText(ErrorConstants.ERROR_REF));
+	}
 }

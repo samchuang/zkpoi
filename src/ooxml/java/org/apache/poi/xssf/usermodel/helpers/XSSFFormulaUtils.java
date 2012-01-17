@@ -88,6 +88,13 @@ public final class XSSFFormulaUtils {
             public String getNameText(NamePtg namePtg) {
                 return _fpwb.getNameText(namePtg);
             }
+
+            //20120117, henrichen@zkoss.org: return extern book index from book name
+            //ZSS-81 Cannot input formula with proper external book name
+			@Override
+			public String getExternalLinkIndexFromBookName(String bookname) {
+				return _fpwb.getExternalLinkIndexFromBookName(bookname);
+			}
         };
 
         // update named ranges

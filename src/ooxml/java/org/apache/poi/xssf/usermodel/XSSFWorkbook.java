@@ -1796,4 +1796,10 @@ public class XSSFWorkbook extends POIXMLDocument implements Workbook, Iterable<X
 	/*package*/ void setPictureData(int pictureIndex, XSSFPictureData img) {
 		pictures.set(pictureIndex, img);
 	}
+	
+	//20110117, henrichen@zkoss.org: get book index
+	//ZSS-81 Cannot input formula with proper external book name
+	/*package*/ String getExternalLinkIndexFromBookName(String bookname) {
+		return bookNameToLinkIndex.get(bookname);
+	}
 }

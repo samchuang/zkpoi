@@ -99,10 +99,14 @@ public final class FormulaParser {
 					}
 				}
 			}
+			String realname = null; //20120117, henrichen@zkoss.org: ZSS-81
 			if (bookName != null) {
-				bookName = book.getBookNameFromExternalLinkIndex(bookName);
+				realname = book.getBookNameFromExternalLinkIndex(bookName);
+				if (realname == null) {
+					realname = bookName;
+				}
 			}
-			_bookName = bookName;
+			_bookName = realname; //20120117, henrichen@zkoss.org: ZSS-81
 			_sheetIdentifier = sheetIdentifier;
 		}
 		public String getBookName() {

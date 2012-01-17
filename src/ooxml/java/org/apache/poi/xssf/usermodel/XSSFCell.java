@@ -437,8 +437,12 @@ public final class XSSFCell implements Cell {
 
         XSSFEvaluationWorkbook fpb = XSSFEvaluationWorkbook.create(wb);
         //validate through the FormulaParser
-        FormulaParser.parse(formula, fpb, formulaType, wb.getSheetIndex(getSheet()));
+        Ptg[] ptgs = FormulaParser.parse(formula, fpb, formulaType, wb.getSheetIndex(getSheet()));
 
+        //20110117, henrichen@zkoss.org: change to internal form (extern book name -> extern book index)
+        //ZSS-81 Cannot input formula with proper external book name
+        formula = FormulaRenderer.toInternalFormulaString(fpb, ptgs);
+        
         CTCellFormula f = CTCellFormula.Factory.newInstance();
         f.setStringValue(formula);
         _cell.setF(f);

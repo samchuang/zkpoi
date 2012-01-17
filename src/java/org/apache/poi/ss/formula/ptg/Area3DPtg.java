@@ -119,4 +119,14 @@ public final class Area3DPtg extends AreaPtgBase implements WorkbookDependentFor
 		final Area3DPtg other = (Area3DPtg) o;
 		return super.equals(o) && other.field_1_index_extern_sheet == this.field_1_index_extern_sheet;
 	}
+	
+	//20120117, henrichen@zkoss.org: return extern book in book index
+	//ZSS-81 Cannot input formula with proper external book name
+	/**
+	 * @return text representation of this area reference that can be used in text
+	 *  formulas. The sheet name will get properly delimited if required.
+	 */
+	public String toInternalFormulaString(FormulaRenderingWorkbook book) {
+		return ExternSheetNameResolver.prependInternalSheetName(book, field_1_index_extern_sheet, formatReferenceAsString());
+	}
 }

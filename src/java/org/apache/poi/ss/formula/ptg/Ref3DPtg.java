@@ -110,4 +110,11 @@ public final class Ref3DPtg extends RefPtgBase implements WorkbookDependentFormu
 		final Ref3DPtg other = (Ref3DPtg) o;
 		return super.equals(o) && other.field_1_index_extern_sheet == this.field_1_index_extern_sheet;
 	}
+
+	//20120117, henrichen@zkoss.org: return extern book in book index form
+	//ZSS-81 Cannot input formula with proper external book name
+	@Override
+	public String toInternalFormulaString(FormulaRenderingWorkbook book) {
+        return ExternSheetNameResolver.prependInternalSheetName(book, field_1_index_extern_sheet, formatReferenceAsString());
+	}
 }

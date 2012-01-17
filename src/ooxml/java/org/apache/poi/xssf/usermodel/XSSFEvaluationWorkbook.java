@@ -141,8 +141,8 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 
 	public String getSheetNameByExternSheet(int externSheetIndex) {
 		String[] names = _uBook.convertFromExternSheetIndex(externSheetIndex);
-		//20101213, henrichen@zkoss.org: sheet could have been deleted
-		return names == null || _uBook.getSheet(names[1]) == null ? "" : names[1].equals(names[2]) ? names[1] : names[1]+':'+names[2];  
+		//20120117, henrichen@zkoss.org: ZSS-82
+		return names == null ? "" : names[1].equals(names[2]) ? names[1] : names[1]+':'+names[2];   
 	}
 
 	public String getNameText(NamePtg namePtg) {
@@ -233,5 +233,12 @@ public final class XSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	public Ptg[] getFormulaTokens(int sheetIndex, String formula) {
 		XSSFEvaluationWorkbook frBook = XSSFEvaluationWorkbook.create(_uBook);
 		return FormulaParser.parse(formula, frBook, FormulaType.CELL, sheetIndex);
+	}
+
+	//20110117, henrichen@zkoss.org: get extern book index from book name
+	//ZSS-81 Cannot input formula with proper external book name
+	@Override
+	public String getExternalLinkIndexFromBookName(String bookname) {
+		return _uBook.getExternalLinkIndexFromBookName(bookname);
 	}
 }

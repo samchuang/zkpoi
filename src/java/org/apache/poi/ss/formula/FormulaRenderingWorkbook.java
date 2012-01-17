@@ -37,4 +37,5 @@ public interface FormulaRenderingWorkbook {
 	String getSheetNameByExternSheet(int externSheetIndex);
 	String resolveNameXText(NameXPtg nameXPtg);
 	String getNameText(NamePtg namePtg);
+	String getExternalLinkIndexFromBookName(String bookname); //20110117, henrichen@zkoss.org: ZSS-81
 }

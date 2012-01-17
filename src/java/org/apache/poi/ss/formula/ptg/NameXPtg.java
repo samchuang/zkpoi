@@ -90,4 +90,11 @@ public final class NameXPtg extends OperandPtg implements WorkbookDependentFormu
 	public int getNameIndex() {
 		return _nameNumber - 1;
 	}
+
+	//20120117, henrichen@zkoss.org
+	//ZSS-81 Cannot input formula with proper external book name
+	@Override
+	public String toInternalFormulaString(FormulaRenderingWorkbook book) {
+		throw new RuntimeException("3D references need a workbook to determine formula text");
+	}
 }

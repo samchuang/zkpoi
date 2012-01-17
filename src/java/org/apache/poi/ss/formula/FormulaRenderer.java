@@ -128,4 +128,86 @@ public class FormulaRenderer {
         }
         return operands;
     }
+
+
+    //20120117, henrichen@zkoss.org: generate formula string to be stored in file
+    //ZSS-81 Cannot input formula with proper external book name
+    /**
+     * Static method to convert an array of {@link Ptg}s in RPN order
+     * to internal string format for storing into file.
+     * @param book  used for defined names and 3D references
+     * @param ptgs  must not be <code>null</code>
+     * @return a human readable String
+     */
+    public static String toInternalFormulaString(FormulaRenderingWorkbook book, Ptg[] ptgs) {
+        if (ptgs == null || ptgs.length == 0) {
+            throw new IllegalArgumentException("ptgs must not be null");
+        }
+        Stack<String> stack = new Stack<String>();
+
+        for (int i=0 ; i < ptgs.length; i++) {
+            Ptg ptg = ptgs[i];
+            // TODO - what about MemNoMemPtg?
+            if(ptg instanceof MemAreaPtg || ptg instanceof MemFuncPtg || ptg instanceof MemErrPtg) {
+                // marks the start of a list of area expressions which will be naturally combined
+                // by their trailing operators (e.g. UnionPtg)
+                // TODO - put comment and throw exception in toFormulaString() of these classes
+                continue;
+            }
+            if (ptg instanceof ParenthesisPtg) {
+                String contents = stack.pop();
+                stack.push ("(" + contents + ")");
+                continue;
+            }
+            if (ptg instanceof AttrPtg) {
+                AttrPtg attrPtg = ((AttrPtg) ptg);
+                if (attrPtg.isOptimizedIf() || attrPtg.isOptimizedChoose() || attrPtg.isSkip()) {
+                    continue;
+                }
+                if (attrPtg.isSpace()) {
+                    // POI currently doesn't render spaces in formulas
+                    continue;
+                    // but if it ever did, care must be taken:
+                    // tAttrSpace comes *before* the operand it applies to, which may be consistent
+                    // with how the formula text appears but is against the RPN ordering assumed here
+                }
+                if (attrPtg.isSemiVolatile()) {
+                    // similar to tAttrSpace - RPN is violated
+                    continue;
+                }
+                if (attrPtg.isSum()) {
+                    String[] operands = getOperands(stack, attrPtg.getNumberOfOperands());
+                    stack.push(attrPtg.toFormulaString(operands));
+                    continue;
+                }
+                throw new RuntimeException("Unexpected tAttr: " + attrPtg.toString());
+            }
+
+            if (ptg instanceof WorkbookDependentFormula) {
+                WorkbookDependentFormula optg = (WorkbookDependentFormula) ptg;
+                stack.push(optg.toInternalFormulaString(book));
+                continue;
+            }
+            if (! (ptg instanceof OperationPtg)) {
+                stack.push(ptg.toFormulaString());
+                continue;
+            }
+
+            OperationPtg o = (OperationPtg) ptg;
+            String[] operands = getOperands(stack, o.getNumberOfOperands());
+            stack.push(o.toFormulaString(operands));
+        }
+        if(stack.isEmpty()) {
+            // inspection of the code above reveals that every stack.pop() is followed by a
+            // stack.push(). So this is either an internal error or impossible.
+            throw new IllegalStateException("Stack underflow");
+        }
+        String result = stack.pop();
+        if(!stack.isEmpty()) {
+            // Might be caused by some tokens like AttrPtg and Mem*Ptg, which really shouldn't
+            // put anything on the stack
+            throw new IllegalStateException("too much stuff left on the stack");
+        }
+        return result;
+    }
 }

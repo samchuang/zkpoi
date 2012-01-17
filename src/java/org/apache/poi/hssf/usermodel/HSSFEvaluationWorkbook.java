@@ -224,4 +224,12 @@ public final class HSSFEvaluationWorkbook implements FormulaRenderingWorkbook, E
 	public Ptg[] getFormulaTokens(int sheetIndex, String formula) {
 		return HSSFFormulaParser.parse(formula, _uBook, FormulaType.CELL, sheetIndex);
 	}
+
+	//20120117, henrichen@zkoss.org: get book index from book name
+	//ZSS-81 Cannot input formula with proper external book name
+	@Override
+	public String getExternalLinkIndexFromBookName(String bookname) {
+		//TODO see #getBookNameFromExternalLinkIndex(String externalIndex)
+		return bookname;
+	}
 }

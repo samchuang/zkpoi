@@ -79,4 +79,11 @@ public final class NamePtg extends OperandPtg implements WorkbookDependentFormul
 	public byte getDefaultOperandClass() {
 		return Ptg.CLASS_REF;
 	}
+
+	//20120117, henrichen@zkoss.org: return extern index
+	//ZSS-81 Cannot input formula with proper external book name
+	@Override
+	public String toInternalFormulaString(FormulaRenderingWorkbook book) {
+		return toFormulaString(book);
+	}
 }

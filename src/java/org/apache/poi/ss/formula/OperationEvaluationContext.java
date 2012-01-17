@@ -92,17 +92,23 @@ public final class OperationEvaluationContext {
 			try {
 				targetEvaluator = _bookEvaluator.getOtherWorkbookEvaluator(workbookName);
 			} catch (WorkbookNotFoundException e) {
-				throw new RuntimeException(e.getMessage());
+				//20120117, henrichen@zkoss.org: ZSS-82
+				return null;
+				//throw new RuntimeException(e.getMessage());
 			}
 			otherSheetIndex = targetEvaluator.getSheetIndex(externalSheet.getSheetName());
 			otherLastSheetIndex = targetEvaluator.getSheetIndex(externalSheet.getLastSheetName());
 			if (otherSheetIndex < 0) {
-				throw new RuntimeException("Invalid sheet name '" + externalSheet.getSheetName()
-						+ "' in bool '" + workbookName + "'.");
+				//20120117, henrichen@zkoss.org: ZSS-82
+				return null;
+				//throw new RuntimeException("Invalid sheet name '" + externalSheet.getSheetName()
+				//		+ "' in bool '" + workbookName + "'.");
 			}
 			if (otherLastSheetIndex < 0) {
-				throw new RuntimeException("Invalid sheet name '" + externalSheet.getLastSheetName()
-						+ "' in bool '" + workbookName + "'.");
+				//20120117, henrichen@zkoss.org: ZSS-82
+				return null;
+				//throw new RuntimeException("Invalid sheet name '" + externalSheet.getLastSheetName()
+				//		+ "' in bool '" + workbookName + "'.");
 			}
 		}
 		return new SheetRefEvaluator(targetEvaluator, _tracker, otherSheetIndex, otherLastSheetIndex);
@@ -258,6 +264,10 @@ public final class OperationEvaluationContext {
 	}
 	public ValueEval getRef3DEval(int rowIndex, int columnIndex, int extSheetIndex) {
 		SheetRefEvaluator sre = createExternSheetRefEvaluator(extSheetIndex);
+		//20120117, henrichen@zkoss.org: ZSS-82
+		if (sre == null) {
+			return ErrorEval.REF_INVALID;
+		}
 		return new LazyRefEval(rowIndex, columnIndex, sre);
 	}
 	public ValueEval getAreaEval(int firstRowIndex, int firstColumnIndex,
@@ -271,6 +281,10 @@ public final class OperationEvaluationContext {
 	public ValueEval getArea3DEval(int firstRowIndex, int firstColumnIndex,
 			int lastRowIndex, int lastColumnIndex, int extSheetIndex) {
 		SheetRefEvaluator sre = createExternSheetRefEvaluator(extSheetIndex);
+		//20120117, henrichen@zkoss.org: ZSS-82
+		if (sre == null) {
+			return ErrorEval.REF_INVALID;
+		}
 		return new LazyAreaEval(firstRowIndex, firstColumnIndex, lastRowIndex, lastColumnIndex, sre);
 	}
 	public ValueEval getNameXEval(NameXPtg nameXPtg) {
