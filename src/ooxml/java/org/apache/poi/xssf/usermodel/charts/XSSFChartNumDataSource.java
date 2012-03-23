@@ -16,6 +16,7 @@
    ==================================================================== */
 package org.zkoss.poi.xssf.usermodel.charts;
 
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumData;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumDataSource;
 import org.zkoss.poi.ss.formula.SheetNameFormatter;
 import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
@@ -78,7 +79,10 @@ public class XSSFChartNumDataSource<T> implements ChartDataSource<T> {
 			final String newref = ref.replaceAll(o+"!", n+"!");
 			if (!newref.equals(ref)) {
 				val.getNumRef().setF(newref);
-				val.getNumRef().unsetNumCache(); //invalidate the cache 
+				CTNumData cache = val.getNumRef().getNumCache();
+				if (cache != null) {
+					val.getNumRef().unsetNumCache(); //invalidate the cache 
+				}
 			}
 		}
 	}

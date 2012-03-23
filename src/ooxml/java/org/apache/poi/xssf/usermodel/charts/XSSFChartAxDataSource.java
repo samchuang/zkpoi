@@ -17,6 +17,8 @@
 package org.zkoss.poi.xssf.usermodel.charts;
 
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxDataSource;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumData;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrData;
 import org.zkoss.poi.ss.formula.SheetNameFormatter;
 import org.zkoss.poi.ss.usermodel.charts.ChartDataSource;
 
@@ -95,7 +97,10 @@ public class XSSFChartAxDataSource<T> implements ChartDataSource<T> {
 				final String newref = ref.replaceAll(o+"!", n+"!");
 				if (!newref.equals(ref)) {
 					cat.getNumRef().setF(newref);
-					cat.getNumRef().unsetNumCache(); //invalidate the cache 
+					CTNumData cache = cat.getNumRef().getNumCache();
+					if (cache != null) {
+						cat.getNumRef().unsetNumCache(); //invalidate the cache 	
+					}
 				}
 			} else {
 				final String o = SheetNameFormatter.format(oldname);
@@ -104,7 +109,10 @@ public class XSSFChartAxDataSource<T> implements ChartDataSource<T> {
 				final String newref = ref.replaceAll(o+"!", n+"!");
 				if (!newref.equals(ref)) {
 					cat.getStrRef().setF(newref);
-					cat.getStrRef().unsetStrCache(); //invalidate the cache 
+					CTStrData cache = cat.getStrRef().getStrCache();
+					if (cache != null) {
+						cat.getStrRef().unsetStrCache(); //invalidate the cache 	
+					}
 				}
 			}
 		}
