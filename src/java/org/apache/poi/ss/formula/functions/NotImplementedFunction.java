@@ -17,8 +17,8 @@
 
 package org.zkoss.poi.ss.formula.functions;
 
-import org.zkoss.poi.ss.formula.eval.ValueEval;
 import org.zkoss.poi.ss.formula.eval.NotImplementedException;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
 
 /**
  *
@@ -31,14 +31,35 @@ import org.zkoss.poi.ss.formula.eval.NotImplementedException;
  */
 public final class NotImplementedFunction implements Function {
 	private final String _functionName;
+	//20120320, henrichen@zkoss.org: ZSS-103
+	private Function _func;
+	private static Class _funcClass;
+	static {
+		try {
+			_funcClass = Thread.currentThread().getClass().forName("org.zkoss.zssex.formula.ELEvalFunction");
+		} catch (ClassNotFoundException e) {
+			//ignore
+		}		
+	}
 	protected NotImplementedFunction() {
 		_functionName = getClass().getName();
 	}
 	public NotImplementedFunction(String name) {
 		_functionName = name;
+		//20120320, henrichen@zkoss.org: ZSS-103
+		if (_funcClass != null) {
+			try {
+				_func = (Function) _funcClass.getConstructor(String.class).newInstance(name);
+			} catch(Exception ex) {
+				//ignore
+			}
+		}
 	}
 
 	public ValueEval evaluate(ValueEval[] operands, int srcRow, int srcCol) {
+		//20120320, henrichen@zkoss.org: ZSS-103
+		if (_func != null)
+			return _func.evaluate(operands, srcRow, srcCol);
 		throw new NotImplementedException(_functionName);
 	}
 	public String getFunctionName() {
