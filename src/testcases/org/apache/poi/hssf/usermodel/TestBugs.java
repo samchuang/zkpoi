@@ -1037,6 +1037,7 @@ public final class TestBugs extends BaseTestBugzillaIssues {
         confirmCachedValue("70164", nc2);
         confirmCachedValue("90210", nc3);
 
+        @SuppressWarnings("deprecation")
         CellValueRecordInterface[] cvrs = ns.getSheet().getValueRecords();
         for (int i = 0; i < cvrs.length; i++) {
             CellValueRecordInterface cvr = cvrs[i];
@@ -1678,17 +1679,17 @@ public final class TestBugs extends BaseTestBugzillaIssues {
        
        row = s.getRow(4);
        assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
-       assertEquals("'[\u0005$http://gagravarr.org/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
+       assertEquals("'[$http://gagravarr.org/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
        assertEquals(112.0, row.getCell(1).getNumericCellValue());
        
        // Change 4
-       row.getCell(1).setCellFormula("'[\u0005$http://gagravarr.org/FormulaRefs2.xls]Sheet1'!B2");
+       row.getCell(1).setCellFormula("'[$http://gagravarr.org/FormulaRefs2.xls]Sheet1'!B2");
        row.getCell(1).setCellValue(123.0);
        
        // Add 5
        row = s.createRow(5);
        row.createCell(1, Cell.CELL_TYPE_FORMULA);
-       row.getCell(1).setCellFormula("'[\u0005$http://example.com/FormulaRefs.xls]Sheet1'!B1");
+       row.getCell(1).setCellFormula("'[$http://example.com/FormulaRefs.xls]Sheet1'!B1");
        row.getCell(1).setCellValue(234.0);
        
        
@@ -1719,12 +1720,12 @@ public final class TestBugs extends BaseTestBugzillaIssues {
 if(1==2) {
        row = s.getRow(4);
        assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
-       assertEquals("'[\u0005$http://gagravarr.org/FormulaRefs2.xls]Sheet1'!B2", row.getCell(1).getCellFormula());
+       assertEquals("'[$http://gagravarr.org/FormulaRefs2.xls]Sheet1'!B2", row.getCell(1).getCellFormula());
        assertEquals(123.0, row.getCell(1).getNumericCellValue());
        
        row = s.getRow(5);
        assertEquals(Cell.CELL_TYPE_FORMULA, row.getCell(1).getCellType());
-       assertEquals("'[\u0005$http://example.com/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
+       assertEquals("'[$http://example.com/FormulaRefs.xls]Sheet1'!B1", row.getCell(1).getCellFormula());
        assertEquals(234.0, row.getCell(1).getNumericCellValue());
 }
     }
@@ -2180,6 +2181,29 @@ if(1==2) {
         HSSFWorkbook wb = openSample("51670.xls");
         writeOutAndReadBack(wb);
     }
+    
+    /**
+     * Sum across multiple workbooks
+     *  eg =SUM($Sheet2.A1:$Sheet3.A1)
+     * DISABLED - We currently get the formula wrong, and mis-evaluate
+     */
+    public void DISABLEDtest48703() {
+        HSSFWorkbook wb = openSample("48703.xls");
+        assertEquals(3, wb.getNumberOfSheets());
+        
+        // Check reading the formula
+        Sheet sheet = wb.getSheetAt(0);
+        Row r = sheet.getRow(0);
+        Cell c = r.getCell(0);
+        
+        assertEquals("SUM(Sheet2!A1:Sheet3!A1)", c.getCellFormula());
+        assertEquals(4.0, c.getNumericCellValue());
+        
+        // Check the evaluated result
+        HSSFFormulaEvaluator eval = new HSSFFormulaEvaluator(wb);
+        eval.evaluateFormulaCell(c);
+        assertEquals(4.0, c.getNumericCellValue());
+    }
 
     /**
      * Normally encrypted files have BOF then FILEPASS, but
@@ -2192,5 +2216,26 @@ if(1==2) {
        } catch(EncryptedDocumentException e) {
           // Good
        }
+    }
+
+    public void test49896() {
+        HSSFWorkbook wb = openSample("49896.xls");
+        HSSFCell  cell = wb.getSheetAt(0).getRow(1).getCell(1);
+        String PATH_SEPARATOR = System.getProperty("file.separator");
+        assertEquals("VLOOKUP(A2,'[C:Documents and Settings" + PATH_SEPARATOR+"Yegor"+PATH_SEPARATOR
+                +"My Documents"+PATH_SEPARATOR+"csco.xls]Sheet1'!$A$2:$B$3,2,FALSE)",
+                cell.getCellFormula());
+     }
+
+    public void test49529() throws Exception {
+        // user code reported in Bugzilla #49529
+        HSSFWorkbook workbook = openSample("49529.xls");
+        workbook.getSheetAt(0).createDrawingPatriarch();
+        // prior to the fix the line below failed with
+        // java.lang.IllegalStateException: EOF - next record not available
+        workbook.cloneSheet(0);
+
+        // make sure we are still readable
+        writeOutAndReadBack(workbook);
     }
 }

@@ -121,7 +121,7 @@ public class XSLFTextRun {
     }
 
     public void setFontColor(Color color){
-        CTTextCharacterProperties rPr = getRpR();
+        CTTextCharacterProperties rPr = getRPr();
         CTSolidColorFillProperties fill = rPr.isSetSolidFill() ? rPr.getSolidFill() : rPr.addNewSolidFill();
         CTSRgbColor clr = fill.isSetSrgbClr() ? fill.getSrgbClr() : fill.addNewSrgbClr();
         clr.setVal(new byte[]{(byte)color.getRed(), (byte)color.getGreen(), (byte)color.getBlue()});
@@ -163,10 +163,14 @@ public class XSLFTextRun {
      * The value of <code>-1</code> unsets the Sz attribyte from the underlying xml bean
      */
     public void setFontSize(double fontSize){
-        CTTextCharacterProperties rPr = getRpR();
+        CTTextCharacterProperties rPr = getRPr();
         if(fontSize == -1.0) {
             if(rPr.isSetSz()) rPr.unsetSz();
         } else {
+            if(fontSize < 1.0) {
+                throw new IllegalArgumentException("Minimum font size is 1pt but was " + fontSize);
+            }
+
             rPr.setSz((int)(100*fontSize));
         }
     }
@@ -213,6 +217,24 @@ public class XSLFTextRun {
     }
 
     /**
+     * Set the spacing between characters within a text run.
+     * <p>
+     * The spacing is specified in points. Positive values will cause the text to expand,
+     * negative values to condense.
+     * </p>
+     *
+     * @param spc  character spacing in points.
+     */
+    public void setCharacterSpacing(double spc){
+        CTTextCharacterProperties rPr = getRPr();
+        if(spc == 0.0) {
+            if(rPr.isSetSpc()) rPr.unsetSpc();
+        } else {
+            rPr.setSpc((int)(100*spc));
+        }
+    }
+
+    /**
      * Specifies the typeface, or name of the font that is to be used for this text run.
      *
      * @param typeface  the font to apply to this text run.
@@ -223,7 +245,7 @@ public class XSLFTextRun {
     }
 
     public void setFontFamily(String typeface, byte charset, byte pictAndFamily, boolean isSymbol){
-        CTTextCharacterProperties rPr = getRpR();
+        CTTextCharacterProperties rPr = getRPr();
 
         if(typeface == null){
             if(rPr.isSetLatin()) rPr.unsetLatin();
@@ -292,8 +314,8 @@ public class XSLFTextRun {
      *
      * @param strike whether a run of text will be formatted as strikethrough text.
      */
-    public void setStrikethrough(boolean strike){
-        getRpR().setStrike(strike ? STTextStrikeType.SNG_STRIKE : STTextStrikeType.NO_STRIKE);
+    public void setStrikethrough(boolean strike) {
+        getRPr().setStrike(strike ? STTextStrikeType.SNG_STRIKE : STTextStrikeType.NO_STRIKE);
     }
 
     /**
@@ -371,7 +393,7 @@ public class XSLFTextRun {
      * @param bold whether this run of text will be formatted as bold text
      */
     public void setBold(boolean bold){
-        getRpR().setB(bold);
+        getRPr().setB(bold);
     }
 
     /**
@@ -395,7 +417,7 @@ public class XSLFTextRun {
      * @param italic whether this run of text is formatted as italic text
      */
     public void setItalic(boolean italic){
-        getRpR().setI(italic);
+        getRPr().setI(italic);
     }
 
     /**
@@ -418,8 +440,8 @@ public class XSLFTextRun {
     /**
      * @param underline whether this run of text is formatted as underlined text
      */
-    public void setUnderline(boolean underline){
-        getRpR().setU(underline ? STTextUnderlineType.SNG : STTextUnderlineType.NONE);
+    public void setUnderline(boolean underline) {
+        getRPr().setU(underline ? STTextUnderlineType.SNG : STTextUnderlineType.NONE);
     }
 
     /**
@@ -439,7 +461,7 @@ public class XSLFTextRun {
         return fetcher.getValue() == null ? false : fetcher.getValue();
     }
 
-    protected CTTextCharacterProperties getRpR(){
+    protected CTTextCharacterProperties getRPr(){
         return _r.isSetRPr() ? _r.getRPr() : _r.addNewRPr();
     }
 
@@ -463,7 +485,7 @@ public class XSLFTextRun {
     private boolean fetchCharacterProperty(CharacterPropertyFetcher fetcher){
         boolean ok = false;
 
-        if(_r.isSetRPr()) ok = fetcher.fetch(_r.getRPr());
+        if(_r.isSetRPr()) ok = fetcher.fetch(getRPr());
 
         if(!ok) {
             XSLFTextShape shape = _p.getParentShape();

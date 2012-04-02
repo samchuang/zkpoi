@@ -41,15 +41,7 @@ import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.FormulaShifter;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellRange;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataValidation;
-import org.apache.poi.ss.usermodel.DataValidationHelper;
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.Header;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
@@ -65,45 +57,7 @@ import org.apache.poi.xssf.usermodel.helpers.XSSFRowShifter;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTAutoFilter;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBreak;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellFormula;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCol;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCols;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTComment;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCommentList;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidation;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDataValidations;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTDrawing;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTHeaderFooter;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTHyperlink;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTLegacyDrawing;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTMergeCell;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTMergeCells;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTOutlinePr;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageBreak;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageMargins;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageSetUpPr;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPane;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPrintOptions;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRow;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSelection;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetCalcPr;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetFormatPr;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetPr;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetProtection;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetView;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetViews;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTablePart;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableParts;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellFormulaType;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STPane;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STPaneState;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STUnsignedShortHex;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.WorksheetDocument;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 
 /**
  * High level representation of a SpreadsheetML worksheet.
@@ -2060,8 +2014,7 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param  height default row height in  twips (1/20 of  a point)
      */
     public void setDefaultRowHeight(short height) {
-        getSheetTypeSheetFormatPr().setDefaultRowHeight((double)height / 20);
-
+        setDefaultRowHeightInPoints((float)height / 20);
     }
 
     /**
@@ -2070,8 +2023,9 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
      * @param height default row height measured in point size.
      */
     public void setDefaultRowHeightInPoints(float height) {
-        getSheetTypeSheetFormatPr().setDefaultRowHeight(height);
-
+        CTSheetFormatPr pr = getSheetTypeSheetFormatPr();
+        pr.setDefaultRowHeight(height);
+        pr.setCustomHeight(true);
     }
 
     /**
@@ -2670,7 +2624,20 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
         if (f != null && f.getT() == STCellFormulaType.SHARED && f.isSetRef() && f.getStringValue() != null) {
             // save a detached  copy to avoid XmlValueDisconnectedException,
             // this may happen when the master cell of a shared formula is changed
-            sharedFormulas.put((int)f.getSi(), (CTCellFormula)f.copy());
+            CTCellFormula sf = (CTCellFormula)f.copy();
+            CellRangeAddress sfRef = CellRangeAddress.valueOf(sf.getRef());
+            CellReference cellRef = new CellReference(cell);
+            // If the shared formula range preceeds the master cell then the preceding  part is discarded, e.g.
+            // if the cell is E60 and the shared formula range is C60:M85 then the effective range is E60:M85
+            // see more details in https://issues.apache.org/bugzilla/show_bug.cgi?id=51710
+            if(cellRef.getCol() > sfRef.getFirstColumn() || cellRef.getRow() > sfRef.getFirstRow()){
+                String effectiveRef = new CellRangeAddress(
+                        Math.max(cellRef.getRow(), sfRef.getFirstRow()), sfRef.getLastRow(),
+                        Math.max(cellRef.getCol(), sfRef.getFirstColumn()), sfRef.getLastColumn()).formatAsString();
+                sf.setRef(effectiveRef);
+            }
+
+            sharedFormulas.put((int)f.getSi(), sf);
         }
         if (f != null && f.getT() == STCellFormulaType.ARRAY && f.getRef() != null) {
             arrayFormulas.add(CellRangeAddress.valueOf(f.getRef()));
@@ -3204,5 +3171,18 @@ public class XSSFSheet extends POIXMLDocumentPart implements Sheet {
 
     public XSSFSheetConditionalFormatting getSheetConditionalFormatting(){
         return new XSSFSheetConditionalFormatting(this);
+    }
+
+    /**
+     * Set background color of the sheet tab
+     *
+     * @param colorIndex  the indexed color to set, must be a constant from {@link IndexedColors}
+     */
+    public void setTabColor(int colorIndex){
+        CTSheetPr pr = worksheet.getSheetPr();
+        if(pr == null) pr = worksheet.addNewSheetPr();
+        CTColor color = CTColor.Factory.newInstance();
+        color.setIndexed(colorIndex);
+        pr.setTabColor(color);
     }
 }

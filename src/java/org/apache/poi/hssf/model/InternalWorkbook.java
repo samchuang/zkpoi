@@ -89,7 +89,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalName;
 import org.apache.poi.ss.formula.EvaluationWorkbook.ExternalSheet;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
-import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.Internal;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
@@ -2456,5 +2455,19 @@ public final class InternalWorkbook {
             records.add(pos + 1, record);
         }
         return record;
+    }
+
+        
+	/**
+	 * Changes an external referenced file to another file.
+	 * A formular in Excel which refers a cell in another file is saved in two parts: 
+	 * The referenced file is stored in an reference table. the row/cell information is saved separate.
+	 * This method invokation will only change the reference in the lookup-table itself.
+	 * @param oldUrl The old URL to search for and which is to be replaced
+	 * @param newUrl The URL replacement
+	 * @return true if the oldUrl was found and replaced with newUrl. Otherwise false
+	 */
+    public boolean changeExternalReference(String oldUrl, String newUrl) {
+    	return linkTable.changeExternalReference(oldUrl, newUrl);
     }
 }

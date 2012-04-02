@@ -30,6 +30,7 @@ import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDocProtect;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTOnOff;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSettings;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTZoom;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STDocProtect;
@@ -147,8 +148,33 @@ public class XWPFSettings extends POIXMLDocumentPart {
         safeGetDocumentProtection().setEnforcement(STOnOff.X_0);
     }
 
+    /**
+     * Enforces fields update on document open (in Word).
+     * In the settings.xml file <br/>
+     * sets the updateSettings value to true (w:updateSettings w:val="true")
+     * 
+     *  NOTICES:
+     *  <ul>
+     *  	<li>Causing Word to ask on open: "This document contains fields that may refer to other files. Do you want to update the fields in this document?"
+     *           (if "Update automatic links at open" is enabled)</li>
+     *  	<li>Flag is removed after saving with changes in Word </li>
+     *  </ul> 
+     */
+    public void setUpdateFields() {
+    	CTOnOff onOff = CTOnOff.Factory.newInstance();
+    	onOff.setVal(STOnOff.TRUE);
+    	ctSettings.setUpdateFields(onOff);
+    }
+
+    boolean isUpdateFields() {
+        return ctSettings.isSetUpdateFields() && ctSettings.getUpdateFields().getVal() == STOnOff.TRUE;
+    }
+
     @Override
     protected void commit() throws IOException {
+        if (ctSettings == null) {
+           throw new IllegalStateException("Unable to write out settings that were never read in!");
+        }
 
         XmlOptions xmlOptions = new XmlOptions(DEFAULT_XML_OPTIONS);
         xmlOptions.setSaveSyntheticDocumentElement(new QName(CTSettings.type.getName().getNamespaceURI(), "settings"));

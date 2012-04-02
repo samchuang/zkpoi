@@ -18,13 +18,10 @@
 package org.apache.poi.xssf.usermodel;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.TreeMap;
 
 import junit.framework.TestCase;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRPrElt;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STXstring;
@@ -140,6 +137,12 @@ public final class TestXSSFRichTextString extends TestCase {
         rt.setString("  Apache");
         assertEquals("<xml-fragment xml:space=\"preserve\">  Apache</xml-fragment>", xs.xmlText());
 
+        rt.append(" POI");
+        rt.append(" ");
+        assertEquals("  Apache POI ", rt.getString());
+        assertEquals("<xml-fragment xml:space=\"preserve\">  Apache</xml-fragment>", rt.getCTRst().getRArray(0).xgetT().xmlText());
+        assertEquals("<xml-fragment xml:space=\"preserve\"> POI</xml-fragment>", rt.getCTRst().getRArray(1).xgetT().xmlText());
+        assertEquals("<xml-fragment xml:space=\"preserve\"> </xml-fragment>", rt.getCTRst().getRArray(2).xgetT().xmlText());
     }
 
     /**

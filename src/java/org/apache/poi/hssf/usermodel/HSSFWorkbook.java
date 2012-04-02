@@ -51,9 +51,7 @@ import org.apache.poi.ss.formula.FormulaType;
 import org.apache.poi.ss.formula.SheetNameFormatter;
 import org.apache.poi.ss.formula.ptg.Area3DPtg;
 import org.apache.poi.ss.formula.ptg.MemFuncPtg;
-import org.apache.poi.ss.formula.ptg.OperandPtg;
 import org.apache.poi.ss.formula.ptg.Ptg;
-import org.apache.poi.ss.formula.ptg.Ref3DPtg;
 import org.apache.poi.ss.formula.ptg.UnionPtg;
 import org.apache.poi.ss.formula.udf.AggregatingUDFFinder;
 import org.apache.poi.ss.formula.udf.UDFFinder;
@@ -1798,5 +1796,16 @@ public final class HSSFWorkbook extends POIDocument implements org.apache.poi.ss
         return recalc != null && recalc.getEngineId() != 0;
     }
 
-
+	/**
+	 * Changes an external referenced file to another file.
+	 * A formular in Excel which refers a cell in another file is saved in two parts: 
+	 * The referenced file is stored in an reference table. the row/cell information is saved separate.
+	 * This method invokation will only change the reference in the lookup-table itself.
+	 * @param oldUrl The old URL to search for and which is to be replaced
+	 * @param newUrl The URL replacement
+	 * @return true if the oldUrl was found and replaced with newUrl. Otherwise false
+	 */
+    public boolean changeExternalReference(String oldUrl, String newUrl) {
+    	return workbook.changeExternalReference(oldUrl, newUrl);
+    }
 }

@@ -38,6 +38,7 @@ import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ import java.util.regex.Pattern;
  * @author Yegor Kozlov
  */
 @Beta
-public class XSLFGroupShape extends XSLFShape {
+public class XSLFGroupShape extends XSLFShape implements XSLFShapeContainer {
     private final CTGroupShape _shape;
     private final XSLFSheet _sheet;
     private final List<XSLFShape> _shapes;
@@ -141,6 +142,15 @@ public class XSLFGroupShape extends XSLFShape {
      */
     public XSLFShape[] getShapes(){
         return _shapes.toArray(new XSLFShape[_shapes.size()]);
+    }
+
+    /**
+     * Returns an iterator over the shapes in this sheet
+     *
+     * @return an iterator over the shapes in this sheet
+     */
+    public Iterator<XSLFShape> iterator(){
+        return _shapes.iterator();
     }
 
     /**
@@ -307,6 +317,30 @@ public class XSLFGroupShape extends XSLFShape {
 
         graphics.setRenderingHint(XSLFRenderingHint.GROUP_TRANSFORM, tx0);
         
+    }
+
+    @Override
+    void copy(XSLFShape src){
+        XSLFGroupShape gr = (XSLFGroupShape)src;
+        // recursively update each shape
+        XSLFShape[] tgtShapes = getShapes();
+        XSLFShape[] srcShapes = gr.getShapes();
+        for(int i = 0; i < tgtShapes.length; i++){
+            XSLFShape s1 = srcShapes[i];
+            XSLFShape s2 = tgtShapes[i];
+
+            s2.copy(s1);
+        }
+    }
+
+    /**
+     * Removes all of the elements from this container (optional operation).
+     * The container will be empty after this call returns.
+     */
+    public void clear() {
+        for(XSLFShape shape : getShapes()){
+            removeShape(shape);
+        }
     }
 
 }

@@ -35,7 +35,6 @@ import org.apache.poi.ss.formula.FormulaShifter;
 import org.apache.poi.ss.formula.ptg.Ptg;
 import org.apache.poi.ss.formula.ptg.Area3DPtg;
 import org.apache.poi.hssf.util.PaneInformation;
-import org.apache.poi.hssf.util.Region;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.FormulaType;
 import org.apache.poi.ss.usermodel.Cell;
@@ -197,6 +196,8 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     public HSSFRow createRow(int rownum)
     {
         HSSFRow row = new HSSFRow(_workbook, this, rownum);
+        // new rows inherit default height from the sheet
+        row.setHeight(getDefaultRowHeight());
 
         addRow(row, true);
         return row;
@@ -763,10 +764,10 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
     /**
      * @deprecated (Aug-2008) use {@link HSSFSheet#getMergedRegion(int)}
      */
-    public Region getMergedRegionAt(int index) {
+    public org.apache.poi.hssf.util.Region getMergedRegionAt(int index) {
         CellRangeAddress cra = getMergedRegion(index);
 
-        return new Region(cra.getFirstRow(), (short)cra.getFirstColumn(),
+        return new org.apache.poi.hssf.util.Region(cra.getFirstRow(), (short)cra.getFirstColumn(),
                 cra.getLastRow(), (short)cra.getLastColumn());
     }
     /**
@@ -1060,7 +1061,14 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * @return the size of the margin
      */
     public double getMargin(short margin) {
-        return _sheet.getPageSettings().getMargin(margin);
+        switch (margin){
+            case FooterMargin:
+                return _sheet.getPageSettings().getPrintSetup().getFooterMargin();
+            case HeaderMargin:
+                return _sheet.getPageSettings().getPrintSetup().getHeaderMargin();
+            default:
+                return _sheet.getPageSettings().getMargin(margin);
+        }
     }
 
     /**
@@ -1069,7 +1077,16 @@ public final class HSSFSheet implements org.apache.poi.ss.usermodel.Sheet {
      * @param size the size of the margin
      */
     public void setMargin(short margin, double size) {
-        _sheet.getPageSettings().setMargin(margin, size);
+        switch (margin){
+            case FooterMargin:
+                _sheet.getPageSettings().getPrintSetup().setFooterMargin(size);
+                break;
+            case HeaderMargin:
+                _sheet.getPageSettings().getPrintSetup().setHeaderMargin(size);
+                break;
+            default:
+                _sheet.getPageSettings().setMargin(margin, size);
+        }
     }
 
     private WorksheetProtectionBlock getProtectionBlock() {

@@ -17,10 +17,11 @@
 
 package org.apache.poi.ss.formula;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
+import org.apache.poi.ss.formula.atp.AnalysisToolPak;
+import org.apache.poi.ss.formula.eval.*;
+import org.apache.poi.ss.formula.functions.Function;
 import org.apache.poi.ss.formula.ptg.Area3DPtg;
 import org.apache.poi.ss.formula.ptg.AreaErrPtg;
 import org.apache.poi.ss.formula.ptg.AreaPtg;
@@ -48,16 +49,6 @@ import org.apache.poi.ss.formula.ptg.RefPtg;
 import org.apache.poi.ss.formula.ptg.StringPtg;
 import org.apache.poi.ss.formula.ptg.UnionPtg;
 import org.apache.poi.ss.formula.ptg.UnknownPtg;
-import org.apache.poi.ss.formula.eval.BlankEval;
-import org.apache.poi.ss.formula.eval.BoolEval;
-import org.apache.poi.ss.formula.eval.ErrorEval;
-import org.apache.poi.ss.formula.eval.EvaluationException;
-import org.apache.poi.ss.formula.eval.MissingArgEval;
-import org.apache.poi.ss.formula.eval.NameEval;
-import org.apache.poi.ss.formula.eval.NumberEval;
-import org.apache.poi.ss.formula.eval.OperandResolver;
-import org.apache.poi.ss.formula.eval.StringEval;
-import org.apache.poi.ss.formula.eval.ValueEval;
 import org.apache.poi.ss.formula.functions.Choose;
 import org.apache.poi.ss.formula.functions.FreeRefFunction;
 import org.apache.poi.ss.formula.functions.IfFunc;
@@ -65,8 +56,9 @@ import org.apache.poi.ss.formula.udf.AggregatingUDFFinder;
 import org.apache.poi.ss.formula.udf.UDFFinder;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment.WorkbookNotFoundException;
-import org.apache.poi.ss.formula.eval.NotImplementedException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.util.POILogFactory;
+import org.apache.poi.util.POILogger;
 
 /**
  * Evaluates formula cells.<p/>
@@ -80,8 +72,10 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author Josh Micich
  */
 public final class WorkbookEvaluator {
+	
+	private static final POILogger LOG = POILogFactory.getLogger(WorkbookEvaluator.class);
 
-	private final EvaluationWorkbook _workbook;
+    private final EvaluationWorkbook _workbook;
 	private EvaluationCache _cache;
 	/** part of cache entry key (useful when evaluating multiple workbooks) */
 	private int _workbookIx;
@@ -92,6 +86,8 @@ public final class WorkbookEvaluator {
 	private CollaboratingWorkbooksEnvironment _collaboratingWorkbookEnvironment;
 	private final IStabilityClassifier _stabilityClassifier;
 	private final AggregatingUDFFinder _udfFinder;
+
+    private boolean _ignoreMissingWorkbooks = false;
 
 	/**
 	 * @param udfFinder pass <code>null</code> for default (AnalysisToolPak only)
@@ -144,11 +140,19 @@ public final class WorkbookEvaluator {
 	}
 
 	private static boolean isDebugLogEnabled() {
-		return false;
+		return LOG.check(POILogger.DEBUG);
+	}
+	private static boolean isInfoLogEnabled() {
+		return LOG.check(POILogger.INFO);
 	}
 	private static void logDebug(String s) {
 		if (isDebugLogEnabled()) {
-			System.out.println(s);
+			LOG.log(POILogger.DEBUG, s);
+		}
+	}
+	private static void logInfo(String s) {
+		if (isInfoLogEnabled()) {
+			LOG.log(POILogger.INFO, s);
 		}
 	}
 	/* package */ void attachToEnvironment(CollaboratingWorkbooksEnvironment collaboratingWorkbooksEnvironment, EvaluationCache cache, int workbookIx) {
@@ -288,9 +292,36 @@ public final class WorkbookEvaluator {
 				}
 
 				tracker.updateCacheResult(result);
-			} catch (NotImplementedException e) {
+			}
+			 catch (NotImplementedException e) {
 				throw addExceptionInfo(e, sheetIndex, rowIndex, columnIndex);
-			} finally {
+			 } catch (RuntimeException re) {
+				 if (re.getCause() instanceof WorkbookNotFoundException && _ignoreMissingWorkbooks) {
+ 					logInfo(re.getCause().getMessage() + " - Continuing with cached value!");
+ 					switch(srcCell.getCachedFormulaResultType()) {
+	 					case Cell.CELL_TYPE_NUMERIC:
+	 						result = new NumberEval(srcCell.getNumericCellValue());
+	 						break;
+	 					case Cell.CELL_TYPE_STRING:
+	 						result =  new StringEval(srcCell.getStringCellValue());
+	 						break;
+	 					case Cell.CELL_TYPE_BLANK:
+	 						result = BlankEval.instance;
+	 						break;
+	 					case Cell.CELL_TYPE_BOOLEAN:
+	 						result =  BoolEval.valueOf(srcCell.getBooleanCellValue());
+	 						break;
+	 					case Cell.CELL_TYPE_ERROR:
+							result =  ErrorEval.valueOf(srcCell.getErrorCellValue());
+							break;
+	 					case Cell.CELL_TYPE_FORMULA:
+						default:
+							throw new RuntimeException("Unexpected cell type '" + srcCell.getCellType()+"' found!");
+ 					}
+				 } else {
+					 throw re;
+				 }
+			 } finally {
 				tracker.endEvaluate(cce);
 			}
 		} else {
@@ -624,4 +655,72 @@ public final class WorkbookEvaluator {
 	public FreeRefFunction findUserDefinedFunction(String functionName) {
 		return _udfFinder.findFunction(functionName);
 	}
+
+    /**
+     * Whether to ignore missing references to external workbooks and
+     * use cached formula results in the main workbook instead.
+     * <p>
+     * In some cases exetrnal workbooks referenced by formulas in the main workbook are not avaiable.
+     * With this method you can control how POI handles such missing references:
+     * <ul>
+     *     <li>by default ignoreMissingWorkbooks=false and POI throws {@link WorkbookNotFoundException}
+     *     if an external reference cannot be resolved</li>
+     *     <li>if ignoreMissingWorkbooks=true then POI uses cached formula result
+     *     that already exists in the main workbook</li>
+     * </ul>
+     *
+     * @param ignore whether to ignore missing references to external workbooks
+     * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=52575">Bug 52575</a> for details
+     */
+    public void setIgnoreMissingWorkbooks(boolean ignore){
+        _ignoreMissingWorkbooks = ignore;
+    }
+
+    /**
+     * Return a collection of functions that POI can evaluate
+     *
+     * @return names of functions supported by POI
+     */
+    public static Collection<String> getSupportedFunctionNames(){
+        Collection<String> lst = new TreeSet<String>();
+        lst.addAll(FunctionEval.getSupportedFunctionNames());
+        lst.addAll(AnalysisToolPak.getSupportedFunctionNames());
+        return lst;
+    }
+
+    /**
+     * Return a collection of functions that POI does not support
+     *
+     * @return names of functions NOT supported by POI
+     */
+    public static Collection<String> getNotSupportedFunctionNames(){
+        Collection<String> lst = new TreeSet<String>();
+        lst.addAll(FunctionEval.getNotSupportedFunctionNames());
+        lst.addAll(AnalysisToolPak.getNotSupportedFunctionNames());
+        return lst;
+    }
+
+    /**
+     * Register a ATP function in runtime.
+     *
+     * @param name  the function name
+     * @param func  the functoin to register
+     * @throws IllegalArgumentException if the function is unknown or already  registered.
+     * @since 3.8 beta6
+     */
+    public static void registerFunction(String name, FreeRefFunction func){
+        AnalysisToolPak.registerFunction(name, func);
+    }
+
+    /**
+     * Register a function in runtime.
+     *
+     * @param name  the function name
+     * @param func  the functoin to register
+     * @throws IllegalArgumentException if the function is unknown or already  registered.
+     * @since 3.8 beta6
+     */
+    public static void registerFunction(String name, Function func){
+        FunctionEval.registerFunction(name, func);
+    }
 }

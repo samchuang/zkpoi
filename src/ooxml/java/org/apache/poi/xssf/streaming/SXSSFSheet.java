@@ -22,14 +22,16 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Map;
 
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 
 import org.apache.poi.ss.util.SheetUtil;
-import org.apache.poi.util.Internal;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import org.apache.poi.hssf.util.PaneInformation;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetFormatPr;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 
 /**
  * Streaming version of XSSFSheet implementing the "BigGridDemo" strategy.
@@ -43,6 +45,7 @@ public class SXSSFSheet implements Sheet, Cloneable
     TreeMap<Integer,SXSSFRow> _rows=new TreeMap<Integer,SXSSFRow>();
     SheetDataWriter _writer;
     int _randomAccessWindowSize = SXSSFWorkbook.DEFAULT_WINDOW_SIZE;
+    int outlineLevelRow = 0;
 
     public SXSSFSheet(SXSSFWorkbook workbook, XSSFSheet xSheet) throws IOException
     {
@@ -84,6 +87,12 @@ public class SXSSFSheet implements Sheet, Cloneable
      */
     public Row createRow(int rownum)
     {
+        int maxrow = SpreadsheetVersion.EXCEL2007.getLastRowIndex();
+        if (rownum < 0 || rownum > maxrow) {
+            throw new IllegalArgumentException("Invalid row number (" + rownum
+                    + ") outside allowable range (0.." + maxrow + ")");
+        }
+
 //Make the initial allocation as big as the row above.
         Row previousRow=rownum>0?getRow(rownum-1):null;
         int initialAllocationSize=0;
@@ -1024,12 +1033,54 @@ public class SXSSFSheet implements Sheet, Cloneable
     /**
      * Tie a range of rows together so that they can be collapsed or expanded
      *
+     * <p>
+     *     Please note the rows being grouped <em>must</em> be in the current window,
+     *     if the rows are already flushed then groupRow has no effect.
+     * </p>
+     * <p>
+     *      Correct code:
+     *      <pre><code>
+     *       Workbook wb = new SXSSFWorkbook(100);  // keep 100 rows in memory
+     *       Sheet sh = wb.createSheet();
+     *       for (int rownum = 0; rownum &lt; 1000; rownum++) {
+     *           Row row = sh.createRow(rownum);
+     *           if(rownum == 200)  {
+     *               sh.groupRow(100, 200);
+     *           }
+     *       }
+     *
+     *      </code></pre>
+     * </p>
+     * <p>
+     *      Incorrect code:
+     *      <pre><code>
+     *       Workbook wb = new SXSSFWorkbook(100);  // keep 100 rows in memory
+     *       Sheet sh = wb.createSheet();
+     *       for (int rownum = 0; rownum &lt; 1000; rownum++) {
+     *           Row row = sh.createRow(rownum);
+     *       }
+     *       sh.groupRow(100, 200); // the rows in the range [100, 200] are already flushed and groupRows has no effect
+     *
+     *      </code></pre>
+     * </p>
+     *
      * @param fromRow   start row (0-based)
      * @param toRow     end row (0-based)
      */
     public void groupRow(int fromRow, int toRow)
     {
-        _sh.groupRow(fromRow, toRow);
+        for(SXSSFRow row : _rows.subMap(fromRow, toRow + 1).values()){
+            int level = row.getOutlineLevel() + 1;
+            row.setOutlineLevel(level);
+
+            if(level > outlineLevelRow) outlineLevelRow = level;
+        }
+
+        CTWorksheet ct = _sh.getCTWorksheet();
+        CTSheetFormatPr pr = ct.isSetSheetFormatPr() ?
+                ct.getSheetFormatPr() :
+                ct.addNewSheetFormatPr();
+        if(outlineLevelRow > 0) pr.setOutlineLevelRow((short)outlineLevelRow);
     }
 
     /**
@@ -1051,7 +1102,8 @@ public class SXSSFSheet implements Sheet, Cloneable
      */
     public void setRowGroupCollapsed(int row, boolean collapse)
     {
-        _sh.setRowGroupCollapsed(row, collapse);
+        //_sh.setRowGroupCollapsed(row, collapse);
+        throw new RuntimeException("Not Implemented");
     }
 
     /**

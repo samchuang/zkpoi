@@ -48,6 +48,7 @@ import org.openxmlformats.schemas.drawingml.x2006.main.STShapeType;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTAnchor;
 import org.openxmlformats.schemas.drawingml.x2006.wordprocessingDrawing.CTInline;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTColor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDrawing;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTEmpty;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFonts;
@@ -74,6 +75,8 @@ import org.openxmlformats.schemas.drawingml.x2006.picture.CTPictureNonVisual;
  * XWPFRun object defines a region of text with a common set of properties
  *
  * @author Yegor Kozlov
+ * @author Gregg Morris (gregg dot morris at gmail dot com) - added getColor(), setColor()
+ *
  */
 public class XWPFRun {
     private CTR run;
@@ -242,6 +245,31 @@ public class XWPFRun {
         CTRPr pr = run.isSetRPr() ? run.getRPr() : run.addNewRPr();
         CTOnOff bold = pr.isSetB() ? pr.getB() : pr.addNewB();
         bold.setVal(value ? STOnOff.TRUE : STOnOff.FALSE);
+    }
+
+    /**
+     * Get text color. The returned value is a string in the hex form "RRGGBB".
+     */
+    public String getColor() {
+    	String color = null;
+        if (run.isSetRPr()) {
+        	CTRPr pr = run.getRPr();
+        	if (pr.isSetColor()) {
+        		CTColor clr = pr.getColor();
+        		color = clr.xgetVal().getStringValue();
+        	}
+        }
+    	return color;
+    }
+
+    /**
+     * Set text color.
+     * @param rgbStr - the desired color, in the hex form "RRGGBB".
+     */
+    public void setColor(String rgbStr) {
+        CTRPr pr = run.isSetRPr() ? run.getRPr() : run.addNewRPr();
+        CTColor color = pr.isSetColor() ? pr.getColor() : pr.addNewColor();
+        color.setVal(rgbStr);
     }
 
     /**
@@ -627,9 +655,10 @@ public class XWPFRun {
      *  
      * @param pictureData The raw picture data
      * @param pictureType The type of the picture, eg {@link Document#PICTURE_TYPE_JPEG}
-     * @throws IOException 
-     * @throws org.apache.poi.openxml4j.exceptions.InvalidFormatException 
-     * @throws IOException 
+     * @param image width in EMUs. To convert to / from points use {@link org.apache.poi.util.Units}
+     * @param image height in EMUs. To convert to / from points use {@link org.apache.poi.util.Units}
+     * @throws org.apache.poi.openxml4j.exceptions.InvalidFormatException
+     * @throws IOException
      */
     public XWPFPicture addPicture(InputStream pictureData, int pictureType, String filename, int width, int height)
     throws InvalidFormatException, IOException {
@@ -648,7 +677,7 @@ public class XWPFRun {
             // (We need full control of what goes where and as what)
             String xml = 
                 "<a:graphic xmlns:a=\"" + CTGraphicalObject.type.getName().getNamespaceURI() + "\">" +
-                "<a:graphicData uri=\"" + CTGraphicalObject.type.getName().getNamespaceURI() + "\">" +
+                "<a:graphicData uri=\"" + CTPicture.type.getName().getNamespaceURI() + "\">" +
                 "<pic:pic xmlns:pic=\"" + CTPicture.type.getName().getNamespaceURI() + "\" />" +
                 "</a:graphicData>" +
                 "</a:graphic>";

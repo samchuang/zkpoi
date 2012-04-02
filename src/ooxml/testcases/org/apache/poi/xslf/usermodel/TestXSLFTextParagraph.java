@@ -27,11 +27,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: yegor
- * Date: Nov 10, 2011
- * Time: 1:43:25 PM
- * To change this template use File | Settings | File Templates.
+ * @author Yegor Kozlov
  */
 public class TestXSLFTextParagraph extends TestCase {
     private static POILogger _logger = POILogFactory.getLogger(XSLFTextParagraph.class);
@@ -219,7 +215,107 @@ public class TestXSLFTextParagraph extends TestCase {
         XSLFTextShape sh3 = (XSLFTextShape)shapes[2];
         assertEquals("Foundation", sh3.getText());
         assertEquals(TextAlign.CENTER, sh3.getTextParagraphs().get(0).getTextAlign());
+    }
 
+    public void testParagraphProperties(){
+        XMLSlideShow ppt = new XMLSlideShow();
+        XSLFSlide slide = ppt.createSlide();
+        XSLFTextShape sh = slide.createAutoShape();
 
+        XSLFTextParagraph p = sh.addNewTextParagraph();
+        assertFalse(p.isBullet());
+        p.setBullet(true);
+        assertTrue(p.isBullet());
+
+        assertEquals("\u2022", p.getBulletCharacter());
+        p.setBulletCharacter("*");
+        assertEquals("*", p.getBulletCharacter());
+
+        assertEquals("Arial", p.getBulletFont());
+        p.setBulletFont("Calibri");
+        assertEquals("Calibri", p.getBulletFont());
+
+        assertEquals(null, p.getBulletFontColor());
+        p.setBulletFontColor(Color.red);
+        assertEquals(Color.red, p.getBulletFontColor());
+
+        assertEquals(100.0, p.getBulletFontSize());
+        p.setBulletFontSize(200.);
+        assertEquals(200., p.getBulletFontSize());
+        p.setBulletFontSize(-20.);
+        assertEquals(-20.0, p.getBulletFontSize());
+
+        assertEquals(72.0, p.getDefaultTabSize());
+        
+        assertEquals(0.0, p.getIndent());
+        p.setIndent(72.0);
+        assertEquals(72.0, p.getIndent());
+        p.setIndent(-1.0); // the value of -1.0 resets to the defaults
+        assertEquals(0.0, p.getIndent());
+
+        assertEquals(0.0, p.getLeftMargin());
+        p.setLeftMargin(72.0);
+        assertEquals(72.0, p.getLeftMargin());
+        p.setLeftMargin(-1.0); // the value of -1.0 resets to the defaults
+        assertEquals(0.0, p.getLeftMargin());
+
+        assertEquals(0, p.getLevel());
+        p.setLevel(1);
+        assertEquals(1, p.getLevel());
+        p.setLevel(2);
+        assertEquals(2, p.getLevel());
+
+        assertEquals(100., p.getLineSpacing());
+        p.setLineSpacing(200.);
+        assertEquals(200.0, p.getLineSpacing());
+        p.setLineSpacing(-15.);
+        assertEquals(-15.0, p.getLineSpacing());
+
+        assertEquals(0., p.getSpaceAfter());
+        p.setSpaceAfter(200.);
+        assertEquals(200.0, p.getSpaceAfter());
+        p.setSpaceAfter(-15.);
+        assertEquals(-15.0, p.getSpaceAfter());
+
+        assertEquals(0., p.getSpaceBefore());
+        p.setSpaceBefore(200.);
+        assertEquals(200.0, p.getSpaceBefore());
+        p.setSpaceBefore(-15.);
+        assertEquals(-15.0, p.getSpaceBefore());
+
+        assertEquals(TextAlign.LEFT, p.getTextAlign());
+        p.setTextAlign(TextAlign.RIGHT);
+        assertEquals(TextAlign.RIGHT, p.getTextAlign());
+
+        p.setBullet(false);
+        assertFalse(p.isBullet());
+    }
+
+    public void testLineBreak(){
+        XMLSlideShow ppt = new XMLSlideShow();
+        XSLFSlide slide = ppt.createSlide();
+        XSLFTextShape sh = slide.createAutoShape();
+
+        XSLFTextParagraph p = sh.addNewTextParagraph();
+        XSLFTextRun r1 = p.addNewTextRun();
+        r1.setText("Hello,");
+        XSLFTextRun r2 = p.addLineBreak();
+        assertEquals("\n", r2.getText());
+        r2.setFontSize(10.0);
+        assertEquals(10.0, r2.getFontSize());
+        XSLFTextRun r3 = p.addNewTextRun();
+        r3.setText("World!");
+        r3.setFontSize(20.0);
+        XSLFTextRun r4 = p.addLineBreak();
+        assertEquals(20.0, r4.getFontSize());
+
+        assertEquals("Hello,\nWorld!\n",sh.getText());
+
+        try {
+            r2.setText("aaa");
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException e){
+            assertEquals("You cannot change text of a line break, it is always '\\n'", e.getMessage());
+        }
     }
 }

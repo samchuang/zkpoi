@@ -159,4 +159,18 @@ public class TestXSLFSlide extends TestCase {
         XSLFPictureShape srcPic = (XSLFPictureShape)src.getSlides()[4].getShapes()[1];
         assertTrue(Arrays.equals(sh4.getPictureData().getData(), srcPic.getPictureData().getData()));
     }
+
+    public void testMergeSlides(){
+        XMLSlideShow ppt = new XMLSlideShow();
+        String[] pptx = {"shapes.pptx", "themes.pptx", "layouts.pptx", "backgrounds.pptx"};
+
+        for(String arg : pptx){
+            XMLSlideShow  src = XSLFTestDataSamples.openSampleDocument(arg);
+
+            for(XSLFSlide srcSlide : src.getSlides()){
+                ppt.createSlide().importContent(srcSlide);
+            }
+        }
+        assertEquals(30, ppt.getSlides().length);
+    }    
 }
