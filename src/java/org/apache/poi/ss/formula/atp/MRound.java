@@ -23,10 +23,6 @@ import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
 import org.zkoss.poi.ss.formula.functions.NumericFunction;
 import org.zkoss.poi.ss.usermodel.DateUtil;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.regex.Pattern;
-
 /**
  * Implementation of Excel 'Analysis ToolPak' function MROUND()<br/>
  *

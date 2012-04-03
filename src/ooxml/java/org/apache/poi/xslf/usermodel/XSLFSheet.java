@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 @Beta
-public abstract class XSLFSheet extends POIXMLDocumentPart implements Iterable<XSLFShape> {
+public abstract class XSLFSheet extends POIXMLDocumentPart implements XSLFShapeContainer {
     private XSLFCommonSlideData _commonSlideData;
     private XSLFDrawing _drawing;
     private List<XSLFShape> _shapes;
@@ -241,6 +241,16 @@ public abstract class XSLFSheet extends POIXMLDocumentPart implements Iterable<X
         return getShapeList().remove(xShape);
     }
 
+    /**
+     * Removes all of the elements from this container (optional operation).
+     * The container will be empty after this call returns.
+     */
+    public void clear() {
+        for(XSLFShape shape : getShapes()){
+            removeShape(shape);
+        }
+    }
+
     protected abstract String getRootElementName();
 
     protected CTGroupShape getSpTree(){
@@ -286,10 +296,11 @@ public abstract class XSLFSheet extends POIXMLDocumentPart implements Iterable<X
         _shapes = null;
         _spTree = null;
         _drawing = null;
+        _spTree = null;
         // first copy the source xml
-        getXmlObject().set(src.getXmlObject());
+        getSpTree().set(src.getSpTree());
 
-        // recursively update each shape 
+        // recursively update each shape
         List<XSLFShape> tgtShapes = getShapeList();
         List<XSLFShape> srcShapes = src.getShapeList();
         for(int i = 0; i < tgtShapes.size(); i++){
@@ -302,10 +313,52 @@ public abstract class XSLFSheet extends POIXMLDocumentPart implements Iterable<X
     }
 
     /**
+     * Append content to this sheet.
+     *
+     * @param src the source sheet
+     * @return modified <code>this</code>.
+     */
+    public XSLFSheet appendContent(XSLFSheet src){
+        CTGroupShape spTree = getSpTree();
+        int numShapes = getShapeList().size();
+
+        CTGroupShape srcTree = src.getSpTree();
+        for(XmlObject ch : srcTree.selectPath("*")){
+            if(ch instanceof CTShape){ // simple shape
+                spTree.addNewSp().set(ch);
+            } else if (ch instanceof CTGroupShape){
+                spTree.addNewGrpSp().set(ch);
+            } else if (ch instanceof CTConnector){
+                spTree.addNewCxnSp().set(ch);
+            } else if (ch instanceof CTPicture){
+                spTree.addNewPic().set(ch);
+            } else if (ch instanceof CTGraphicalObjectFrame){
+                spTree.addNewGraphicFrame().set(ch);
+            }
+        }
+
+        _shapes = null;
+        _spTree = null;
+        _drawing = null;
+        _spTree = null;
+
+        // recursively update each shape
+        List<XSLFShape> tgtShapes = getShapeList();
+        List<XSLFShape> srcShapes = src.getShapeList();
+        for(int i = 0; i < srcShapes.size(); i++){
+            XSLFShape s1 = srcShapes.get(i);
+            XSLFShape s2 = tgtShapes.get(numShapes + i);
+
+            s2.copy(s1);
+        }
+        return this;
+    }
+
+   /**
      * @return theme (shared styles) associated with this theme.
      *  By default returns <code>null</code> which means that this sheet is theme-less.
      *  Sheets that support the notion of themes (slides, masters, layouts, etc.) should override this
-     *  method and return the corresposnding package part.
+     *  method and return the corresponding package part.
      */
     XSLFTheme getTheme(){
     	return null;

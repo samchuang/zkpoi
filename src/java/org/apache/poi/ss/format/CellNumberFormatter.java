@@ -66,6 +66,40 @@ public class CellNumberFormatter extends CellFormatter {
     private DecimalFormat decimalFmt;
     private boolean fixDenominator;
 
+/*    static final CellFormatter SIMPLE_NUMBER = new CellFormatter("General") {
+        public void formatValue(StringBuffer toAppendTo, Object value) {
+            if (value == null)
+                return;
+            if (value instanceof Number) {
+                Number num = (Number) value;
+                if (num.doubleValue() % 1.0 == 0)
+                    SIMPLE_INT.formatValue(toAppendTo, value);
+                else
+                	//20110328, henrichen@zkoss.org: shall consider the Excel 15 digits limit(bug# 311)
+                    //SIMPLE_FLOAT.formatValue(toAppendTo, value);
+                	toAppendTo.append(NumberToTextConverter.toText(((Number)value).doubleValue()));
+            } else {
+                CellTextFormatter.SIMPLE_TEXT.formatValue(toAppendTo, value);
+            }
+        }
+
+        public void simpleValue(StringBuffer toAppendTo, Object value) {
+            formatValue(toAppendTo, value);
+        }
+    };
+
+    private static final CellFormatter SIMPLE_INT = new CellNumberFormatter(
+            "#");
+    private static final CellFormatter SIMPLE_FLOAT = new CellNumberFormatter(
+            "#.###############"); //20100616, Henri Chen
+*/
+    // The CellNumberFormatter.simpleValue() method uses the SIMPLE_NUMBER
+    // CellFormatter defined here. The CellFormat.GENERAL_FORMAT CellFormat
+    // no longer uses the SIMPLE_NUMBER CellFormatter.
+    // Note that the simpleValue()/SIMPLE_NUMBER CellFormatter format
+    // ("#" for integer values, and "#.#" for floating-point values) is
+    // different from the 'General' format for numbers ("#" for integer
+    // values and "#.#########" for floating-point values).
     //20111229, henrichen@zkoss.org: ZSS-68
 	/*package*/ enum FormatterType {
 		SIMPLE_NUMBER,
@@ -113,33 +147,6 @@ public class CellNumberFormatter extends CellFormatter {
 		return formatter;
 	}
 
-/*    static final CellFormatter SIMPLE_NUMBER = new CellFormatter("General") {
-        public void formatValue(StringBuffer toAppendTo, Object value) {
-            if (value == null)
-                return;
-            if (value instanceof Number) {
-                Number num = (Number) value;
-                if (num.doubleValue() % 1.0 == 0)
-                    SIMPLE_INT.formatValue(toAppendTo, value);
-                else
-                	//20110328, henrichen@zkoss.org: shall consider the Excel 15 digits limit(bug# 311)
-                    //SIMPLE_FLOAT.formatValue(toAppendTo, value);
-                	toAppendTo.append(NumberToTextConverter.toText(((Number)value).doubleValue()));
-            } else {
-                CellTextFormatter.SIMPLE_TEXT.formatValue(toAppendTo, value);
-            }
-        }
-
-        public void simpleValue(StringBuffer toAppendTo, Object value) {
-            formatValue(toAppendTo, value);
-        }
-    };
-
-    private static final CellFormatter SIMPLE_INT = new CellNumberFormatter(
-            "#");
-    private static final CellFormatter SIMPLE_FLOAT = new CellNumberFormatter(
-            "#.###############"); //20100616, Henri Chen
-*/
     /**
      * This class is used to mark where the special characters in the format
      * are, as opposed to the other characters that are simply printed.
@@ -672,7 +679,13 @@ public class CellNumberFormatter extends CellFormatter {
         double value = ((Number) valueObject).doubleValue();
         value *= scale;
 
-        // the '-' sign goes at the front, always, so we pick it out
+        // For negative numbers:
+        // - If the cell format has a negative number format, this method
+        // is called with a positive value and the number format has
+        // the negative formatting required, e.g. minus sign or brackets.
+        // - If the cell format does not have a negative number format,
+        // this method is called with a negative value and the number is
+        // formatted with a minus sign at the start.
         boolean negative = value < 0;
         if (negative)
             value = -value;

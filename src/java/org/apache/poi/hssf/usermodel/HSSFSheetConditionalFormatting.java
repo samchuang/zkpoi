@@ -122,8 +122,8 @@ public final class HSSFSheetConditionalFormatting implements SheetConditionalFor
 	/**
 	 * @deprecated use <tt>CellRangeAddress</tt> instead of <tt>Region</tt>
 	 */
-	public int addConditionalFormatting(Region[] regions, HSSFConditionalFormattingRule[] cfRules) {
-		return addConditionalFormatting(Region.convertRegionsToCellRanges(regions), cfRules);
+	public int addConditionalFormatting(org.zkoss.poi.ss.util.Region[] regions, HSSFConditionalFormattingRule[] cfRules) {
+		return addConditionalFormatting(org.zkoss.poi.ss.util.Region.convertRegionsToCellRanges(regions), cfRules);
 	}
 	/**
 	 * Allows to add a new Conditional Formatting set to the sheet.

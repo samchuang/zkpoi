@@ -168,9 +168,15 @@ public class TestDataFormatter extends TestCase {
     public void testFractions() {
        DataFormatter dfUS = new DataFormatter(Locale.US);
        
-       assertEquals("321 1/3", dfUS.formatRawCellContents(321.321, -1, "# #/#"));
+       // Excel often prefers "# #/#"
+       assertEquals("321 1/3",   dfUS.formatRawCellContents(321.321, -1, "# #/#"));
        assertEquals("321 26/81", dfUS.formatRawCellContents(321.321, -1, "# #/##"));
-       assertEquals("26027/81", dfUS.formatRawCellContents(321.321, -1, "#/##"));
+       assertEquals("26027/81",  dfUS.formatRawCellContents(321.321, -1, "#/##"));
+
+       // OOo seems to like the "# ?/?" form
+       assertEquals("321 1/3",   dfUS.formatRawCellContents(321.321, -1, "# ?/?"));
+       assertEquals("321 26/81", dfUS.formatRawCellContents(321.321, -1, "# ?/??"));
+       assertEquals("26027/81",  dfUS.formatRawCellContents(321.321, -1, "?/??"));
     }
     
     /**
@@ -237,6 +243,22 @@ public class TestDataFormatter extends TestCase {
        assertEquals("2010-J-1 2:00:00", dfUS.formatRawCellContents(
              DateUtil.getExcelDate(c, false), -1, "YYYY-MMMMM-D h:mm:ss"
        ));
+    }
+    
+    /**
+     * Tests that we do AM/PM handling properly
+     */
+    public void testAMPM() {
+       DataFormatter dfUS = new DataFormatter(Locale.US);
+       
+       assertEquals("06:00", dfUS.formatRawCellContents(0.25, -1, "hh:mm"));
+       assertEquals("18:00", dfUS.formatRawCellContents(0.75, -1, "hh:mm"));
+       
+       assertEquals("06:00 AM", dfUS.formatRawCellContents(0.25, -1, "hh:mm AM/PM"));
+       assertEquals("06:00 PM", dfUS.formatRawCellContents(0.75, -1, "hh:mm AM/PM"));
+       
+       assertEquals("1904-01-01 06:00:00 AM", dfUS.formatRawCellContents(0.25, -1, "yyyy-mm-dd hh:mm:ss AM/PM", true));
+       assertEquals("1904-01-01 06:00:00 PM", dfUS.formatRawCellContents(0.75, -1, "yyyy-mm-dd hh:mm:ss AM/PM", true));
     }
     
     /**
@@ -392,5 +414,22 @@ public class TestDataFormatter extends TestCase {
         assertEquals("-12.34 ", dfUS.formatRawCellContents(-12.34, -1, "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-"));
         assertEquals(" -   ", dfUS.formatRawCellContents(0.0, -1, "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-"));
         assertEquals(" $-   ", dfUS.formatRawCellContents(0.0, -1, "_-$* #,##0.00_-;-$* #,##0.00_-;_-$* \"-\"??_-;_-@_-"));
+    }
+
+    /**
+     * TODO Fix these so that they work
+     */
+    public void DISABLEDtestCustomFormats() {
+       DataFormatter dfUS = new DataFormatter(Locale.US, true);
+       String fmt;
+       
+       fmt = "\"At\" H:MM AM/PM \"on\" DDDD MMMM D\",\" YYYY";
+       assertEquals(
+             "At 4:20 AM on Thursday May 17, 2007",
+             dfUS.formatRawCellContents(39219.1805636921, -1, fmt)
+       );
+       
+       fmt = "0 \"dollars and\" .00 \"cents\"";
+       assertEquals("19 dollars and .99 cents", dfUS.formatRawCellContents(19.99, -1, fmt));
     }
 }

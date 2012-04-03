@@ -19,8 +19,6 @@ package org.zkoss.poi.poifs.crypt;
 import java.util.Arrays;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FilterInputStream;
-import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
@@ -29,7 +27,6 @@ import org.zkoss.poi.poifs.filesystem.DirectoryNode;
 import org.zkoss.poi.EncryptedDocumentException;
 
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.spec.IvParameterSpec;
@@ -46,6 +43,7 @@ public class AgileDecryptor extends Decryptor {
 
     private final EncryptionInfo _info;
     private SecretKey _secretKey;
+    private long _length = -1;
 
     private static final byte[] kVerifierInputBlock;
     private static final byte[] kHashedVerifierBlock;
@@ -104,8 +102,13 @@ public class AgileDecryptor extends Decryptor {
 
     public InputStream getDataStream(DirectoryNode dir) throws IOException, GeneralSecurityException {
         DocumentInputStream dis = dir.createDocumentInputStream("EncryptedPackage");
-        long size = dis.readLong();
-        return new ChunkedCipherInputStream(dis, size);
+        _length = dis.readLong();
+        return new ChunkedCipherInputStream(dis, _length);
+    }
+
+    public long getLength(){
+        if(_length == -1) throw new IllegalStateException("EcmaDecryptor.getDataStream() was not called");
+        return _length;
     }
 
     protected AgileDecryptor(EncryptionInfo info) {
@@ -182,7 +185,7 @@ public class AgileDecryptor extends Decryptor {
         private byte[] nextChunk() throws GeneralSecurityException, IOException {
             int index = (int)(_pos >> 12);
             byte[] blockKey = new byte[4];
-            LittleEndian.putInt(blockKey, index);
+            LittleEndian.putInt(blockKey, 0, index);
             byte[] iv = generateIv(_info.getHeader().getAlgorithm(),
                                    _info.getHeader().getKeySalt(), blockKey);
             _cipher.init(Cipher.DECRYPT_MODE, _secretKey, new IvParameterSpec(iv));

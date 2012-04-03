@@ -29,10 +29,6 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFontSize;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTVerticalAlignFontProperty;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STVerticalAlignRun;
 
-import java.util.Map;
-import java.util.Iterator;
-import java.awt.*;
-import java.awt.Font;
 
 /**
  * @author Yegor Kozlov

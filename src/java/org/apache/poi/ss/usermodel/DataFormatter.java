@@ -351,9 +351,9 @@ public class DataFormatter {
         }
         
         // Excel supports fractions in format strings, which Java doesn't
-        if (formatStr.indexOf("/") == formatStr.lastIndexOf("/") && 
-              formatStr.indexOf("/") >= 0 && !formatStr.contains("-") &&
-              !formatStr.contains("AM/PM") && !formatStr.contains("am/pm") ) {
+        if (!formatStr.contains("-") &&
+              (formatStr.indexOf("#/#") >= 0 && formatStr.indexOf("#/#") == formatStr.lastIndexOf("#/#")) ||
+              (formatStr.indexOf("?/?") >= 0 && formatStr.indexOf("?/?") == formatStr.lastIndexOf("?/?"))) {
             return new FractionFormat(formatStr);
         }
         
@@ -1008,15 +1008,22 @@ public class DataFormatter {
        public String format(Number num) {
           double wholePart = Math.floor(num.doubleValue());
           double decPart = num.doubleValue() - wholePart;
-          if (wholePart * decPart == 0) {
+          if (wholePart + decPart == 0) {
              return "0";
           }
+          
+          // Split the format string into decimal and fraction parts
           String[] parts = str.split(" ");
           String[] fractParts;
           if (parts.length == 2) {
              fractParts = parts[1].split("/");
           } else {
              fractParts = str.split("/");
+          }
+          
+          // Excel supports both #/# and ?/?, but Java only the former
+          for (int i=0; i<fractParts.length; i++) {
+             fractParts[i] = fractParts[i].replace('?', '#');
           }
 
           if (fractParts.length == 2) {

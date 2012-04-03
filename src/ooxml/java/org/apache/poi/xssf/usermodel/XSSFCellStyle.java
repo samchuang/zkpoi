@@ -18,12 +18,9 @@
 package org.zkoss.poi.xssf.usermodel;
 
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlToken;
-import org.w3c.dom.Node;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBorder;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBorderPr;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellAlignment;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCellProtection;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFill;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFont;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPatternFill;

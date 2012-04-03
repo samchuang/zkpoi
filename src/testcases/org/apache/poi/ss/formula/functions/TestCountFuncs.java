@@ -36,6 +36,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.util.CellReference;
 
 /**
  * Test cases for COUNT(), COUNTA() COUNTIF(), COUNTBLANK()
@@ -191,6 +193,27 @@ public final class TestCountFuncs extends TestCase {
 		range = EvalFactory.createAreaEval("A1:A5", values);
 		confirmCountIf(4, range, new StringEval("<>111"));
 	}
+
+    /**
+     * String criteria in COUNTIF are case insensitive;
+     * for example, the string "apples" and the string "APPLES" will match the same cells.
+     */
+    public void testCaseInsensitiveStringComparison() {
+        AreaEval range;
+        ValueEval[] values;
+
+        values = new ValueEval[] {
+                new StringEval("no"),
+                new StringEval("NO"),
+                new StringEval("No"),
+                new StringEval("Yes")
+        };
+
+        range = EvalFactory.createAreaEval("A1:A4", values);
+        confirmCountIf(3, range, new StringEval("no"));
+        confirmCountIf(3, range, new StringEval("NO"));
+        confirmCountIf(3, range, new StringEval("No"));
+    }
 
 	/**
 	 * special case where the criteria argument is a cell reference
@@ -357,6 +380,54 @@ public final class TestCountFuncs extends TestCase {
 		confirmPredicate(false, mp, ErrorEval.REF_INVALID);
 	}
 
+   /**
+    * Bug #51498 - Check that CountIf behaves correctly for GTE, LTE
+    *  and NEQ cases
+    */
+	public void testCountifBug51498() throws Exception {
+		final int REF_COL = 4;
+		final int EVAL_COL = 3;
+		
+        HSSFWorkbook workbook = HSSFTestDataSamples.openSampleWorkbook("51498.xls");
+		FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+		HSSFSheet sheet = workbook.getSheetAt(0);
+
+		// numeric criteria
+        for (int i = 0; i < 8; i++) {
+			CellValue expected = evaluator.evaluate(sheet.getRow(i).getCell(REF_COL));
+			CellValue actual = evaluator.evaluate(sheet.getRow(i).getCell(EVAL_COL));
+			assertEquals(expected.formatAsString(), actual.formatAsString());
+		}
+
+        // boolean criteria
+        for (int i = 0; i < 8; i++) {
+            HSSFCell cellFmla = sheet.getRow(i).getCell(8);
+            HSSFCell cellRef = sheet.getRow(i).getCell(9);
+
+            double expectedValue = cellRef.getNumericCellValue();
+            double actualValue = evaluator.evaluate(cellFmla).getNumberValue();
+
+            assertEquals(
+                    "Problem with a formula at " +
+                            new CellReference(cellFmla).formatAsString() + "[" + cellFmla.getCellFormula()+"] ",
+                    expectedValue, actualValue, 0.0001);
+        }
+
+        // string criteria
+        for (int i = 1; i < 9; i++) {
+            HSSFCell cellFmla = sheet.getRow(i).getCell(13);
+            HSSFCell cellRef = sheet.getRow(i).getCell(14);
+
+            double expectedValue = cellRef.getNumericCellValue();
+            double actualValue = evaluator.evaluate(cellFmla).getNumberValue();
+
+            assertEquals(
+                    "Problem with a formula at " +
+                            new CellReference(cellFmla).formatAsString() + "[" + cellFmla.getCellFormula()+"] ",
+                    expectedValue, actualValue, 0.0001);
+        }
+	}
+
 	public void testWildCards() {
 		I_MatchPredicate mp;
 
@@ -424,6 +495,53 @@ public final class TestCountFuncs extends TestCase {
 	public void testCountifFromSpreadsheet() {
 		testCountFunctionFromSpreadsheet("countifExamples.xls", 1, 2, 3, "countif");
 	}
+
+    /**
+     * Two COUNTIF examples taken from
+     * http://office.microsoft.com/en-us/excel-help/countif-function-HP010069840.aspx?CTT=5&origin=HA010277524
+     */
+    public void testCountifExamples() {
+        HSSFWorkbook wb = HSSFTestDataSamples.openSampleWorkbook("countifExamples.xls");
+        HSSFFormulaEvaluator fe = new HSSFFormulaEvaluator(wb);
+
+        HSSFSheet sheet1 = wb.getSheet("MSDN Example 1");
+        for (int rowIx=7; rowIx<=12; rowIx++) {
+            HSSFRow row = sheet1.getRow(rowIx-1);
+            HSSFCell cellA = row.getCell(0);  // cell containing a formula with COUNTIF
+            assertEquals(HSSFCell.CELL_TYPE_FORMULA, cellA.getCellType());
+            HSSFCell cellC = row.getCell(2);  // cell with a reference value
+            assertEquals(HSSFCell.CELL_TYPE_NUMERIC, cellC.getCellType());
+
+            CellValue cv = fe.evaluate(cellA);
+            double actualValue = cv.getNumberValue();
+            double expectedValue = cellC.getNumericCellValue();
+            assertEquals(
+                    "Problem with a formula at  " + new CellReference(cellA).formatAsString()
+                            + ": " + cellA.getCellFormula() + " :"
+                    + "Expected = (" + expectedValue + ") Actual=(" + actualValue + ") ",
+                    expectedValue, actualValue, 0.0001);
+        }
+
+        HSSFSheet sheet2 = wb.getSheet("MSDN Example 2");
+        for (int rowIx=9; rowIx<=14; rowIx++) {
+            HSSFRow row = sheet2.getRow(rowIx-1);
+            HSSFCell cellA = row.getCell(0);  // cell containing a formula with COUNTIF
+            assertEquals(HSSFCell.CELL_TYPE_FORMULA, cellA.getCellType());
+            HSSFCell cellC = row.getCell(2);  // cell with a reference value
+            assertEquals(HSSFCell.CELL_TYPE_NUMERIC, cellC.getCellType());
+
+            CellValue cv = fe.evaluate(cellA);
+            double actualValue = cv.getNumberValue();
+            double expectedValue = cellC.getNumericCellValue();
+
+            assertEquals(
+                    "Problem with a formula at " +
+                            new CellReference(cellA).formatAsString() + "[" + cellA.getCellFormula()+"]: "
+                            + "Expected = (" + expectedValue + ") Actual=(" + actualValue + ") ",
+                    expectedValue, actualValue, 0.0001);
+
+        }
+    }
 
 	public void testCountBlankFromSpreadsheet() {
 		testCountFunctionFromSpreadsheet("countblankExamples.xls", 1, 3, 4, "countblank");

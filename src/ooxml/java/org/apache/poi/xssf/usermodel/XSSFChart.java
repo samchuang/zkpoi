@@ -41,19 +41,19 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTDoughnutChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLine3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTOfPieChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPageMargins;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPie3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPieChart;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPrintSettings;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTRadarChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTScatterChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTStockChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurface3DChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTSurfaceChart;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTValAx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.ChartSpaceDocument;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTValAx;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPrintSettings;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTPageMargins;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STBarDir;
 import org.openxmlformats.schemas.officeDocument.x2006.relationships.STRelationshipId;
 import org.w3c.dom.NodeList;
@@ -336,7 +336,7 @@ public final class XSSFChart extends POIXMLDocumentPart implements Chart, ChartA
 	}
 
 	private void parseValueAxis() {
-		for (CTValAx valAx : chart.getPlotArea().getValAxArray()) {
+		for (CTValAx valAx : chart.getPlotArea().getValAxList()) {
 			axis.add(new XSSFValueAxis(this, valAx));
 		}
 	}

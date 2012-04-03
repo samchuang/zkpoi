@@ -17,7 +17,6 @@
 package org.zkoss.poi.xssf.usermodel;
 
 import org.zkoss.poi.ss.usermodel.BorderFormatting;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTFont;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBorder;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STBorderStyle;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTBorderPr;

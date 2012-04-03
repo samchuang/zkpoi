@@ -34,8 +34,11 @@ public final class HSSFRegionUtil {
 		// no instances of this class
 	}
 
-	private static CellRangeAddress toCRA(Region region) {
-		return Region.convertToCellRangeAddress(region);
+    /**
+     * @deprecated (Aug 2008) use {@link CellRangeAddress} instead of {@link Region}
+     */
+	private static CellRangeAddress toCRA(org.zkoss.poi.ss.util.Region region) {
+		return org.zkoss.poi.ss.util.Region.convertToCellRangeAddress(region);
 	}
 
 	/**

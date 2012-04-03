@@ -78,4 +78,7 @@ class Vector
         return offset - startOffset;
     }
 
+    TypedPropertyValue[] getValues(){
+        return _values;
+    }
 }

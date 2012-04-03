@@ -19,7 +19,6 @@ package org.zkoss.poi.hwpf.extractor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 
 import org.zkoss.poi.hwpf.converter.WordToTextConverter;
 import org.zkoss.poi.hwpf.usermodel.HeaderStories;

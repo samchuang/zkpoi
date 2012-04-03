@@ -18,23 +18,17 @@
 package org.zkoss.poi.xssf.usermodel.helpers;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.text.AttributedString;
-import java.text.NumberFormat;
-import java.text.DecimalFormat;
-import java.awt.font.TextLayout;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextAttribute;
-import java.awt.geom.AffineTransform;
 
+import org.zkoss.poi.ss.usermodel.CellStyle;
+import org.zkoss.poi.xssf.util.CTColComparator;
+import org.zkoss.poi.xssf.util.NumericRanges;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCol;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCols;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
-import org.zkoss.poi.ss.usermodel.CellStyle;
 import org.zkoss.poi.ss.util.CellRangeAddress;
 import org.zkoss.poi.xssf.usermodel.*;
-import org.zkoss.poi.xssf.util.CTColComparator;
-import org.zkoss.poi.xssf.util.NumericRanges;
+
+
 
 /**
  * Helper class for dealing with the Column settings on

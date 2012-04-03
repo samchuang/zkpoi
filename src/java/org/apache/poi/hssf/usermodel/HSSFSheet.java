@@ -210,6 +210,8 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
     public HSSFRow createRow(int rownum)
     {
         HSSFRow row = new HSSFRow(_workbook, this, rownum);
+        // new rows inherit default height from the sheet
+        row.setHeight(getDefaultRowHeight());
 
         addRow(row, true);
         return row;
@@ -776,10 +778,10 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
     /**
      * @deprecated (Aug-2008) use {@link HSSFSheet#getMergedRegion(int)}
      */
-    public Region getMergedRegionAt(int index) {
+    public org.zkoss.poi.hssf.util.Region getMergedRegionAt(int index) {
         CellRangeAddress cra = getMergedRegion(index);
 
-        return new Region(cra.getFirstRow(), (short)cra.getFirstColumn(),
+        return new org.zkoss.poi.hssf.util.Region(cra.getFirstRow(), (short)cra.getFirstColumn(),
                 cra.getLastRow(), (short)cra.getLastColumn());
     }
     /**
@@ -1073,7 +1075,14 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
      * @return the size of the margin
      */
     public double getMargin(short margin) {
-        return _sheet.getPageSettings().getMargin(margin);
+        switch (margin){
+            case FooterMargin:
+                return _sheet.getPageSettings().getPrintSetup().getFooterMargin();
+            case HeaderMargin:
+                return _sheet.getPageSettings().getPrintSetup().getHeaderMargin();
+            default:
+                return _sheet.getPageSettings().getMargin(margin);
+        }
     }
 
     /**
@@ -1082,7 +1091,16 @@ public class HSSFSheet implements org.zkoss.poi.ss.usermodel.Sheet {
      * @param size the size of the margin
      */
     public void setMargin(short margin, double size) {
-        _sheet.getPageSettings().setMargin(margin, size);
+        switch (margin){
+            case FooterMargin:
+                _sheet.getPageSettings().getPrintSetup().setFooterMargin(size);
+                break;
+            case HeaderMargin:
+                _sheet.getPageSettings().getPrintSetup().setHeaderMargin(size);
+                break;
+            default:
+                _sheet.getPageSettings().setMargin(margin, size);
+        }
     }
 
     private WorksheetProtectionBlock getProtectionBlock() {

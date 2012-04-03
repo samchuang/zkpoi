@@ -18,13 +18,7 @@
 package org.zkoss.poi.xssf.usermodel;
 
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Iterator;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 import org.openxmlformats.schemas.drawingml.x2006.main.CTBlipFillProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
@@ -38,8 +32,6 @@ import org.openxmlformats.schemas.drawingml.x2006.main.STShapeType;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTPicture;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTPictureNonVisual;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCol;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackageRelationship;

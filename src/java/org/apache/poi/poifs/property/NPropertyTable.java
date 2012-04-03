@@ -29,6 +29,8 @@ import org.zkoss.poi.poifs.common.POIFSConstants;
 import org.zkoss.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.zkoss.poi.poifs.filesystem.NPOIFSStream;
 import org.zkoss.poi.poifs.storage.HeaderBlock;
+import org.zkoss.poi.util.POILogFactory;
+import org.zkoss.poi.util.POILogger;
 
 /**
  * This class embodies the Property Table for a {@link NPOIFSFileSystem}; 
@@ -36,6 +38,8 @@ import org.zkoss.poi.poifs.storage.HeaderBlock;
  * filesystem.
  */
 public final class NPropertyTable extends PropertyTableBase {
+    private static final POILogger _logger =
+       POILogFactory.getLogger(NPropertyTable.class);
     private POIFSBigBlockSize _bigBigBlockSize;
 
     public NPropertyTable(HeaderBlock headerBlock)
@@ -90,7 +94,18 @@ public final class NPropertyTable extends PropertyTableBase {
              data = bb.array();
           } else {
              data = new byte[bigBlockSize.getBigBlockSize()];
-             bb.get(data, 0, data.length);
+             
+             int toRead = data.length;
+             if (bb.remaining() < bigBlockSize.getBigBlockSize()) {
+                // Looks to be a truncated block
+                // This isn't allowed, but some third party created files
+                //  sometimes do this, and we can normally read anyway
+                _logger.log(POILogger.WARN, "Short Property Block, ", bb.remaining(),
+                            " bytes instead of the expected " + bigBlockSize.getBigBlockSize());
+                toRead = bb.remaining();
+             }
+             
+             bb.get(data, 0, toRead);
           }
           
           PropertyFactory.convertToProperties(data, properties);

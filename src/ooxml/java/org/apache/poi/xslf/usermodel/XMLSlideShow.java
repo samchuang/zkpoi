@@ -19,12 +19,14 @@ package org.zkoss.poi.xslf.usermodel;
 import org.zkoss.poi.POIXMLDocument;
 import org.zkoss.poi.POIXMLDocumentPart;
 import org.zkoss.poi.POIXMLException;
+import org.zkoss.poi.POIXMLRelation;
 import org.zkoss.poi.openxml4j.exceptions.OpenXML4JException;
 import org.zkoss.poi.openxml4j.opc.OPCPackage;
 import org.zkoss.poi.openxml4j.opc.PackagePart;
 import org.zkoss.poi.openxml4j.opc.PackagePartName;
 import org.zkoss.poi.openxml4j.opc.TargetMode;
 import org.zkoss.poi.util.Beta;
+import org.zkoss.poi.util.IOUtils;
 import org.zkoss.poi.util.Internal;
 import org.zkoss.poi.util.POILogFactory;
 import org.zkoss.poi.util.POILogger;
@@ -338,21 +340,40 @@ public class XMLSlideShow  extends POIXMLDocument {
      * @see XSLFPictureData#PICTURE_TYPE_DIB
      */
     public int addPicture(byte[] pictureData, int format) {
-        getAllPictures();
-        
-        int imageNumber = _pictures.size() + 1;
-        XSLFPictureData img = (XSLFPictureData) createRelationship(
-                XSLFPictureData.RELATIONS[format], XSLFFactory.getInstance(), imageNumber, true);
-        _pictures.add(img);
-        try {
-            OutputStream out = img.getPackagePart().getOutputStream();
-            out.write(pictureData);
-            out.close();
-        } catch (IOException e) {
-            throw new POIXMLException(e);
+        XSLFPictureData img = findPictureData(pictureData);
+        POIXMLRelation relDesc = XSLFPictureData.RELATIONS[format];
+
+        if(img == null) {
+            int imageNumber = _pictures.size();
+            img = (XSLFPictureData) createRelationship(
+                    XSLFPictureData.RELATIONS[format], XSLFFactory.getInstance(), imageNumber + 1, true);
+            _pictures.add(img);
+            try {
+                OutputStream out = img.getPackagePart().getOutputStream();
+                out.write(pictureData);
+                out.close();
+            } catch (IOException e) {
+                throw new POIXMLException(e);
+            }
+            return _pictures.size() - 1;
+        } else {
+            return _pictures.indexOf(img);
         }
-        return imageNumber - 1;
     }
+
+    /**
+     * check if a picture with this picture data already exists in this presentation
+     */
+    XSLFPictureData findPictureData(byte[] pictureData){
+        long checksum = IOUtils.calculateChecksum(pictureData);
+        for(XSLFPictureData pic : getAllPictures()){
+            if(pic.getChecksum() == checksum) {
+                return pic;
+            }
+        }
+        return null;
+    }
+
     public XSLFTableStyles getTableStyles(){
         return _tableStyles;
     }

@@ -1,30 +1,25 @@
-/* ====================================================================
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-==================================================================== */
+/*
+ * ==================================================================== Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or
+ * agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ * ====================================================================
+ */
 
 package org.zkoss.poi.ss.formula.atp;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.zkoss.poi.ss.formula.eval.ValueEval;
-import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
-import org.zkoss.poi.ss.formula.udf.UDFFinder;
 import org.zkoss.poi.ss.formula.OperationEvaluationContext;
 import org.zkoss.poi.ss.formula.eval.NotImplementedException;
+import org.zkoss.poi.ss.formula.eval.ValueEval;
+import org.zkoss.poi.ss.formula.function.FunctionMetadata;
+import org.zkoss.poi.ss.formula.function.FunctionMetadataRegistry;
+import org.zkoss.poi.ss.formula.functions.FreeRefFunction;
+import org.zkoss.poi.ss.formula.functions.Sumifs;
+import org.zkoss.poi.ss.formula.udf.UDFFinder;
+
+import java.util.*;
 
 /**
  * @author Josh Micich
@@ -50,13 +45,16 @@ public final class AnalysisToolPak implements UDFFinder {
 
     private final Map<String, FreeRefFunction> _functionsByName = createFunctionsMap();
 
-
     private AnalysisToolPak() {
         // enforce singleton
     }
 
     public FreeRefFunction findFunction(String name) {
-        return _functionsByName.get(name);
+        // functions that are available in Excel 2007+ have a prefix _xlfn.
+        // if you save such a .xlsx workbook as .xls
+        if(name.startsWith("_xlfn.")) name = name.substring(6);
+
+        return _functionsByName.get(name.toUpperCase());
     }
 
     private Map<String, FreeRefFunction> createFunctionsMap() {
@@ -140,7 +138,7 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "MDURATION", null);
         r(m, "MROUND", MRound.instance);
         r(m, "MULTINOMIAL", null);
-        r(m, "NETWORKDAYS", null);
+        r(m, "NETWORKDAYS", NetworkdaysFunction.instance);
         r(m, "NOMINAL", null);
         r(m, "OCT2BIN", null);
         r(m, "OCT2DEC", null);
@@ -158,12 +156,12 @@ public final class AnalysisToolPak implements UDFFinder {
         r(m, "RTD", null);
         r(m, "SERIESSUM", null);
         r(m, "SQRTPI", null);
-        r(m, "SUMIFS", null);
+        r(m, "SUMIFS", Sumifs.instance);
         r(m, "TBILLEQ", null);
         r(m, "TBILLPRICE", null);
         r(m, "TBILLYIELD", null);
         r(m, "WEEKNUM", null);
-        r(m, "WORKDAY", null);
+        r(m, "WORKDAY", WorkdayFunction.instance);
         r(m, "XIRR", null);
         r(m, "XNPV", null);
         r(m, "YEARFRAC", YearFrac.instance);
@@ -177,5 +175,74 @@ public final class AnalysisToolPak implements UDFFinder {
     private static void r(Map<String, FreeRefFunction> m, String functionName, FreeRefFunction pFunc) {
         FreeRefFunction func = pFunc == null ? new NotImplemented(functionName) : pFunc;
         m.put(functionName, func);
+    }
+
+    public static boolean isATPFunction(String name){
+        AnalysisToolPak inst = (AnalysisToolPak)instance;
+        return inst._functionsByName.containsKey(name);
+    }
+
+    /**
+     * Returns a collection of ATP function names implemented by POI.
+     *
+     * @return an array of supported functions
+     * @since 3.8 beta6
+     */
+    public static Collection<String> getSupportedFunctionNames(){
+        AnalysisToolPak inst = (AnalysisToolPak)instance;
+        Collection<String> lst = new TreeSet<String>();
+        for(String name : inst._functionsByName.keySet()){
+            FreeRefFunction func = inst._functionsByName.get(name);
+            if(func != null && !(func instanceof NotImplemented)){
+                lst.add(name);
+            }
+        }
+        return Collections.unmodifiableCollection(lst);
+    }
+
+    /**
+     * Returns a collection of ATP function names NOT implemented by POI.
+     *
+     * @return an array of not supported functions
+     * @since 3.8 beta6
+     */
+    public static Collection<String> getNotSupportedFunctionNames(){
+        AnalysisToolPak inst = (AnalysisToolPak)instance;
+        Collection<String> lst = new TreeSet<String>();
+        for(String name : inst._functionsByName.keySet()){
+            FreeRefFunction func = inst._functionsByName.get(name);
+            if(func != null && (func instanceof NotImplemented)){
+                lst.add(name);
+            }
+        }
+        return Collections.unmodifiableCollection(lst);
+    }
+
+    /**
+     * Register a ATP function in runtime.
+     *
+     * @param name  the function name
+     * @param func  the functoin to register
+     * @throws IllegalArgumentException if the function is unknown or already  registered.
+     * @since 3.8 beta6
+     */
+   public static void registerFunction(String name, FreeRefFunction func){
+        AnalysisToolPak inst = (AnalysisToolPak)instance;
+        if(!isATPFunction(name)) {
+            FunctionMetadata metaData = FunctionMetadataRegistry.getFunctionByName(name);
+            if(metaData != null) {
+                throw new IllegalArgumentException(name + " is a built-in Excel function. " +
+                        "Use FunctoinEval.registerFunction(String name, Function func) instead.");
+            } else {
+                throw new IllegalArgumentException(name + " is not a function from the Excel Analysis Toolpack.");
+            }
+        }
+        FreeRefFunction f = inst.findFunction(name);
+        if(f != null && !(f instanceof NotImplemented)) {
+            throw new IllegalArgumentException("POI already implememts " + name +
+                    ". You cannot override POI's implementations of Excel functions");
+        }
+
+        inst._functionsByName.put(name, func);
     }
 }

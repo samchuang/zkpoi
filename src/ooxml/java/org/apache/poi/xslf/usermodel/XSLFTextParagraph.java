@@ -115,16 +115,39 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
         return _runs.iterator();
     }
 
+    /**
+     * Add a new run of text
+     *
+     * @return a new run of text
+     */
     public XSLFTextRun addNewTextRun(){
         CTRegularTextRun r = _p.addNewR();
-        r.addNewRPr();
+        CTTextCharacterProperties rPr = r.addNewRPr();
+        rPr.setLang("en-US");
         XSLFTextRun run = new XSLFTextRun(r, this);
         _runs.add(run);
         return run;
     }
 
-    public void addLineBreak(){
-        _p.addNewBr();
+    /**
+     * Insert a line break
+     *
+     * @return text run representing this line break ('\n')
+     */
+    public XSLFTextRun addLineBreak(){
+        CTTextLineBreak br = _p.addNewBr();
+        CTTextCharacterProperties brProps = br.addNewRPr();
+        if(_runs.size() > 0){
+            // by default line break has the font size of the last text run
+            CTTextCharacterProperties prevRun = _runs.get(_runs.size() - 1).getRPr();
+            brProps.set(prevRun);
+        }
+        CTRegularTextRun r = CTRegularTextRun.Factory.newInstance();
+        r.setRPr(brProps);
+        r.setT("\n");
+        XSLFTextRun run = new XSLFLineBreak(r, this, brProps);
+        _runs.add(run);
+        return run;
     }
 
     /**
@@ -211,6 +234,11 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
         c.setChar(str);
     }
 
+    /**
+     *
+     * @return the color of bullet characters within a given paragraph.
+     * A <code>null</code> value means to use the text font color.
+     */
     public Color getBulletFontColor(){
         final XSLFTheme theme = getParentShape().getSheet().getTheme();
         ParagraphPropertyFetcher<Color> fetcher = new ParagraphPropertyFetcher<Color>(getLevel()){
@@ -227,6 +255,11 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
         return fetcher.getValue();
     }
 
+    /**
+     * Set the color to be used on bullet characters within a given paragraph.
+     *
+     * @param color the bullet color
+     */
     public void setBulletFontColor(Color color){
         CTTextParagraphProperties pr = _p.isSetPPr() ? _p.getPPr() : _p.addNewPPr();
         CTColor c = pr.isSetBuClr() ? pr.getBuClr() : pr.addNewBuClr();
@@ -234,6 +267,16 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
         clr.setVal(new byte[]{(byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue()});
     }
 
+    /**
+     * Returns the bullet size that is to be used within a paragraph.
+     * This may be specified in two different ways, percentage spacing and font point spacing:
+     * <p>
+     * If bulletSize >= 0, then bulletSize is a percentage of the font size.
+     * If bulletSize < 0, then it specifies the size in points
+     * </p>
+     *
+     * @return the bullet size
+     */
     public double getBulletFontSize(){
         ParagraphPropertyFetcher<Double> fetcher = new ParagraphPropertyFetcher<Double>(getLevel()){
             public boolean fetch(CTTextParagraphProperties props){
@@ -252,12 +295,29 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
         return fetcher.getValue() == null ? 100 : fetcher.getValue();
     }
 
-    public void setBulletFontSize(double size){
+    /**
+     * Sets the bullet size that is to be used within a paragraph.
+     * This may be specified in two different ways, percentage spacing and font point spacing:
+     * <p>
+     * If bulletSize >= 0, then bulletSize is a percentage of the font size.
+     * If bulletSize < 0, then it specifies the size in points
+     * </p>
+     *
+     * @return the bullet size
+     */
+    public void setBulletFontSize(double bulletSize){
         CTTextParagraphProperties pr = _p.isSetPPr() ? _p.getPPr() : _p.addNewPPr();
-        CTTextBulletSizePoint pt = pr.isSetBuSzPts() ? pr.getBuSzPts() : pr.addNewBuSzPts();
-        pt.setVal((int)(size*1000));
-        if(pr.isSetBuSzPct()) pr.unsetBuSzPct();
-    }
+
+        if(bulletSize >= 0) {
+            CTTextBulletSizePercent pt = pr.isSetBuSzPct() ? pr.getBuSzPct() : pr.addNewBuSzPct();
+            pt.setVal((int)(bulletSize*1000));
+            if(pr.isSetBuSzPts()) pr.unsetBuSzPts();
+        } else {
+            CTTextBulletSizePoint pt = pr.isSetBuSzPts() ? pr.getBuSzPts() : pr.addNewBuSzPts();
+            pt.setVal((int)(-bulletSize*100));
+            if(pr.isSetBuSzPct()) pr.unsetBuSzPct();
+        }
+   }
 
     /**
      * Specifies the indent size that will be applied to the first line of text in the paragraph.
@@ -302,7 +362,12 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
      */
     public void setLeftMargin(double value){
         CTTextParagraphProperties pr = _p.isSetPPr() ? _p.getPPr() : _p.addNewPPr();
-        pr.setMarL(Units.toEMU(value));
+        if(value == -1) {
+            if(pr.isSetMarL()) pr.unsetMarL();
+        } else {
+            pr.setMarL(Units.toEMU(value));
+        }
+
     }
 
     /**
@@ -327,7 +392,7 @@ public class XSLFTextParagraph implements Iterable<XSLFTextRun>{
 
     /**
      *
-     * @return the default size for a tab character within this paragraph
+     * @return the default size for a tab character within this paragraph in points
      */
     public double getDefaultTabSize(){
         ParagraphPropertyFetcher<Double> fetcher = new ParagraphPropertyFetcher<Double>(getLevel()){

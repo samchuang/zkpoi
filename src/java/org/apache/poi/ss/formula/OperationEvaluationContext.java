@@ -94,7 +94,7 @@ public final class OperationEvaluationContext {
 			} catch (WorkbookNotFoundException e) {
 				//20120117, henrichen@zkoss.org: ZSS-82
 				return null;
-				//throw new RuntimeException(e.getMessage());
+				//throw new RuntimeException(e.getMessage(), e);
 			}
 			otherSheetIndex = targetEvaluator.getSheetIndex(externalSheet.getSheetName());
 			otherLastSheetIndex = targetEvaluator.getSheetIndex(externalSheet.getLastSheetName());

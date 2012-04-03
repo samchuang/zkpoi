@@ -33,7 +33,6 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTAxPos;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumFmt;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTCrosses;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTScaling;
-import org.openxmlformats.schemas.drawingml.x2006.chart.STAxPos;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STCrossBetween;
 import org.openxmlformats.schemas.drawingml.x2006.chart.STTickLblPos;
 

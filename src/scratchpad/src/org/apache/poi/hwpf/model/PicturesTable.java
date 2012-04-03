@@ -18,7 +18,6 @@
 package org.zkoss.poi.hwpf.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.zkoss.poi.ddf.DefaultEscherRecordFactory;

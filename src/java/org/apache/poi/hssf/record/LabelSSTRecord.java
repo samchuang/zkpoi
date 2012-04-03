@@ -69,7 +69,8 @@ public final class LabelSSTRecord extends CellRecord {
 
     @Override
     protected void appendValueText(StringBuilder sb) {
-		sb.append("    .sstIndex = ").append(HexDump.intToHex(field_4_sst_index));
+		sb.append("  .sstIndex = ");
+    	sb.append(HexDump.shortToHex(getSSTIndex()));
     }
     @Override
     protected void serializeValue(LittleEndianOutput out) {

@@ -23,8 +23,6 @@ import org.zkoss.poi.ss.formula.eval.EvaluationException;
 import org.zkoss.poi.ss.formula.eval.NumberEval;
 import org.zkoss.poi.ss.formula.eval.ValueEval;
 
-import java.util.Arrays;
-
 /**
  * Calculates the net present value of an investment by using a discount rate
  * and a series of future payments (negative values) and income (positive

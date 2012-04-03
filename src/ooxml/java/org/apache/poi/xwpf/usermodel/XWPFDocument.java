@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -205,6 +206,20 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                     picData.onDocumentRead();
                     registerPackagePictureData(picData);
                     pictures.add(picData);
+                } else if (relation.equals(XWPFRelation.GLOSSARY_DOCUMENT.getRelation())) {
+                    // We don't currently process the glossary itself
+                    // Until we do, we do need to load the glossary child parts of it
+                    for (POIXMLDocumentPart gp : p.getRelations()) {
+                       // Trigger the onDocumentRead for all the child parts
+                       // Otherwise we'll hit issues on Styles, Settings etc on save
+                       try {
+                          Method onDocumentRead = gp.getClass().getDeclaredMethod("onDocumentRead");
+                          onDocumentRead.setAccessible(true);
+                          onDocumentRead.invoke(gp);
+                       } catch(Exception e) {
+                          throw new POIXMLException(e);
+                       }
+                    }
                 }
             }
             initHyperlinks();
@@ -304,6 +319,10 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     	return Collections.unmodifiableList(bodyElements);
     }
     
+    public Iterator<IBodyElement> getBodyElementsIterator() {
+    	return bodyElements.iterator();
+    }
+
     /**
 	 * @see org.zkoss.poi.xwpf.usermodel.IBody#getParagraphs()
      */
@@ -494,7 +513,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     }
     
     /**
-     * Look up the paragraph at the specified position in the body elemnts list
+     * Look up the paragraph at the specified position in the body elements list
      * and return this paragraphs position in the paragraphs list
      * 
      * @param pos
@@ -606,7 +625,6 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
             cursor.toParent();
             CTTbl t = (CTTbl) cursor.getObject();
             XWPFTable newT = new XWPFTable(t, this);
-            cursor.removeXmlContents();
             XmlObject o = null;
             while (!(o instanceof CTTbl) && (cursor.toPrevSibling())) {
                 o = cursor.getObject();
@@ -618,16 +636,22 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 tables.add(pos, newT);
             }
             int i = 0;
-            cursor = t.newCursor();
+            XmlCursor tableCursor = t.newCursor();
+            try {
+                cursor.toCursor(tableCursor);
             while (cursor.toPrevSibling()) {
                 o = cursor.getObject();
                 if (o instanceof CTP || o instanceof CTTbl)
                     i++;
             }
             bodyElements.add(i, newT);
-            cursor = t.newCursor();
+            	cursor.toCursor(tableCursor);
             cursor.toEndToken();
             return newT;
+        }
+            finally {
+            	tableCursor.dispose();
+            }
         }
         return null;
     }
@@ -967,6 +991,10 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
         return settings.isEnforcedWith(STDocProtect.TRACKED_CHANGES);
     }
 
+    public boolean isEnforcedUpdateFields() {
+        return settings.isUpdateFields();
+    }
+
     /**
      * Enforces the readOnly protection.<br/>
      * In the documentProtection tag inside settings.xml file, <br/>
@@ -1040,6 +1068,22 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
         settings.removeEnforcement();
     }
 
+    /**
+     * Enforces fields update on document open (in Word).
+     * In the settings.xml file <br/>
+     * sets the updateSettings value to true (w:updateSettings w:val="true")
+     * 
+     *  NOTICES:
+     *  <ul>
+     *  	<li>Causing Word to ask on open: "This document contains fields that may refer to other files. Do you want to update the fields in this document?"
+     *           (if "Update automatic links at open" is enabled)</li>
+     *  	<li>Flag is removed after saving with changes in Word </li>
+     *  </ul> 
+     */
+    public void enforceUpdateFields() {
+    	settings.setUpdateFields();
+    }
+    
     /**
      * inserts an existing XWPFTable to the arrays bodyElements and tables
      * @param pos
@@ -1319,7 +1363,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 			return null;
 		}
 		XWPFTableRow tableRow = table.getRow(row);
-		if(row == null){
+		if (tableRow == null) {
 			return null;
 		}
 		return tableRow.getTableCell(cell);

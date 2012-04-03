@@ -147,6 +147,7 @@ public final class RecordFactory {
 		DatRecord.class,
 		DateWindow1904Record.class,
 		DBCellRecord.class,
+                DConRefRecord.class,
 		DefaultColWidthRecord.class,
 		DefaultDataLabelTextPropertiesRecord.class,
 		DefaultRowHeightRecord.class,

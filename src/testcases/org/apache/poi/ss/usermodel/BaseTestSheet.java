@@ -401,6 +401,10 @@ public abstract class BaseTestSheet extends TestCase {
         assertEquals((short) 300, sheet.getDefaultRowHeight());
         assertEquals(15.0F, sheet.getDefaultRowHeightInPoints(), 0F);
 
+        Row row = sheet.createRow(1);
+        // new row inherits  default height from the sheet
+        assertEquals(sheet.getDefaultRowHeight(), row.getHeight());
+
         // Set a new default row height in twips and test getting the value in points
         sheet.setDefaultRowHeight((short) 360);
         assertEquals(18.0f, sheet.getDefaultRowHeightInPoints(), 0F);
@@ -552,6 +556,11 @@ public abstract class BaseTestSheet extends TestCase {
         assertEquals(12.0, sheet.getMargin(Sheet.TopMargin), 0.0);
         sheet.setMargin(Sheet.BottomMargin, 13.0);
         assertEquals(13.0, sheet.getMargin(Sheet.BottomMargin), 0.0);
+
+        sheet.setMargin(Sheet.FooterMargin, 5.6);
+        assertEquals(5.6, sheet.getMargin(Sheet.FooterMargin), 0.0);
+        sheet.setMargin(Sheet.HeaderMargin, 11.5);
+        assertEquals(11.5, sheet.getMargin(Sheet.HeaderMargin), 0.0);
 
         // incorrect margin constant
         try {

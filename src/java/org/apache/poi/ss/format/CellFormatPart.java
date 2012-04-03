@@ -52,7 +52,7 @@ public class CellFormatPart {
     private final Color color;
     private CellFormatCondition condition;
     private final CellFormatter format;
-    private CellFormatType type; //Henri Chen
+    private final CellFormatType type;
 
     private static final Map<String, Color> NAMED_COLORS;
 
@@ -184,6 +184,7 @@ public class CellFormatPart {
         locale = locale0;
         color = getColor(m);
         condition = getCondition(m);
+        type = getCellFormatType(m);
         format = getFormatter(m);
     }
 
@@ -191,7 +192,7 @@ public class CellFormatPart {
      * Returns <tt>true</tt> if this format part applies to the given value. If
      * the value is a number and this is part has a condition, returns
      * <tt>true</tt> only if the number passes the condition.  Otherwise, this
-     * allways return <tt>true</tt>.
+     * always return <tt>true</tt>.
      *
      * @param valueObject The value to evaluate.
      *
@@ -293,6 +294,19 @@ public class CellFormatPart {
     }
 
     /**
+     * Returns the CellFormatType object implied by the format specification for
+     * the format part.
+     *
+     * @param matcher The matcher for the format part.
+     *
+     * @return The CellFormatType.
+     */
+    private CellFormatType getCellFormatType(Matcher matcher) {
+        String fdesc = matcher.group(SPECIFICATION_GROUP);
+        return formatType(fdesc);
+    }
+
+    /**
      * Returns the formatter object implied by the format specification for the
      * format part.
      *
@@ -302,15 +316,11 @@ public class CellFormatPart {
      */
     private CellFormatter getFormatter(Matcher matcher) {
         String fdesc = matcher.group(SPECIFICATION_GROUP);
-        type = formatType(fdesc);
+//        type = formatType(fdesc);
         return type.formatter(fdesc, locale); //ZSS-68
+//        return type.formatter(fdesc);
     }
  
-    //20100615, Henri Chen
-    public CellFormatType getCellFormatType() {
-    	return type;
-    }
-
     /**
      * Returns the type of format.
      *
@@ -438,6 +448,25 @@ public class CellFormatPart {
             label.setForeground(result.textColor);
         }
         return result;
+    }
+
+    /**
+     * Returns the CellFormatType object implied by the format specification for
+     * the format part.
+     *
+     * @return The CellFormatType.
+     */
+    public CellFormatType getCellFormatType() { //20120402, henrichen@zkoss.org: make public
+        return type;
+    }
+
+    /**
+     * Returns <tt>true</tt> if this format part has a condition.
+     *
+     * @return <tt>true</tt> if this format part has a condition.
+     */
+    boolean hasCondition() {
+        return condition != null;
     }
 
     public static StringBuffer parseFormat(String fdesc, CellFormatType type,

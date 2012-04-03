@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.zkoss.poi.util.BitField;
 import org.zkoss.poi.util.BitFieldFactory;
-import org.zkoss.poi.util.LittleEndian;
+import org.zkoss.poi.util.Internal;
 
 /**
  * The base abstract record from which all escher records are defined.  Subclasses will need
@@ -109,11 +109,13 @@ public abstract class EscherRecord {
     }
 
     /**
+     * <p
+     * Note that <code>options</code> is an internal field. Use {@link #setInstance(short)} ()} and
+     *             {@link #setVersion(short)} ()} to set the actual fields.
+     * </p>
      * @return The options field for this record. All records have one.
-     * @deprecated Options is an internal field. Use {@link #getInstance()} and
-     *             {@link #getVersion()} to access actual fields.
      */
-    @Deprecated
+    @Internal
     public short getOptions()
     {
         return _options;
@@ -122,10 +124,13 @@ public abstract class EscherRecord {
     /**
      * Set the options this this record.  Container records should have the
      * last nibble set to 0xF.
-     * @deprecated Options is an internal field. Use {@link #getInstance()} and
+     *
+     * <p
+     * Note that <code>options</code> is an internal field. Use {@link #getInstance()} and
      *             {@link #getVersion()} to access actual fields.
+     * </p>
      */
-    @Deprecated
+    @Internal
     public void setOptions( short options ) {
         // call to handle correct/incorrect values
         setVersion( fVersion.getShortValue( options ) );

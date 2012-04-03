@@ -18,8 +18,8 @@ package org.apache.poi.xslf.usermodel;
 
 import junit.framework.TestCase;
 import org.apache.poi.xslf.XSLFTestDataSamples;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTPicture;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -112,5 +112,44 @@ public class TestXSLFPictureShape extends TestCase {
             assertEquals(fileName, data.getFileName());
             assertTrue(Arrays.equals(data1, data.getData()));
         }
+    }
+
+    public void testImageCaching() {
+        XMLSlideShow ppt = new XMLSlideShow();
+        byte[] img1 = new byte[]{1,2,3};
+        byte[] img2 = new byte[]{3,4,5};
+        int idx1 = ppt.addPicture(img1, XSLFPictureData.PICTURE_TYPE_PNG);
+        assertEquals(0, idx1);
+        assertEquals(0, ppt.addPicture(img1, XSLFPictureData.PICTURE_TYPE_PNG));
+
+        int idx2 = ppt.addPicture(img2, XSLFPictureData.PICTURE_TYPE_PNG);
+        assertEquals(1, idx2);
+        assertEquals(1, ppt.addPicture(img2, XSLFPictureData.PICTURE_TYPE_PNG));
+
+        XSLFSlide slide1 = ppt.createSlide();
+        XSLFSlide slide2 = ppt.createSlide();
+
+    }
+
+    public void testMerge() {
+        XMLSlideShow ppt1 = new XMLSlideShow();
+        byte[] data1 = new byte[100];
+        int idx1 = ppt1.addPicture(data1, XSLFPictureData.PICTURE_TYPE_JPEG);
+
+        XSLFSlide slide1 = ppt1.createSlide();
+        XSLFPictureShape shape1 = slide1.createPicture(idx1);
+        CTPicture ctPic1 = (CTPicture)shape1.getXmlObject();
+        ctPic1.getNvPicPr().getNvPr().addNewCustDataLst().addNewTags().setId("rId99");
+
+        XMLSlideShow ppt2 = new XMLSlideShow();
+
+        XSLFSlide slide2 = ppt2.createSlide().importContent(slide1);
+        XSLFPictureShape shape2 = (XSLFPictureShape)slide2.getShapes()[0];
+
+        assertTrue(Arrays.equals(data1, shape2.getPictureData().getData()));
+
+        CTPicture ctPic2 = (CTPicture)shape2.getXmlObject();
+        assertFalse(ctPic2.getNvPicPr().getNvPr().isSetCustDataLst());
+
     }
 }
