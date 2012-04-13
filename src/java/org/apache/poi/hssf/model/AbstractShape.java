@@ -17,9 +17,21 @@
 
 package org.zkoss.poi.hssf.model;
 
-import org.zkoss.poi.ddf.*;
+import org.zkoss.poi.ddf.EscherBoolProperty;
+import org.zkoss.poi.ddf.EscherContainerRecord;
+import org.zkoss.poi.ddf.EscherOptRecord;
+import org.zkoss.poi.ddf.EscherProperties;
+import org.zkoss.poi.ddf.EscherRGBProperty;
+import org.zkoss.poi.ddf.EscherRecord;
+import org.zkoss.poi.ddf.EscherSimpleProperty;
+import org.zkoss.poi.ddf.EscherSpRecord;
 import org.zkoss.poi.hssf.record.ObjRecord;
-import org.zkoss.poi.hssf.usermodel.*;
+import org.zkoss.poi.hssf.usermodel.HSSFAnchor;
+import org.zkoss.poi.hssf.usermodel.HSSFComment;
+import org.zkoss.poi.hssf.usermodel.HSSFPolygon;
+import org.zkoss.poi.hssf.usermodel.HSSFShape;
+import org.zkoss.poi.hssf.usermodel.HSSFSimpleShape;
+import org.zkoss.poi.hssf.usermodel.HSSFTextbox;
 
 /**
  * An abstract shape is the lowlevel model for a shape.
@@ -66,6 +78,9 @@ public abstract class AbstractShape
                 case HSSFSimpleShape.OBJECT_TYPE_COMBO_BOX:
                     shape = new ComboboxShape( simpleShape, shapeId );
                     break;
+//                //20120412: samchuang@zkoss.org: POI not support export Chart yet
+//                case HSSFSimpleShape.OBJECT_TYPE_CHART:
+//                	break;
                 default:
                     throw new IllegalArgumentException("Do not know how to handle this type of shape");
             }

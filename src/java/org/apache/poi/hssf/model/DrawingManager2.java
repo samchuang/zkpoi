@@ -17,11 +17,12 @@
 
 package org.zkoss.poi.hssf.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.zkoss.poi.ddf.EscherDgRecord;
 import org.zkoss.poi.ddf.EscherDggRecord;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.zkoss.poi.ddf.EscherDggRecord.FileIdCluster;
 
 
 /**
@@ -46,7 +47,7 @@ public class DrawingManager2
     public void clearDrawingGroups() {
     	drawingGroups.clear(); 
     }
-
+    
     public EscherDgRecord createDgRecord()
     {
         EscherDgRecord dg = new EscherDgRecord();
@@ -122,7 +123,15 @@ public class DrawingManager2
 
     EscherDgRecord getDrawingGroup(int drawingGroupId)
     {
-        return (EscherDgRecord) drawingGroups.get(drawingGroupId-1);
+    	//20120412: samchuang@zkoss.org, (drawingGroupId-1) not equal to drawingGroups array index 
+    	int size = drawingGroups.size();
+    	for (int i = 0; i < size; i++) {
+    		EscherDgRecord r = (EscherDgRecord) drawingGroups.get(i);
+    		if (r.getDrawingGroupId() == drawingGroupId)
+    			return r;
+    	}
+    	return null;
+//        return (EscherDgRecord) drawingGroups.get(drawingGroupId-1);
     }
 
     boolean drawingGroupExists( short dgId )

@@ -110,6 +110,8 @@ public final class Chart3DRecord extends StandardRecord {
         out.writeShort(field_1_anRot);
         out.writeShort(field_2_anElev);
         out.writeShort(field_3_pcDist);
+        //20120412 samchuang@zkoss.org
+        out.writeShort(field_4_pcHeight);
         out.writeShort(field_5_depth);
         out.writeShort(field_6_gap);
         out.writeShort(field_7_formatFlags);

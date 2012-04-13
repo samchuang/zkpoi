@@ -48,6 +48,8 @@ public class ConvertAnchor
             anchor.setDx2( (short) a.getDx2() );
             anchor.setRow2( (short) Math.max(a.getRow1(), a.getRow2()) );
             anchor.setDy2( (short) a.getDy2() );
+            //20120412 samchuang@zkoss.org
+            anchor.setRemainingData(new byte[0]);
             return anchor;
         }
         HSSFChildAnchor a = (HSSFChildAnchor) userAnchor;

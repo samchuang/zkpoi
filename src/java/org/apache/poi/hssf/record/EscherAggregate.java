@@ -47,6 +47,7 @@ import org.zkoss.poi.hssf.model.ConvertAnchor;
 import org.zkoss.poi.hssf.model.DrawingManager2;
 import org.zkoss.poi.hssf.model.TextboxShape;
 import org.zkoss.poi.hssf.usermodel.HSSFAnchor;
+import org.zkoss.poi.hssf.usermodel.HSSFChartX;
 import org.zkoss.poi.hssf.usermodel.HSSFChildAnchor;
 import org.zkoss.poi.hssf.usermodel.HSSFClientAnchor;
 import org.zkoss.poi.hssf.usermodel.HSSFPatriarch;
@@ -509,7 +510,9 @@ public class EscherAggregate extends AbstractEscherHolderRecord {
 		convertUserModelToRecords();
 		List records = getEscherRecords();
 		int rawEscherSize = getEscherRecordSize( records );
-		int drawingRecordSize = rawEscherSize + ( shapeToObj.size() ) * 4;
+		//20120412: samchuang@zkoss.org: POI not support export Chart yet
+//		int drawingRecordSize = rawEscherSize + ( shapeToObj.size() ) * 4;
+		int drawingRecordSize = 0;
 		int objRecordSize = 0;
 		for ( Iterator iterator = shapeToObj.values().iterator(); iterator.hasNext(); )
 		{
@@ -850,6 +853,10 @@ public class EscherAggregate extends AbstractEscherHolderRecord {
 			}
 			else
 			{
+				//20120412: samchuang@zkoss.org: POI not support export Chart yet
+				if (shape instanceof HSSFChartX) {
+					break;
+				}
 				AbstractShape shapeModel = AbstractShape.createShape(
 						shape,
 						drawingManager.allocateShapeId(drawingGroupId) );
